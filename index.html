@@ -237,7 +237,7 @@
       <div style="display:flex;align-items:center;gap:14px;">
         <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
           <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="Donează prin PayPal" alt="Donate with PayPal button" style="cursor:pointer;height:24px;" />
+          <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:background 0.2s;" onmouseover="this.style.background='#6a0000'" onmouseout="this.style.background='#8B0000'">Donează</button>
           <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
         </form>
       </div>
@@ -312,11 +312,7 @@
     <div class="hero-card">
       <h2>Susține activitatea asociației</h2>
       <p>Fiecare sprijin oferit înseamnă o șansă în plus pentru educație și progres.</p>
-      <form action="https://www.paypal.com/donate" method="post" target="_top" style="margin-top:8px">
-        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="Donează prin PayPal" alt="Donate with PayPal button" style="cursor:pointer;" />
-        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-      </form>
+      <button class="btn-card" onclick="openContactModal()">Află cum poți să ne susții</button>
     </div>
     <div class="hero-card center-card">
       <span class="word" id="w1">Învățare</span>
