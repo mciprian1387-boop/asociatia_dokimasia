@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin — Asociația Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #f5f5f5; color: #222; }
@@ -252,6 +253,11 @@
         Noutăți
       </div>
 
+      <div class="sidebar-item" onclick="showSection('vizite')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Vizite
+      </div>
+
       <div class="sidebar-item" onclick="showSection('setari')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         Setări
@@ -410,6 +416,44 @@
         </div>
       </div>
 
+      <!-- VIZITE -->
+      <div class="section" id="sec-vizite">
+        <div class="page-title">📈 Vizite</div>
+
+        <div class="stats-grid" style="margin-bottom:24px;">
+          <div class="stat-card">
+            <div class="stat-icon">👁</div>
+            <div class="stat-number" id="viziteAzi">—</div>
+            <div class="stat-label">Vizite azi</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-number" id="vizite7zile">—</div>
+            <div class="stat-label">Vizite 7 zile</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📆</div>
+            <div class="stat-number" id="vizite30zile">—</div>
+            <div class="stat-label">Vizite 30 zile</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-number" id="viziteTotal">—</div>
+            <div class="stat-label">Total vizite</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📊 Vizite pe zile (ultimele 14 zile)</h3>
+          <canvas id="viziteChart" height="80"></canvas>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <h3>📄 Pagini cele mai vizitate</h3>
+          <div id="topPagini"><div class="loading">Se încarcă...</div></div>
+        </div>
+      </div>
+
       <!-- SETĂRI -->
       <div class="section" id="sec-setari">
         <div class="page-title">⚙️ Setări site</div>
@@ -520,16 +564,7 @@
     loadDashboard()
   }
 
-  function showSection(name) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'))
-    document.getElementById('sec-' + name).classList.add('active')
-    event.currentTarget.classList.add('active')
 
-    if (name === 'mesaje') loadMesaje()
-    if (name === 'utilizatori') loadUtilizatori()
-    if (name === 'noutati') loadNoutati()
-  }
 
   // ─── DASHBOARD ───
   async function loadDashboard() {
@@ -820,6 +855,86 @@
   async function logout() {
     await sb.auth.signOut()
     window.location.href = 'index.html'
+  }
+
+  async function loadVizite() {
+    try {
+      const now = new Date()
+      const todayStr = now.toISOString().split('T')[0]
+      const day7 = new Date(now - 7*24*60*60*1000).toISOString()
+      const day30 = new Date(now - 30*24*60*60*1000).toISOString()
+
+      const { data: all } = await sb.from('page_views').select('created_at, page')
+      if (!all) return
+
+      const today = all.filter(v => v.created_at.startsWith(todayStr))
+      const last7 = all.filter(v => new Date(v.created_at) >= new Date(day7))
+      const last30 = all.filter(v => new Date(v.created_at) >= new Date(day30))
+
+      document.getElementById('viziteAzi').textContent = today.length
+      document.getElementById('vizite7zile').textContent = last7.length
+      document.getElementById('vizite30zile').textContent = last30.length
+      document.getElementById('viziteTotal').textContent = all.length
+
+      // Chart - last 14 days
+      const days = []
+      const counts = []
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date(now - i*24*60*60*1000)
+        const ds = d.toISOString().split('T')[0]
+        days.push(ds.slice(5)) // MM-DD
+        counts.push(all.filter(v => v.created_at.startsWith(ds)).length)
+      }
+
+      const ctx = document.getElementById('viziteChart').getContext('2d')
+      if (window.viziteChartInstance) window.viziteChartInstance.destroy()
+      window.viziteChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Vizite',
+            data: counts,
+            backgroundColor: 'rgba(139,0,0,0.7)',
+            borderColor: '#8B0000',
+            borderWidth: 1,
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+      })
+
+      // Top pages
+      const pageCounts = {}
+      all.forEach(v => { const p = v.page || '/'; pageCounts[p] = (pageCounts[p] || 0) + 1 })
+      const sorted = Object.entries(pageCounts).sort((a,b) => b[1]-a[1]).slice(0,10)
+      document.getElementById('topPagini').innerHTML = `
+        <table>
+          <thead><tr><th>Pagină</th><th>Vizite</th></tr></thead>
+          <tbody>${sorted.map(([page, count]) => `
+            <tr><td>${page}</td><td><strong>${count}</strong></td></tr>`).join('')}
+          </tbody>
+        </table>`
+    } catch(e) {
+      console.error(e)
+    }
+  }
+
+  // Update showSection to load vizite when clicked
+  const _origShowSection = showSection
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'))
+    document.getElementById('sec-' + name).classList.add('active')
+    event.currentTarget.classList.add('active')
+    if (name === 'mesaje') loadMesaje()
+    if (name === 'utilizatori') loadUtilizatori()
+    if (name === 'noutati') loadNoutati()
+    if (name === 'vizite') loadVizite()
   }
 
   checkAccess()
