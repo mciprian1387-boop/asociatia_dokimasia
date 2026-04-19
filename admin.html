@@ -744,6 +744,12 @@
     }
   }
 
+  async function openMesajById(id, isDeleted) {
+    const m = allMessagesCache[id]
+    if (!m) return
+    await openMesaj(m.id, m.name||'', m.email||'', m.subject||'', m.message||'', m.created_at, isDeleted)
+  }
+
   async function openMesaj(id, name, email, subject, message, date, isDeleted) {
     currentMsgId = id
     document.getElementById('msgDetailTitle').textContent = subject || 'Mesaj'
