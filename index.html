@@ -332,10 +332,23 @@
         <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:0.8rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;letter-spacing:1px;">Donează</button>
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
-      <button class="mob-account-btn" onclick="openModal('login')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        <span id="mobAccountLabel">Contul meu</span>
-      </button>
+      <div style="position:relative;">
+        <button class="mob-account-btn" onclick="toggleMobAccount()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="mobAccountLabel">Contul meu</span>
+        </button>
+        <div id="mobAccountDropdown" style="display:none;position:absolute;top:110%;right:0;background:#fff;border:1px solid #e0e0e0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);min-width:180px;z-index:500;padding:8px 0;">
+          <div id="mobLoggedOut">
+            <a href="#" onclick="openModal('login');closeMobAccount()" style="display:block;padding:10px 20px;font-size:0.9rem;color:#333;">Autentificare</a>
+            <a href="#" onclick="openModal('register');closeMobAccount()" style="display:block;padding:10px 20px;font-size:0.9rem;color:#333;">Înregistrare</a>
+          </div>
+          <div id="mobLoggedIn" style="display:none;">
+            <div id="mobAdminBtn" style="display:none;"><a href="admin.html" style="display:block;padding:10px 20px;font-size:0.9rem;color:#8B0000;font-weight:bold;">⚙ Panou Admin</a></div>
+            <a href="cont.html" style="display:block;padding:10px 20px;font-size:0.9rem;color:#333;">Profilul meu</a>
+            <a href="#" onclick="logout();closeMobAccount()" style="display:block;padding:10px 20px;font-size:0.9rem;color:#333;">Deconectare</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <div class="mob-row2">
@@ -459,6 +472,11 @@
 
   function toggleMenu() { document.getElementById('mainNav').classList.toggle('open') }
   function toggleMobMenu() { document.getElementById('mobNav').classList.toggle('open') }
+  function toggleMobAccount() {
+    const dd = document.getElementById('mobAccountDropdown')
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none'
+  }
+  function closeMobAccount() { document.getElementById('mobAccountDropdown').style.display = 'none' }
   function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
 
   document.addEventListener('click', function(e) {
@@ -583,22 +601,45 @@
   async function updateAccountUI() {
     const { data: { user } } = await sb.auth.getUser()
     const label = document.getElementById('accountLabel')
+    const mobLabel = document.getElementById('mobAccountLabel')
     const loggedOut = document.getElementById('loggedOut')
     const loggedIn = document.getElementById('loggedIn')
     if (user) {
-      const name = user.user_metadata?.full_name || user.email
-      label.textContent = name.split(' ')[0]
-      loggedOut.style.display = 'none'
-      loggedIn.style.display = 'block'
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email
+      const firstName = name.split(' ')[0]
+      if (label) label.textContent = firstName
+      if (mobLabel) mobLabel.textContent = firstName
+      if (loggedOut) loggedOut.style.display = 'none'
+      if (loggedIn) loggedIn.style.display = 'block'
       if (user.email === 'm.ciprian1387@gmail.com') {
-        document.getElementById('adminBtn').style.display = 'block'
+        const adminBtn = document.getElementById('adminBtn')
+        if (adminBtn) adminBtn.style.display = 'block'
+        const mobAdminBtn = document.getElementById('mobAdminBtn')
+        if (mobAdminBtn) mobAdminBtn.style.display = 'block'
       }
+      const mobLoggedOut = document.getElementById('mobLoggedOut')
+      const mobLoggedIn = document.getElementById('mobLoggedIn')
+      if (mobLoggedOut) mobLoggedOut.style.display = 'none'
+      if (mobLoggedIn) mobLoggedIn.style.display = 'block'
     } else {
-      label.textContent = 'Contul meu'
-      loggedOut.style.display = 'block'
-      loggedIn.style.display = 'none'
+      if (label) label.textContent = 'Contul meu'
+      if (mobLabel) mobLabel.textContent = 'Contul meu'
+      if (loggedOut) loggedOut.style.display = 'block'
+      if (loggedIn) loggedIn.style.display = 'none'
+      const mobLoggedOut = document.getElementById('mobLoggedOut')
+      const mobLoggedIn = document.getElementById('mobLoggedIn')
+      if (mobLoggedOut) mobLoggedOut.style.display = 'block'
+      if (mobLoggedIn) mobLoggedIn.style.display = 'none'
     }
   }
+
+  // Listen for auth state changes (important for Google OAuth on mobile)
+  sb.auth.onAuthStateChange((event, session) => {
+    updateAccountUI()
+    if (event === 'SIGNED_IN') {
+      closeModal()
+    }
+  })
 
   updateAccountUI()
 
