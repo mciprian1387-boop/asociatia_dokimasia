@@ -135,7 +135,13 @@
       .page-hero { padding: 40px 16px; }
       .map-section { padding: 0 16px; margin-bottom: 40px; }
     }
-  </style>
+  
+    /* Contact Modal */
+    .contact-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .contact-modal-overlay.open { display: flex; }
+    .contact-modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 480px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .contact-modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; font-family: 'Georgia', serif; }
+</style>
 </head>
 <body>
 <header>
@@ -219,7 +225,6 @@
     <a href="despre.html">Despre noi</a>
     <a href="proiecte.html">Proiecte</a>
     <a href="noutati.html">Noutăți</a>
-    <a href="noutati.html">Noutăți</a>
     <a href="contact.html" class="active">Contact</a>
   </nav>
 </header>
@@ -253,7 +258,6 @@
     <a href="index.html">Acasă</a>
     <a href="despre.html">Despre noi</a>
     <a href="proiecte.html">Proiecte</a>
-    <a href="noutati.html">Noutăți</a>
     <a href="noutati.html">Noutăți</a>
     <a href="noutati.html">Noutăți</a>
     <a href="contact.html" class="active">Contact</a>
