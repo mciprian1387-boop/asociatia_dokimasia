@@ -554,9 +554,9 @@
             <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th></tr></thead>
             <tbody>${users.slice(0,5).map(u => `
               <tr>
-                <td>${u.raw_user_meta_data?.full_name || '—'}</td>
+                <td>${u.full_name || u.google_name || '—'}</td>
                 <td>${u.email || '—'}</td>
-                <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
+                <td>${u.created_at ? new Date(u.created_at.replace(' ','T')).toLocaleDateString('ro-RO') : '—'}</td>
               </tr>`).join('')}
             </tbody>
           </table>`
