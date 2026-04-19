@@ -678,6 +678,7 @@
 
   // ─── MESAJE ───
   let currentMsgId = null
+  let allMessagesCache = {}
   let currentMsgTab = 'necitite'
 
   function switchMsgTab(tab) {
@@ -692,25 +693,32 @@
   }
 
   function msgItemHTML(m, isDeleted) {
-    const safeName = (m.name||'').replace(/'/g, "\'")
-    const safeSubj = (m.subject||'').replace(/'/g, "\'")
-    return '<div class="msg-item ' + (m.citit ? '' : 'unread') + '" onclick="openMesaj('' + m.id + '','' + safeName + '','' + (m.email||'') + '','' + safeSubj + '',this.dataset.msg,'' + m.created_at + '',' + isDeleted + ')" data-msg="' + (m.message||'').replace(/"/g,'&quot;') + '">' +
-      '<div class="msg-meta">' +
-      '<span class="msg-name">' + (m.name||'—') + '</span>' +
-      '<span class="msg-subject">' + (m.subject||'') + '</span>' +
-      '<span class="msg-date">' + new Date(m.created_at).toLocaleDateString('ro-RO') + '</span>' +
-      (!m.citit && !isDeleted ? '<span class="badge badge-red">Nou</span>' : '') +
-      (isDeleted ? '<span class="badge badge-gray">Șters</span>' : '') +
-      '</div>' +
-      '<div class="msg-preview">' + (m.message||'').substring(0,100) + '...</div>' +
-      '</div>'
+    allMessagesCache[m.id] = m
+    const id = m.id
+    const name = (m.name||'—')
+    const subj = (m.subject||'')
+    const date = new Date(m.created_at).toLocaleDateString('ro-RO')
+    const preview = (m.message||'').substring(0,100)
+    const unread = m.citit ? '' : 'unread'
+    const badge = !m.citit && !isDeleted ? '<span class="badge badge-red">Nou</span>' : (isDeleted ? '<span class="badge badge-gray">Șters</span>' : '')
+    return `<div class="msg-item ${unread}" onclick="openMesajById('${id}',${isDeleted})">
+      <div class="msg-meta">
+        <span class="msg-name">${name}</span>
+        <span class="msg-subject">${subj}</span>
+        <span class="msg-date">${date}</span>
+        ${badge}
+      </div>
+      <div class="msg-preview">${preview}...</div>
+    </div>`
   }
+
 
   async function loadMesaje() {
     try {
       const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false })
-      allMessagesCache = data || []
-      const allMsgs = allMessagesCache
+      const allMsgs = data || []
+      allMessagesCache = {}
+      allMsgs.forEach(m => allMessagesCache[m.id] = m)
       const active = allMsgs.filter(m => m.sters !== true)
       const necitite = active.filter(m => m.citit !== true)
       const citite = active.filter(m => m.citit === true)
