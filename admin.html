@@ -666,10 +666,10 @@
           <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th><th>Acțiuni</th></tr></thead>
           <tbody>${active.map(u => `
             <tr>
-              <td>${u.raw_user_meta_data?.full_name || u.raw_user_meta_data?.name || '—'}</td>
+              <td>${u.full_name || u.google_name || '—'}</td>
               <td>${u.email || '—'}</td>
-              <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
-              <td><button class="btn btn-danger btn-sm" onclick="stergeUtilizator('${u.id}','${(u.email||'').replace(/'/g,"\'")}','${(u.raw_user_meta_data?.full_name||u.raw_user_meta_data?.name||'').replace(/'/g,"\'")}','${u.created_at}')">🗑 Șterge</button></td>
+              <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('ro-RO') : '—'}</td>
+              <td><button class="btn btn-danger btn-sm" onclick="stergeUtilizator('${u.id}','${(u.email||'').replace(/'/g,"\'")}','${(u.full_name||u.google_name||'').replace(/'/g,"\'")}','${u.created_at}')">🗑 Șterge</button></td>
             </tr>`).join('')}
           </tbody>
         </table>`
