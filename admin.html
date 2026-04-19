@@ -546,7 +546,7 @@
 
     // Users count
     try {
-      const { data: users } = await sb.from('users_view').select('id')
+      const { data: users } = await sb.from('users_view').select('id, email, full_name, google_name, created_at')
       document.getElementById('statUsers').textContent = users?.length || 0
       if (users?.length) {
         document.getElementById('dashUsers').innerHTML = `
@@ -668,7 +668,7 @@
             <tr>
               <td>${u.full_name || u.google_name || '—'}</td>
               <td>${u.email || '—'}</td>
-              <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('ro-RO') : '—'}</td>
+              <td>${u.created_at ? new Date(u.created_at.replace(' ', 'T')).toLocaleDateString('ro-RO') : '—'}</td>
               <td><button class="btn btn-danger btn-sm" onclick="stergeUtilizator('${u.id}','${(u.email||'').replace(/'/g,"\'")}','${(u.full_name||u.google_name||'').replace(/'/g,"\'")}','${u.created_at}')">🗑 Șterge</button></td>
             </tr>`).join('')}
           </tbody>
