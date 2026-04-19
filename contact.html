@@ -561,7 +561,8 @@
   }
 
   async function updateAccountUI() {
-    const { data: { user } } = await sb.auth.getUser()
+    const { data: { session } } = await sb.auth.getSession()
+    const user = session?.user
     const label = document.getElementById('accountLabel')
     const loggedOut = document.getElementById('loggedOut')
     const loggedIn = document.getElementById('loggedIn')
