@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Asociația Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #f5f5f5; color: #222; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── HEADER ─── */
+    header { border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); background: #fff; }
+    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; }
+    .header-logo img { height: 80px; width: auto; display: block; }
+    .header-center { text-align: center; }
+    .header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
+    .header-motto { display: block; font-size: clamp(0.65rem, 1.5vw, 0.95rem); color: #8B0000; font-weight: normal; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+    .btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
+    .btn-account:hover { background: #6a0000; }
+
+    /* ─── NAVBAR ─── */
+    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
+    nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
+    nav.main-nav a:last-child { border-right: none; }
+    nav.main-nav a:hover { background: rgba(255,255,255,0.15); }
+    nav.main-nav a.admin-link { background: rgba(0,0,0,0.2); }
+
+    /* ─── ADMIN LAYOUT ─── */
+    .admin-wrap { display: flex; min-height: calc(100vh - 200px); }
+
+    /* Sidebar */
+    .admin-sidebar {
+      width: 240px; background: #fff; border-right: 1px solid #e0e0e0;
+      padding: 24px 0; flex-shrink: 0;
+    }
+    .sidebar-title {
+      font-size: 0.7rem; font-weight: bold; color: #999; letter-spacing: 2px;
+      text-transform: uppercase; padding: 0 20px 12px; border-bottom: 1px solid #f0e0e0; margin-bottom: 8px;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; cursor: pointer; transition: all 0.2s;
+      font-size: 0.9rem; color: #444; border-left: 3px solid transparent;
+    }
+    .sidebar-item:hover { background: #fdf5f5; color: #8B0000; }
+    .sidebar-item.active { background: #fdf5f5; color: #8B0000; border-left-color: #8B0000; font-weight: bold; }
+    .sidebar-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .sidebar-badge {
+      margin-left: auto; background: #8B0000; color: #fff;
+      font-size: 0.7rem; padding: 2px 7px; border-radius: 10px;
+    }
+
+    /* Content */
+    .admin-content { flex: 1; padding: 30px; overflow-x: auto; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Page title */
+    .page-title { font-size: 1.5rem; font-weight: bold; color: #8B0000; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid #f0e0e0; }
+
+    /* Stats cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 30px; }
+    .stat-card { background: #fff; border-radius: 10px; padding: 20px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.04); text-align: center; }
+    .stat-card .stat-icon { font-size: 2rem; margin-bottom: 8px; }
+    .stat-card .stat-number { font-size: 2rem; font-weight: bold; color: #8B0000; }
+    .stat-card .stat-label { font-size: 0.8rem; color: #888; margin-top: 4px; }
+
+    /* Tables */
+    .table-wrap { background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+    .table-header { padding: 16px 20px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; }
+    .table-header h3 { font-size: 1rem; color: #333; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #fdf5f5; color: #8B0000; font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; padding: 12px 16px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    td { padding: 12px 16px; font-size: 0.88rem; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fdfafa; }
+
+    /* Buttons */
+    .btn { padding: 8px 16px; border-radius: 6px; font-family: 'Georgia', serif; font-size: 0.85rem; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-red { background: #8B0000; color: #fff; }
+    .btn-red:hover { background: #6a0000; }
+    .btn-outline { background: #fff; color: #8B0000; border: 1px solid #8B0000; }
+    .btn-outline:hover { background: #fdf5f5; }
+    .btn-sm { padding: 5px 10px; font-size: 0.78rem; }
+    .btn-danger { background: #fff; color: #c00; border: 1px solid #c00; }
+    .btn-danger:hover { background: #fff0f0; }
+
+    /* Status badges */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
+    .badge-green { background: #e6f9ee; color: #1a7a3f; }
+    .badge-orange { background: #fff3e0; color: #b35c00; }
+    .badge-red { background: #fdecea; color: #c00; }
+    .badge-gray { background: #f0f0f0; color: #666; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.82rem; color: #666; margin-bottom: 6px; font-weight: bold; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px;
+      font-size: 0.9rem; font-family: 'Georgia', serif; outline: none; transition: border 0.2s; background: #fff;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #8B0000; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-full { grid-column: 1 / -1; }
+
+    /* Card container */
+    .card { background: #fff; border-radius: 10px; border: 1px solid #e0e0e0; padding: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); margin-bottom: 20px; }
+    .card h3 { font-size: 1rem; color: #8B0000; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #f0e0e0; }
+
+    /* Message item */
+    .msg-item { padding: 16px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: background 0.15s; }
+    .msg-item:hover { background: #fdfafa; }
+    .msg-item:last-child { border-bottom: none; }
+    .msg-item.unread { border-left: 3px solid #8B0000; }
+    .msg-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .msg-name { font-weight: bold; font-size: 0.9rem; }
+    .msg-subject { font-size: 0.85rem; color: #555; }
+    .msg-date { font-size: 0.78rem; color: #999; margin-left: auto; }
+    .msg-preview { font-size: 0.82rem; color: #888; }
+
+    /* Access denied */
+    .access-denied { text-align: center; padding: 80px 20px; }
+    .access-denied h2 { font-size: 1.5rem; color: #8B0000; margin-bottom: 12px; }
+    .access-denied p { color: #666; margin-bottom: 24px; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 40px; color: #888; font-size: 0.9rem; }
+
+    /* Mobile header */
+    .mobile-header { display: none; }
+
+    /* FOOTER */
+    footer { background: #8B0000; color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; margin-top: auto; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .header-top { display: none; }
+      nav.main-nav { display: none !important; }
+      .mobile-header { display: block; background: #fff; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+      .mob-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
+      .mob-logo img { height: 50px; }
+      .mob-account-btn { background: #8B0000; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.8rem; }
+      .mob-row2 { text-align: center; padding: 6px 16px 2px; }
+      .mob-title { display: block; font-size: 1.05rem; font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 2px; }
+      .mob-motto { display: block; font-size: 0.68rem; color: #8B0000; letter-spacing: 1px; margin-top: 2px; }
+      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid #f0e0e0; }
+      .mob-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
+      .mob-hamburger span { display: block; width: 28px; height: 3px; background: #8B0000; border-radius: 2px; }
+      .mob-nav { display: none; flex-direction: column; background: #8B0000; }
+      .mob-nav.open { display: flex; }
+      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
+      .admin-sidebar { display: none; }
+      .admin-sidebar.mob-open { display: block; position: fixed; top: 0; left: 0; height: 100vh; z-index: 500; box-shadow: 4px 0 16px rgba(0,0,0,0.15); }
+      .admin-content { padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      table { font-size: 0.78rem; }
+      th, td { padding: 8px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER DESKTOP -->
+<header>
+  <div class="header-top">
+    <a href="index.html" class="header-logo">
+      <img src="Logo.gif" alt="Asociatia Dokimasia" />
+    </a>
+    <a href="index.html" class="header-center">
+      <span class="header-title">Asociația Dokimasia</span>
+      <span class="header-motto">Învățare. Implicare. Progres.</span>
+    </a>
+    <div class="header-right">
+      <button class="btn-account" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="adminName">Admin</span>
+      </button>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="contact.html">Contact</a>
+    <a href="admin.html" class="admin-link">⚙ Admin</a>
+  </nav>
+</header>
+
+<!-- HEADER MOBIL -->
+<div class="mobile-header">
+  <div class="mob-row1">
+    <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
+    <button class="mob-account-btn" onclick="logout()">Deconectare</button>
+  </div>
+  <div class="mob-row2">
+    <span class="mob-title">Asociația Dokimasia</span>
+    <span class="mob-motto">Panou Admin</span>
+  </div>
+  <div class="mob-row4">
+    <button class="mob-hamburger" onclick="document.getElementById('adminSidebar').classList.toggle('mob-open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav class="mob-nav" id="mobNav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div>
+
+<!-- ACCESS DENIED (hidden by default) -->
+<div id="accessDenied" style="display:none">
+  <div class="access-denied">
+    <h2>🔒 Acces restricționat</h2>
+    <p>Această pagină este disponibilă doar pentru administratori.</p>
+    <a href="index.html" class="btn btn-red">Înapoi la site</a>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none">
+  <div class="admin-wrap">
+
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar" id="adminSidebar">
+      <div class="sidebar-title">Panou Admin</div>
+
+      <div class="sidebar-item active" onclick="showSection('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('mesaje')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Mesaje
+        <span class="sidebar-badge" id="msgBadge">0</span>
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('utilizatori')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Utilizatori
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('noutati')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Noutăți
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('setari')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Setări
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="admin-content">
+
+      <!-- DASHBOARD -->
+      <div class="section active" id="sec-dashboard">
+        <div class="page-title">📊 Dashboard</div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number" id="statUsers">—</div>
+            <div class="stat-label">Utilizatori înregistrați</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📬</div>
+            <div class="stat-number" id="statMsgs">—</div>
+            <div class="stat-label">Mesaje primite</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📰</div>
+            <div class="stat-number" id="statNews">—</div>
+            <div class="stat-label">Articole publicate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-number" id="statDate">—</div>
+            <div class="stat-label">Data curentă</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📬 Ultimele mesaje primite</h3>
+          <div id="dashMsgs"><div class="loading">Se încarcă...</div></div>
+        </div>
+
+        <div class="card">
+          <h3>👥 Ultimii utilizatori înregistrați</h3>
+          <div id="dashUsers"><div class="loading">Se încarcă...</div></div>
+        </div>
+      </div>
+
+      <!-- MESAJE -->
+      <div class="section" id="sec-mesaje">
+        <div class="page-title">📬 Mesaje</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>Toate mesajele</h3>
+            <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻ Actualizează</button>
+          </div>
+          <div id="mesajeList"><div class="loading">Se încarcă...</div></div>
+        </div>
+
+        <!-- Detaliu mesaj -->
+        <div id="msgDetail" style="display:none; margin-top:20px;">
+          <div class="card">
+            <h3 id="msgDetailTitle">Detaliu mesaj</h3>
+            <div id="msgDetailContent"></div>
+            <div style="margin-top:16px; display:flex; gap:10px;">
+              <button class="btn btn-outline btn-sm" onclick="document.getElementById('msgDetail').style.display='none'">← Înapoi</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteMesaj()">🗑 Șterge</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UTILIZATORI -->
+      <div class="section" id="sec-utilizatori">
+        <div class="page-title">👥 Utilizatori</div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>Utilizatori înregistrați</h3>
+            <button class="btn btn-outline btn-sm" onclick="loadUtilizatori()">↻ Actualizează</button>
+          </div>
+          <div id="utilizatoriList"><div class="loading">Se încarcă...</div></div>
+        </div>
+      </div>
+
+      <!-- NOUTĂȚI -->
+      <div class="section" id="sec-noutati">
+        <div class="page-title">📰 Noutăți</div>
+
+        <div class="card">
+          <h3>➕ Adaugă articol nou</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Titlu articol</label>
+              <input type="text" id="newsTitle" placeholder="Titlul articolului" />
+            </div>
+            <div class="form-group">
+              <label>Categorie</label>
+              <select id="newsCat">
+                <option value="noutati">Noutăți</option>
+                <option value="proiecte">Proiecte</option>
+                <option value="evenimente">Evenimente</option>
+                <option value="publicatii">Publicații</option>
+              </select>
+            </div>
+            <div class="form-group form-full">
+              <label>Conținut</label>
+              <textarea id="newsContent" rows="5" placeholder="Scrie conținutul articolului..."></textarea>
+            </div>
+          </div>
+          <button class="btn btn-red" onclick="addArticol()">Publică articol</button>
+          <span id="newsMsg" style="margin-left:12px;font-size:0.85rem;color:#8B0000;"></span>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3>Articole publicate</h3>
+            <button class="btn btn-outline btn-sm" onclick="loadNoutati()">↻ Actualizează</button>
+          </div>
+          <div id="noutatiList"><div class="loading">Se încarcă...</div></div>
+        </div>
+      </div>
+
+      <!-- SETĂRI -->
+      <div class="section" id="sec-setari">
+        <div class="page-title">⚙️ Setări site</div>
+
+        <div class="card">
+          <h3>📍 Date de contact</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Email contact</label>
+              <input type="email" id="setEmail" placeholder="contact@dokimasia.ro" value="contact@dokimasia.ro" />
+            </div>
+            <div class="form-group">
+              <label>Telefon / WhatsApp</label>
+              <input type="text" id="setTel" placeholder="+40700000000" />
+            </div>
+            <div class="form-group">
+              <label>Adresă</label>
+              <input type="text" id="setAdresa" placeholder="Strada, Oraș" />
+            </div>
+            <div class="form-group">
+              <label>CUI / CIF asociație</label>
+              <input type="text" id="setCui" placeholder="RO12345678" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🌐 Social Media</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Facebook URL</label>
+              <input type="url" id="setFb" placeholder="https://facebook.com/..." />
+            </div>
+            <div class="form-group">
+              <label>Instagram URL</label>
+              <input type="url" id="setIg" placeholder="https://instagram.com/..." />
+            </div>
+            <div class="form-group">
+              <label>WhatsApp număr</label>
+              <input type="text" id="setWa" placeholder="40700000000" />
+            </div>
+            <div class="form-group">
+              <label>YouTube URL</label>
+              <input type="url" id="setYt" placeholder="https://youtube.com/..." />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📝 Texte site</h3>
+          <div class="form-group">
+            <label>Motto / Slogan</label>
+            <input type="text" id="setMotto" placeholder="Învățare. Implicare. Progres." value="Învățare. Implicare. Progres." />
+          </div>
+          <div class="form-group">
+            <label>Descriere asociație (Despre noi)</label>
+            <textarea id="setDescr" rows="4" placeholder="Scrie o scurtă descriere a asociației..."></textarea>
+          </div>
+        </div>
+
+        <button class="btn btn-red" onclick="saveSetari()">💾 Salvează setările</button>
+        <span id="setariMsg" style="margin-left:12px;font-size:0.85rem;color:green;"></span>
+      </div>
+
+    </div><!-- end admin-content -->
+  </div><!-- end admin-wrap -->
+</div><!-- end adminPanel -->
+
+<div id="loadingScreen" style="text-align:center;padding:80px;font-size:1rem;color:#888;">
+  Se verifică accesul...
+</div>
+
+<footer>
+  <p>© <span id="year"></span> Asociația Dokimasia. Toate drepturile rezervate.</p>
+</footer>
+
+<script>
+  const ADMIN_EMAIL = 'm.ciprian1387@gmail.com'
+
+  const { createClient } = supabase
+  const sb = createClient(
+    'https://jaoxhsyplnkanhqevnnr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
+  )
+
+  document.getElementById('year').textContent = new Date().getFullYear()
+  document.getElementById('statDate').textContent = new Date().toLocaleDateString('ro-RO')
+
+  // Check admin access
+  async function checkAccess() {
+    const { data: { user } } = await sb.auth.getUser()
+    document.getElementById('loadingScreen').style.display = 'none'
+
+    if (!user || user.email !== ADMIN_EMAIL) {
+      document.getElementById('accessDenied').style.display = 'block'
+      return
+    }
+
+    document.getElementById('adminPanel').style.display = 'block'
+    const name = user.user_metadata?.full_name || user.email.split('@')[0]
+    document.getElementById('adminName').textContent = name
+
+    loadDashboard()
+  }
+
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'))
+    document.getElementById('sec-' + name).classList.add('active')
+    event.currentTarget.classList.add('active')
+
+    if (name === 'mesaje') loadMesaje()
+    if (name === 'utilizatori') loadUtilizatori()
+    if (name === 'noutati') loadNoutati()
+  }
+
+  // ─── DASHBOARD ───
+  async function loadDashboard() {
+    // Stats
+    try {
+      const { data: msgs } = await sb.from('messages').select('id', { count: 'exact' })
+      document.getElementById('statMsgs').textContent = msgs?.length || 0
+      const unread = msgs?.filter(m => !m.citit)?.length || 0
+      document.getElementById('msgBadge').textContent = unread
+
+      const { data: news } = await sb.from('noutati').select('id', { count: 'exact' })
+      document.getElementById('statNews').textContent = news?.length || 0
+    } catch(e) {}
+
+    // Last messages
+    try {
+      const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false }).limit(3)
+      if (data && data.length > 0) {
+        document.getElementById('dashMsgs').innerHTML = data.map(m => `
+          <div class="msg-item ${m.citit ? '' : 'unread'}">
+            <div class="msg-meta">
+              <span class="msg-name">${m.name || '—'}</span>
+              <span class="msg-subject">${m.subject || ''}</span>
+              <span class="msg-date">${new Date(m.created_at).toLocaleDateString('ro-RO')}</span>
+            </div>
+            <div class="msg-preview">${(m.message || '').substring(0, 80)}...</div>
+          </div>`).join('')
+      } else {
+        document.getElementById('dashMsgs').innerHTML = '<div class="loading">Nu există mesaje încă.</div>'
+      }
+    } catch(e) {
+      document.getElementById('dashMsgs').innerHTML = '<div class="loading">Tabelul messages nu există încă.</div>'
+    }
+  }
+
+  // ─── MESAJE ───
+  let currentMsgId = null
+  async function loadMesaje() {
+    try {
+      const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false })
+      if (!data || data.length === 0) {
+        document.getElementById('mesajeList').innerHTML = '<div class="loading">Nu există mesaje încă.</div>'
+        return
+      }
+      document.getElementById('mesajeList').innerHTML = data.map(m => `
+        <div class="msg-item ${m.citit ? '' : 'unread'}" onclick="openMesaj('${m.id}', '${(m.name||'').replace(/'/g,"\\'")}', '${(m.email||'')}', '${(m.subject||'').replace(/'/g,"\\'")}', \`${(m.message||'').replace(/`/g,'\\`')}\`, '${m.created_at}')">
+          <div class="msg-meta">
+            <span class="msg-name">${m.name || '—'}</span>
+            <span class="msg-subject">${m.subject || ''}</span>
+            <span class="msg-date">${new Date(m.created_at).toLocaleDateString('ro-RO')}</span>
+            ${!m.citit ? '<span class="badge badge-red">Nou</span>' : ''}
+          </div>
+          <div class="msg-preview">${(m.message || '').substring(0, 100)}...</div>
+        </div>`).join('')
+    } catch(e) {
+      document.getElementById('mesajeList').innerHTML = '<div class="loading">Creează tabelul "messages" în Supabase.</div>'
+    }
+  }
+
+  async function openMesaj(id, name, email, subject, message, date) {
+    currentMsgId = id
+    document.getElementById('msgDetailTitle').textContent = subject || 'Mesaj'
+    document.getElementById('msgDetailContent').innerHTML = `
+      <p><strong>De la:</strong> ${name} (${email})</p>
+      <p style="margin-top:6px"><strong>Data:</strong> ${new Date(date).toLocaleString('ro-RO')}</p>
+      <hr style="margin:16px 0;border:none;border-top:1px solid #f0e0e0;">
+      <p style="line-height:1.8;">${message}</p>
+      <div style="margin-top:16px;">
+        <a href="mailto:${email}?subject=Re: ${subject}" class="btn btn-red btn-sm">↩ Răspunde pe email</a>
+      </div>`
+    document.getElementById('msgDetail').style.display = 'block'
+    await sb.from('messages').update({ citit: true }).eq('id', id)
+  }
+
+  async function deleteMesaj() {
+    if (!currentMsgId) return
+    if (!confirm('Ștergi acest mesaj?')) return
+    await sb.from('messages').delete().eq('id', currentMsgId)
+    document.getElementById('msgDetail').style.display = 'none'
+    loadMesaje()
+  }
+
+  // ─── UTILIZATORI ───
+  async function loadUtilizatori() {
+    try {
+      const { data, error } = await sb.auth.admin.listUsers()
+      if (error) throw error
+      if (!data?.users?.length) {
+        document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Nu există utilizatori încă.</div>'
+        return
+      }
+      document.getElementById('utilizatoriList').innerHTML = `
+        <table>
+          <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th><th>Provider</th></tr></thead>
+          <tbody>${data.users.map(u => `
+            <tr>
+              <td>${u.user_metadata?.full_name || '—'}</td>
+              <td>${u.email || '—'}</td>
+              <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
+              <td><span class="badge badge-gray">${u.app_metadata?.provider || 'email'}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`
+      document.getElementById('statUsers').textContent = data.users.length
+    } catch(e) {
+      document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Necesită cheie service_role pentru lista utilizatori.</div>'
+    }
+  }
+
+  // ─── NOUTĂȚI ───
+  async function loadNoutati() {
+    try {
+      const { data } = await sb.from('noutati').select('*').order('created_at', { ascending: false })
+      if (!data || data.length === 0) {
+        document.getElementById('noutatiList').innerHTML = '<div class="loading">Nu există articole încă. Adaugă primul!</div>'
+        return
+      }
+      document.getElementById('noutatiList').innerHTML = `
+        <table>
+          <thead><tr><th>Titlu</th><th>Categorie</th><th>Data</th><th>Acțiuni</th></tr></thead>
+          <tbody>${data.map(n => `
+            <tr>
+              <td>${n.title}</td>
+              <td><span class="badge badge-orange">${n.category || '—'}</span></td>
+              <td>${new Date(n.created_at).toLocaleDateString('ro-RO')}</td>
+              <td><button class="btn btn-danger btn-sm" onclick="deleteArticol('${n.id}')">🗑 Șterge</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`
+    } catch(e) {
+      document.getElementById('noutatiList').innerHTML = '<div class="loading">Creează tabelul "noutati" în Supabase.</div>'
+    }
+  }
+
+  async function addArticol() {
+    const title = document.getElementById('newsTitle').value.trim()
+    const content = document.getElementById('newsContent').value.trim()
+    const category = document.getElementById('newsCat').value
+    const msg = document.getElementById('newsMsg')
+
+    if (!title || !content) { msg.textContent = 'Completează titlul și conținutul.'; msg.style.color = '#c00'; return }
+
+    const { error } = await sb.from('noutati').insert({ title, content, category })
+    if (error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = '#c00'; return }
+
+    msg.textContent = '✅ Articol publicat!'; msg.style.color = 'green'
+    document.getElementById('newsTitle').value = ''
+    document.getElementById('newsContent').value = ''
+    loadNoutati()
+    setTimeout(() => msg.textContent = '', 3000)
+  }
+
+  async function deleteArticol(id) {
+    if (!confirm('Ștergi acest articol?')) return
+    await sb.from('noutati').delete().eq('id', id)
+    loadNoutati()
+  }
+
+  // ─── SETĂRI ───
+  async function saveSetari() {
+    const msg = document.getElementById('setariMsg')
+    try {
+      const settings = {
+        email: document.getElementById('setEmail').value,
+        tel: document.getElementById('setTel').value,
+        adresa: document.getElementById('setAdresa').value,
+        cui: document.getElementById('setCui').value,
+        facebook: document.getElementById('setFb').value,
+        instagram: document.getElementById('setIg').value,
+        whatsapp: document.getElementById('setWa').value,
+        youtube: document.getElementById('setYt').value,
+        motto: document.getElementById('setMotto').value,
+        descriere: document.getElementById('setDescr').value,
+      }
+      await sb.from('setari').upsert({ id: 1, ...settings })
+      msg.textContent = '✅ Setările au fost salvate!'
+      setTimeout(() => msg.textContent = '', 3000)
+    } catch(e) {
+      msg.textContent = 'Eroare la salvare.'
+      msg.style.color = '#c00'
+    }
+  }
+
+  async function loadSetari() {
+    try {
+      const { data } = await sb.from('setari').select('*').eq('id', 1).single()
+      if (data) {
+        if (data.email) document.getElementById('setEmail').value = data.email
+        if (data.tel) document.getElementById('setTel').value = data.tel
+        if (data.adresa) document.getElementById('setAdresa').value = data.adresa
+        if (data.cui) document.getElementById('setCui').value = data.cui
+        if (data.facebook) document.getElementById('setFb').value = data.facebook
+        if (data.instagram) document.getElementById('setIg').value = data.instagram
+        if (data.whatsapp) document.getElementById('setWa').value = data.whatsapp
+        if (data.youtube) document.getElementById('setYt').value = data.youtube
+        if (data.motto) document.getElementById('setMotto').value = data.motto
+        if (data.descriere) document.getElementById('setDescr').value = data.descriere
+      }
+    } catch(e) {}
+  }
+
+  async function logout() {
+    await sb.auth.signOut()
+    window.location.href = 'index.html'
+  }
+
+  checkAccess()
+  loadSetari()
+</script>
+</body>
+</html>
