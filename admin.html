@@ -507,6 +507,27 @@
       document.getElementById('statNews').textContent = news?.length || 0
     } catch(e) {}
 
+    // Users count
+    try {
+      const { data: users } = await sb.from('users_view').select('id')
+      document.getElementById('statUsers').textContent = users?.length || 0
+      if (users?.length) {
+        document.getElementById('dashUsers').innerHTML = `
+          <table>
+            <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th></tr></thead>
+            <tbody>${users.slice(0,5).map(u => `
+              <tr>
+                <td>${u.raw_user_meta_data?.full_name || '—'}</td>
+                <td>${u.email || '—'}</td>
+                <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>`
+      } else {
+        document.getElementById('dashUsers').innerHTML = '<div class="loading">Nu există utilizatori încă.</div>'
+      }
+    } catch(e) {}
+
     // Last messages
     try {
       const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false }).limit(3)
@@ -578,27 +599,26 @@
   // ─── UTILIZATORI ───
   async function loadUtilizatori() {
     try {
-      const { data, error } = await sbAdmin.auth.admin.listUsers()
+      const { data, error } = await sb.from('users_view').select('*').order('created_at', { ascending: false })
       if (error) throw error
-      if (!data?.users?.length) {
+      if (!data?.length) {
         document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Nu există utilizatori încă.</div>'
         return
       }
       document.getElementById('utilizatoriList').innerHTML = `
         <table>
-          <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th><th>Provider</th></tr></thead>
-          <tbody>${data.users.map(u => `
+          <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th></tr></thead>
+          <tbody>${data.map(u => `
             <tr>
-              <td>${u.user_metadata?.full_name || '—'}</td>
+              <td>${u.raw_user_meta_data?.full_name || '—'}</td>
               <td>${u.email || '—'}</td>
               <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
-              <td><span class="badge badge-gray">${u.app_metadata?.provider || 'email'}</span></td>
             </tr>`).join('')}
           </tbody>
         </table>`
-      document.getElementById('statUsers').textContent = data.users.length
+      document.getElementById('statUsers').textContent = data.length
     } catch(e) {
-      document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Necesită cheie service_role pentru lista utilizatori.</div>'
+      document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Eroare: ' + e.message + '</div>'
     }
   }
 
