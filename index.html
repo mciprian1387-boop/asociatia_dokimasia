@@ -300,6 +300,9 @@
             <a href="#" onclick="openModal('register')">Înregistrare</a>
           </div>
           <div id="loggedIn" style="display:none">
+            <div id="adminBtn" style="display:none">
+              <a href="admin.html" style="color:#8B0000;font-weight:bold;">⚙ Panou Admin</a>
+            </div>
             <a href="cont.html">Profilul meu</a>
             <a href="comenzi.html">Comenzile mele</a>
             <a href="#" onclick="logout()">Deconectare</a>
@@ -403,6 +406,9 @@
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="email@exemplu.ro" /></div>
       <div class="form-group"><label>Parolă</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
       <button class="btn-primary" onclick="login()">Intră în cont</button>
+      <p style="text-align:center;margin-top:10px;">
+        <a href="#" onclick="resetPassword()" style="font-size:0.82rem;color:#8B0000;">Ai uitat parola?</a>
+      </p>
       <p class="modal-msg" id="loginMsg"></p>
     </div>
     <div id="formRegister" style="display:none">
@@ -565,6 +571,15 @@
     updateAccountUI()
   }
 
+  async function resetPassword() {
+    const email = document.getElementById('loginEmail').value.trim()
+    const msg = document.getElementById('loginMsg')
+    if (!email) { msg.textContent = 'Introdu emailul mai întâi.'; msg.style.color = '#c00'; return }
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://dokimasia.ro' })
+    if (error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = '#c00' }
+    else { msg.textContent = 'Email de resetare trimis!'; msg.style.color = 'green' }
+  }
+
   async function updateAccountUI() {
     const { data: { user } } = await sb.auth.getUser()
     const label = document.getElementById('accountLabel')
@@ -575,6 +590,9 @@
       label.textContent = name.split(' ')[0]
       loggedOut.style.display = 'none'
       loggedIn.style.display = 'block'
+      if (user.email === 'm.ciprian1387@gmail.com') {
+        document.getElementById('adminBtn').style.display = 'block'
+      }
     } else {
       label.textContent = 'Contul meu'
       loggedOut.style.display = 'block'
