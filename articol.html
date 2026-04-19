@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Noutăți — Asociația Dokimasia</title>
+  <title>Articol — Asociația Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,40 +33,37 @@
     nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; }
     .hamburger span { display: block; width: 26px; height: 3px; background: #8B0000; border-radius: 2px; }
-    .page-hero { background: linear-gradient(135deg, #8B0000 0%, #6a0000 100%); color: #fff; text-align: center; padding: 16px 20px; }
-    .page-hero h1 { font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 6px; letter-spacing: 2px; }
-    .page-hero p { font-size: 1rem; opacity: 0.9; }
-    .blog-wrap { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 300px; gap: 40px; }
-    .article-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 28px; border: 1px solid #e8e8e8; transition: box-shadow 0.2s; }
-    .article-card:hover { box-shadow: 0 6px 20px rgba(139,0,0,0.1); }
-    .article-img { width: 100%; height: 220px; object-fit: cover; display: block; }
-    .article-img-placeholder { width: 100%; height: 220px; background: linear-gradient(135deg, #fdf5f5, #f0e0e0); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
-    .article-body { padding: 24px; }
-    .article-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
-    .article-cat { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; background: #fdf5f5; color: #8B0000; border: 1px solid #e0c0c0; }
-    .article-date { font-size: 0.78rem; color: #999; }
-    .article-title { font-size: 1.25rem; font-weight: bold; color: #1a1a1a; margin-bottom: 10px; line-height: 1.4; transition: color 0.2s; }
-    .article-title:hover { color: #8B0000; }
-    .article-excerpt { font-size: 0.9rem; color: #666; line-height: 1.7; margin-bottom: 16px; }
-    .btn-read { display: inline-block; background: #8B0000; color: #fff; padding: 8px 20px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; transition: background 0.2s; }
-    .btn-read:hover { background: #6a0000; }
-    .pagination { display: flex; justify-content: center; gap: 8px; margin: 20px 0 40px; }
-    .page-btn { width: 36px; height: 36px; border-radius: 6px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; font-family: 'Georgia', serif; font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
-    .page-btn:hover, .page-btn.active { background: #8B0000; color: #fff; border-color: #8B0000; }
+
+    /* ARTICLE */
+    .article-wrap { max-width: 1100px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 300px; gap: 40px; }
+    .article-main { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; }
+    .breadcrumb { font-size: 0.82rem; color: #999; margin-bottom: 20px; }
+    .breadcrumb a { color: #8B0000; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .article-hero-img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 28px; }
+    .article-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .article-cat { display: inline-block; padding: 4px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; background: #fdf5f5; color: #8B0000; border: 1px solid #e0c0c0; }
+    .article-date { font-size: 0.82rem; color: #999; }
+    .article-title { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: bold; color: #1a1a1a; line-height: 1.4; margin-bottom: 24px; }
+    .article-content { font-size: 1rem; line-height: 1.9; color: #333; white-space: pre-line; }
+    .article-content p { margin-bottom: 16px; }
+    .back-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 32px; color: #8B0000; font-size: 0.9rem; font-weight: bold; transition: gap 0.2s; }
+    .back-btn:hover { gap: 12px; }
+
+    /* SIDEBAR */
     .sidebar { position: sticky; top: 20px; }
     .sidebar-widget { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e8e8e8; }
     .widget-title { font-size: 0.85rem; font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #f0e0e0; }
-    .cat-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer; font-size: 0.9rem; color: #444; transition: color 0.2s; }
-    .cat-item:last-child { border-bottom: none; }
-    .cat-item:hover { color: #8B0000; }
-    .cat-count { background: #f0e8e8; color: #8B0000; font-size: 0.72rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; }
     .recent-item { padding: 10px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer; }
     .recent-item:last-child { border-bottom: none; }
     .recent-title { font-size: 0.88rem; color: #333; line-height: 1.4; margin-bottom: 4px; transition: color 0.2s; }
     .recent-item:hover .recent-title { color: #8B0000; }
     .recent-date { font-size: 0.75rem; color: #999; }
-    .empty-state { text-align: center; padding: 60px 20px; color: #999; background: #fff; border-radius: 12px; border: 1px solid #e8e8e8; }
-    .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+
+    /* LOADING */
+    .loading-state { text-align: center; padding: 80px 20px; color: #999; }
+
+    /* MODAL */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
     .modal-overlay.open { display: flex; }
     .modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
@@ -87,10 +84,12 @@
     .contact-modal-overlay.open { display: flex; }
     .contact-modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 480px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
     .contact-modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
+
     footer { background: #8B0000; color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; }
     footer a { color: #f5c0c0; }
+
     .mobile-header { display: none; }
-    @media (max-width: 900px) { .blog-wrap { grid-template-columns: 1fr; } .sidebar { position: static; } }
+    @media (max-width: 900px) { .article-wrap { grid-template-columns: 1fr; } .sidebar { position: static; } }
     @media (max-width: 768px) {
       .header-top { display: none; }
       nav.main-nav { display: none !important; }
@@ -106,7 +105,8 @@
       .mob-nav { display: none; flex-direction: column; background: #8B0000; }
       .mob-nav.open { display: flex; }
       .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
-      .blog-wrap { padding: 0 16px; margin: 20px auto; }
+      .article-main { padding: 24px 16px; }
+      .article-wrap { padding: 0 16px; margin: 20px auto; }
     }
   </style>
 </head>
@@ -127,9 +127,7 @@
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
       <div class="social-icons">
-        <a onclick="openContactModal()" title="Contact" style="cursor:pointer;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        </a>
+        <a onclick="openContactModal()" style="cursor:pointer;"><svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></a>
         <a href="https://facebook.com" target="_blank"><svg viewBox="0 0 24 24" fill="#1877F2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
         <a href="https://instagram.com" target="_blank"><svg viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig)"/><circle cx="12" cy="12" r="4" fill="none" stroke="white" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg></a>
         <a href="https://wa.me/40700000000" target="_blank"><svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.857L.054 23.61a.75.75 0 00.916.919l5.858-1.516A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.95 9.95 0 01-5.187-1.449l-.362-.216-3.676.952.981-3.565-.236-.376A9.954 9.954 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg></a>
@@ -140,10 +138,7 @@
           <span id="accountLabel">Contul meu</span>
         </button>
         <div class="account-dropdown" id="accountDropdown">
-          <div id="loggedOut">
-            <a href="#" onclick="openModal('login')">Autentificare</a>
-            <a href="#" onclick="openModal('register')">Înregistrare</a>
-          </div>
+          <div id="loggedOut"><a href="#" onclick="openModal('login')">Autentificare</a><a href="#" onclick="openModal('register')">Înregistrare</a></div>
           <div id="loggedIn" style="display:none">
             <div id="adminBtn" style="display:none"><a href="admin.html" style="color:#8B0000;font-weight:bold;">⚙ Panou Admin</a></div>
             <a href="cont.html">Profilul meu</a>
@@ -198,23 +193,12 @@
   </nav>
 </div>
 
-<!-- HERO -->
-<div class="page-hero">
-  <h1>Noutăți</h1>
-  <p>Ultimele articole și informații de la Asociația Dokimasia</p>
-</div>
-
-<!-- BLOG -->
-<div class="blog-wrap">
-  <div>
-    <div id="articlesList"></div>
-    <div class="pagination" id="pagination"></div>
+<!-- ARTICLE CONTENT -->
+<div class="article-wrap">
+  <div class="article-main" id="articleMain">
+    <div class="loading-state">Se încarcă articolul...</div>
   </div>
   <aside class="sidebar">
-    <div class="sidebar-widget">
-      <div class="widget-title">Categorii</div>
-      <div id="categoriesList"></div>
-    </div>
     <div class="sidebar-widget">
       <div class="widget-title">Articole recente</div>
       <div id="recentList"></div>
@@ -238,15 +222,9 @@
       <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
     </div>
     <div id="formLogin">
-      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.95rem;font-family:'Georgia',serif;margin-bottom:16px;">
-        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.05 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-3.55-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-        Continuă cu Google
-      </button>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"><span style="font-size:0.8rem;color:#999;">sau</span><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"></div>
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="email@exemplu.ro" /></div>
       <div class="form-group"><label>Parolă</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
       <button class="btn-primary" onclick="login()">Intră în cont</button>
-      <p style="text-align:center;margin-top:10px;"><a href="#" onclick="resetPassword()" style="font-size:0.82rem;color:#8B0000;">Ai uitat parola?</a></p>
       <p class="modal-msg" id="loginMsg"></p>
     </div>
     <div id="formRegister" style="display:none">
@@ -278,72 +256,51 @@
   const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
   document.getElementById('year').textContent = new Date().getFullYear()
 
-  const PER_PAGE = 6
-  let allArticles = []
-  let currentPage = 1
-  let currentCat = 'all'
-
   function getCatLabel(cat) {
     const map = { noutati:'Noutăți', proiecte:'Proiecte', evenimente:'Evenimente', publicatii:'Publicații' }
     return map[cat] || cat
   }
 
-  function renderArticles() {
-    const filtered = currentCat === 'all' ? allArticles : allArticles.filter(a => a.category === currentCat)
-    const totalPages = Math.ceil(filtered.length / PER_PAGE)
-    const page = filtered.slice((currentPage-1)*PER_PAGE, currentPage*PER_PAGE)
-    const list = document.getElementById('articlesList')
-    if (!page.length) {
-      list.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>Nu există articole publicate încă.</p></div>'
-      document.getElementById('pagination').innerHTML = ''
+  async function loadArticle() {
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id')
+    if (!id) { location.href = 'noutati.html'; return }
+
+    const { data: article, error } = await sb.from('noutati').select('*').eq('id', id).single()
+    if (error || !article) {
+      document.getElementById('articleMain').innerHTML = '<div class="loading-state">Articolul nu a fost găsit. <a href="noutati.html" style="color:#8B0000;">← Înapoi la Noutăți</a></div>'
       return
     }
-    list.innerHTML = page.map(a => {
-      const date = new Date(a.created_at).toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})
-      const excerpt = a.rezumat || (a.content ? a.content.substring(0,180)+'...' : '')
-      const img = a.imagine ? `<img src="${a.imagine}" alt="${a.title}" class="article-img" onerror="this.parentElement.innerHTML='<div class=article-img-placeholder>📰</div>'" />` : `<div class="article-img-placeholder">📰</div>`
-      return `<div class="article-card">
-        <a href="articol.html?id=${a.id}">${img}</a>
-        <div class="article-body">
-          <div class="article-meta"><span class="article-cat">${getCatLabel(a.category)}</span><span class="article-date">${date}</span></div>
-          <a href="articol.html?id=${a.id}"><div class="article-title">${a.title}</div></a>
-          <div class="article-excerpt">${excerpt}</div>
-          <a href="articol.html?id=${a.id}" class="btn-read">Citește mai mult →</a>
-        </div>
-      </div>`
-    }).join('')
-    // Pagination
-    const pag = document.getElementById('pagination')
-    if (totalPages <= 1) { pag.innerHTML = ''; return }
-    let html = ''
-    if (currentPage > 1) html += `<button class="page-btn" onclick="goPage(${currentPage-1})">‹</button>`
-    for (let i=1; i<=totalPages; i++) html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`
-    if (currentPage < totalPages) html += `<button class="page-btn" onclick="goPage(${currentPage+1})">›</button>`
-    pag.innerHTML = html
-  }
 
-  function goPage(p) { currentPage = p; renderArticles(); window.scrollTo({top:0,behavior:'smooth'}) }
+    // Update page title
+    document.title = article.title + ' — Asociația Dokimasia'
 
-  function filterCat(cat) { currentCat = cat; currentPage = 1; renderArticles() }
+    const date = new Date(article.created_at).toLocaleDateString('ro-RO', { day:'numeric', month:'long', year:'numeric' })
+    const img = article.imagine ? `<img src="${article.imagine}" alt="${article.title}" class="article-hero-img" />` : ''
 
-  function renderSidebar() {
-    const cats = {}
-    allArticles.forEach(a => { cats[a.category] = (cats[a.category]||0)+1 })
-    document.getElementById('categoriesList').innerHTML =
-      `<div class="cat-item" onclick="filterCat('all')"><span>Toate</span><span class="cat-count">${allArticles.length}</span></div>` +
-      Object.entries(cats).map(([cat,n]) => `<div class="cat-item" onclick="filterCat('${cat}')"><span>${getCatLabel(cat)}</span><span class="cat-count">${n}</span></div>`).join('')
-    document.getElementById('recentList').innerHTML = allArticles.slice(0,5).map(a =>
-      `<div class="recent-item" onclick="location.href='articol.html?id=${a.id}'">
-        <div class="recent-title">${a.title}</div>
-        <div class="recent-date">${new Date(a.created_at).toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})}</div>
-      </div>`).join('')
-  }
+    document.getElementById('articleMain').innerHTML = `
+      <div class="breadcrumb">
+        <a href="index.html">Acasă</a> › <a href="noutati.html">Noutăți</a> › ${article.title}
+      </div>
+      ${img}
+      <div class="article-meta">
+        <span class="article-cat">${getCatLabel(article.category)}</span>
+        <span class="article-date">${date}</span>
+      </div>
+      <h1 class="article-title">${article.title}</h1>
+      <div class="article-content">${article.content || ''}</div>
+      <a href="noutati.html" class="back-btn">← Înapoi la Noutăți</a>
+    `
 
-  async function loadArticles() {
-    let { data } = await sb.from('noutati').select('*').eq('publicat',true).order('created_at',{ascending:false})
-    if (!data) { const r = await sb.from('noutati').select('*').order('created_at',{ascending:false}); data = r.data }
-    allArticles = data || []
-    renderArticles(); renderSidebar()
+    // Load recent articles for sidebar
+    const { data: recent } = await sb.from('noutati').select('id,title,created_at').neq('id', id).order('created_at', { ascending: false }).limit(5)
+    if (recent && recent.length) {
+      document.getElementById('recentList').innerHTML = recent.map(a =>
+        `<div class="recent-item" onclick="location.href='articol.html?id=${a.id}'">
+          <div class="recent-title">${a.title}</div>
+          <div class="recent-date">${new Date(a.created_at).toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})}</div>
+        </div>`).join('')
+    }
   }
 
   // AUTH
@@ -362,8 +319,6 @@
   function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
   function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
   document.getElementById('contactModalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeContactModal() })
-
-  async function loginWithGoogle() { await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://dokimasia.ro/noutati.html'}}) }
   async function login() {
     const msg = document.getElementById('loginMsg')
     msg.textContent = 'Se conectează...'
@@ -375,13 +330,6 @@
     document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!'
   }
   async function logout() { await sb.auth.signOut(); updateAccountUI() }
-  async function resetPassword() {
-    const email = document.getElementById('loginEmail').value.trim()
-    const msg = document.getElementById('loginMsg')
-    if(!email){msg.textContent='Introdu emailul mai întâi.';return}
-    const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://dokimasia.ro'})
-    msg.textContent = error ? 'Eroare: '+error.message : 'Email trimis!'
-  }
   async function updateAccountUI() {
     const {data:{session}} = await sb.auth.getSession()
     const user = session?.user
@@ -404,8 +352,8 @@
   }
   sb.auth.onAuthStateChange(() => updateAccountUI())
   updateAccountUI()
-  loadArticles()
-  try { sb.from('page_views').insert({page:'/noutati.html',user_agent:navigator.userAgent}) } catch(e) {}
+  loadArticle()
+  try { sb.from('page_views').insert({page:'/articol.html',user_agent:navigator.userAgent}) } catch(e) {}
 </script>
 </body>
 </html>

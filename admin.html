@@ -427,11 +427,13 @@
       <div class="section" id="sec-noutati">
         <div class="page-title">📰 Noutăți</div>
 
-        <div class="card">
-          <h3>➕ Adaugă articol nou</h3>
+        <!-- FORM ADAUGARE/EDITARE -->
+        <div class="card" id="articolForm">
+          <h3 id="articolFormTitle">➕ Adaugă articol nou</h3>
+          <input type="hidden" id="editingId" value="" />
           <div class="form-grid">
             <div class="form-group">
-              <label>Titlu articol</label>
+              <label>Titlu articol *</label>
               <input type="text" id="newsTitle" placeholder="Titlul articolului" />
             </div>
             <div class="form-group">
@@ -444,17 +446,36 @@
               </select>
             </div>
             <div class="form-group form-full">
-              <label>Conținut</label>
-              <textarea id="newsContent" rows="5" placeholder="Scrie conținutul articolului..."></textarea>
+              <label>Rezumat (apare în lista articolelor)</label>
+              <textarea id="newsRezumat" rows="2" placeholder="Un scurt rezumat al articolului..."></textarea>
+            </div>
+            <div class="form-group form-full">
+              <label>Conținut complet *</label>
+              <textarea id="newsContent" rows="8" placeholder="Conținutul complet al articolului..."></textarea>
+            </div>
+            <div class="form-group form-full">
+              <label>URL imagine (opțional)</label>
+              <input type="text" id="newsImagine" placeholder="https://example.com/imagine.jpg" />
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="newsPublicat">
+                <option value="true">✅ Publicat</option>
+                <option value="false">📝 Draft</option>
+              </select>
             </div>
           </div>
-          <button class="btn btn-red" onclick="addArticol()">Publică articol</button>
-          <span id="newsMsg" style="margin-left:12px;font-size:0.85rem;color:#8B0000;"></span>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-red" onclick="saveArticol()">💾 Salvează articol</button>
+            <button class="btn btn-outline" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">✕ Anulează editarea</button>
+            <span id="newsMsg" style="font-size:0.85rem;color:#8B0000;"></span>
+          </div>
         </div>
 
+        <!-- LISTA ARTICOLE -->
         <div class="table-wrap">
           <div class="table-header">
-            <h3>Articole publicate</h3>
+            <h3>Toate articolele</h3>
             <button class="btn btn-outline btn-sm" onclick="loadNoutati()">↻ Actualizează</button>
           </div>
           <div id="noutatiList"><div class="loading">Se încarcă...</div></div>
@@ -903,54 +924,92 @@
 
   // ─── NOUTĂȚI ───
   async function loadNoutati() {
-    try {
-      const { data } = await sb.from('noutati').select('*').order('created_at', { ascending: false })
-      if (!data || data.length === 0) {
-        document.getElementById('noutatiList').innerHTML = '<div class="loading">Nu există articole încă. Adaugă primul!</div>'
-        return
-      }
-      document.getElementById('noutatiList').innerHTML = `
-        <table>
-          <thead><tr><th>Titlu</th><th>Categorie</th><th>Data</th><th>Acțiuni</th></tr></thead>
-          <tbody>${data.map(n => `
-            <tr>
-              <td>${n.title}</td>
-              <td><span class="badge badge-orange">${n.category || '—'}</span></td>
-              <td>${new Date(n.created_at).toLocaleDateString('ro-RO')}</td>
-              <td><button class="btn btn-danger btn-sm" onclick="deleteArticol('${n.id}')">🗑 Șterge</button></td>
-            </tr>`).join('')}
-          </tbody>
-        </table>`
-    } catch(e) {
-      document.getElementById('noutatiList').innerHTML = '<div class="loading">Creează tabelul "noutati" în Supabase.</div>'
+    const { data } = await sb.from('noutati').select('*').order('created_at', { ascending: false })
+    if (!data || data.length === 0) {
+      document.getElementById('noutatiList').innerHTML = '<div class="loading">Nu există articole încă. Adaugă primul!</div>'
+      return
     }
+    const catLabel = { noutati:'Noutăți', proiecte:'Proiecte', evenimente:'Evenimente', publicatii:'Publicații' }
+    document.getElementById('noutatiList').innerHTML = data.map(a => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #f0e0e0;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-weight:bold;color:#222;margin-bottom:4px;">${a.title}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span style="background:#fdf5f5;color:#8B0000;font-size:0.72rem;font-weight:bold;padding:2px 8px;border-radius:10px;border:1px solid #e0c0c0;">${catLabel[a.category]||a.category}</span>
+            <span style="font-size:0.75rem;color:#999;">${new Date(a.created_at).toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})}</span>
+            <span style="font-size:0.75rem;color:${a.publicat===false?'#e65100':'#2e7d32'};">${a.publicat===false?'📝 Draft':'✅ Publicat'}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <a href="../articol.html?id=${a.id}" target="_blank" class="btn btn-outline btn-sm">👁 Vezi</a>
+          <button class="btn btn-outline btn-sm" onclick="editArticol('${a.id}')">✏️ Editează</button>
+          <button class="btn btn-red btn-sm" onclick="deleteArticol('${a.id}')">🗑 Șterge</button>
+        </div>
+      </div>`).join('')
   }
 
-  async function addArticol() {
+  async function saveArticol() {
+    const id = document.getElementById('editingId').value
     const title = document.getElementById('newsTitle').value.trim()
     const content = document.getElementById('newsContent').value.trim()
     const category = document.getElementById('newsCat').value
+    const rezumat = document.getElementById('newsRezumat').value.trim()
+    const imagine = document.getElementById('newsImagine').value.trim()
+    const publicat = document.getElementById('newsPublicat').value === 'true'
     const msg = document.getElementById('newsMsg')
+    if (!title || !content) { msg.textContent = 'Titlul și conținutul sunt obligatorii!'; return }
+    msg.textContent = 'Se salvează...'
+    const payload = { title, content, category, rezumat: rezumat||null, imagine: imagine||null, publicat }
+    let error
+    if (id) {
+      const r = await sb.from('noutati').update(payload).eq('id', id)
+      error = r.error
+    } else {
+      const r = await sb.from('noutati').insert(payload)
+      error = r.error
+    }
+    if (error) { msg.textContent = 'Eroare: ' + error.message }
+    else {
+      msg.textContent = id ? '✅ Articol actualizat!' : '✅ Articol publicat!'
+      cancelEdit()
+      loadNoutati()
+    }
+  }
 
-    if (!title || !content) { msg.textContent = 'Completează titlul și conținutul.'; msg.style.color = '#c00'; return }
+  async function editArticol(id) {
+    const { data } = await sb.from('noutati').select('*').eq('id', id).single()
+    if (!data) return
+    document.getElementById('editingId').value = id
+    document.getElementById('newsTitle').value = data.title || ''
+    document.getElementById('newsCat').value = data.category || 'noutati'
+    document.getElementById('newsRezumat').value = data.rezumat || ''
+    document.getElementById('newsContent').value = data.content || ''
+    document.getElementById('newsImagine').value = data.imagine || ''
+    document.getElementById('newsPublicat').value = data.publicat === false ? 'false' : 'true'
+    document.getElementById('articolFormTitle').textContent = '✏️ Editează articol'
+    document.getElementById('cancelEditBtn').style.display = 'inline-flex'
+    document.getElementById('articolForm').scrollIntoView({ behavior: 'smooth' })
+  }
 
-    const { error } = await sb.from('noutati').insert({ title, content, category })
-    if (error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = '#c00'; return }
-
-    msg.textContent = '✅ Articol publicat!'; msg.style.color = 'green'
+  function cancelEdit() {
+    document.getElementById('editingId').value = ''
     document.getElementById('newsTitle').value = ''
+    document.getElementById('newsCat').value = 'noutati'
+    document.getElementById('newsRezumat').value = ''
     document.getElementById('newsContent').value = ''
-    loadNoutati()
-    setTimeout(() => msg.textContent = '', 3000)
+    document.getElementById('newsImagine').value = ''
+    document.getElementById('newsPublicat').value = 'true'
+    document.getElementById('articolFormTitle').textContent = '➕ Adaugă articol nou'
+    document.getElementById('cancelEditBtn').style.display = 'none'
+    document.getElementById('newsMsg').textContent = ''
   }
 
   async function deleteArticol(id) {
-    if (!confirm('Ștergi acest articol?')) return
     await sb.from('noutati').delete().eq('id', id)
     loadNoutati()
   }
 
-  // ─── SETĂRI ───
+
   async function saveSetari() {
     const msg = document.getElementById('setariMsg')
     try {
