@@ -678,6 +678,20 @@
 
   // ─── MESAJE ───
   let currentMsgId = null
+  let currentMsgTab = 'necitite'
+
+  function switchMsgTab(tab) {
+    currentMsgTab = tab
+    const tabs = ['necitite', 'citite', 'sterse']
+    tabs.forEach(t => {
+      const el = document.getElementById('msg' + t.charAt(0).toUpperCase() + t.slice(1))
+      if (el) el.style.display = t === tab ? 'block' : 'none'
+      const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
+      if (btn) btn.className = t === tab ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
+    })
+    document.getElementById('msgDetail').style.display = 'none'
+  }
+
   async function loadMesaje() {
     try {
       const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false })
