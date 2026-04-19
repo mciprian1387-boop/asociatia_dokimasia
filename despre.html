@@ -39,7 +39,7 @@
     .hamburger span { display: block; width: 26px; height: 3px; background: #8B0000; border-radius: 2px; }
 
     /* ─── PAGE HERO ─── */
-    .page-hero { background: linear-gradient(135deg, #8B0000 0%, #6a0000 100%); color: #fff; text-align: center; padding: 60px 20px; }
+    .page-hero { background: linear-gradient(135deg, #8B0000 0%, #6a0000 100%); color: #fff; text-align: center; padding: 32px 20px; }
     .page-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 12px; letter-spacing: 2px; }
     .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 650px; margin: 0 auto; line-height: 1.7; }
 
@@ -139,9 +139,9 @@
       .membri-grid { grid-template-columns: repeat(2, 1fr); }
       .misiune-inner { grid-template-columns: 1fr; gap: 24px; }
       .section-wrap { padding: 40px 16px; }
-      .misiune-wrap { padding: 40px 16px; }
+      .misiune-wrap { padding: 0; }
       .activitati-wrap { padding: 40px 16px; }
-      .page-hero { padding: 40px 16px; }
+      .page-hero { padding: 20px 16px; }
     }
   </style>
 </head>
@@ -253,35 +253,85 @@
 
 <!-- MISIUNEA -->
 <div class="misiune-wrap">
-  <div class="misiune-inner">
-    <div>
-      <div class="section-title">Misiunea noastră</div>
-      <div class="section-line"></div>
-      <p class="section-text">
-        Asociația Dokimasia este o organizație neguvernamentală, non-profit, apolitică și independentă, dedicată dezvoltării aptitudinilor tinerilor din medii sociale diferite — rural și urban, cu accent pe tinerii vulnerabili și cei din medii dezavantajate.
-        <br><br>
-        Ne propunem să creăm un cadru propice schimbului de cunoștințe și informații cultural-educative, prin care fiecare tânăr să poată să se adapteze și să se integreze eficient într-o societate dinamică.
-        <br><br>
-        Credem că educația nu este un privilegiu, ci un drept. Și că fiecare om, indiferent de origine sau circumstanțe, merită șansa de a se descoperi, de a crește și de a contribui la o lume mai bună.
-      </p>
-    </div>
-    <div>
-      <blockquote class="misiune-quote">
-        „Dokimasia — în greacă — înseamnă examinare, discernământ, verificare. Este procesul prin care descoperi cine ești cu adevărat și ce poți deveni. Acesta este drumul pe care îl propunem fiecărui tânăr care ni se alătură."
-      </blockquote>
+  <div style="max-width:1000px;margin:0 auto;padding:60px 20px;">
+    <div class="section-title">Misiunea noastră</div>
+    <div class="section-line"></div>
 
-      <div style="margin-top:28px;padding-top:24px;border-top:1px solid #e0c0c0;">
-        <p style="font-size:0.88rem;font-weight:bold;color:#8B0000;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Originea numelui</p>
-        <p style="font-size:0.9rem;line-height:1.8;color:#555;">
-          <em>Dokimasia</em> (δοκιμασία) este un termen din greaca veche, derivat din verbul <em>dokimazō</em> — a examina, a testa, a verifica, a aproba după o cercetare atentă.
-        </p>
-        <p style="font-size:0.9rem;line-height:1.8;color:#555;margin-top:10px;">
-          În Atena antică, dokimasia era o procedură oficială prin care cetățenii care urmau să ocupe funcții publice erau supuși unui examen riguros al caracterului și al aptitudinilor. Nu era o simplă formalitate — era un act de discernământ profund, prin care comunitatea se asigura că cel chemat să slujească este cu adevărat pregătit pentru această responsabilitate.
-        </p>
-        <p style="font-size:0.9rem;line-height:1.8;color:#555;margin-top:10px;">
-          Asociația noastră și-a ales acest nume ca expresie a unui angajament: credem că fiecare tânăr merită să fie văzut și evaluat după potențialul pe care îl poartă, nu după originea sa. Dokimasia este invitația la un drum al descoperirii de sine, al creșterii prin cunoaștere și implicare.
-        </p>
+    <!-- Timeline cards -->
+    <div style="position:relative;margin-top:40px;">
+      <!-- Linie verticala -->
+      <div style="position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#8B0000,#e0c0c0);"></div>
+
+      <!-- Card 1 -->
+      <div style="display:flex;gap:28px;margin-bottom:32px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:58px;height:58px;background:#8B0000;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 4px 12px rgba(139,0,0,0.3);">
+          <span style="font-size:1.4rem;">δ</span>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:24px 28px;flex:1;border:1px solid #e0e0e0;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size:0.75rem;font-weight:bold;color:#8B0000;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Originea numelui</div>
+          <p style="font-size:0.95rem;line-height:1.8;color:#444;">
+            <em>Dokimasia</em> (δοκιμασία) este un termen din greaca veche, derivat din verbul <em>dokimazō</em> — a examina, a testa, a verifica, a aproba după o cercetare atentă. În Atena antică, era procedura prin care cetățenii care urmau funcții publice erau supuși unui examen riguros al caracterului și aptitudinilor — un act de discernământ profund, nu o simplă formalitate.
+          </p>
+        </div>
       </div>
+
+      <!-- Card 2 -->
+      <div style="display:flex;gap:28px;margin-bottom:32px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:58px;height:58px;background:#8B0000;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 4px 12px rgba(139,0,0,0.3);">
+          <span style="font-size:1.4rem;">👥</span>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:24px 28px;flex:1;border:1px solid #e0e0e0;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size:0.75rem;font-weight:bold;color:#8B0000;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Cine suntem</div>
+          <p style="font-size:0.95rem;line-height:1.8;color:#444;">
+            Asociația Dokimasia a fost constituită de un grup de profesioniști cu experiență în educație formală și non-formală, formare și dezvoltare profesională, consiliere, comunicare, voluntariat și implicare civică, uniți de scopul comun al dezvoltării comunității.
+          </p>
+          <p style="font-size:0.95rem;line-height:1.8;color:#444;margin-top:10px;">
+            Suntem cadre didactice, experți în educație non-formală, formatori cu experiență și tineri voluntari cu inițiativă. Ne unește dorința sinceră de a face ceva concret pentru comunitate — nu doar de a vorbi despre schimbare, ci de a o construi împreună.
+          </p>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div style="display:flex;gap:28px;margin-bottom:32px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:58px;height:58px;background:#8B0000;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 4px 12px rgba(139,0,0,0.3);">
+          <span style="font-size:1.4rem;">🎯</span>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:24px 28px;flex:1;border:1px solid #e0e0e0;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size:0.75rem;font-weight:bold;color:#8B0000;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;">Cu cine lucrăm</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:#fdf5f5;border-radius:8px;padding:14px;border-left:3px solid #8B0000;">
+              <div style="font-size:0.82rem;font-weight:bold;color:#8B0000;margin-bottom:4px;">🧑 Tineri</div>
+              <div style="font-size:0.82rem;color:#555;line-height:1.6;">Din medii sociale diferite, cărora le oferim instrumente pentru a se descoperi și a se integra.</div>
+            </div>
+            <div style="background:#fdf5f5;border-radius:8px;padding:14px;border-left:3px solid #8B0000;">
+              <div style="font-size:0.82rem;font-weight:bold;color:#8B0000;margin-bottom:4px;">🤲 Persoane vulnerabile</div>
+              <div style="font-size:0.82rem;color:#555;line-height:1.6;">Pentru care accesul la educație și sprijin poate face o diferență reală.</div>
+            </div>
+            <div style="background:#fdf5f5;border-radius:8px;padding:14px;border-left:3px solid #8B0000;">
+              <div style="font-size:0.82rem;font-weight:bold;color:#8B0000;margin-bottom:4px;">📚 Cadre didactice</div>
+              <div style="font-size:0.82rem;color:#555;line-height:1.6;">Prin programe de formare, schimb de bune practici și dezvoltare profesională continuă.</div>
+            </div>
+            <div style="background:#fdf5f5;border-radius:8px;padding:14px;border-left:3px solid #8B0000;">
+              <div style="font-size:0.82rem;font-weight:bold;color:#8B0000;margin-bottom:4px;">🚀 Dezvoltare personală</div>
+              <div style="font-size:0.82rem;color:#555;line-height:1.6;">Persoane interesate de evoluție în carieră și dezvoltare personală și profesională.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div style="display:flex;gap:28px;align-items:flex-start;">
+        <div style="flex-shrink:0;width:58px;height:58px;background:#8B0000;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 4px 12px rgba(139,0,0,0.3);">
+          <span style="font-size:1.4rem;">🌱</span>
+        </div>
+        <div style="background:#8B0000;border-radius:12px;padding:24px 28px;flex:1;box-shadow:0 4px 16px rgba(139,0,0,0.3);">
+          <div style="font-size:0.75rem;font-weight:bold;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Ce ne propunem</div>
+          <p style="font-size:0.95rem;line-height:1.8;color:#fff;">
+            Credem că schimbarea autentică se produce atunci când oamenii din toate aceste categorii se întâlnesc, colaborează și învață unii de la alții. Dokimasia este spațiul în care acest lucru devine posibil — un cadru de cunoaștere, implicare și progres, construit cu responsabilitate și deschidere.
+          </p>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
