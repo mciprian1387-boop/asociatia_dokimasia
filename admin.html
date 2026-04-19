@@ -682,62 +682,116 @@
 
   function switchMsgTab(tab) {
     currentMsgTab = tab
-    const tabs = ['necitite', 'citite', 'sterse']
-    tabs.forEach(t => {
-      const el = document.getElementById('msg' + t.charAt(0).toUpperCase() + t.slice(1))
-      if (el) el.style.display = t === tab ? 'block' : 'none'
-      const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1))
-      if (btn) btn.className = t === tab ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
-    })
+    document.getElementById('msgNecitite').style.display = tab === 'necitite' ? 'block' : 'none'
+    document.getElementById('msgCitite').style.display = tab === 'citite' ? 'block' : 'none'
+    document.getElementById('msgSterse').style.display = tab === 'sterse' ? 'block' : 'none'
+    document.getElementById('tabNecitite').className = tab === 'necitite' ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
+    document.getElementById('tabCitite').className = tab === 'citite' ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
+    document.getElementById('tabSterse').className = tab === 'sterse' ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
     document.getElementById('msgDetail').style.display = 'none'
+  }
+
+  function msgItemHTML(m, isDeleted) {
+    const safeName = (m.name||'').replace(/'/g, "\'")
+    const safeSubj = (m.subject||'').replace(/'/g, "\'")
+    return '<div class="msg-item ' + (m.citit ? '' : 'unread') + '" onclick="openMesaj('' + m.id + '','' + safeName + '','' + (m.email||'') + '','' + safeSubj + '',this.dataset.msg,'' + m.created_at + '',' + isDeleted + ')" data-msg="' + (m.message||'').replace(/"/g,'&quot;') + '">' +
+      '<div class="msg-meta">' +
+      '<span class="msg-name">' + (m.name||'—') + '</span>' +
+      '<span class="msg-subject">' + (m.subject||'') + '</span>' +
+      '<span class="msg-date">' + new Date(m.created_at).toLocaleDateString('ro-RO') + '</span>' +
+      (!m.citit && !isDeleted ? '<span class="badge badge-red">Nou</span>' : '') +
+      (isDeleted ? '<span class="badge badge-gray">Șters</span>' : '') +
+      '</div>' +
+      '<div class="msg-preview">' + (m.message||'').substring(0,100) + '...</div>' +
+      '</div>'
   }
 
   async function loadMesaje() {
     try {
       const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false })
-      if (!data || data.length === 0) {
-        document.getElementById('mesajeList').innerHTML = '<div class="loading">Nu există mesaje încă.</div>'
-        return
-      }
-      document.getElementById('mesajeList').innerHTML = data.map(m => `
-        <div class="msg-item ${m.citit ? '' : 'unread'}" onclick="openMesaj('${m.id}', '${(m.name||'').replace(/'/g,"\\'")}', '${(m.email||'')}', '${(m.subject||'').replace(/'/g,"\\'")}', \`${(m.message||'').replace(/`/g,'\\`')}\`, '${m.created_at}')">
-          <div class="msg-meta">
-            <span class="msg-name">${m.name || '—'}</span>
-            <span class="msg-subject">${m.subject || ''}</span>
-            <span class="msg-date">${new Date(m.created_at).toLocaleDateString('ro-RO')}</span>
-            ${!m.citit ? '<span class="badge badge-red">Nou</span>' : ''}
-          </div>
-          <div class="msg-preview">${(m.message || '').substring(0, 100)}...</div>
-        </div>`).join('')
+      const allMsgs = data || []
+      const active = allMsgs.filter(m => m.sters !== true)
+      const necitite = active.filter(m => m.citit !== true)
+      const citite = active.filter(m => m.citit === true)
+      const sterse = allMsgs.filter(m => m.sters === true)
+
+      const cn = document.getElementById('countNecitite')
+      const cc = document.getElementById('countCitite')
+      const cs = document.getElementById('countSterse')
+      const cb = document.getElementById('msgBadge')
+      const ln = document.getElementById('mesajeListNecitite')
+      const lc = document.getElementById('mesajeListCitite')
+      const ls = document.getElementById('mesajeListSterse')
+
+      if (cn) cn.textContent = necitite.length
+      if (cc) cc.textContent = citite.length
+      if (cs) cs.textContent = sterse.length
+      if (cb) cb.textContent = necitite.length
+      if (ln) ln.innerHTML = necitite.length ? necitite.map(m => msgItemHTML(m,false)).join('') : '<div class="loading">Nu există mesaje necitite.</div>'
+      if (lc) lc.innerHTML = citite.length ? citite.map(m => msgItemHTML(m,false)).join('') : '<div class="loading">Nu există mesaje citite.</div>'
+      if (ls) ls.innerHTML = sterse.length ? sterse.map(m => msgItemHTML(m,true)).join('') : '<div class="loading">Coșul de gunoi este gol.</div>'
     } catch(e) {
-      document.getElementById('mesajeList').innerHTML = '<div class="loading">Creează tabelul "messages" în Supabase.</div>'
+      console.error('loadMesaje error:', e)
     }
   }
 
-  async function openMesaj(id, name, email, subject, message, date) {
+  async function openMesaj(id, name, email, subject, message, date, isDeleted) {
     currentMsgId = id
     document.getElementById('msgDetailTitle').textContent = subject || 'Mesaj'
-    document.getElementById('msgDetailContent').innerHTML = `
-      <p><strong>De la:</strong> ${name} (${email})</p>
-      <p style="margin-top:6px"><strong>Data:</strong> ${new Date(date).toLocaleString('ro-RO')}</p>
-      <hr style="margin:16px 0;border:none;border-top:1px solid #f0e0e0;">
-      <p style="line-height:1.8;">${message}</p>
-      <div style="margin-top:16px;">
-        <a href="mailto:${email}?subject=Re: ${subject}" class="btn btn-red btn-sm">↩ Răspunde pe email</a>
-      </div>`
+    let html = '<p><strong>De la:</strong> ' + name + ' (' + email + ')</p>'
+    html += '<p style="margin-top:6px"><strong>Data:</strong> ' + new Date(date).toLocaleString('ro-RO') + '</p>'
+    html += '<hr style="margin:16px 0;border:none;border-top:1px solid #f0e0e0;">'
+    html += '<p style="line-height:1.8;">' + message + '</p>'
+    if (!isDeleted) html += '<div style="margin-top:16px;"><a href="mailto:' + email + '?subject=Re: ' + subject + '" class="btn btn-red btn-sm">↩ Răspunde pe email</a></div>'
+    document.getElementById('msgDetailContent').innerHTML = html
+
+    const deleteBtn = document.getElementById('msgDeleteBtn')
+    const revBtn = document.getElementById('revenireBtn')
+    if (revBtn) revBtn.remove()
+    if (isDeleted) {
+      if (deleteBtn) { deleteBtn.textContent = '🗑 Șterge definitiv'; deleteBtn.onclick = deleteMesajDefinitiv }
+      if (deleteBtn) deleteBtn.insertAdjacentHTML('beforebegin', '<button class="btn btn-outline btn-sm" id="revenireBtn" onclick="revenireMesaj()">↩ Revenire</button>')
+    } else {
+      if (deleteBtn) { deleteBtn.textContent = '🗑 Șterge'; deleteBtn.onclick = deleteMesaj }
+    }
     document.getElementById('msgDetail').style.display = 'block'
-    await sb.from('messages').update({ citit: true }).eq('id', id)
+    if (!isDeleted) await sb.from('messages').update({ citit: true }).eq('id', id)
   }
 
   async function deleteMesaj() {
     if (!currentMsgId) return
-    if (!confirm('Ștergi acest mesaj?')) return
-    await sb.from('messages').delete().eq('id', currentMsgId)
+    showConfirm('Mesajul va fi mutat în coșul de gunoi.', async () => {
+      await sb.from('messages').update({ sters: true }).eq('id', currentMsgId)
+      document.getElementById('msgDetail').style.display = 'none'
+      loadMesaje()
+    })
+  }
+
+  async function deleteMesajDefinitiv() {
+    if (!currentMsgId) return
+    showConfirm('Mesajul va fi șters definitiv!', async () => {
+      await sb.from('messages').delete().eq('id', currentMsgId)
+      document.getElementById('msgDetail').style.display = 'none'
+      loadMesaje()
+    })
+  }
+
+  async function revenireMesaj() {
+    if (!currentMsgId) return
+    await sb.from('messages').update({ sters: false }).eq('id', currentMsgId)
     document.getElementById('msgDetail').style.display = 'none'
+    switchMsgTab('citite')
     loadMesaje()
   }
 
-  // ─── UTILIZATORI ───
+  async function golireSterse() {
+    showConfirm('Toate mesajele din coș vor fi șterse definitiv!', async () => {
+      await sb.from('messages').delete().eq('sters', true)
+      loadMesaje()
+    })
+  }
+
+    // ─── UTILIZATORI ───
   function switchUtilTab(tab) {
     document.getElementById('utilActivi').style.display = tab === 'activi' ? 'block' : 'none'
     document.getElementById('utilCos').style.display = tab === 'cos' ? 'block' : 'none'
