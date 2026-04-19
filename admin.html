@@ -634,10 +634,6 @@
   }
 
   // ─── UTILIZATORI ───
-  // Trash stored in localStorage
-  function getTrash() { try { return JSON.parse(localStorage.getItem('dokimasia_trash') || '[]') } catch(e) { return [] } }
-  function saveTrash(arr) { localStorage.setItem('dokimasia_trash', JSON.stringify(arr)) }
-
   function switchUtilTab(tab) {
     document.getElementById('utilActivi').style.display = tab === 'activi' ? 'block' : 'none'
     document.getElementById('utilCos').style.display = tab === 'cos' ? 'block' : 'none'
@@ -655,10 +651,11 @@
 
   async function loadUtilizatori() {
     try {
-      const trash = getTrash().map(u => u.id)
+      const { data: trashData } = await sb.from('users_trash').select('id')
+      const trashIds = (trashData || []).map(u => u.id)
       const { data, error } = await sb.from('users_view').select('*').order('created_at', { ascending: false })
       if (error) throw error
-      const active = (data || []).filter(u => !trash.includes(u.id))
+      const active = (data || []).filter(u => !trashIds.includes(u.id))
       if (!active.length) {
         document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Nu există utilizatori activi.</div>'
         document.getElementById('statUsers').textContent = 0
@@ -683,45 +680,47 @@
   }
 
   function stergeUtilizator(id, email, name, created_at) {
-    showConfirm(`Utilizatorul "${email}" va fi mutat în coșul de gunoi.`, () => {
-      const trash = getTrash()
-      trash.push({ id, email, name, created_at, deleted_at: new Date().toISOString() })
-      saveTrash(trash)
+    showConfirm(`Utilizatorul "${email}" va fi mutat în coșul de gunoi.`, async () => {
+      await sb.from('users_trash').upsert({ id, email, name, created_at })
       loadUtilizatori()
     })
   }
 
-  function loadCos() {
-    const trash = getTrash()
-    if (!trash.length) {
-      document.getElementById('cosList').innerHTML = '<div class="loading">Coșul de gunoi este gol.</div>'
-      return
+  async function loadCos() {
+    try {
+      const { data, error } = await sb.from('users_trash').select('*').order('deleted_at', { ascending: false })
+      if (error) throw error
+      if (!data?.length) {
+        document.getElementById('cosList').innerHTML = '<div class="loading">Coșul de gunoi este gol.</div>'
+        return
+      }
+      document.getElementById('cosList').innerHTML = `
+        <table>
+          <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th><th>Șters la</th><th>Acțiuni</th></tr></thead>
+          <tbody>${data.map(u => `
+            <tr>
+              <td>${u.name || '—'}</td>
+              <td>${u.email || '—'}</td>
+              <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
+              <td>${new Date(u.deleted_at).toLocaleDateString('ro-RO')}</td>
+              <td><button class="btn btn-outline btn-sm" onclick="revenireUtilizator('${u.id}')">↩ Revenire</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`
+    } catch(e) {
+      document.getElementById('cosList').innerHTML = '<div class="loading">Eroare: ' + e.message + '</div>'
     }
-    document.getElementById('cosList').innerHTML = `
-      <table>
-        <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th><th>Șters la</th><th>Acțiuni</th></tr></thead>
-        <tbody>${trash.map(u => `
-          <tr>
-            <td>${u.name || '—'}</td>
-            <td>${u.email || '—'}</td>
-            <td>${new Date(u.created_at).toLocaleDateString('ro-RO')}</td>
-            <td>${new Date(u.deleted_at).toLocaleDateString('ro-RO')}</td>
-            <td><button class="btn btn-outline btn-sm" onclick="revenireUtilizator('${u.id}')">↩ Revenire</button></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`
   }
 
-  function revenireUtilizator(id) {
-    const trash = getTrash().filter(u => u.id !== id)
-    saveTrash(trash)
+  async function revenireUtilizator(id) {
+    await sb.from('users_trash').delete().eq('id', id)
     loadCos()
     loadUtilizatori()
   }
 
   function golireIstoric() {
-    showConfirm('Toți utilizatorii din coș vor fi șterși definitiv. Această acțiune nu poate fi anulată!', () => {
-      saveTrash([])
+    showConfirm('Toți utilizatorii din coș vor fi șterși definitiv. Această acțiune nu poate fi anulată!', async () => {
+      await sb.from('users_trash').delete().neq('id', '00000000-0000-0000-0000-000000000000')
       loadCos()
     })
   }
