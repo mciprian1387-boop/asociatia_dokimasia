@@ -607,6 +607,14 @@
   setTimeout(() => document.getElementById('w2').classList.add('visible'), 900)
   setTimeout(() => document.getElementById('w3').classList.add('visible'), 1500)
   setTimeout(() => document.getElementById('sub').classList.add('visible'), 2200)
+
+  // Track page view
+  async function trackPageView() {
+    try {
+      await sb.from('page_views').insert({ page: window.location.pathname || '/', user_agent: navigator.userAgent })
+    } catch(e) {}
+  }
+  trackPageView()
 </script>
 </body>
 </html>
