@@ -140,6 +140,7 @@
       .misiune-inner { grid-template-columns: 1fr; gap: 24px; }
       .section-wrap { padding: 40px 16px; }
       .misiune-wrap { padding: 0; }
+      .misiune-img-col { display: none !important; }
       .activitati-wrap { padding: 40px 16px; }
       .page-hero { padding: 20px 16px; }
     }
@@ -253,7 +254,12 @@
 
 <!-- MISIUNEA -->
 <div class="misiune-wrap">
-  <div style="max-width:1000px;margin:0 auto;padding:60px 20px;">
+  <div style="max-width:1200px;margin:0 auto;padding:60px 20px;display:flex;gap:0;align-items:stretch;">
+    <!-- Imagine stanga - doar desktop -->
+    <div class="misiune-img-col" style="width:25%;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding-right:32px;">
+      <img src="logo_cap.gif" alt="Dokimasia" style="width:100%;max-width:180px;height:auto;display:block;" />
+    </div>
+    <div style="flex:1;">
     <div class="section-title">Misiunea noastră</div>
     <div class="section-line"></div>
 
@@ -333,7 +339,8 @@
       </div>
 
     </div>
-  </div>
+    </div><!-- end flex:1 -->
+  </div><!-- end flex container -->
 </div>
 
 <!-- VALORI -->
