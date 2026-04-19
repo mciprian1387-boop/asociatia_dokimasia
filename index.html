@@ -323,21 +323,21 @@
 <div class="mobile-header">
   <div class="mob-row1">
     <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
-    <button class="mob-account-btn" onclick="toggleAccount()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span id="mobAccountLabel">Contul meu</span>
-    </button>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
+        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+        <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:0.8rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;letter-spacing:1px;">Donează</button>
+        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+      </form>
+      <button class="mob-account-btn" onclick="openModal('login')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="mobAccountLabel">Contul meu</span>
+      </button>
+    </div>
   </div>
   <div class="mob-row2">
     <span class="mob-title">Asociația Dokimasia</span>
     <span class="mob-motto">Învățare. Implicare. Progres.</span>
-  </div>
-  <div class="mob-row3">
-    <form action="https://www.paypal.com/donate" method="post" target="_top">
-      <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-      <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 24px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;letter-spacing:1px;">Donează</button>
-      <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-    </form>
   </div>
   <div class="mob-row4">
     <button class="mob-hamburger" onclick="toggleMobMenu()">
