@@ -541,6 +541,8 @@
         title: subject,
         message: message
       })
+      // Salvează și în Supabase
+      await sb.from('messages').insert({ name, email, subject, message, citit: false })
       msg.textContent = 'Mesajul a fost trimis cu succes! Îți mulțumim.'
       msg.style.color = 'green'
       document.getElementById('contactName').value = ''
