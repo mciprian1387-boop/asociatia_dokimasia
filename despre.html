@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Despre noi — Asociația Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #fff; color: #222; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── HEADER ─── */
+    header { border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; }
+    .header-logo img { height: 80px; width: auto; display: block; }
+    .header-center { text-align: center; }
+    .header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
+    .header-motto { display: block; font-size: clamp(0.65rem, 1.5vw, 0.95rem); color: #8B0000; font-weight: normal; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+    .social-icons { display: flex; align-items: center; gap: 10px; }
+    .social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
+    .social-icons a:hover { opacity: 0.7; }
+    .social-icons svg { width: 26px; height: 26px; }
+    .btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
+    .btn-account:hover { background: #6a0000; }
+    .account-wrapper { position: relative; }
+    .account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; padding: 8px 0; }
+    .account-dropdown.open { display: block; }
+    .account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
+    .account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
+
+    /* ─── NAVBAR ─── */
+    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
+    nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
+    nav.main-nav a:last-child { border-right: none; }
+    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; }
+    .hamburger span { display: block; width: 26px; height: 3px; background: #8B0000; border-radius: 2px; }
+
+    /* ─── PAGE HERO ─── */
+    .page-hero { background: linear-gradient(135deg, #8B0000 0%, #6a0000 100%); color: #fff; text-align: center; padding: 60px 20px; }
+    .page-hero h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); margin-bottom: 12px; letter-spacing: 2px; }
+    .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 650px; margin: 0 auto; line-height: 1.7; }
+
+    /* ─── SECTIONS ─── */
+    .section-wrap { max-width: 1000px; margin: 0 auto; padding: 60px 20px; }
+    .section-title { font-size: 1.4rem; font-weight: bold; color: #8B0000; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; }
+    .section-line { width: 60px; height: 3px; background: #8B0000; margin-bottom: 28px; }
+    .section-text { font-size: 1rem; line-height: 1.9; color: #444; }
+
+    /* ─── MISIUNEA ─── */
+    .misiune-wrap { background: #fdf5f5; padding: 60px 20px; }
+    .misiune-inner { max-width: 1000px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .misiune-quote { font-size: 1.15rem; line-height: 1.9; color: #333; font-style: italic; border-left: 4px solid #8B0000; padding-left: 24px; }
+
+    /* ─── VALORI ─── */
+    .valori-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 8px; }
+    .valoare-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 28px 24px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+    .valoare-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(139,0,0,0.1); }
+    .valoare-icon { font-size: 2.5rem; margin-bottom: 14px; }
+    .valoare-title { font-size: 1.1rem; font-weight: bold; color: #8B0000; margin-bottom: 10px; }
+    .valoare-text { font-size: 0.88rem; color: #666; line-height: 1.7; }
+
+    /* ─── ACTIVITATI ─── */
+    .activitati-wrap { background: #fdf5f5; padding: 60px 20px; }
+    .activitati-inner { max-width: 1000px; margin: 0 auto; }
+    .activitati-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 8px; }
+    .activitate-item { display: flex; align-items: flex-start; gap: 14px; background: #fff; border-radius: 10px; padding: 18px 20px; border: 1px solid #e0e0e0; }
+    .activitate-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .activitate-text { font-size: 0.92rem; color: #444; line-height: 1.6; }
+    .activitate-text strong { color: #8B0000; display: block; margin-bottom: 3px; }
+
+    /* ─── DATE OFICIALE ─── */
+    .date-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 8px; }
+    .data-card { background: #8B0000; color: #fff; border-radius: 12px; padding: 24px; text-align: center; }
+    .data-number { font-size: 2rem; font-weight: bold; margin-bottom: 6px; }
+    .data-label { font-size: 0.82rem; opacity: 0.85; letter-spacing: 1px; text-transform: uppercase; }
+
+    /* ─── MEMBRI ─── */
+    .membri-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 8px; }
+    .membru-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 28px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .membru-avatar { width: 70px; height: 70px; background: #fdf5f5; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border: 2px solid #8B0000; }
+    .membru-avatar svg { width: 36px; height: 36px; }
+    .membru-rol { font-size: 0.82rem; color: #8B0000; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ─── LINIE DE TIMP ─── */
+    .timeline { position: relative; padding-left: 32px; margin-top: 8px; }
+    .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e0c0c0; }
+    .timeline-item { position: relative; margin-bottom: 32px; }
+    .timeline-item::before { content: ''; position: absolute; left: -28px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: #8B0000; border: 3px solid #fff; box-shadow: 0 0 0 2px #8B0000; }
+    .timeline-year { font-size: 0.8rem; font-weight: bold; color: #8B0000; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+    .timeline-text { font-size: 0.95rem; color: #444; line-height: 1.7; }
+
+    /* ─── FOOTER ─── */
+    footer { background: #8B0000; color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; margin-top: 60px; }
+    footer a { color: #f5c0c0; }
+    footer a:hover { color: #fff; }
+
+    /* ─── MODAL ─── */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
+    .modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; background: none; border: none; }
+    .modal-close:hover { color: #8B0000; }
+    .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e0e0e0; }
+    .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-size: 0.95rem; color: #999; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .modal-tab.active { color: #8B0000; border-bottom-color: #8B0000; font-weight: bold; }
+    .modal-msg { text-align: center; font-size: 0.85rem; margin-top: 12px; min-height: 20px; color: #8B0000; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: 'Georgia', serif; outline: none; transition: border 0.2s; }
+    .form-group input:focus { border-color: #8B0000; }
+    .btn-primary { background: #8B0000; color: #fff; padding: 12px 30px; border-radius: 6px; font-size: 1rem; font-family: 'Georgia', serif; transition: background 0.2s; display: inline-block; border: none; cursor: pointer; width: 100%; margin-top: 8px; }
+    .btn-primary:hover { background: #6a0000; }
+
+    /* ─── MOBILE HEADER ─── */
+    .mobile-header { display: none; }
+
+    @media (max-width: 768px) {
+      .header-top { display: none; }
+      nav.main-nav { display: none !important; }
+      .mobile-header { display: block; background: #fff; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+      .mob-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
+      .mob-logo img { height: 50px; }
+      .mob-row2 { text-align: center; padding: 6px 16px 2px; }
+      .mob-title { display: block; font-size: 1.05rem; font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 2px; }
+      .mob-motto { display: block; font-size: 0.68rem; color: #8B0000; letter-spacing: 1px; margin-top: 2px; }
+      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid #f0e0e0; }
+      .mob-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
+      .mob-hamburger span { display: block; width: 28px; height: 3px; background: #8B0000; border-radius: 2px; }
+      .mob-nav { display: none; flex-direction: column; background: #8B0000; }
+      .mob-nav.open { display: flex; }
+      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
+      .valori-grid { grid-template-columns: 1fr; }
+      .activitati-grid { grid-template-columns: 1fr; }
+      .date-grid { grid-template-columns: 1fr; }
+      .membri-grid { grid-template-columns: repeat(2, 1fr); }
+      .misiune-inner { grid-template-columns: 1fr; gap: 24px; }
+      .section-wrap { padding: 40px 16px; }
+      .misiune-wrap { padding: 40px 16px; }
+      .activitati-wrap { padding: 40px 16px; }
+      .page-hero { padding: 40px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER DESKTOP -->
+<header>
+  <div class="header-top">
+    <a href="index.html" class="header-logo">
+      <img src="Logo.gif" alt="Asociatia Dokimasia" />
+    </a>
+    <a href="index.html" class="header-center">
+      <span class="header-title">Asociația Dokimasia</span>
+      <span class="header-motto">Învățare. Implicare. Progres.</span>
+    </a>
+    <div class="header-right">
+      <div style="display:flex;align-items:center;">
+        <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
+          <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+          <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;letter-spacing:1px;">Donează</button>
+          <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+        </form>
+      </div>
+      <div class="social-icons">
+        <a href="contact.html" title="Contact">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+        <a href="https://facebook.com" target="_blank" title="Facebook">
+          <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+        </a>
+        <a href="https://instagram.com" target="_blank" title="Instagram">
+          <svg viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#dc2743"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs>
+          <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig)"/>
+          <circle cx="12" cy="12" r="4" fill="none" stroke="white" stroke-width="2"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
+        </a>
+        <a href="https://wa.me/40700000000" target="_blank" title="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.533 5.857L.054 23.61a.75.75 0 00.916.919l5.858-1.516A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.95 9.95 0 01-5.187-1.449l-.362-.216-3.676.952.981-3.565-.236-.376A9.954 9.954 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        </a>
+      </div>
+      <div class="account-wrapper">
+        <button class="btn-account" onclick="toggleAccount()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="accountLabel">Contul meu</span>
+        </button>
+        <div class="account-dropdown" id="accountDropdown">
+          <div id="loggedOut">
+            <a href="#" onclick="openModal('login')">Autentificare</a>
+            <a href="#" onclick="openModal('register')">Înregistrare</a>
+          </div>
+          <div id="loggedIn" style="display:none">
+            <div id="adminBtn" style="display:none"><a href="admin.html" style="color:#8B0000;font-weight:bold;">⚙ Panou Admin</a></div>
+            <a href="cont.html">Profilul meu</a>
+            <a href="#" onclick="logout()">Deconectare</a>
+          </div>
+        </div>
+      </div>
+      <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <nav class="main-nav" id="mainNav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html" class="active">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<!-- HEADER MOBIL -->
+<div class="mobile-header">
+  <div class="mob-row1">
+    <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
+        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+        <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:0.8rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
+        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+      </form>
+      <a href="contact.html" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 10px;display:flex;align-items:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      </a>
+      <button onclick="toggleAccount()" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="mob-row2">
+    <span class="mob-title">Asociația Dokimasia</span>
+    <span class="mob-motto">Învățare. Implicare. Progres.</span>
+  </div>
+  <div class="mob-row4">
+    <button class="mob-hamburger" onclick="document.getElementById('mobNav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav class="mob-nav" id="mobNav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div>
+
+<!-- HERO -->
+<div class="page-hero">
+  <h1>Despre noi</h1>
+  <p>O organizație construită pe valori, dedicată tinerilor și comunității.</p>
+</div>
+
+<!-- MISIUNEA -->
+<div class="misiune-wrap">
+  <div class="misiune-inner">
+    <div>
+      <div class="section-title">Misiunea noastră</div>
+      <div class="section-line"></div>
+      <p class="section-text">
+        Asociația Dokimasia este o organizație neguvernamentală, non-profit, apolitică și independentă, dedicată dezvoltării aptitudinilor tinerilor din medii sociale diferite — rural și urban, cu accent pe tinerii vulnerabili și cei din medii dezavantajate.
+        <br><br>
+        Ne propunem să creăm un cadru propice schimbului de cunoștințe și informații cultural-educative, prin care fiecare tânăr să poată să se adapteze și să se integreze eficient într-o societate dinamică.
+        <br><br>
+        Credem că educația nu este un privilegiu, ci un drept. Și că fiecare om, indiferent de origine sau circumstanțe, merită șansa de a se descoperi, de a crește și de a contribui la o lume mai bună.
+      </p>
+    </div>
+    <div>
+      <blockquote class="misiune-quote">
+        „Dokimasia — în greacă — înseamnă examinare, discernământ, verificare. Este procesul prin care descoperi cine ești cu adevărat și ce poți deveni. Acesta este drumul pe care îl propunem fiecărui tânăr care ni se alătură."
+      </blockquote>
+    </div>
+  </div>
+</div>
+
+<!-- VALORI -->
+<div class="section-wrap">
+  <div class="section-title">Valorile noastre</div>
+  <div class="section-line"></div>
+  <div class="valori-grid">
+    <div class="valoare-card">
+      <div class="valoare-icon">📚</div>
+      <div class="valoare-title">Cunoaștere</div>
+      <div class="valoare-text">Promovăm accesul la educație de calitate, gândire critică și dorința permanentă de a învăța și a crește.</div>
+    </div>
+    <div class="valoare-card">
+      <div class="valoare-icon">🤝</div>
+      <div class="valoare-title">Implicare</div>
+      <div class="valoare-text">Credem în puterea comunității și a acțiunii colective. Fiecare voce contează, fiecare contribuție face diferența.</div>
+    </div>
+    <div class="valoare-card">
+      <div class="valoare-icon">🌱</div>
+      <div class="valoare-title">Progres</div>
+      <div class="valoare-text">Ne angajăm să sprijinim fiecare tânăr să se dezvolte, să depășească obstacole și să construiască un viitor mai bun.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVITATI -->
+<div class="activitati-wrap">
+  <div class="activitati-inner">
+    <div class="section-title">Ce facem</div>
+    <div class="section-line"></div>
+    <div class="activitati-grid">
+      <div class="activitate-item">
+        <div class="activitate-icon">🎓</div>
+        <div class="activitate-text"><strong>Cursuri și cercuri educative</strong>Programe în domeniile: Limbă și comunicare, Științe, Om și societate, Estetic și Creativ, Psihomotric.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🏕</div>
+        <div class="activitate-text"><strong>Tabere și boot camp-uri</strong>Programe educaționale complexe care îmbină sesiunile de pregătire nonformală cu activități în aer liber.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🌿</div>
+        <div class="activitate-text"><strong>Educație ecologică</strong>Activități de educare în privința protejării mediului și a dezvoltării durabile.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🎤</div>
+        <div class="activitate-text"><strong>Public speaking și comunicare</strong>Programe dedicate dezvoltării abilităților de comunicare, exprimare și prezentare în public.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🚌</div>
+        <div class="activitate-text"><strong>Excursii tematice</strong>Vizite la muzee, teatre, cinematografe, monumente istorice, parcuri și rezervații naturale.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🎨</div>
+        <div class="activitate-text"><strong>Creativitate și arte</strong>Ateliere creative care stimulează imaginația, exprimarea artistică și dezvoltarea personală.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">📖</div>
+        <div class="activitate-text"><strong>Publicații și materiale educative</strong>Editarea de cărți, reviste, ghiduri, broșuri și alte materiale informative pentru comunitate.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🏆</div>
+        <div class="activitate-text"><strong>Conferințe și dezbateri</strong>Evenimente publice care stimulează dialogul, gândirea critică și schimbul de idei în comunitate.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🤲</div>
+        <div class="activitate-text"><strong>Acțiuni caritabile</strong>Sprijin material și social pentru tinerii identificați ca talentați sau aflați în dificultate.</div>
+      </div>
+      <div class="activitate-item">
+        <div class="activitate-icon">🌐</div>
+        <div class="activitate-text"><strong>Parteneriate și proiecte</strong>Colaborări cu autorități publice, ONG-uri și instituții de învățământ din România și din străinătate.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DATE OFICIALE -->
+<div class="section-wrap">
+  <div class="section-title">Date oficiale</div>
+  <div class="section-line"></div>
+  <div class="date-grid">
+    <div class="data-card">
+      <div class="data-number">2014</div>
+      <div class="data-label">Anul înființării</div>
+    </div>
+    <div class="data-card">
+      <div class="data-number">32867923</div>
+      <div class="data-label">CUI</div>
+    </div>
+    <div class="data-card">
+      <div class="data-number">Iași</div>
+      <div class="data-label">Sediu</div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBRI -->
+<div class="activitati-wrap">
+  <div class="activitati-inner">
+    <div class="section-title">Membri fondatori</div>
+    <div class="section-line"></div>
+    <div class="membri-grid">
+      <div class="membru-card">
+        <div class="membru-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="membru-rol">Președinte</div>
+      </div>
+      <div class="membru-card">
+        <div class="membru-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="membru-rol">Vicepreședinte</div>
+      </div>
+      <div class="membru-card">
+        <div class="membru-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="membru-rol">Secretar</div>
+      </div>
+      <div class="membru-card">
+        <div class="membru-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="membru-rol">Membru</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LINIE DE TIMP -->
+<div class="section-wrap">
+  <div class="section-title">Istoria noastră</div>
+  <div class="section-line"></div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-year">2013</div>
+      <div class="timeline-text">Înregistrarea denumirii asociației la Ministerul Justiției și Libertăților Cetățenești.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2014</div>
+      <div class="timeline-text">Înființarea oficială a Asociației Dokimasia, înscrisă în Registrul Asociațiilor și Fundațiilor sub nr. 14/A/06.02.2014.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">2025</div>
+      <div class="timeline-text">Actualizarea structurii organizatorice și consolidarea echipei fondatoare. Lansarea noului site oficial al asociației.</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-year">Viitor</div>
+      <div class="timeline-text">Extinderea programelor educaționale, lansarea publicațiilor și cursurilor de formare pentru tineri din medii vulnerabile.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© <span id="year"></span> Asociația Dokimasia. Toate drepturile rezervate.</p>
+  <p style="margin-top:8px"><a href="contact.html">contact@dokimasia.ro</a></p>
+</footer>
+
+<!-- MODAL LOGIN -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Contul meu</h2>
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Autentificare</div>
+      <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
+    </div>
+    <div id="formLogin">
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="email@exemplu.ro" /></div>
+      <div class="form-group"><label>Parolă</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
+      <button class="btn-primary" onclick="login()">Intră în cont</button>
+      <p style="text-align:center;margin-top:10px;"><a href="#" onclick="resetPassword()" style="font-size:0.82rem;color:#8B0000;">Ai uitat parola?</a></p>
+      <p class="modal-msg" id="loginMsg"></p>
+    </div>
+    <div id="formRegister" style="display:none">
+      <div class="form-group"><label>Nume complet</label><input type="text" id="regName" placeholder="Ion Popescu" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="email@exemplu.ro" /></div>
+      <div class="form-group"><label>Parolă</label><input type="password" id="regPassword" placeholder="••••••••" /></div>
+      <button class="btn-primary" onclick="register()">Creează cont</button>
+      <p class="modal-msg" id="registerMsg"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const { createClient } = supabase
+  const sb = createClient(
+    'https://jaoxhsyplnkanhqevnnr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
+  )
+
+  document.getElementById('year').textContent = new Date().getFullYear()
+
+  function toggleMenu() { document.getElementById('mainNav').classList.toggle('open') }
+  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
+
+  document.addEventListener('click', function(e) {
+    const aw = document.querySelector('.account-wrapper')
+    if (aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open')
+  })
+
+  function openModal(tab) {
+    document.getElementById('modalOverlay').classList.add('open')
+    switchTab(tab)
+    document.getElementById('accountDropdown').classList.remove('open')
+  }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
+  document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal() })
+
+  function switchTab(tab) {
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none'
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none'
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login')
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register')
+  }
+
+  async function resetPassword() {
+    const email = document.getElementById('loginEmail').value.trim()
+    const msg = document.getElementById('loginMsg')
+    if (!email) { msg.textContent = 'Introdu emailul mai întâi.'; msg.style.color = '#c00'; return }
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://dokimasia.ro' })
+    if (error) { msg.textContent = 'Eroare: ' + error.message }
+    else { msg.textContent = 'Email de resetare trimis!'; msg.style.color = 'green' }
+  }
+
+  async function login() {
+    const email = document.getElementById('loginEmail').value
+    const password = document.getElementById('loginPassword').value
+    const msg = document.getElementById('loginMsg')
+    msg.textContent = 'Se conectează...'
+    const { error } = await sb.auth.signInWithPassword({ email, password })
+    if (error) { msg.textContent = 'Eroare: ' + error.message }
+    else { closeModal(); updateAccountUI() }
+  }
+
+  async function register() {
+    const name = document.getElementById('regName').value
+    const email = document.getElementById('regEmail').value
+    const password = document.getElementById('regPassword').value
+    const msg = document.getElementById('registerMsg')
+    const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } })
+    if (error) { msg.textContent = 'Eroare: ' + error.message }
+    else { msg.textContent = 'Cont creat! Poți să te loghezi acum.' }
+  }
+
+  async function logout() {
+    await sb.auth.signOut()
+    updateAccountUI()
+  }
+
+  async function updateAccountUI() {
+    const { data: { user } } = await sb.auth.getUser()
+    const label = document.getElementById('accountLabel')
+    const loggedOut = document.getElementById('loggedOut')
+    const loggedIn = document.getElementById('loggedIn')
+    if (user) {
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email
+      if (label) label.textContent = name.split(' ')[0]
+      if (loggedOut) loggedOut.style.display = 'none'
+      if (loggedIn) loggedIn.style.display = 'block'
+      if (user.email === 'm.ciprian1387@gmail.com') {
+        const adminBtn = document.getElementById('adminBtn')
+        if (adminBtn) adminBtn.style.display = 'block'
+      }
+    } else {
+      if (label) label.textContent = 'Contul meu'
+      if (loggedOut) loggedOut.style.display = 'block'
+      if (loggedIn) loggedIn.style.display = 'none'
+    }
+  }
+
+  sb.auth.onAuthStateChange(() => updateAccountUI())
+  updateAccountUI()
+
+  async function trackPageView() {
+    try { await sb.from('page_views').insert({ page: '/despre.html', user_agent: navigator.userAgent }) } catch(e) {}
+  }
+  trackPageView()
+</script>
+</body>
+</html>
