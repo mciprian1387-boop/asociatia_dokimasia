@@ -709,7 +709,8 @@
   async function loadMesaje() {
     try {
       const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false })
-      const allMsgs = data || []
+      allMessagesCache = data || []
+      const allMsgs = allMessagesCache
       const active = allMsgs.filter(m => m.sters !== true)
       const necitite = active.filter(m => m.citit !== true)
       const citite = active.filter(m => m.citit === true)
