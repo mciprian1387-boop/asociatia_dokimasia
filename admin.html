@@ -457,6 +457,11 @@
     'https://jaoxhsyplnkanhqevnnr.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
   )
+  const sbAdmin = createClient(
+    'https://jaoxhsyplnkanhqevnnr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQwNDQ1NiwiZXhwIjoyMDkxOTgwNDU2fQ.XzUqltkqUHLZfMsIOWNI4O7WBvmzNcdoL8Saet05T-A',
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
 
   document.getElementById('year').textContent = new Date().getFullYear()
   document.getElementById('statDate').textContent = new Date().toLocaleDateString('ro-RO')
@@ -573,7 +578,7 @@
   // ─── UTILIZATORI ───
   async function loadUtilizatori() {
     try {
-      const { data, error } = await sb.auth.admin.listUsers()
+      const { data, error } = await sbAdmin.auth.admin.listUsers()
       if (error) throw error
       if (!data?.users?.length) {
         document.getElementById('utilizatoriList').innerHTML = '<div class="loading">Nu există utilizatori încă.</div>'
