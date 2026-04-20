@@ -603,8 +603,15 @@
     }
   }
 
-  sb.auth.onAuthStateChange(() => updateAccountUI())
-  updateAccountUI()
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+      updateAccountUI()
+    }
+    if (event === 'SIGNED_IN') {
+      const modals = document.querySelectorAll('.modal-overlay')
+      modals.forEach(m => m.classList.remove('open'))
+    }
+  })
 
   // Animatie
   setTimeout(() => document.getElementById('w1').classList.add('visible'), 300)
