@@ -267,6 +267,16 @@
         Autori
       </div>
 
+      <div class="sidebar-item" onclick="showSection('resurse')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="14 2 14 8 20 8"/><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Resurse
+      </div>
+
+      <div class="sidebar-item" onclick="showSection('carti')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Cărți
+      </div>
+
       <div class="sidebar-item" onclick="showSection('plati')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
         Plăți
@@ -655,124 +665,123 @@
       </div>
 
       <!-- ─── REVISTĂ ─── -->
-      <div id="sec-revista" style="display:none;">
+      <div class="section" id="sec-revista">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h2 style="color:#8B0000;font-size:1.3rem;">📖 Revistă</h2>
           <button class="btn btn-red" onclick="showFormEditie()">+ Ediție nouă</button>
         </div>
-
-        <!-- Form ediție nouă -->
         <div id="formEditie" style="display:none;background:#f9f4f4;border:1px solid #e0c0c0;border-radius:10px;padding:24px;margin-bottom:24px;">
           <h3 style="color:#8B0000;margin-bottom:16px;" id="formEditieTitlu">Ediție nouă</h3>
           <input type="hidden" id="editieId" value="" />
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Titlul ediției *</label><input type="text" id="editieTitlu" placeholder="ex: Educația în era digitală" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Numărul ediției *</label><input type="text" id="editieEditie" placeholder="ex: Nr. 1 / 2025" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Data apariției</label><input type="date" id="editieData" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">URL Copertă</label><input type="text" id="editieCoperta" placeholder="https://cdn.dokimasia.ro/coperte/..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-            <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Descriere</label><textarea id="editieDescriere" rows="3" placeholder="Descrierea acestei ediții..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;resize:vertical;"></textarea></div>
-            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Status</label>
-              <select id="editieStatus" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;">
-                <option value="draft">Draft</option>
-                <option value="publicat">Publicat</option>
-              </select>
-            </div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Titlu *</label><input type="text" id="editieTitlu" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Ediție *</label><input type="text" id="editieEditie" placeholder="Nr. 1 / 2025" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Data</label><input type="date" id="editieData" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">URL Copertă</label><input type="text" id="editieCoperta" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Descriere</label><textarea id="editieDescriere" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"></textarea></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Status</label><select id="editieStatus" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"><option value="draft">Draft</option><option value="publicat">Publicat</option></select></div>
           </div>
-          <div style="margin-top:16px;display:flex;gap:10px;">
-            <button class="btn btn-red" onclick="salveazaEditie()">💾 Salvează ediția</button>
-            <button class="btn btn-outline" onclick="document.getElementById('formEditie').style.display='none'">Anulează</button>
-          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-red" onclick="salveazaEditie()">💾 Salvează</button><button class="btn btn-outline" onclick="document.getElementById('formEditie').style.display='none'">Anulează</button></div>
           <p id="editieMsg" style="margin-top:10px;font-size:0.85rem;color:green;"></p>
         </div>
-
-        <!-- Lista ediții -->
         <div id="editiiAdminList"><p style="color:#888;">Se încarcă...</p></div>
-
-        <!-- Articolele unei ediții -->
         <div id="articoleEditieSection" style="display:none;margin-top:30px;border-top:2px solid #f0e0e0;padding-top:24px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <h3 style="color:#8B0000;" id="articoleEditieTitlu">Articole</h3>
-            <div style="display:flex;gap:10px;">
-              <button class="btn btn-red" onclick="showFormArticol()">+ Articol nou</button>
-              <button class="btn btn-outline" onclick="document.getElementById('articoleEditieSection').style.display='none'">✕ Închide</button>
-            </div>
+            <div style="display:flex;gap:10px;"><button class="btn btn-red" onclick="showFormArticol()">+ Articol nou</button><button class="btn btn-outline" onclick="document.getElementById('articoleEditieSection').style.display='none'">✕ Închide</button></div>
           </div>
-
-          <!-- Form articol -->
           <div id="formArticol" style="display:none;background:#f9f4f4;border:1px solid #e0c0c0;border-radius:10px;padding:24px;margin-bottom:20px;">
             <h4 style="color:#8B0000;margin-bottom:16px;" id="formArticolTitlu">Articol nou</h4>
-            <input type="hidden" id="articolId" value="" />
-            <input type="hidden" id="articolRevistaId" value="" />
+            <input type="hidden" id="articolId" /><input type="hidden" id="articolRevistaId" />
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Titlu articol *</label><input type="text" id="articolTitlu" placeholder="Titlul articolului" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Autor (selectează)</label>
-                <select id="articolAutorId" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"><option value="">— Selectează autorul —</option></select>
-              </div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Rubrică</label><input type="text" id="articolRubrica" placeholder="ex: Editorial, Educație, Interviu" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Rezumat</label><textarea id="articolRezumat" rows="2" placeholder="Un scurt rezumat al articolului..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;resize:vertical;"></textarea></div>
-              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Conținut</label><textarea id="articolContinut" rows="8" placeholder="Conținutul complet al articolului..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;resize:vertical;"></textarea></div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">URL Fișier (PDF/Word)</label><input type="text" id="articolFisierUrl" placeholder="https://cdn.dokimasia.ro/articole/..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Upload fișier</label>
-                <input type="file" id="articolFisier" accept=".pdf,.doc,.docx" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" onchange="uploadArticolFisier(this)" />
-                <p id="uploadMsg" style="font-size:0.8rem;color:#888;margin-top:4px;"></p>
-              </div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Acces</label>
-                <select id="articolAcces" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;">
-                  <option value="premium">Premium (cont necesar)</option>
-                  <option value="gratuit">Gratuit</option>
-                </select>
-              </div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Status</label>
-                <select id="articolStatus" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;">
-                  <option value="trimis">Trimis</option>
-                  <option value="in_evaluare">În evaluare</option>
-                  <option value="acceptat">Acceptat</option>
-                  <option value="publicat">Publicat</option>
-                  <option value="respins">Respins</option>
-                </select>
-              </div>
-              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Ordine afișare</label><input type="number" id="articolOrdine" value="0" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
-              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Feedback editor (vizibil pentru autor)</label><textarea id="articolFeedback" rows="2" placeholder="Observații pentru autor..." style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;resize:vertical;"></textarea></div>
+              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Titlu *</label><input type="text" id="articolTitlu" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Autor</label><select id="articolAutorId" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"><option value="">— Selectează —</option></select></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Rubrică</label><input type="text" id="articolRubrica" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Rezumat</label><textarea id="articolRezumat" rows="2" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"></textarea></div>
+              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Conținut</label><textarea id="articolContinut" rows="8" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"></textarea></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Upload fișier</label><input type="file" id="articolFisier" accept=".pdf,.doc,.docx" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" onchange="uploadArticolFisier(this)" /><p id="uploadMsg" style="font-size:0.8rem;color:#888;margin-top:4px;"></p></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">URL Fișier</label><input type="text" id="articolFisierUrl" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Acces</label><select id="articolAcces" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"><option value="premium">Premium</option><option value="gratuit">Gratuit</option></select></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Status</label><select id="articolStatus" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"><option value="trimis">Trimis</option><option value="in_evaluare">În evaluare</option><option value="acceptat">Acceptat</option><option value="publicat">Publicat</option><option value="respins">Respins</option></select></div>
+              <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Ordine</label><input type="number" id="articolOrdine" value="0" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+              <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Feedback editor</label><textarea id="articolFeedback" rows="2" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"></textarea></div>
             </div>
-            <div style="margin-top:16px;display:flex;gap:10px;align-items:center;">
-              <button class="btn btn-red" onclick="salveazaArticol()">💾 Salvează articolul</button>
-              <button class="btn btn-outline" onclick="document.getElementById('formArticol').style.display='none'">Anulează</button>
-              <label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;cursor:pointer;"><input type="checkbox" id="articolPlatit" /> Taxa plătită</label>
-            </div>
+            <div style="margin-top:16px;display:flex;gap:10px;align-items:center;"><button class="btn btn-red" onclick="salveazaArticol()">💾 Salvează</button><button class="btn btn-outline" onclick="document.getElementById('formArticol').style.display='none'">Anulează</button><label style="display:flex;align-items:center;gap:6px;font-size:0.85rem;"><input type="checkbox" id="articolPlatit" /> Taxa plătită</label></div>
             <p id="articolMsg" style="margin-top:10px;font-size:0.85rem;color:green;"></p>
           </div>
-
-          <div id="articoleEditieList"><p style="color:#888;">Selectează o ediție pentru a vedea articolele.</p></div>
+          <div id="articoleEditieList"></div>
         </div>
       </div>
 
       <!-- ─── AUTORI ─── -->
-      <div id="sec-autori" style="display:none;">
+      <div class="section" id="sec-autori">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h2 style="color:#8B0000;font-size:1.3rem;">✍️ Autori</h2>
           <button class="btn btn-outline" onclick="loadAutori()">↻ Actualizează</button>
         </div>
-        <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <button class="btn" style="background:#f5e8e8;color:#8B0000;border:1px solid #e0c0c0;" onclick="filtreazaAutori('toti')">Toți</button>
-          <button class="btn" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;" onclick="filtreazaAutori('in_asteptare')">În așteptare</button>
-          <button class="btn" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="filtreazaAutori('aprobat')">Aprobați</button>
-          <button class="btn" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="filtreazaAutori('respins')">Respinși</button>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" onclick="filtreazaAutori('toti')">Toți</button>
+          <button class="btn btn-sm" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;" onclick="filtreazaAutori('in_asteptare')">În așteptare</button>
+          <button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="filtreazaAutori('aprobat')">Aprobați</button>
+          <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="filtreazaAutori('respins')">Respinși</button>
         </div>
         <div id="autoriList"><p style="color:#888;">Se încarcă...</p></div>
       </div>
 
-      <!-- ─── PLĂȚI ─── -->
-      <div id="sec-plati" style="display:none;">
+      <!-- ─── RESURSE ─── -->
+      <div class="section" id="sec-resurse">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-          <h2 style="color:#8B0000;font-size:1.3rem;">💳 Plăți articole</h2>
+          <h2 style="color:#8B0000;font-size:1.3rem;">📄 Resurse educaționale deschise</h2>
+          <button class="btn btn-red" onclick="showFormResursa()">+ Resursă nouă</button>
+        </div>
+        <div id="formResursa" style="display:none;background:#f9f4f4;border:1px solid #e0c0c0;border-radius:10px;padding:24px;margin-bottom:24px;">
+          <h3 style="color:#8B0000;margin-bottom:16px;" id="formResursaTitlu">Resursă nouă</h3>
+          <input type="hidden" id="resursaId" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Titlu *</label><input type="text" id="resursaTitlu" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div style="grid-column:1/-1;"><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Descriere</label><textarea id="resursaDescriere" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"></textarea></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Categorie</label><input type="text" id="resursaCategorie" placeholder="ex: Fișe lucru" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Ordine</label><input type="number" id="resursaOrdine" value="0" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Upload fișier</label><input type="file" id="resursaFisier" onchange="uploadResursaFisier(this)" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;" /><p id="resursaUploadMsg" style="font-size:0.8rem;color:#888;margin-top:4px;"></p></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">URL Fișier</label><input type="text" id="resursaFisierUrl" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" /></div>
+            <div><label style="font-size:0.85rem;color:#555;display:block;margin-bottom:4px;">Status</label><select id="resursaPublicat" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;"><option value="true">Publicat</option><option value="false">Ascuns</option></select></div>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;"><button class="btn btn-red" onclick="salveazaResursa()">💾 Salvează</button><button class="btn btn-outline" onclick="document.getElementById('formResursa').style.display='none'">Anulează</button></div>
+          <p id="resursaMsg" style="margin-top:10px;font-size:0.85rem;color:green;"></p>
+        </div>
+        <div id="resurseList"><p style="color:#888;">Se încarcă...</p></div>
+      </div>
+
+      <!-- ─── CĂRȚI ─── -->
+      <div class="section" id="sec-carti">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h2 style="color:#8B0000;font-size:1.3rem;">📚 Cărți publicate de utilizatori</h2>
+          <button class="btn btn-outline" onclick="loadCartiAdmin()">↻ Actualizează</button>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" onclick="filtreazaCarti('toate')">Toate</button>
+          <button class="btn btn-sm" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;" onclick="filtreazaCarti('trimis')">Trimise</button>
+          <button class="btn btn-sm" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;" onclick="filtreazaCarti('in_evaluare')">În evaluare</button>
+          <button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="filtreazaCarti('publicat')">Publicate</button>
+          <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="filtreazaCarti('respins')">Respinse</button>
+        </div>
+        <div id="cartiAdminList"><p style="color:#888;">Se încarcă...</p></div>
+      </div>
+
+      <!-- ─── PLĂȚI ─── -->
+      <div class="section" id="sec-plati">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h2 style="color:#8B0000;font-size:1.3rem;">💳 Plăți</h2>
           <button class="btn btn-outline" onclick="loadPlati()">↻ Actualizează</button>
         </div>
         <div id="platiStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;"></div>
-        <div id="platiList"><p style="color:#888;">Se încarcă...</p></div>
+        <h3 style="color:#8B0000;font-size:1rem;margin-bottom:12px;">Plăți articole revistă</h3>
+        <div id="platiArticoleList" style="margin-bottom:30px;"><p style="color:#888;">Se încarcă...</p></div>
+        <h3 style="color:#8B0000;font-size:1rem;margin-bottom:12px;">Plăți cărți</h3>
+        <div id="platiCartiList"><p style="color:#888;">Se încarcă...</p></div>
       </div>
 
     </div><!-- end admin-content -->
-
   </div><!-- end admin-wrap -->
 </div><!-- end adminPanel -->
 
@@ -1364,13 +1373,17 @@
     if (name === 'abonati') loadAbonati()
     if (name === 'revista') loadEditiiAdmin()
     if (name === 'autori') loadAutori()
+    if (name === 'resurse') loadResurseAdmin()
+    if (name === 'carti') loadCartiAdmin()
     if (name === 'plati') loadPlati()
   }
 
-  // ─── REVISTĂ ───
+  // ─── R2 CONFIG ───
   const R2_WORKER = 'https://r2-upload-dokimasia.m-ciprian1387.workers.dev'
   const R2_SECRET = 'dokimasia-r2-secret-2024'
   const CDN = 'https://cdn.dokimasia.ro'
+
+  // ─── REVISTĂ ───
   let currentEditieId = null
 
   function showFormEditie(editie = null) {
@@ -1407,13 +1420,10 @@
       descriere: document.getElementById('editieDescriere').value.trim() || null,
       status: document.getElementById('editieStatus').value
     }
-    if(!payload.titlu || !payload.editie) { document.getElementById('editieMsg').textContent = 'Completează titlul și numărul ediției!'; document.getElementById('editieMsg').style.color = '#c00'; return }
+    if(!payload.titlu || !payload.editie) { document.getElementById('editieMsg').textContent = 'Completează titlul și ediția!'; document.getElementById('editieMsg').style.color = '#c00'; return }
     let error
-    if(id) {
-      ({error} = await sbAdmin.from('reviste').update(payload).eq('id', id))
-    } else {
-      ({error} = await sbAdmin.from('reviste').insert([payload]))
-    }
+    if(id) { ({error} = await sbAdmin.from('reviste').update(payload).eq('id', id)) }
+    else { ({error} = await sbAdmin.from('reviste').insert([payload])) }
     if(error) { document.getElementById('editieMsg').textContent = 'Eroare: ' + error.message; document.getElementById('editieMsg').style.color = '#c00' }
     else { document.getElementById('editieMsg').textContent = '✓ Salvat!'; document.getElementById('editieMsg').style.color = 'green'; document.getElementById('formEditie').style.display = 'none'; loadEditiiAdmin() }
   }
@@ -1421,8 +1431,8 @@
   async function loadEditiiAdmin() {
     const list = document.getElementById('editiiAdminList')
     list.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
-    const {data, error} = await sbAdmin.from('reviste').select('*').order('data_aparitie', {ascending: false})
-    if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:20px;">Nu există ediții încă. Creează prima ediție!</p>'; return }
+    const {data} = await sbAdmin.from('reviste').select('*').order('data_aparitie', {ascending: false})
+    if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:20px;">Nu există ediții. Creează prima ediție!</p>'; return }
     list.innerHTML = `<table>
       <thead><tr><th>Ediție</th><th>Titlu</th><th>Data</th><th>Status</th><th>Acțiuni</th></tr></thead>
       <tbody>${data.map(e => `
@@ -1432,8 +1442,8 @@
           <td>${e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO') : '—'}</td>
           <td><span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;background:${e.status==='publicat'?'#e8f5e9':'#fff3e0'};color:${e.status==='publicat'?'#2e7d32':'#e65100'};">${e.status==='publicat'?'✓ Publicat':'Draft'}</span></td>
           <td style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-sm btn-outline" onclick="gestioneazaArticole('${e.id}','${e.titlu.replace(/'/g,"\\'")}')">📄 Articole</button>
-            <button class="btn btn-sm btn-outline" onclick='showFormEditie(${JSON.stringify(e)})'>✏️ Edit</button>
+            <button class="btn btn-sm btn-outline" onclick="gestioneazaArticole('${e.id}','${(e.titlu||'').replace(/'/g,"\\\\'")}')">📄 Articole</button>
+            <button class="btn btn-sm btn-outline" onclick='showFormEditie(${JSON.stringify(e).replace(/'/g,"&#39;")})'>✏️</button>
             <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="stergeEditie('${e.id}')">🗑</button>
           </td>
         </tr>`).join('')}
@@ -1442,7 +1452,7 @@
   }
 
   async function stergeEditie(id) {
-    if(!confirm('Ștergi această ediție? Articolele legate vor fi deconectate.')) return
+    if(!confirm('Ștergi această ediție?')) return
     await sbAdmin.from('reviste').delete().eq('id', id)
     loadEditiiAdmin()
   }
@@ -1453,10 +1463,9 @@
     document.getElementById('articoleEditieTitlu').textContent = '📄 Articole: ' + titlu
     document.getElementById('formArticol').style.display = 'none'
     loadArticoleEditie(revistaId)
-    // Load autori for select
     const {data: autori} = await sbAdmin.from('autori').select('id, nume_complet, institutie').eq('status','aprobat')
     const sel = document.getElementById('articolAutorId')
-    sel.innerHTML = '<option value="">— Selectează autorul —</option>' + (autori||[]).map(a => `<option value="${a.id}">${a.nume_complet}${a.institutie?' — '+a.institutie:''}</option>`).join('')
+    sel.innerHTML = '<option value="">— Selectează —</option>' + (autori||[]).map(a => `<option value="${a.id}">${a.nume_complet}${a.institutie?' — '+a.institutie:''}</option>`).join('')
   }
 
   async function loadArticoleEditie(revistaId) {
@@ -1466,7 +1475,7 @@
     if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:16px;">Nu există articole în această ediție.</p>'; return }
     const statusColor = {trimis:'#fff3e0|#e65100', in_evaluare:'#e3f2fd|#1565c0', acceptat:'#e8f5e9|#2e7d32', publicat:'#e8f5e9|#1b5e20', respins:'#fce4ec|#c62828'}
     list.innerHTML = `<table>
-      <thead><tr><th>Ord.</th><th>Titlu</th><th>Autor</th><th>Rubrică</th><th>Acces</th><th>Status</th><th>Plătit</th><th>Acțiuni</th></tr></thead>
+      <thead><tr><th>Ord.</th><th>Titlu</th><th>Autor</th><th>Rubrică</th><th>Status</th><th>Plătit</th><th>Acțiuni</th></tr></thead>
       <tbody>${data.map(a => {
         const [bg,col] = (statusColor[a.status]||'#f5f5f5|#555').split('|')
         return `<tr>
@@ -1474,7 +1483,6 @@
           <td><strong>${a.titlu}</strong></td>
           <td>${a.autori?.nume_complet||'—'}</td>
           <td>${a.rubrica||'—'}</td>
-          <td><span style="font-size:0.78rem;">${a.tip_acces==='gratuit'?'✓ Gratuit':'🔒 Premium'}</span></td>
           <td><span style="padding:3px 8px;border-radius:20px;font-size:0.75rem;background:${bg};color:${col};">${a.status}</span></td>
           <td style="text-align:center;">${a.platit?'✓':'—'}</td>
           <td style="display:flex;gap:6px;">
@@ -1482,9 +1490,7 @@
             <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="stergeArticol('${a.id}')">🗑</button>
           </td>
         </tr>`
-      }).join('')}
-      </tbody>
-    </table>`
+      }).join('')}</tbody></table>`
   }
 
   function showFormArticol() {
@@ -1532,19 +1538,11 @@
     msg.textContent = '⏳ Se uploadează...'
     try {
       const key = 'articole/' + Date.now() + '_' + file.name.replace(/\s+/g,'_')
-      const res = await fetch(R2_WORKER + '/' + key, {
-        method: 'PUT',
-        headers: {'Authorization': 'Bearer ' + R2_SECRET, 'Content-Type': file.type},
-        body: file
-      })
+      const res = await fetch(R2_WORKER + '/' + key, {method:'PUT', headers:{'Authorization':'Bearer '+R2_SECRET,'Content-Type':file.type}, body:file})
       const data = await res.json()
-      document.getElementById('articolFisierUrl').value = data.url || CDN + '/' + key
-      msg.textContent = '✓ Uploadat! ' + data.url
-      msg.style.color = 'green'
-    } catch(e) {
-      msg.textContent = 'Eroare upload: ' + e.message
-      msg.style.color = '#c00'
-    }
+      document.getElementById('articolFisierUrl').value = data.url || CDN+'/'+key
+      msg.textContent = '✓ Uploadat!'; msg.style.color='green'
+    } catch(e) { msg.textContent='Eroare: '+e.message; msg.style.color='#c00' }
   }
 
   async function salveazaArticol() {
@@ -1563,17 +1561,17 @@
       feedback_editor: document.getElementById('articolFeedback').value.trim() || null,
       platit: document.getElementById('articolPlatit').checked
     }
-    if(!payload.titlu) { document.getElementById('articolMsg').textContent = 'Completează titlul!'; document.getElementById('articolMsg').style.color='#c00'; return }
+    if(!payload.titlu) { document.getElementById('articolMsg').textContent='Completează titlul!'; document.getElementById('articolMsg').style.color='#c00'; return }
     let error
-    if(id) { ({error} = await sbAdmin.from('articole_revista').update(payload).eq('id', id)) }
+    if(id) { ({error} = await sbAdmin.from('articole_revista').update(payload).eq('id',id)) }
     else { ({error} = await sbAdmin.from('articole_revista').insert([payload])) }
-    if(error) { document.getElementById('articolMsg').textContent = 'Eroare: '+error.message; document.getElementById('articolMsg').style.color='#c00' }
-    else { document.getElementById('articolMsg').textContent = '✓ Salvat!'; document.getElementById('articolMsg').style.color='green'; document.getElementById('formArticol').style.display='none'; loadArticoleEditie(currentEditieId) }
+    if(error) { document.getElementById('articolMsg').textContent='Eroare: '+error.message; document.getElementById('articolMsg').style.color='#c00' }
+    else { document.getElementById('articolMsg').textContent='✓ Salvat!'; document.getElementById('articolMsg').style.color='green'; document.getElementById('formArticol').style.display='none'; loadArticoleEditie(currentEditieId) }
   }
 
   async function stergeArticol(id) {
-    if(!confirm('Ștergi acest articol definitiv?')) return
-    await sbAdmin.from('articole_revista').delete().eq('id', id)
+    if(!confirm('Ștergi acest articol?')) return
+    await sbAdmin.from('articole_revista').delete().eq('id',id)
     loadArticoleEditie(currentEditieId)
   }
 
@@ -1582,7 +1580,7 @@
   async function loadAutori() {
     const list = document.getElementById('autoriList')
     list.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
-    let query = sbAdmin.from('autori').select('*, users_view(email)').order('created_at', {ascending: false})
+    let query = sbAdmin.from('autori').select('*, users_view(email)').order('created_at',{ascending:false})
     if(filtruAutori !== 'toti') query = query.eq('status', filtruAutori)
     const {data} = await query
     if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:20px;">Nu există autori în această categorie.</p>'; return }
@@ -1602,64 +1600,180 @@
           <td style="display:flex;gap:6px;flex-wrap:wrap;">
             ${a.status!=='aprobat'?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="schimbaStatusAutor('${a.id}','aprobat')">✓ Aprobă</button>`:''}
             ${a.status!=='respins'?`<button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="schimbaStatusAutor('${a.id}','respins')">✗ Respinge</button>`:''}
-            ${a.status!=='in_asteptare'?`<button class="btn btn-sm btn-outline" onclick="schimbaStatusAutor('${a.id}','in_asteptare')">↩ Resetează</button>`:''}
           </td>
         </tr>`
-      }).join('')}
-      </tbody>
-    </table>`
+      }).join('')}</tbody></table>`
   }
 
-  function filtreazaAutori(filtru) { filtruAutori = filtru; loadAutori() }
+  function filtreazaAutori(f) { filtruAutori = f; loadAutori() }
+  async function schimbaStatusAutor(id, status) { await sbAdmin.from('autori').update({status}).eq('id',id); loadAutori() }
 
-  async function schimbaStatusAutor(id, status) {
-    await sbAdmin.from('autori').update({status}).eq('id', id)
-    loadAutori()
+  // ─── RESURSE ───
+  function showFormResursa(r = null) {
+    document.getElementById('formResursa').style.display = 'block'
+    if(r) {
+      document.getElementById('formResursaTitlu').textContent = 'Editează resursa'
+      document.getElementById('resursaId').value = r.id
+      document.getElementById('resursaTitlu').value = r.titlu || ''
+      document.getElementById('resursaDescriere').value = r.descriere || ''
+      document.getElementById('resursaCategorie').value = r.categorie || ''
+      document.getElementById('resursaOrdine').value = r.ordine || 0
+      document.getElementById('resursaFisierUrl').value = r.fisier_url || ''
+      document.getElementById('resursaPublicat').value = r.publicat ? 'true' : 'false'
+    } else {
+      document.getElementById('formResursaTitlu').textContent = 'Resursă nouă'
+      document.getElementById('resursaId').value = ''
+      document.getElementById('resursaTitlu').value = ''
+      document.getElementById('resursaDescriere').value = ''
+      document.getElementById('resursaCategorie').value = ''
+      document.getElementById('resursaOrdine').value = '0'
+      document.getElementById('resursaFisierUrl').value = ''
+      document.getElementById('resursaPublicat').value = 'true'
+    }
+    document.getElementById('resursaMsg').textContent = ''
   }
+
+  async function uploadResursaFisier(input) {
+    const file = input.files[0]
+    if(!file) return
+    const msg = document.getElementById('resursaUploadMsg')
+    msg.textContent = '⏳ Se uploadează...'
+    try {
+      const key = 'resurse/' + Date.now() + '_' + file.name.replace(/\s+/g,'_')
+      const res = await fetch(R2_WORKER + '/' + key, {method:'PUT', headers:{'Authorization':'Bearer '+R2_SECRET,'Content-Type':file.type}, body:file})
+      const data = await res.json()
+      document.getElementById('resursaFisierUrl').value = data.url || CDN+'/'+key
+      msg.textContent = '✓ Uploadat!'; msg.style.color='green'
+    } catch(e) { msg.textContent='Eroare: '+e.message; msg.style.color='#c00' }
+  }
+
+  async function salveazaResursa() {
+    const id = document.getElementById('resursaId').value
+    const payload = {
+      titlu: document.getElementById('resursaTitlu').value.trim(),
+      descriere: document.getElementById('resursaDescriere').value.trim() || null,
+      categorie: document.getElementById('resursaCategorie').value.trim() || null,
+      ordine: parseInt(document.getElementById('resursaOrdine').value) || 0,
+      fisier_url: document.getElementById('resursaFisierUrl').value.trim() || null,
+      publicat: document.getElementById('resursaPublicat').value === 'true'
+    }
+    if(!payload.titlu) { document.getElementById('resursaMsg').textContent='Completează titlul!'; document.getElementById('resursaMsg').style.color='#c00'; return }
+    let error
+    if(id) { ({error} = await sbAdmin.from('resurse').update(payload).eq('id',id)) }
+    else { ({error} = await sbAdmin.from('resurse').insert([payload])) }
+    if(error) { document.getElementById('resursaMsg').textContent='Eroare: '+error.message; document.getElementById('resursaMsg').style.color='#c00' }
+    else { document.getElementById('resursaMsg').textContent='✓ Salvat!'; document.getElementById('resursaMsg').style.color='green'; document.getElementById('formResursa').style.display='none'; loadResurseAdmin() }
+  }
+
+  async function loadResurseAdmin() {
+    const list = document.getElementById('resurseList')
+    list.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
+    const {data} = await sbAdmin.from('resurse').select('*').order('ordine')
+    if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:20px;">Nu există resurse. Adaugă prima resursă!</p>'; return }
+    list.innerHTML = `<table>
+      <thead><tr><th>Ord.</th><th>Titlu</th><th>Categorie</th><th>Status</th><th>Acțiuni</th></tr></thead>
+      <tbody>${data.map(r => `
+        <tr>
+          <td>${r.ordine}</td>
+          <td><strong>${r.titlu}</strong>${r.descriere?`<br><small style="color:#888;">${r.descriere.substring(0,80)}${r.descriere.length>80?'...':''}</small>`:''}</td>
+          <td>${r.categorie||'—'}</td>
+          <td><span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;background:${r.publicat?'#e8f5e9':'#f5f5f5'};color:${r.publicat?'#2e7d32':'#666'};">${r.publicat?'✓ Publicat':'Ascuns'}</span></td>
+          <td style="display:flex;gap:6px;">
+            ${r.fisier_url?`<a class="btn btn-sm btn-outline" href="${r.fisier_url}" target="_blank">📄</a>`:''}
+            <button class="btn btn-sm btn-outline" onclick='showFormResursa(${JSON.stringify(r).replace(/'/g,"&#39;")})'>✏️</button>
+            <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="stergeResursa('${r.id}')">🗑</button>
+          </td>
+        </tr>`).join('')}</tbody></table>`
+  }
+
+  async function stergeResursa(id) {
+    if(!confirm('Ștergi această resursă?')) return
+    await sbAdmin.from('resurse').delete().eq('id',id)
+    loadResurseAdmin()
+  }
+
+  // ─── CĂRȚI ADMIN ───
+  let filtruCarti = 'toate'
+  async function loadCartiAdmin() {
+    const list = document.getElementById('cartiAdminList')
+    list.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
+    let query = sbAdmin.from('carti').select('*').order('created_at',{ascending:false})
+    if(filtruCarti !== 'toate') query = query.eq('status', filtruCarti)
+    const {data} = await query
+    if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:20px;">Nu există cărți în această categorie.</p>'; return }
+    const statusBg = {trimis:'#fff3e0|#e65100', in_evaluare:'#e3f2fd|#1565c0', acceptat:'#e8f5e9|#2e7d32', publicat:'#e8f5e9|#1b5e20', respins:'#fce4ec|#c62828'}
+    list.innerHTML = `<table>
+      <thead><tr><th>Copertă</th><th>Titlu</th><th>Autor</th><th>Status</th><th>Plătit</th><th>Data</th><th>Acțiuni</th></tr></thead>
+      <tbody>${data.map(c => {
+        const [bg,col] = (statusBg[c.status]||'#f5f5f5|#555').split('|')
+        return `<tr>
+          <td>${c.coperta_url?`<img src="${c.coperta_url}" style="width:50px;height:70px;object-fit:cover;border-radius:4px;" />`:'📚'}</td>
+          <td><strong>${c.titlu}</strong></td>
+          <td>${c.autor||'—'}</td>
+          <td><span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;background:${bg};color:${col};">${c.status}</span></td>
+          <td style="text-align:center;">${c.platit?'✓':'—'}</td>
+          <td>${new Date(c.created_at).toLocaleDateString('ro-RO')}</td>
+          <td style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${c.pdf_url?`<a class="btn btn-sm btn-outline" href="${c.pdf_url}" target="_blank">📖</a>`:''}
+            ${c.status!=='publicat'?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="schimbaStatusCarte('${c.id}','publicat')">✓ Publică</button>`:''}
+            ${c.status!=='respins'?`<button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="schimbaStatusCarte('${c.id}','respins')">✗ Respinge</button>`:''}
+            <button class="btn btn-sm" style="background:${c.platit?'#f5f5f5':'#e8f5e9'};color:#333;" onclick="togglePlatitCarte('${c.id}',${!c.platit})">${c.platit?'Retrage plată':'Marchează plătit'}</button>
+            <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="stergeCarte('${c.id}')">🗑</button>
+          </td>
+        </tr>`
+      }).join('')}</tbody></table>`
+  }
+  function filtreazaCarti(f) { filtruCarti = f; loadCartiAdmin() }
+  async function schimbaStatusCarte(id, status) { await sbAdmin.from('carti').update({status}).eq('id',id); loadCartiAdmin() }
+  async function togglePlatitCarte(id, platit) { await sbAdmin.from('carti').update({platit}).eq('id',id); loadCartiAdmin() }
+  async function stergeCarte(id) { if(!confirm('Ștergi această carte?')) return; await sbAdmin.from('carti').delete().eq('id',id); loadCartiAdmin() }
 
   // ─── PLĂȚI ───
   async function loadPlati() {
-    const list = document.getElementById('platiList')
-    list.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
-    const {data} = await sbAdmin.from('plati_articole').select('*, articole_revista(titlu), autori(nume_complet)').order('created_at', {ascending: false})
-    const stats = document.getElementById('platiStats')
-    if(data) {
-      const total = data.length
-      const completate = data.filter(p=>p.status==='completat').length
-      const suma = data.filter(p=>p.status==='completat').reduce((s,p)=>s+(parseFloat(p.suma)||0),0)
-      stats.innerHTML = `
-        <div style="background:#e8f5e9;border-radius:10px;padding:20px;text-align:center;"><div style="font-size:1.8rem;font-weight:bold;color:#2e7d32;">${completate}</div><div style="font-size:0.85rem;color:#555;margin-top:4px;">Plăți completate</div></div>
-        <div style="background:#fff3e0;border-radius:10px;padding:20px;text-align:center;"><div style="font-size:1.8rem;font-weight:bold;color:#e65100;">${total - completate}</div><div style="font-size:0.85rem;color:#555;margin-top:4px;">În așteptare</div></div>
-        <div style="background:#f5e8e8;border-radius:10px;padding:20px;text-align:center;"><div style="font-size:1.8rem;font-weight:bold;color:#8B0000;">${suma.toFixed(2)} RON</div><div style="font-size:0.85rem;color:#555;margin-top:4px;">Total încasat</div></div>
-      `
-    }
-    if(!data || !data.length) { list.innerHTML = '<p style="color:#888;padding:20px;">Nu există plăți înregistrate.</p>'; return }
+    const listArt = document.getElementById('platiArticoleList')
+    const listCarti = document.getElementById('platiCartiList')
+    listArt.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
+    listCarti.innerHTML = '<p style="color:#888;">Se încarcă...</p>'
+
+    const {data: articole} = await sbAdmin.from('plati_articole').select('*, articole_revista(titlu), autori(nume_complet)').order('created_at',{ascending:false})
+    const {data: carti} = await sbAdmin.from('plati_carti').select('*, carti(titlu)').order('created_at',{ascending:false})
+
+    const all = [...(articole||[]), ...(carti||[])]
+    const total = all.length
+    const completate = all.filter(p=>p.status==='completat').length
+    const suma = all.filter(p=>p.status==='completat').reduce((s,p)=>s+(parseFloat(p.suma)||0),0)
+    document.getElementById('platiStats').innerHTML = `
+      <div style="background:#e8f5e9;border-radius:10px;padding:20px;text-align:center;"><div style="font-size:1.8rem;font-weight:bold;color:#2e7d32;">${completate}</div><div style="font-size:0.85rem;color:#555;margin-top:4px;">Plăți completate</div></div>
+      <div style="background:#fff3e0;border-radius:10px;padding:20px;text-align:center;"><div style="font-size:1.8rem;font-weight:bold;color:#e65100;">${total-completate}</div><div style="font-size:0.85rem;color:#555;margin-top:4px;">În așteptare</div></div>
+      <div style="background:#f5e8e8;border-radius:10px;padding:20px;text-align:center;"><div style="font-size:1.8rem;font-weight:bold;color:#8B0000;">${suma.toFixed(2)} RON</div><div style="font-size:0.85rem;color:#555;margin-top:4px;">Total încasat</div></div>
+    `
+
     const statusBg = {pending:'#fff3e0|#e65100', completat:'#e8f5e9|#2e7d32', anulat:'#fce4ec|#c62828'}
-    list.innerHTML = `<table>
-      <thead><tr><th>Articol</th><th>Autor</th><th>Sumă</th><th>PayPal ID</th><th>Status</th><th>Data</th><th>Acțiuni</th></tr></thead>
-      <tbody>${data.map(p => {
-        const [bg,col] = (statusBg[p.status]||'#f5f5f5|#555').split('|')
-        return `<tr>
-          <td>${p.articole_revista?.titlu||'—'}</td>
-          <td>${p.autori?.nume_complet||'—'}</td>
-          <td><strong>${p.suma||'—'} RON</strong></td>
-          <td style="font-size:0.78rem;color:#888;">${p.paypal_order_id||'—'}</td>
-          <td><span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;background:${bg};color:${col};">${p.status}</span></td>
-          <td>${new Date(p.created_at).toLocaleDateString('ro-RO')}</td>
-          <td style="display:flex;gap:6px;">
-            ${p.status==='pending'?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="schimbaStatusPlata('${p.id}','completat')">✓ Confirmă</button>`:''}
-            ${p.status!=='anulat'?`<button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="schimbaStatusPlata('${p.id}','anulat')">✗ Anulează</button>`:''}
-          </td>
-        </tr>`
-      }).join('')}
-      </tbody>
-    </table>`
+
+    listArt.innerHTML = !articole||!articole.length ? '<p style="color:#888;padding:16px;">Nu există plăți articole.</p>' : `<table>
+      <thead><tr><th>Articol</th><th>Autor</th><th>Sumă</th><th>Status</th><th>Data</th><th>Acțiuni</th></tr></thead>
+      <tbody>${articole.map(p => { const [bg,col]=(statusBg[p.status]||'#f5f5f5|#555').split('|'); return `<tr>
+        <td>${p.articole_revista?.titlu||'—'}</td><td>${p.autori?.nume_complet||'—'}</td><td><strong>${p.suma||'—'} RON</strong></td>
+        <td><span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;background:${bg};color:${col};">${p.status}</span></td>
+        <td>${new Date(p.created_at).toLocaleDateString('ro-RO')}</td>
+        <td style="display:flex;gap:6px;">
+          ${p.status==='pending'?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="schimbaStatusPlata('plati_articole','${p.id}','completat')">✓</button>`:''}
+          ${p.status!=='anulat'?`<button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="schimbaStatusPlata('plati_articole','${p.id}','anulat')">✗</button>`:''}
+        </td></tr>`}).join('')}</tbody></table>`
+
+    listCarti.innerHTML = !carti||!carti.length ? '<p style="color:#888;padding:16px;">Nu există plăți cărți.</p>' : `<table>
+      <thead><tr><th>Carte</th><th>Sumă</th><th>Status</th><th>Data</th><th>Acțiuni</th></tr></thead>
+      <tbody>${carti.map(p => { const [bg,col]=(statusBg[p.status]||'#f5f5f5|#555').split('|'); return `<tr>
+        <td>${p.carti?.titlu||'—'}</td><td><strong>${p.suma||'—'} RON</strong></td>
+        <td><span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;background:${bg};color:${col};">${p.status}</span></td>
+        <td>${new Date(p.created_at).toLocaleDateString('ro-RO')}</td>
+        <td style="display:flex;gap:6px;">
+          ${p.status==='pending'?`<button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="schimbaStatusPlata('plati_carti','${p.id}','completat')">✓</button>`:''}
+          ${p.status!=='anulat'?`<button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="schimbaStatusPlata('plati_carti','${p.id}','anulat')">✗</button>`:''}
+        </td></tr>`}).join('')}</tbody></table>`
   }
 
-  async function schimbaStatusPlata(id, status) {
-    await sbAdmin.from('plati_articole').update({status}).eq('id', id)
-    loadPlati()
-  }
+  async function schimbaStatusPlata(table, id, status) { await sbAdmin.from(table).update({status}).eq('id',id); loadPlati() }
 
 
   // ─── ABONATI ───

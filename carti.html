@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cărți și ghiduri — Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #fff; color: #222; }
+    a { text-decoration: none; color: inherit; }
+    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+    .header-logo img { height: 80px; width: auto; display: block; }
+    .header-center { text-align: center; }
+    .header-title { display: block; font-size: clamp(1rem,3vw,2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
+    .header-motto { display: block; font-size: clamp(0.65rem,1.5vw,0.95rem); color: #8B0000; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+    .btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; white-space: nowrap; }
+    .account-wrapper { position: relative; }
+    .account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; padding: 8px 0; }
+    .account-dropdown.open { display: block; }
+    .account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; }
+    .account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
+    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
+    nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; border-right: 1px solid rgba(255,255,255,0.4); }
+    nav.main-nav a:last-child { border-right: none; }
+    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+    .social-icons { display: flex; align-items: center; gap: 10px; }
+    .social-icons a { display: flex; align-items: center; cursor: pointer; }
+    .social-icons svg { width: 26px; height: 26px; }
+    .page-hero { background: linear-gradient(135deg,#2c3e50,#3498db); color: #fff; padding: 40px; text-align: center; }
+    .page-hero h1 { font-size: 2.2rem; letter-spacing: 2px; margin-bottom: 10px; }
+    .page-hero p { font-size: 1rem; opacity: 0.9; }
+    .wrap { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .actions-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .actions-bar h2 { font-size: 1.2rem; color: #2c3e50; letter-spacing: 1px; }
+    .btn-publish { background: linear-gradient(135deg,#2c3e50,#3498db); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 0.9rem; font-family: 'Georgia', serif; border: none; cursor: pointer; font-weight: bold; }
+    .btn-publish:hover { opacity: 0.9; }
+    .carti-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 28px; }
+    .carte-card { border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; background: #fff; }
+    .carte-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+    .carte-coperta { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: linear-gradient(135deg,#2c3e50,#34495e); }
+    .carte-coperta-placeholder { width: 100%; aspect-ratio: 2/3; background: linear-gradient(135deg,#2c3e50,#34495e); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 3rem; }
+    .carte-info { padding: 16px; }
+    .carte-titlu { font-size: 1rem; font-weight: bold; color: #222; margin-bottom: 4px; line-height: 1.3; }
+    .carte-autor { font-size: 0.82rem; color: #888; font-style: italic; }
+    .loading { text-align: center; padding: 60px; color: #888; }
+    footer { background: #8B0000; color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; }
+    footer a { color: #f5c0c0; }
+    .newsletter { background: #6a0000; padding: 32px 20px; text-align: center; }
+    .mobile-header { display: none; }
+    /* Modals */
+    .modal-overlay, .contact-modal-overlay, .publish-modal-overlay, .carte-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; overflow-y: auto; padding: 20px; }
+    .modal-overlay.open, .contact-modal-overlay.open, .publish-modal-overlay.open, .carte-modal-overlay.open { display: flex; }
+    .modal, .contact-modal, .publish-modal, .carte-modal-inner { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: auto; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .contact-modal { max-width: 480px; }
+    .publish-modal { max-width: 640px; }
+    .carte-modal-inner { max-width: 900px; }
+    .modal h2, .contact-modal h2, .publish-modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
+    .publish-modal h2 { color: #2c3e50; }
+    .modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #999; background: none; border: none; }
+    .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e0e0e0; }
+    .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-size: 0.95rem; color: #999; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+    .modal-tab.active { color: #8B0000; border-bottom-color: #8B0000; font-weight: bold; }
+    .modal-msg { text-align: center; font-size: 0.85rem; margin-top: 12px; min-height: 20px; color: #8B0000; }
+    .btn-primary { background: #8B0000; color: #fff; padding: 12px 30px; border-radius: 6px; font-size: 1rem; font-family: 'Georgia', serif; border: none; cursor: pointer; width: 100%; margin-top: 8px; }
+    .btn-blue { background: #2c3e50; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 6px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: 'Georgia', serif; outline: none; }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    /* Carte detail modal */
+    .carte-detail { display: flex; gap: 30px; align-items: flex-start; margin-bottom: 24px; }
+    .carte-detail img, .carte-detail .no-cover { width: 180px; aspect-ratio: 2/3; object-fit: cover; border-radius: 8px; flex-shrink: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .carte-detail .no-cover { background: linear-gradient(135deg,#2c3e50,#34495e); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.5rem; }
+    .carte-meta h2 { color: #2c3e50; font-size: 1.6rem; margin-bottom: 6px; }
+    .carte-meta .autor { color: #888; font-style: italic; margin-bottom: 12px; }
+    .carte-meta .desc { font-size: 0.9rem; line-height: 1.7; color: #444; margin-bottom: 16px; }
+    .carte-meta .detalii { font-size: 0.82rem; color: #666; margin-bottom: 16px; }
+    .carte-meta .detalii span { display: inline-block; background: #f5f5f5; padding: 3px 10px; border-radius: 20px; margin-right: 6px; margin-bottom: 4px; }
+    .carte-pdf { margin-top: 20px; border-top: 1px solid #e0e0e0; padding-top: 20px; }
+    .carte-pdf iframe { width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; }
+    .download-gate { text-align: center; padding: 24px; background: #fff3e0; border-radius: 10px; margin-top: 16px; }
+    .download-gate p { color: #e65100; margin-bottom: 12px; font-size: 0.9rem; }
+    @media (max-width: 768px) {
+      .header-top { display: none; }
+      nav.main-nav { display: none !important; }
+      .mobile-header { display: block; background: #fff; border-bottom: 1px solid #e0e0e0; }
+      .mob-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
+      .mob-logo img { height: 50px; }
+      .mob-account-btn { background: #8B0000; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; display: flex; align-items: center; gap: 6px; font-family: 'Georgia', serif; font-size: 0.8rem; }
+      .mob-row2 { text-align: center; padding: 6px 16px 2px; }
+      .mob-title { display: block; font-size: 1.05rem; font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 2px; }
+      .mob-motto { display: block; font-size: 0.68rem; color: #8B0000; margin-top: 2px; }
+      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid #f0e0e0; }
+      .mob-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
+      .mob-hamburger span { display: block; width: 28px; height: 3px; background: #8B0000; border-radius: 2px; }
+      .mob-nav { display: none; flex-direction: column; background: #8B0000; }
+      .mob-nav.open { display: flex; }
+      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
+      .page-hero { padding: 30px 16px; }
+      .page-hero h1 { font-size: 1.5rem; }
+      .carti-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .carte-detail { flex-direction: column; }
+      .carte-detail img, .carte-detail .no-cover { width: 140px; margin: 0 auto; }
+      .carte-pdf iframe { height: 400px; }
+      .publish-modal, .modal, .contact-modal, .carte-modal-inner { padding: 24px 16px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <a href="index.html" class="header-logo"><img src="Logo.gif" alt="Dokimasia" /></a>
+    <a href="index.html" class="header-center">
+      <span class="header-title">Asociația Dokimasia</span>
+      <span class="header-motto">Învățare. Implicare. Progres.</span>
+    </a>
+    <div class="header-right">
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
+        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+        <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
+      </form>
+      <div class="social-icons">
+        <a onclick="openContactModal()" title="Email"><svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></a>
+      </div>
+      <div class="account-wrapper">
+        <button class="btn-account" onclick="toggleAccount()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="accountLabel">Contul meu</span>
+        </button>
+        <div class="account-dropdown" id="accountDropdown">
+          <div id="loggedOut">
+            <a href="#" onclick="openModal('login')">Autentificare</a>
+            <a href="#" onclick="openModal('register')">Înregistrare</a>
+          </div>
+          <div id="loggedIn" style="display:none">
+            <div id="adminBtn" style="display:none"><a href="admin.html" style="color:#8B0000;font-weight:bold;">⚙ Panou Admin</a></div>
+            <a href="cont.html">Profilul meu</a>
+            <a href="#" onclick="logout()">Deconectare</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="publicatii.html" class="active">Publicații</a>
+    <a href="noutati.html">Noutăți</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<div class="mobile-header">
+  <div class="mob-row1">
+    <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Dokimasia" /></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
+        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+        <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:0.8rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
+      </form>
+      <button class="mob-account-btn" onclick="openModal('login')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="mobAccountLabel">Cont</span>
+      </button>
+    </div>
+  </div>
+  <div class="mob-row2"><span class="mob-title">Asociația Dokimasia</span><span class="mob-motto">Învățare. Implicare. Progres.</span></div>
+  <div class="mob-row4"><button class="mob-hamburger" onclick="toggleMobMenu()"><span></span><span></span><span></span></button></div>
+  <nav class="mob-nav" id="mobNav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="publicatii.html">Publicații</a>
+    <a href="noutati.html">Noutăți</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div>
+
+<div class="page-hero">
+  <h1>📚 Cărți și ghiduri</h1>
+  <p>Bibliotecă digitală cu cărți publicate de autori din comunitate</p>
+</div>
+
+<div class="wrap">
+  <div class="actions-bar">
+    <h2>Biblioteca noastră</h2>
+    <button class="btn-publish" onclick="deschidePublicare()">✍️ Publică o carte</button>
+  </div>
+  <div id="cartiGrid"><div class="loading">Se încarcă cărțile...</div></div>
+</div>
+
+<div class="newsletter">
+  <div style="max-width:500px;margin:0 auto;">
+    <h3 style="color:#fff;font-size:1.1rem;margin-bottom:8px;letter-spacing:1px;">📧 Abonează-te la newsletter</h3>
+    <p style="color:rgba(255,255,255,0.8);font-size:0.85rem;margin-bottom:16px;">Fii primul care află noutățile asociației.</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <input type="text" id="subNume" placeholder="Numele tău" style="padding:10px 14px;border-radius:6px;border:none;font-family:'Georgia',serif;font-size:0.9rem;width:160px;" />
+      <input type="email" id="subEmail" placeholder="Email-ul tău" style="padding:10px 14px;border-radius:6px;border:none;font-family:'Georgia',serif;font-size:0.9rem;width:200px;" />
+      <button onclick="subscribe()" style="padding:10px 20px;background:#fff;color:#8B0000;border:none;border-radius:6px;font-family:'Georgia',serif;font-size:0.9rem;font-weight:bold;cursor:pointer;">Abonează-mă</button>
+    </div>
+    <p id="subMsg" style="color:rgba(255,255,255,0.9);font-size:0.82rem;margin-top:10px;min-height:16px;"></p>
+  </div>
+</div>
+<footer>
+  <p>© <span id="year"></span> Asociația Dokimasia.</p>
+  <p style="margin-top:8px"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
+</footer>
+
+<!-- Modal Login -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Contul meu</h2>
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Autentificare</div>
+      <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
+    </div>
+    <div id="formLogin">
+      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.95rem;font-family:'Georgia',serif;margin-bottom:16px;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.05 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-3.55-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continuă cu Google
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"><span style="font-size:0.8rem;color:#999;">sau</span><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" /></div>
+      <div class="form-group"><label>Parolă</label><input type="password" id="loginPassword" /></div>
+      <button class="btn-primary" onclick="login()">Intră în cont</button>
+      <p style="text-align:center;margin-top:10px;"><a href="#" onclick="resetPassword()" style="font-size:0.82rem;color:#8B0000;">Ai uitat parola?</a></p>
+      <p class="modal-msg" id="loginMsg"></p>
+    </div>
+    <div id="formRegister" style="display:none">
+      <div class="form-group"><label>Nume complet</label><input type="text" id="regName" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" /></div>
+      <div class="form-group"><label>Parolă</label><input type="password" id="regPassword" /></div>
+      <button class="btn-primary" onclick="register()">Creează cont</button>
+      <p class="modal-msg" id="registerMsg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Contact -->
+<div class="contact-modal-overlay" id="contactModalOverlay">
+  <div class="contact-modal">
+    <button class="modal-close" onclick="closeContactModal()">×</button>
+    <h2>Trimite-ne un mesaj</h2>
+    <div class="form-group"><label>Numele tău</label><input type="text" id="contactName" /></div>
+    <div class="form-group"><label>Email-ul tău</label><input type="email" id="contactEmail" /></div>
+    <div class="form-group"><label>Subiect</label><input type="text" id="contactSubject" /></div>
+    <div class="form-group"><label>Mesaj</label><textarea id="contactMessage"></textarea></div>
+    <button class="btn-primary" onclick="sendEmail()">Trimite mesajul</button>
+    <p class="modal-msg" id="contactMsg"></p>
+  </div>
+</div>
+
+<!-- Modal Publică carte -->
+<div class="publish-modal-overlay" id="publishModalOverlay">
+  <div class="publish-modal">
+    <button class="modal-close" onclick="closePublicare()">×</button>
+    <h2>📚 Publică o carte</h2>
+    <p style="text-align:center;color:#666;font-size:0.9rem;margin-bottom:20px;">Completează detaliile cărții tale. După aprobare, va apărea în bibliotecă.</p>
+    
+    <div id="publishStep1">
+      <div class="form-group"><label>Titlul cărții *</label><input type="text" id="pubTitlu" /></div>
+      <div class="form-group"><label>Autor *</label><input type="text" id="pubAutor" placeholder="Numele autorului" /></div>
+      <div class="form-group"><label>Descriere *</label><textarea id="pubDescriere" placeholder="O scurtă descriere a cărții..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>An publicare</label><input type="number" id="pubAn" placeholder="2025" /></div>
+        <div class="form-group"><label>Nr. pagini</label><input type="number" id="pubPagini" placeholder="150" /></div>
+      </div>
+      <div class="form-group"><label>ISBN (opțional)</label><input type="text" id="pubIsbn" /></div>
+      <div class="form-group">
+        <label>Copertă (imagine)</label>
+        <input type="file" id="pubCoperta" accept="image/*" onchange="uploadFisier(this,'coperta')" />
+        <p id="coperta-msg" style="font-size:0.8rem;color:#888;margin-top:4px;"></p>
+      </div>
+      <div class="form-group">
+        <label>Fișier PDF al cărții *</label>
+        <input type="file" id="pubPdf" accept=".pdf" onchange="uploadFisier(this,'pdf')" />
+        <p id="pdf-msg" style="font-size:0.8rem;color:#888;margin-top:4px;"></p>
+      </div>
+      <input type="hidden" id="pubCopertaUrl" />
+      <input type="hidden" id="pubPdfUrl" />
+      <button class="btn-primary btn-blue" onclick="trimiteCartea()">Trimite cartea spre evaluare</button>
+      <p class="modal-msg" id="publishMsg"></p>
+    </div>
+
+    <div id="publishStep2" style="display:none;text-align:center;">
+      <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+      <h3 style="color:#2c3e50;margin-bottom:12px;">Cartea a fost trimisă!</h3>
+      <p style="color:#666;line-height:1.7;margin-bottom:20px;">Mulțumim pentru contribuție. Cartea ta va fi evaluată de echipa Dokimasia. Vei primi email la statusul aprobării.</p>
+      <div style="background:#fff3e0;padding:20px;border-radius:10px;margin-bottom:20px;">
+        <p style="color:#e65100;font-size:0.9rem;margin-bottom:12px;"><strong>Pasul următor:</strong> Achită taxa de publicare</p>
+        <form action="https://www.paypal.com/donate" method="post" target="_top" style="text-align:center;">
+          <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+          <button type="submit" style="background:#0070ba;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:0.95rem;font-weight:bold;cursor:pointer;">Plătește taxa cu PayPal</button>
+        </form>
+      </div>
+      <button class="btn-primary" onclick="closePublicare()">Închide</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal carte detail -->
+<div class="carte-modal-overlay" id="carteModalOverlay">
+  <div class="carte-modal-inner">
+    <button class="modal-close" onclick="closeCarteDetail()">×</button>
+    <div id="carteDetailContent"></div>
+  </div>
+</div>
+
+<script>
+  emailjs.init({publicKey: 'cPvtBWK6KReX_pqhM'})
+  const { createClient } = supabase
+  const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
+  document.getElementById('year').textContent = new Date().getFullYear()
+
+  const R2_WORKER = 'https://r2-upload-dokimasia.m-ciprian1387.workers.dev'
+  const R2_SECRET = 'dokimasia-r2-secret-2024'
+  let currentUser = null
+
+  // Auth
+  function toggleMobMenu() { document.getElementById('mobNav').classList.toggle('open') }
+  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
+  document.addEventListener('click', function(e) { const aw = document.querySelector('.account-wrapper'); if(aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open') })
+  function openModal(tab) { document.getElementById('modalOverlay').classList.add('open'); switchTab(tab); document.getElementById('accountDropdown').classList.remove('open') }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
+  function switchTab(tab) { document.getElementById('formLogin').style.display = tab==='login'?'block':'none'; document.getElementById('formRegister').style.display = tab==='register'?'block':'none'; document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register') }
+  function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
+  function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
+  async function login() { const {error} = await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value, password:document.getElementById('loginPassword').value}); if(error){document.getElementById('loginMsg').textContent='Eroare: '+error.message}else{closeModal();updateAccountUI()} }
+  async function register() { const {error} = await sb.auth.signUp({email:document.getElementById('regEmail').value, password:document.getElementById('regPassword').value, options:{data:{full_name:document.getElementById('regName').value}}}); document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!' }
+  async function logout() { await sb.auth.signOut(); updateAccountUI() }
+  async function loginWithGoogle() { await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://dokimasia.ro/carti.html'}}) }
+  async function resetPassword() { const email = document.getElementById('loginEmail').value.trim(); const msg = document.getElementById('loginMsg'); if(!email){msg.textContent='Introdu emailul mai întâi.';return}; const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://dokimasia.ro'}); msg.textContent = error ? 'Eroare: '+error.message : 'Email trimis!' }
+  async function updateAccountUI() {
+    const {data:{session}} = await sb.auth.getSession()
+    const user = session?.user
+    currentUser = user || null
+    const label = document.getElementById('accountLabel')
+    const mobLabel = document.getElementById('mobAccountLabel')
+    if(user){
+      const name = user.user_metadata?.full_name||user.user_metadata?.name||user.email
+      const firstName = name.split(' ')[0]
+      if(label) label.textContent = firstName
+      if(mobLabel) mobLabel.textContent = firstName
+      document.getElementById('loggedOut').style.display = 'none'
+      document.getElementById('loggedIn').style.display = 'block'
+      if(user.email==='m.ciprian1387@gmail.com') document.getElementById('adminBtn').style.display = 'block'
+    } else {
+      if(label) label.textContent = 'Contul meu'
+      if(mobLabel) mobLabel.textContent = 'Cont'
+      document.getElementById('loggedOut').style.display = 'block'
+      document.getElementById('loggedIn').style.display = 'none'
+    }
+  }
+  updateAccountUI()
+  sb.auth.onAuthStateChange((event, session) => { if(['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI(); if(event==='SIGNED_IN') document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')) })
+
+  async function sendEmail() {
+    const name=document.getElementById('contactName').value, email=document.getElementById('contactEmail').value
+    const subject=document.getElementById('contactSubject').value, message=document.getElementById('contactMessage').value
+    const msg=document.getElementById('contactMsg')
+    if(!name||!email||!message){msg.textContent='Completează toate câmpurile.';return}
+    try { await emailjs.send('service_swl59rb','template_ky5fzal',{from_name:name,from_email:email,subject:subject||'Mesaj nou',message:message,to_name:'Asociația Dokimasia'}); await sb.from('messages').insert([{name,email,subject,message}]); msg.textContent='Mesaj trimis!'; msg.style.color='green'; setTimeout(()=>{closeContactModal();msg.textContent=''},3000) } catch(e){ msg.textContent='Eroare.'; msg.style.color='#c00' }
+  }
+  async function subscribe() {
+    const email=document.getElementById('subEmail').value, nume=document.getElementById('subNume').value
+    const msg=document.getElementById('subMsg')
+    if(!email){msg.textContent='Introdu adresa de email.';return}
+    const {error}=await sb.from('abonati').insert([{email,nume}])
+    if(error&&error.code==='23505'){msg.textContent='Ești deja abonat!'}
+    else if(error){msg.textContent='Eroare: '+error.message}
+    else{msg.textContent='Te-ai abonat cu succes! 🎉'}
+  }
+  async function trackPageView() {
+    try { const ua=navigator.userAgent; let device='Desktop'; if(/Mobi|Android/i.test(ua)) device='Mobil'; else if(/Tablet|iPad/i.test(ua)) device='Tableta'; let browser='Altul'; if(/Edg/i.test(ua)) browser='Edge'; else if(/Chrome/i.test(ua)) browser='Chrome'; else if(/Firefox/i.test(ua)) browser='Firefox'; else if(/Safari/i.test(ua)) browser='Safari'; let city=null,country=null,ip=null; try { const geo=await fetch('https://ipapi.co/json/').then(r=>r.json()); city=geo.city; country=geo.country_name; ip=geo.ip } catch(e){}; await sb.from('page_views').insert([{page:'carti.html',user_agent:ua,device,browser,referrer:document.referrer||null,city,country,ip}]) } catch(e){}
+  }
+  trackPageView()
+
+  // ─── CĂRȚI ───
+  async function loadCarti() {
+    const {data} = await sb.from('carti').select('*').eq('status','publicat').order('created_at', {ascending: false})
+    if(!data || !data.length) { document.getElementById('cartiGrid').innerHTML = '<p style="color:#888;text-align:center;padding:60px;">Nu există cărți publicate momentan. Fii primul care publică!</p>'; return }
+    document.getElementById('cartiGrid').innerHTML = `<div class="carti-grid">${data.map(c => `
+      <div class="carte-card" onclick="deschidCarte('${c.id}')">
+        ${c.coperta_url ? `<img src="${c.coperta_url}" alt="${c.titlu}" class="carte-coperta" onerror="this.outerHTML='<div class=carte-coperta-placeholder>📚</div>'" />` : `<div class="carte-coperta-placeholder">📚</div>`}
+        <div class="carte-info">
+          <div class="carte-titlu">${c.titlu}</div>
+          <div class="carte-autor">${c.autor||''}</div>
+        </div>
+      </div>
+    `).join('')}</div>`
+  }
+  loadCarti()
+
+  async function deschidCarte(id) {
+    document.getElementById('carteModalOverlay').classList.add('open')
+    document.getElementById('carteDetailContent').innerHTML = '<div class="loading">Se încarcă...</div>'
+    const {data: c} = await sb.from('carti').select('*').eq('id', id).single()
+    if(!c) { document.getElementById('carteDetailContent').innerHTML = '<p>Eroare.</p>'; return }
+    const canDownload = currentUser !== null
+    document.getElementById('carteDetailContent').innerHTML = `
+      <div class="carte-detail">
+        ${c.coperta_url ? `<img src="${c.coperta_url}" alt="${c.titlu}" onerror="this.outerHTML='<div class=no-cover>📚</div>'" />` : `<div class="no-cover">📚</div>`}
+        <div class="carte-meta">
+          <h2>${c.titlu}</h2>
+          <div class="autor">de ${c.autor||'Autor necunoscut'}</div>
+          <div class="detalii">
+            ${c.an_publicare ? `<span>📅 ${c.an_publicare}</span>` : ''}
+            ${c.nr_pagini ? `<span>📄 ${c.nr_pagini} pagini</span>` : ''}
+            ${c.isbn ? `<span>ISBN: ${c.isbn}</span>` : ''}
+          </div>
+          <div class="desc">${c.descriere||''}</div>
+          ${c.pdf_url ? (canDownload
+            ? `<a href="${c.pdf_url}" target="_blank" download style="display:inline-block;background:#2c3e50;color:#fff;padding:12px 24px;border-radius:8px;font-weight:bold;font-size:0.9rem;">⬇ Descarcă PDF</a>`
+            : `<div class="download-gate"><p>🔒 Pentru a descărca cartea, autentifică-te gratuit.</p><button class="btn-primary" style="max-width:200px;" onclick="closeCarteDetail();openModal('login')">Autentificare</button></div>`) : ''}
+        </div>
+      </div>
+      ${c.pdf_url ? `<div class="carte-pdf"><h3 style="color:#2c3e50;margin-bottom:12px;">📖 Previzualizare</h3><iframe src="${c.pdf_url}#toolbar=0" title="${c.titlu}"></iframe></div>` : ''}
+    `
+  }
+
+  function closeCarteDetail() { document.getElementById('carteModalOverlay').classList.remove('open') }
+  document.getElementById('carteModalOverlay').addEventListener('click', function(e) { if(e.target===this) closeCarteDetail() })
+
+  // ─── PUBLICARE ───
+  function deschidePublicare() {
+    if(!currentUser) { openModal('login'); return }
+    document.getElementById('publishStep1').style.display = 'block'
+    document.getElementById('publishStep2').style.display = 'none'
+    document.getElementById('publishModalOverlay').classList.add('open')
+  }
+  function closePublicare() { document.getElementById('publishModalOverlay').classList.remove('open') }
+
+  async function uploadFisier(input, tip) {
+    const file = input.files[0]
+    if(!file) return
+    const msg = document.getElementById(tip + '-msg')
+    msg.textContent = '⏳ Se uploadează...'
+    msg.style.color = '#888'
+    try {
+      const key = 'carti/' + tip + '/' + Date.now() + '_' + file.name.replace(/\s+/g,'_')
+      const res = await fetch(R2_WORKER + '/' + key, {
+        method: 'PUT',
+        headers: {'Authorization': 'Bearer ' + R2_SECRET, 'Content-Type': file.type},
+        body: file
+      })
+      const data = await res.json()
+      const url = data.url || 'https://cdn.dokimasia.ro/' + key
+      if(tip === 'coperta') document.getElementById('pubCopertaUrl').value = url
+      else document.getElementById('pubPdfUrl').value = url
+      msg.textContent = '✓ Uploadat cu succes'
+      msg.style.color = 'green'
+    } catch(e) { msg.textContent = 'Eroare upload: ' + e.message; msg.style.color = '#c00' }
+  }
+
+  async function trimiteCartea() {
+    if(!currentUser) { openModal('login'); return }
+    const titlu = document.getElementById('pubTitlu').value.trim()
+    const autor = document.getElementById('pubAutor').value.trim()
+    const descriere = document.getElementById('pubDescriere').value.trim()
+    const pdfUrl = document.getElementById('pubPdfUrl').value
+    const msg = document.getElementById('publishMsg')
+    if(!titlu || !autor || !descriere) { msg.textContent = 'Completează titlul, autorul și descrierea!'; msg.style.color='#c00'; return }
+    if(!pdfUrl) { msg.textContent = 'Uploadează fișierul PDF al cărții!'; msg.style.color='#c00'; return }
+    const payload = {
+      user_id: currentUser.id,
+      titlu, autor, descriere,
+      coperta_url: document.getElementById('pubCopertaUrl').value || null,
+      pdf_url: pdfUrl,
+      an_publicare: parseInt(document.getElementById('pubAn').value) || null,
+      nr_pagini: parseInt(document.getElementById('pubPagini').value) || null,
+      isbn: document.getElementById('pubIsbn').value.trim() || null,
+      status: 'trimis',
+      platit: false
+    }
+    const {error} = await sb.from('carti').insert([payload])
+    if(error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color='#c00' }
+    else { document.getElementById('publishStep1').style.display='none'; document.getElementById('publishStep2').style.display='block' }
+  }
+</script>
+</body>
+</html>
