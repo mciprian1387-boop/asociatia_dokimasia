@@ -6,142 +6,729 @@
   <title>Revista Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --crimson: #8B0000;
+      --crimson-dark: #5a0000;
+      --crimson-light: #c0392b;
+      --ink: #1a1108;
+      --paper: #faf8f4;
+      --paper-dark: #f0ece4;
+      --gold: #b8963e;
+      --gold-light: #d4af6a;
+      --muted: #7a7060;
+      --border: #ddd8cc;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Georgia', serif; background: #fff; color: #222; }
+
+    body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
     a { text-decoration: none; color: inherit; }
-    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+
+    /* ── HEADER ── */
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .header-top {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      padding: 12px 40px;
+      gap: 16px;
+    }
+
     .header-logo img { height: 80px; width: auto; display: block; }
     .header-center { text-align: center; }
-    .header-title { display: block; font-size: clamp(1rem,3vw,2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
-    .header-motto { display: block; font-size: clamp(0.65rem,1.5vw,0.95rem); color: #8B0000; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+    .header-title {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1rem, 3vw, 2rem);
+      font-weight: 900;
+      color: var(--crimson);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+    .header-motto {
+      display: block;
+      font-size: clamp(0.65rem, 1.5vw, 0.9rem);
+      color: var(--crimson);
+      letter-spacing: 2px;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
     .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
-    .btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
-    .btn-account:hover { background: #6a0000; }
-    .account-wrapper { position: relative; }
-    .account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; padding: 8px 0; }
-    .account-dropdown.open { display: block; }
-    .account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
-    .account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
-    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
-    nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
-    nav.main-nav a:last-child { border-right: none; }
-    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
     .social-icons { display: flex; align-items: center; gap: 10px; }
     .social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
     .social-icons a:hover { opacity: 0.7; }
-    .social-icons svg { width: 26px; height: 26px; }
-    /* Hero */
-    .page-hero { background: #8B0000; color: #fff; padding: 40px 40px 30px; text-align: center; }
-    .page-hero h1 { font-size: 2.2rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
-    .page-hero p { font-size: 1rem; opacity: 0.85; font-style: italic; }
-    /* Numerele revistei */
-    .revista-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-    .editii-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; margin-top: 30px; }
-    .editie-card { border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-    .editie-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-    .editie-coperta { width: 100%; height: 200px; object-fit: cover; background: #f5e8e8; display: flex; align-items: center; justify-content: center; }
-    .editie-coperta-placeholder { width: 100%; height: 200px; background: linear-gradient(135deg, #8B0000, #c0392b); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; text-align: center; padding: 20px; }
-    .editie-info { padding: 20px; }
-    .editie-badge { display: inline-block; background: #8B0000; color: #fff; font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 1px; }
-    .editie-titlu { font-size: 1.1rem; font-weight: bold; color: #222; margin-bottom: 6px; }
-    .editie-data { font-size: 0.82rem; color: #888; margin-bottom: 10px; }
-    .editie-desc { font-size: 0.85rem; color: #555; line-height: 1.6; }
-    .editie-btn { display: inline-block; margin-top: 14px; background: #8B0000; color: #fff; padding: 8px 18px; border-radius: 6px; font-size: 0.85rem; transition: background 0.2s; }
-    .editie-btn:hover { background: #6a0000; }
-    /* Articole dintr-o ediție */
-    .editie-detail { display: none; max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .social-icons svg { width: 24px; height: 24px; }
+
+    .btn-account {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--crimson); color: #fff;
+      padding: 8px 16px; border-radius: 4px;
+      font-size: 0.83rem; font-family: 'Source Serif 4', serif;
+      cursor: pointer; border: none; transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-account:hover { background: var(--crimson-dark); }
+    .account-wrapper { position: relative; }
+    .account-dropdown {
+      display: none; position: absolute; top: 110%; right: 0;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      min-width: 190px; z-index: 200; padding: 6px 0;
+    }
+    .account-dropdown.open { display: block; }
+    .account-dropdown a {
+      display: block; padding: 10px 18px;
+      font-size: 0.88rem; color: #444; transition: background 0.15s;
+    }
+    .account-dropdown a:hover { background: var(--paper); color: var(--crimson); }
+
+    nav.main-nav {
+      background: var(--crimson);
+      display: flex; width: 100%;
+    }
+    nav.main-nav a {
+      flex: 1; color: #fff; font-size: 0.85rem;
+      font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; text-align: center;
+      padding: 13px 0; transition: background 0.2s;
+      border-right: 1px solid rgba(255,255,255,0.25);
+      font-family: 'Source Serif 4', serif;
+    }
+    nav.main-nav a:last-child { border-right: none; }
+    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+
+    /* ── HERO REVISTĂ ── */
+    .revista-hero {
+      background: var(--crimson);
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px);
+      padding: 56px 40px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .revista-hero::before {
+      content: '';
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 1px; height: 100%;
+      background: rgba(255,255,255,0.12);
+    }
+    .revista-hero-label {
+      display: inline-block;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.75rem; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--gold-light);
+      margin-bottom: 16px;
+    }
+    .revista-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .revista-hero p {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.75);
+      font-style: italic;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+    .hero-ornament {
+      color: var(--gold-light);
+      font-size: 1.4rem;
+      margin: 20px 0 0;
+      letter-spacing: 8px;
+      opacity: 0.6;
+    }
+
+    /* ── LISTA EDIȚII ── */
+    .revista-wrap { max-width: 1200px; margin: 0 auto; padding: 56px 24px; }
+
+    .section-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--crimson);
+      position: relative;
+    }
+    .section-header::after {
+      content: '';
+      position: absolute; bottom: -6px; left: 0;
+      width: 60px; height: 2px;
+      background: var(--gold);
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 1px;
+    }
+    .section-count {
+      font-size: 0.8rem; color: var(--muted);
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+
+    .editii-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 32px;
+    }
+
+    .editie-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+      display: flex; flex-direction: column;
+    }
+    .editie-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(139,0,0,0.12);
+    }
+
+    .coperta-wrap {
+      position: relative;
+      height: 240px;
+      overflow: hidden;
+      background: var(--crimson);
+    }
+    .coperta-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .editie-card:hover .coperta-wrap img { transform: scale(1.04); }
+
+    .coperta-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, var(--crimson) 0%, var(--crimson-dark) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff; gap: 12px;
+      padding: 24px;
+    }
+    .coperta-placeholder .nr {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.75rem; letter-spacing: 4px;
+      text-transform: uppercase; opacity: 0.6;
+    }
+    .coperta-placeholder .titlu-cop {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700;
+      text-align: center; line-height: 1.4;
+    }
+    .coperta-placeholder .ornament {
+      color: var(--gold-light); font-size: 1rem;
+      letter-spacing: 6px; opacity: 0.7;
+    }
+
+    .editie-badge-wrap {
+      position: absolute; top: 12px; right: 12px;
+    }
+    .editie-badge {
+      display: inline-block;
+      background: var(--gold);
+      color: #fff;
+      font-size: 0.68rem; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+      font-family: 'Source Serif 4', serif;
+    }
+
+    .editie-info {
+      padding: 24px 24px 20px;
+      flex: 1; display: flex; flex-direction: column;
+    }
+    .editie-numar {
+      font-size: 0.72rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--crimson);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .editie-titlu {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700;
+      color: var(--ink); line-height: 1.4;
+      margin-bottom: 6px;
+    }
+    .editie-data {
+      font-size: 0.78rem; color: var(--muted);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+    .editie-desc {
+      font-size: 0.87rem; color: #555;
+      line-height: 1.65; flex: 1;
+    }
+    .editie-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-top: 18px; padding-top: 14px;
+      border-top: 1px solid var(--paper-dark);
+    }
+    .editie-art-count {
+      font-size: 0.75rem; color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .btn-explore {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--crimson); color: #fff;
+      padding: 8px 16px; border-radius: 3px;
+      font-size: 0.8rem; font-family: 'Source Serif 4', serif;
+      transition: background 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .btn-explore:hover { background: var(--crimson-dark); }
+    .btn-explore .arrow { transition: transform 0.2s; }
+    .editie-card:hover .btn-explore .arrow { transform: translateX(3px); }
+
+    /* ── DETALIU EDIȚIE ── */
+    .editie-detail {
+      display: none;
+      max-width: 1100px; margin: 0 auto;
+      padding: 40px 24px;
+      animation: fadeUp 0.3s ease;
+    }
     .editie-detail.open { display: block; }
-    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #8B0000; font-size: 0.9rem; cursor: pointer; margin-bottom: 20px; border: none; background: none; font-family: 'Georgia', serif; }
-    .back-btn:hover { text-decoration: underline; }
-    .editie-header { display: flex; gap: 30px; align-items: flex-start; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0e0e0; }
-    .editie-header img { width: 180px; height: 240px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); flex-shrink: 0; }
-    .editie-header-placeholder { width: 180px; height: 240px; background: linear-gradient(135deg, #8B0000, #c0392b); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; text-align: center; padding: 16px; flex-shrink: 0; }
-    .editie-meta h2 { font-size: 1.6rem; color: #8B0000; margin-bottom: 8px; }
-    .editie-meta .data { color: #888; font-size: 0.9rem; margin-bottom: 12px; }
-    .editie-meta .descriere { font-size: 0.95rem; line-height: 1.7; color: #444; }
-    /* Articole */
-    .articole-titlu { font-size: 1.2rem; font-weight: bold; color: #8B0000; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #f0e0e0; }
-    .articol-row { border: 1px solid #e8e8e8; border-radius: 10px; padding: 20px; margin-bottom: 14px; transition: box-shadow 0.2s; }
-    .articol-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-    .articol-row-header { display: flex; align-items: flex-start; gap: 16px; }
-    .articol-rubrica { flex-shrink: 0; background: #f5e8e8; color: #8B0000; font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
-    .articol-titlu { font-size: 1rem; font-weight: bold; color: #222; flex: 1; line-height: 1.4; }
-    .articol-autor { font-size: 0.82rem; color: #888; margin-top: 4px; }
-    .articol-rezumat { font-size: 0.88rem; color: #555; line-height: 1.6; margin-top: 10px; }
-    .articol-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
-    .badge-acces { font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--crimson); font-size: 0.85rem;
+      cursor: pointer; margin-bottom: 32px;
+      border: none; background: none;
+      font-family: 'Source Serif 4', serif;
+      transition: gap 0.2s;
+    }
+    .back-btn:hover { gap: 12px; }
+
+    .editie-masthead {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 40px;
+      align-items: start;
+      padding: 32px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--crimson);
+      margin-bottom: 40px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .editie-masthead img {
+      width: 200px; height: 270px;
+      object-fit: cover; border-radius: 2px;
+      box-shadow: 4px 4px 20px rgba(0,0,0,0.18);
+    }
+    .masthead-placeholder {
+      width: 200px; height: 270px;
+      background: linear-gradient(160deg, var(--crimson), var(--crimson-dark));
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: #fff; gap: 10px; padding: 20px;
+      border-radius: 2px;
+      box-shadow: 4px 4px 20px rgba(0,0,0,0.18);
+    }
+    .masthead-info { padding: 8px 0; }
+    .masthead-numar {
+      font-size: 0.72rem; letter-spacing: 4px;
+      text-transform: uppercase; color: var(--crimson);
+      margin-bottom: 12px; font-weight: 600;
+    }
+    .masthead-titlu {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900;
+      color: var(--ink); line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .masthead-data {
+      font-size: 0.85rem; color: var(--muted);
+      font-style: italic; margin-bottom: 16px;
+    }
+    .masthead-descriere {
+      font-size: 0.95rem; line-height: 1.75;
+      color: #444; margin-bottom: 20px;
+    }
+    .masthead-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-pdf {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1.5px solid var(--crimson); color: var(--crimson);
+      padding: 8px 16px; border-radius: 3px;
+      font-size: 0.82rem; font-family: 'Source Serif 4', serif;
+      transition: all 0.2s;
+    }
+    .btn-pdf:hover { background: var(--crimson); color: #fff; }
+
+    /* Cuprins */
+    .cuprins-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px;
+    }
+    .cuprins-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--ink);
+    }
+    .cuprins-line {
+      flex: 1; height: 1px; background: var(--border);
+    }
+
+    .articol-row {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 22px 24px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .articol-row:hover {
+      border-color: #c8b8b8;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .articol-row::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: transparent;
+      transition: background 0.2s;
+      border-radius: 2px 0 0 2px;
+    }
+    .articol-row:hover::before { background: var(--crimson); }
+
+    .articol-top { display: flex; align-items: flex-start; gap: 14px; }
+    .articol-rubrica {
+      flex-shrink: 0;
+      background: var(--paper-dark);
+      color: var(--crimson);
+      font-size: 0.68rem; padding: 4px 10px;
+      border-radius: 2px; letter-spacing: 1.5px;
+      text-transform: uppercase; font-weight: 600;
+      margin-top: 3px;
+    }
+    .articol-main { flex: 1; }
+    .articol-titlu {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--ink); line-height: 1.4;
+      margin-bottom: 4px;
+    }
+    .articol-autor {
+      font-size: 0.8rem; color: var(--muted);
+      font-style: italic;
+    }
+    .articol-rezumat {
+      font-size: 0.87rem; color: #555;
+      line-height: 1.65; margin-top: 10px;
+    }
+    .articol-actions {
+      display: flex; align-items: center;
+      gap: 10px; margin-top: 14px; flex-wrap: wrap;
+    }
+    .badge-acces {
+      font-size: 0.7rem; padding: 3px 10px;
+      border-radius: 2px; letter-spacing: 1px;
+      text-transform: uppercase; font-weight: 600;
+    }
     .badge-gratuit { background: #e8f5e9; color: #2e7d32; }
-    .badge-premium { background: #fff3e0; color: #e65100; }
-    .btn-citeste { background: #8B0000; color: #fff; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; border: none; cursor: pointer; font-family: 'Georgia', serif; transition: background 0.2s; }
-    .btn-citeste:hover { background: #6a0000; }
-    .btn-citeste:disabled { background: #ccc; cursor: not-allowed; }
-    /* Modal citire */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-    .modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
-    .modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; background: none; border: none; }
-    .modal-close:hover { color: #8B0000; }
-    .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e0e0e0; }
-    .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-size: 0.95rem; color: #999; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-    .modal-tab.active { color: #8B0000; border-bottom-color: #8B0000; font-weight: bold; }
-    .modal-msg { text-align: center; font-size: 0.85rem; margin-top: 12px; min-height: 20px; color: #8B0000; }
-    .btn-primary { background: #8B0000; color: #fff; padding: 12px 30px; border-radius: 6px; font-size: 1rem; font-family: 'Georgia', serif; transition: background 0.2s; display: inline-block; border: none; cursor: pointer; width: 100%; margin-top: 8px; }
-    .btn-primary:hover { background: #6a0000; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 6px; }
-    .form-group input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: 'Georgia', serif; outline: none; transition: border 0.2s; }
-    .form-group input:focus { border-color: #8B0000; }
-    /* Articol complet modal */
-    .articol-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px; }
+    .badge-cont { background: #fff3e0; color: #e65100; }
+
+    .btn-citeste {
+      background: var(--crimson); color: #fff;
+      padding: 7px 16px; border-radius: 3px;
+      font-size: 0.8rem; border: none; cursor: pointer;
+      font-family: 'Source Serif 4', serif;
+      transition: background 0.2s; letter-spacing: 0.5px;
+    }
+    .btn-citeste:hover { background: var(--crimson-dark); }
+    .btn-citeste.locked {
+      background: #aaa; cursor: default;
+    }
+    .btn-citeste.locked:hover { background: #999; }
+
+    .btn-pdf-art {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.78rem; color: var(--crimson);
+      border: 1px solid #dcc;
+      padding: 6px 12px; border-radius: 3px;
+      transition: background 0.2s;
+    }
+    .btn-pdf-art:hover { background: var(--paper); }
+
+    /* ── MODAL ARTICOL ── */
+    .articol-modal {
+      display: none; position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(20,10,5,0.65);
+      z-index: 2000; justify-content: center;
+      align-items: flex-start; overflow-y: auto; padding: 32px 16px;
+    }
     .articol-modal.open { display: flex; }
-    .articol-modal-inner { background: #fff; border-radius: 12px; width: 100%; max-width: 800px; margin: auto; padding: 48px; position: relative; }
-    .articol-modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #999; background: none; border: none; }
-    .articol-modal-titlu { font-size: 1.8rem; color: #8B0000; margin-bottom: 8px; line-height: 1.3; }
-    .articol-modal-meta { font-size: 0.85rem; color: #888; margin-bottom: 20px; }
-    .articol-modal-rezumat { font-size: 1rem; color: #555; font-style: italic; border-left: 3px solid #8B0000; padding-left: 16px; margin-bottom: 24px; line-height: 1.7; }
-    .articol-modal-continut { font-size: 0.95rem; line-height: 1.9; color: #333; white-space: pre-wrap; }
-    .articol-modal-fisier { margin-top: 24px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
-    .loading { text-align: center; padding: 60px; color: #888; font-size: 1rem; }
-    footer { background: #8B0000; color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; }
-    footer a { color: #f5c0c0; }
-    /* Newsletter */
-    .newsletter { background: #6a0000; padding: 32px 20px; text-align: center; }
-    /* Mobile */
-    .mobile-header { display: none; }
-    .contact-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .articol-modal-inner {
+      background: var(--paper);
+      border-radius: 2px;
+      width: 100%; max-width: 780px;
+      margin: auto; padding: 56px 60px;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+      animation: fadeUp 0.3s ease;
+    }
+    .articol-modal-close {
+      position: absolute; top: 20px; right: 24px;
+      font-size: 1.6rem; cursor: pointer; color: var(--muted);
+      background: none; border: none; line-height: 1;
+      transition: color 0.2s;
+    }
+    .articol-modal-close:hover { color: var(--crimson); }
+    .modal-rubrica {
+      font-size: 0.72rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--crimson);
+      margin-bottom: 12px; font-weight: 600;
+    }
+    .modal-titlu {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900;
+      color: var(--ink); line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .modal-meta {
+      font-size: 0.82rem; color: var(--muted);
+      font-style: italic; margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-rezumat {
+      font-size: 1.05rem; line-height: 1.75;
+      color: #444; font-style: italic;
+      border-left: 3px solid var(--crimson);
+      padding-left: 20px; margin-bottom: 28px;
+    }
+    .modal-continut {
+      font-size: 0.97rem; line-height: 1.9;
+      color: #333; white-space: pre-wrap;
+    }
+    .modal-continut p { margin-bottom: 16px; }
+    .modal-bio {
+      margin-top: 36px; padding: 20px 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 2px;
+    }
+    .modal-bio strong {
+      font-family: 'Playfair Display', serif;
+      color: var(--crimson); font-size: 0.85rem;
+      letter-spacing: 1px; display: block;
+      margin-bottom: 8px;
+    }
+    .modal-bio p { font-size: 0.88rem; color: #555; line-height: 1.65; }
+
+    /* ── MODAL LOGIN ── */
+    .modal-overlay {
+      display: none; position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000; justify-content: center; align-items: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 4px;
+      padding: 40px; width: 100%; max-width: 400px;
+      margin: 20px; position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--crimson); font-size: 1.5rem;
+      margin-bottom: 24px; text-align: center;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 20px;
+      font-size: 1.5rem; cursor: pointer;
+      color: #999; background: none; border: none;
+    }
+    .modal-close:hover { color: var(--crimson); }
+    .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e0e0e0; }
+    .modal-tab {
+      flex: 1; text-align: center; padding: 10px;
+      cursor: pointer; font-size: 0.9rem; color: #999;
+      border-bottom: 3px solid transparent; margin-bottom: -2px;
+    }
+    .modal-tab.active { color: var(--crimson); border-bottom-color: var(--crimson); font-weight: bold; }
+    .modal-msg { text-align: center; font-size: 0.85rem; margin-top: 12px; color: var(--crimson); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.82rem; color: #555; margin-bottom: 6px; }
+    .form-group input {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid #ddd; border-radius: 3px;
+      font-size: 0.95rem; font-family: 'Source Serif 4', serif;
+      outline: none; transition: border 0.2s;
+    }
+    .form-group input:focus { border-color: var(--crimson); }
+    .btn-primary {
+      background: var(--crimson); color: #fff;
+      padding: 12px 30px; border-radius: 3px;
+      font-size: 0.95rem; font-family: 'Source Serif 4', serif;
+      border: none; cursor: pointer; width: 100%; margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--crimson-dark); }
+
+    /* ── MODAL CONTACT ── */
+    .contact-modal-overlay {
+      display: none; position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 3000; justify-content: center; align-items: center;
+    }
     .contact-modal-overlay.open { display: flex; }
-    .contact-modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 480px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-    .contact-modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
-    .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: 'Georgia', serif; outline: none; resize: vertical; min-height: 100px; }
+    .contact-modal {
+      background: #fff; border-radius: 4px;
+      padding: 40px; width: 100%; max-width: 480px;
+      margin: 20px; position: relative;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+    .contact-modal h2 {
+      font-family: 'Playfair Display', serif;
+      color: var(--crimson); font-size: 1.4rem;
+      margin-bottom: 24px; text-align: center;
+    }
+    .form-group textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid #ddd; border-radius: 3px;
+      font-size: 0.92rem; font-family: 'Source Serif 4', serif;
+      outline: none; resize: vertical; min-height: 100px;
+      transition: border 0.2s;
+    }
+    .form-group textarea:focus { border-color: var(--crimson); }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      background: var(--crimson-dark);
+      background-image: repeating-linear-gradient(
+        45deg, transparent, transparent 20px,
+        rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px
+      );
+      padding: 48px 20px; text-align: center;
+    }
+    .newsletter h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; color: #fff;
+      margin-bottom: 8px;
+    }
+    .newsletter p { color: rgba(255,255,255,0.7); font-size: 0.88rem; margin-bottom: 20px; font-style: italic; }
+    .newsletter-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .newsletter-form input {
+      padding: 11px 16px; border-radius: 3px; border: none;
+      font-family: 'Source Serif 4', serif; font-size: 0.9rem;
+    }
+    .newsletter-form input:first-child { width: 160px; }
+    .newsletter-form input:nth-child(2) { width: 220px; }
+    .newsletter-form button {
+      padding: 11px 22px;
+      background: var(--gold); color: #fff;
+      border: none; border-radius: 3px;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: background 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .newsletter-form button:hover { background: var(--gold-light); }
+    #subMsg { color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-top: 10px; min-height: 16px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--crimson);
+      color: #fff; text-align: center;
+      padding: 32px 20px; font-size: 0.85rem;
+    }
+    footer a { color: rgba(255,255,255,0.7); }
+    footer a:hover { color: #fff; }
+
+    /* ── LOADING / EMPTY ── */
+    .loading {
+      text-align: center; padding: 80px 20px;
+      color: var(--muted); font-style: italic; font-size: 1rem;
+    }
+    .loading::after {
+      content: '';
+      display: inline-block; width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--crimson);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 10px; vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state {
+      text-align: center; padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty-state p { font-style: italic; }
+
+    /* ── MOBILE HEADER ── */
+    .mobile-header { display: none; }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       .header-top { display: none; }
       nav.main-nav { display: none !important; }
-      .mobile-header { display: block; background: #fff; border-bottom: 1px solid #e0e0e0; }
+      .mobile-header {
+        display: block; background: #fff;
+        border-bottom: 1px solid var(--border);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      }
       .mob-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
       .mob-logo img { height: 50px; }
-      .mob-account-btn { background: #8B0000; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Georgia', serif; font-size: 0.8rem; }
       .mob-row2 { text-align: center; padding: 6px 16px 2px; }
-      .mob-title { display: block; font-size: 1.05rem; font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 2px; }
-      .mob-motto { display: block; font-size: 0.68rem; color: #8B0000; letter-spacing: 1px; margin-top: 2px; }
-      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid #f0e0e0; }
+      .mob-title { display: block; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 900; color: var(--crimson); text-transform: uppercase; letter-spacing: 2px; }
+      .mob-motto { display: block; font-size: 0.68rem; color: var(--crimson); letter-spacing: 1px; margin-top: 2px; font-style: italic; }
+      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid var(--paper-dark); }
       .mob-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
-      .mob-hamburger span { display: block; width: 28px; height: 3px; background: #8B0000; border-radius: 2px; }
-      .mob-nav { display: none; flex-direction: column; background: #8B0000; }
+      .mob-hamburger span { display: block; width: 28px; height: 3px; background: var(--crimson); border-radius: 2px; }
+      .mob-nav { display: none; flex-direction: column; background: var(--crimson); }
       .mob-nav.open { display: flex; }
-      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
-      .page-hero { padding: 24px 16px; }
-      .page-hero h1 { font-size: 1.4rem; }
+      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.88rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
+
+      .revista-hero { padding: 36px 20px 28px; }
+      .revista-hero h1 { font-size: 2rem; }
       .editii-grid { grid-template-columns: 1fr; }
-      .editie-header { flex-direction: column; }
-      .articol-modal-inner { padding: 24px 16px; }
-      .articol-modal-titlu { font-size: 1.3rem; }
+      .editie-masthead { grid-template-columns: 1fr; }
+      .editie-masthead img, .masthead-placeholder { width: 100%; height: 200px; }
+      .articol-modal-inner { padding: 32px 20px; }
+      .modal-titlu { font-size: 1.4rem; }
     }
   </style>
 </head>
 <body>
 
+<!-- HEADER DESKTOP -->
 <header>
   <div class="header-top">
     <a href="index.html" class="header-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
@@ -150,21 +737,22 @@
       <span class="header-motto">Învățare. Implicare. Progres.</span>
     </a>
     <div class="header-right">
-      <div style="display:flex;align-items:center;gap:14px;">
-        <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
-          <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
-          <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-        </form>
-      </div>
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
+        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+        <button type="submit" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:8px 18px;font-size:0.85rem;font-family:'Source Serif 4',serif;cursor:pointer;font-weight:600;letter-spacing:0.5px;">Donează</button>
+        <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+      </form>
       <div class="social-icons">
-        <a onclick="openContactModal()" title="Email" style="cursor:pointer;">
+        <a onclick="openContactModal()" title="Contact" style="cursor:pointer;">
           <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+        <a href="https://facebook.com/dokimasia" target="_blank">
+          <svg viewBox="0 0 24 24" fill="#1877F2"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
         </a>
       </div>
       <div class="account-wrapper">
         <button class="btn-account" onclick="toggleAccount()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span id="accountLabel">Contul meu</span>
         </button>
         <div class="account-dropdown" id="accountDropdown">
@@ -173,7 +761,9 @@
             <a href="#" onclick="openModal('register')">Înregistrare</a>
           </div>
           <div id="loggedIn" style="display:none">
-            <div id="adminBtn" style="display:none"><a href="admin.html" style="color:#8B0000;font-weight:bold;">⚙ Panou Admin</a></div>
+            <div id="adminBtn" style="display:none">
+              <a href="admin-revista.html" style="color:var(--crimson);font-weight:bold;">⚙ Admin Revistă</a>
+            </div>
             <a href="cont.html">Profilul meu</a>
             <a href="#" onclick="logout()">Deconectare</a>
           </div>
@@ -191,16 +781,17 @@
   </nav>
 </header>
 
+<!-- HEADER MOBIL -->
 <div class="mobile-header">
   <div class="mob-row1">
     <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
     <div style="display:flex;align-items:center;gap:8px;">
       <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
         <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-        <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:0.8rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
+        <button type="submit" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:7px 12px;font-size:0.78rem;font-family:'Source Serif 4',serif;cursor:pointer;font-weight:600;">Donează</button>
       </form>
-      <button class="mob-account-btn" onclick="openModal('login')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <button onclick="toggleAccount()" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Source Serif 4',serif;font-size:0.78rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <span id="mobAccountLabel">Cont</span>
       </button>
     </div>
@@ -210,7 +801,9 @@
     <span class="mob-motto">Învățare. Implicare. Progres.</span>
   </div>
   <div class="mob-row4">
-    <button class="mob-hamburger" onclick="toggleMobMenu()"><span></span><span></span><span></span></button>
+    <button class="mob-hamburger" onclick="document.getElementById('mobNav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
   </div>
   <nav class="mob-nav" id="mobNav">
     <a href="index.html">Acasă</a>
@@ -222,44 +815,55 @@
   </nav>
 </div>
 
-<div class="page-hero">
-  <h1>📖 Revista Dokimasia</h1>
-  <p>Publicație periodică dedicată educației, formării și implicării civice</p>
+<!-- HERO -->
+<div class="revista-hero">
+  <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
+  <h1>Revista Dokimasia</h1>
+  <p>Educație, formare și implicare civică — articole scrise de cadre didactice, cercetători și experți</p>
+  <div class="hero-ornament">— ✦ —</div>
 </div>
 
-<!-- Lista ediții -->
+<!-- LISTA EDIȚII -->
 <div class="revista-wrap" id="listaEditii">
-  <div class="loading" id="loadingMsg">Se încarcă edițiile...</div>
+  <div class="section-header">
+    <span class="section-title">Edițiile revistei</span>
+    <span class="section-count" id="editiiCount"></span>
+  </div>
+  <div class="loading" id="loadingMsg">Se încarcă edițiile</div>
   <div class="editii-grid" id="editiiGrid"></div>
 </div>
 
-<!-- Detaliu ediție -->
+<!-- DETALIU EDIȚIE -->
 <div class="editie-detail" id="editieDetail">
   <button class="back-btn" onclick="inapoiLaLista()">← Înapoi la toate edițiile</button>
-  <div class="editie-header" id="editieHeader"></div>
-  <div class="articole-titlu">Articolele acestei ediții</div>
-  <div id="articoleList"><div class="loading">Se încarcă articolele...</div></div>
+  <div class="editie-masthead" id="editieMasthead"></div>
+  <div class="cuprins-header">
+    <span class="cuprins-title">Cuprins</span>
+    <div class="cuprins-line"></div>
+  </div>
+  <div id="articoleList"><div class="loading">Se încarcă articolele</div></div>
 </div>
 
-<!-- Newsletter -->
+<!-- NEWSLETTER -->
 <div class="newsletter">
-  <div style="max-width:500px;margin:0 auto;">
-    <h3 style="color:#fff;font-size:1.1rem;margin-bottom:8px;letter-spacing:1px;">📧 Abonează-te la newsletter</h3>
-    <p style="color:rgba(255,255,255,0.8);font-size:0.85rem;margin-bottom:16px;">Fii primul care află noutățile asociației.</p>
-    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-      <input type="text" id="subNume" placeholder="Numele tău" style="padding:10px 14px;border-radius:6px;border:none;font-family:'Georgia',serif;font-size:0.9rem;width:160px;" />
-      <input type="email" id="subEmail" placeholder="Email-ul tău" style="padding:10px 14px;border-radius:6px;border:none;font-family:'Georgia',serif;font-size:0.9rem;width:200px;" />
-      <button onclick="subscribe()" style="padding:10px 20px;background:#fff;color:#8B0000;border:none;border-radius:6px;font-family:'Georgia',serif;font-size:0.9rem;font-weight:bold;cursor:pointer;">Abonează-mă</button>
+  <div style="max-width:520px;margin:0 auto;">
+    <h3>Abonează-te la newsletter</h3>
+    <p>Fii primul care primește noile ediții și noutățile asociației.</p>
+    <div class="newsletter-form">
+      <input type="text" id="subNume" placeholder="Numele tău" />
+      <input type="email" id="subEmail" placeholder="Email-ul tău" />
+      <button onclick="subscribe()">Abonează-mă</button>
     </div>
-    <p id="subMsg" style="color:rgba(255,255,255,0.9);font-size:0.82rem;margin-top:10px;min-height:16px;"></p>
+    <p id="subMsg"></p>
   </div>
 </div>
+
 <footer>
   <p>© <span id="year"></span> Asociația Dokimasia. Toate drepturile rezervate.</p>
-  <p style="margin-top:8px"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
+  <p style="margin-top:8px;"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
 </footer>
 
-<!-- Modal Login -->
+<!-- MODAL LOGIN -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">×</button>
@@ -269,15 +873,15 @@
       <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
     </div>
     <div id="formLogin">
-      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.95rem;font-family:'Georgia',serif;margin-bottom:16px;">
+      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;border:1px solid #ddd;border-radius:3px;background:#fff;cursor:pointer;font-size:0.9rem;font-family:'Source Serif 4',serif;margin-bottom:16px;">
         <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.05 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-3.55-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
         Continuă cu Google
       </button>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"><span style="font-size:0.8rem;color:#999;">sau</span><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"><span style="font-size:0.78rem;color:#999;">sau</span><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"></div>
       <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="email@exemplu.ro" /></div>
       <div class="form-group"><label>Parolă</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
       <button class="btn-primary" onclick="login()">Intră în cont</button>
-      <p style="text-align:center;margin-top:10px;"><a href="#" onclick="resetPassword()" style="font-size:0.82rem;color:#8B0000;">Ai uitat parola?</a></p>
+      <p style="text-align:center;margin-top:10px;"><a href="#" onclick="resetPassword()" style="font-size:0.8rem;color:var(--crimson);">Ai uitat parola?</a></p>
       <p class="modal-msg" id="loginMsg"></p>
     </div>
     <div id="formRegister" style="display:none">
@@ -290,7 +894,7 @@
   </div>
 </div>
 
-<!-- Modal Contact -->
+<!-- MODAL CONTACT -->
 <div class="contact-modal-overlay" id="contactModalOverlay">
   <div class="contact-modal">
     <button class="modal-close" onclick="closeContactModal()">×</button>
@@ -304,7 +908,7 @@
   </div>
 </div>
 
-<!-- Modal Articol complet -->
+<!-- MODAL ARTICOL COMPLET -->
 <div class="articol-modal" id="articolModal">
   <div class="articol-modal-inner">
     <button class="articol-modal-close" onclick="closeArticolModal()">×</button>
@@ -315,20 +919,27 @@
 <script>
   emailjs.init({publicKey: 'cPvtBWK6KReX_pqhM'})
   const { createClient } = supabase
-  const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
-  document.getElementById('year').textContent = new Date().getFullYear()
+  const sb = createClient(
+    'https://jaoxhsyplnkanhqevnnr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
+  )
 
+  document.getElementById('year').textContent = new Date().getFullYear()
   let currentUser = null
 
-  function toggleMobMenu() { document.getElementById('mobNav').classList.toggle('open') }
+  // ── AUTH ──
   function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', e => {
     const aw = document.querySelector('.account-wrapper')
     if (aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open')
   })
-
-  function openModal(tab) { document.getElementById('modalOverlay').classList.add('open'); switchTab(tab); document.getElementById('accountDropdown').classList.remove('open') }
+  function openModal(tab) {
+    document.getElementById('modalOverlay').classList.add('open')
+    switchTab(tab)
+    document.getElementById('accountDropdown').classList.remove('open')
+  }
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
+  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal() })
   function switchTab(tab) {
     document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none'
     document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none'
@@ -337,197 +948,302 @@
   }
   function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
   function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
+  document.getElementById('contactModalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeContactModal() })
 
+  async function loginWithGoogle() {
+    await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'https://dokimasia.ro/revista.html' } })
+  }
   async function login() {
-    const {error} = await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value, password:document.getElementById('loginPassword').value})
-    if(error){document.getElementById('loginMsg').textContent='Eroare: '+error.message}else{closeModal();updateAccountUI()}
+    const msg = document.getElementById('loginMsg')
+    msg.textContent = 'Se conectează...'
+    const { error } = await sb.auth.signInWithPassword({
+      email: document.getElementById('loginEmail').value,
+      password: document.getElementById('loginPassword').value
+    })
+    if (error) { msg.textContent = 'Eroare: ' + error.message }
+    else { closeModal(); updateAccountUI() }
   }
   async function register() {
-    const {error} = await sb.auth.signUp({email:document.getElementById('regEmail').value, password:document.getElementById('regPassword').value, options:{data:{full_name:document.getElementById('regName').value}}})
-    document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!'
+    const { error } = await sb.auth.signUp({
+      email: document.getElementById('regEmail').value,
+      password: document.getElementById('regPassword').value,
+      options: { data: { full_name: document.getElementById('regName').value } }
+    })
+    document.getElementById('registerMsg').textContent = error
+      ? 'Eroare: ' + error.message
+      : 'Cont creat! Verifică emailul.'
   }
   async function logout() { await sb.auth.signOut(); currentUser = null; updateAccountUI() }
-  async function loginWithGoogle() { await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://dokimasia.ro/revista.html'}}) }
   async function resetPassword() {
     const email = document.getElementById('loginEmail').value.trim()
     const msg = document.getElementById('loginMsg')
-    if(!email){msg.textContent='Introdu emailul mai întâi.';return}
-    const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://dokimasia.ro'})
-    msg.textContent = error ? 'Eroare: '+error.message : 'Email trimis!'
+    if (!email) { msg.textContent = 'Introdu emailul mai întâi.'; return }
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://dokimasia.ro' })
+    msg.textContent = error ? 'Eroare: ' + error.message : 'Email de resetare trimis!'
   }
+
   async function updateAccountUI() {
-    const {data:{session}} = await sb.auth.getSession()
+    const { data: { session } } = await sb.auth.getSession()
     const user = session?.user
     currentUser = user || null
     const label = document.getElementById('accountLabel')
     const mobLabel = document.getElementById('mobAccountLabel')
-    if(user){
-      const name = user.user_metadata?.full_name||user.user_metadata?.name||user.email
+    if (user) {
+      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email
       const firstName = name.split(' ')[0]
-      if(label) label.textContent = firstName
-      if(mobLabel) mobLabel.textContent = firstName
+      if (label) label.textContent = firstName
+      if (mobLabel) mobLabel.textContent = firstName
       document.getElementById('loggedOut').style.display = 'none'
       document.getElementById('loggedIn').style.display = 'block'
-      if(user.email==='m.ciprian1387@gmail.com') document.getElementById('adminBtn').style.display = 'block'
+      if (user.email === 'm.ciprian1387@gmail.com') {
+        document.getElementById('adminBtn').style.display = 'block'
+      }
     } else {
-      if(label) label.textContent = 'Contul meu'
-      if(mobLabel) mobLabel.textContent = 'Cont'
+      if (label) label.textContent = 'Contul meu'
+      if (mobLabel) mobLabel.textContent = 'Cont'
       document.getElementById('loggedOut').style.display = 'block'
       document.getElementById('loggedIn').style.display = 'none'
     }
   }
   updateAccountUI()
   sb.auth.onAuthStateChange((event, session) => {
-    if(['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI()
-    if(event==='SIGNED_IN'){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')) }
+    if (['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI()
+    if (event === 'SIGNED_IN') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'))
   })
 
+  // ── CONTACT ──
   async function sendEmail() {
-    const name=document.getElementById('contactName').value, email=document.getElementById('contactEmail').value
-    const subject=document.getElementById('contactSubject').value, message=document.getElementById('contactMessage').value
-    const msg=document.getElementById('contactMsg')
-    if(!name||!email||!message){msg.textContent='Completează toate câmpurile.';return}
+    const name = document.getElementById('contactName').value.trim()
+    const email = document.getElementById('contactEmail').value.trim()
+    const subject = document.getElementById('contactSubject').value.trim()
+    const message = document.getElementById('contactMessage').value.trim()
+    const msg = document.getElementById('contactMsg')
+    if (!name || !email || !message) { msg.textContent = 'Completează toate câmpurile.'; return }
     try {
-      await emailjs.send('service_swl59rb','template_ky5fzal',{from_name:name,from_email:email,subject:subject||'Mesaj nou',message:message,to_name:'Asociația Dokimasia'})
-      await sb.from('messages').insert([{name,email,subject,message}])
-      msg.textContent='Mesaj trimis cu succes!'; msg.style.color='green'
-      setTimeout(()=>{closeContactModal();msg.textContent=''},3000)
-    } catch(e){ msg.textContent='Eroare la trimitere.'; msg.style.color='#c00' }
+      await emailjs.send('service_4a8gp1c', 'template_wg7nlez', { name, email, title: subject || 'Mesaj nou', message })
+      msg.textContent = 'Mesaj trimis cu succes!'; msg.style.color = 'green'
+      setTimeout(() => { closeContactModal(); msg.textContent = '' }, 3000)
+    } catch(e) { msg.textContent = 'Eroare la trimitere.'; msg.style.color = '#c00' }
   }
 
+  // ── NEWSLETTER ──
   async function subscribe() {
-    const email=document.getElementById('subEmail').value, nume=document.getElementById('subNume').value
-    const msg=document.getElementById('subMsg')
-    if(!email){msg.textContent='Introdu adresa de email.';return}
-    const {error}=await sb.from('abonati').insert([{email,nume}])
-    if(error&&error.code==='23505'){msg.textContent='Ești deja abonat!'}
-    else if(error){msg.textContent='Eroare: '+error.message}
-    else{msg.textContent='Te-ai abonat cu succes! 🎉'}
+    const email = document.getElementById('subEmail').value.trim()
+    const nume = document.getElementById('subNume').value.trim()
+    const msg = document.getElementById('subMsg')
+    if (!email) { msg.textContent = 'Introdu adresa de email.'; return }
+    const { error } = await sb.from('abonati').insert([{ email, nume }])
+    if (error?.code === '23505') msg.textContent = 'Ești deja abonat!'
+    else if (error) msg.textContent = 'Eroare: ' + error.message
+    else msg.textContent = '✓ Te-ai abonat cu succes!'
   }
 
-  // Tracking
-  async function trackPageView() {
-    try {
-      const ua=navigator.userAgent
-      let device='Desktop'
-      if(/Mobi|Android/i.test(ua)) device='Mobil'
-      else if(/Tablet|iPad/i.test(ua)) device='Tableta'
-      let browser='Altul'
-      if(/Edg/i.test(ua)) browser='Edge'
-      else if(/Chrome/i.test(ua)) browser='Chrome'
-      else if(/Firefox/i.test(ua)) browser='Firefox'
-      else if(/Safari/i.test(ua)) browser='Safari'
-      const referrer=document.referrer||null
-      let city=null,country=null,ip=null
-      try {
-        const geo=await fetch('https://ipapi.co/json/').then(r=>r.json())
-        city=geo.city; country=geo.country_name; ip=geo.ip
-      } catch(e){}
-      await sb.from('page_views').insert([{page:'revista.html',user_agent:ua,device,browser,referrer,city,country,ip}])
-    } catch(e){}
-  }
-  trackPageView()
-
-  // ─── REVISTA LOGIC ───
+  // ── REVISTA LOGIC ──
   async function loadEditii() {
-    const {data, error} = await sb.from('reviste').select('*').eq('status','publicat').order('data_aparitie', {ascending: false})
+    const { data, error } = await sb
+      .from('reviste')
+      .select('*')
+      .eq('status', 'publicat')
+      .order('data_aparitie', { ascending: false })
+
     document.getElementById('loadingMsg').style.display = 'none'
-    if(error || !data || data.length === 0) {
-      document.getElementById('editiiGrid').innerHTML = '<p style="color:#888;text-align:center;padding:40px;font-size:1rem;">Nu există ediții publicate momentan. Reveniți curând!</p>'
+
+    if (error || !data || data.length === 0) {
+      document.getElementById('editiiGrid').innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="icon">📖</div>
+          <p>Nu există ediții publicate momentan. Reveniți curând!</p>
+        </div>`
       return
     }
+
+    document.getElementById('editiiCount').textContent = data.length + ' ediți' + (data.length === 1 ? 'e' : 'i')
+
     document.getElementById('editiiGrid').innerHTML = data.map(e => `
       <div class="editie-card" onclick="deschideEditie('${e.id}')">
-        ${e.coperta_url
-          ? `<img src="${e.coperta_url}" alt="${e.titlu}" class="editie-coperta" style="width:100%;height:200px;object-fit:cover;" />`
-          : `<div class="editie-coperta-placeholder">📖 ${e.editie}</div>`}
+        <div class="coperta-wrap">
+          ${e.coperta_url
+            ? `<img src="${e.coperta_url}" alt="${e.titlu}" />`
+            : `<div class="coperta-placeholder">
+                <div class="nr">${e.editie}</div>
+                <div class="titlu-cop">${e.titlu}</div>
+                <div class="ornament">— ✦ —</div>
+              </div>`}
+          <div class="editie-badge-wrap">
+            <span class="editie-badge">${e.editie}</span>
+          </div>
+        </div>
         <div class="editie-info">
-          <span class="editie-badge">${e.editie}</span>
+          <div class="editie-numar">${e.editie}</div>
           <div class="editie-titlu">${e.titlu}</div>
-          <div class="editie-data">${e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO',{year:'numeric',month:'long'}) : ''}</div>
-          ${e.descriere ? `<div class="editie-desc">${e.descriere.substring(0,120)}${e.descriere.length>120?'...':''}</div>` : ''}
-          <span class="editie-btn">Citește ediția →</span>
+          <div class="editie-data">${e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO', {year:'numeric', month:'long'}) : ''}</div>
+          ${e.descriere ? `<div class="editie-desc">${e.descriere.substring(0, 140)}${e.descriere.length > 140 ? '...' : ''}</div>` : ''}
+          <div class="editie-footer">
+            <span class="editie-art-count" id="count-${e.id}">Se încarcă...</span>
+            <span class="btn-explore">Citește ediția <span class="arrow">→</span></span>
+          </div>
         </div>
       </div>
     `).join('')
+
+    // Număr articole per ediție
+    for (const e of data) {
+      const { count } = await sb.from('articole_revista')
+        .select('*', { count: 'exact', head: true })
+        .eq('revista_id', e.id)
+        .eq('status', 'publicat')
+      const el = document.getElementById('count-' + e.id)
+      if (el) el.textContent = (count || 0) + ' articol' + (count === 1 ? '' : 'e')
+    }
   }
 
   async function deschideEditie(revistaId) {
     document.getElementById('listaEditii').style.display = 'none'
-    document.getElementById('editieDetail').classList.add('open')
-    document.getElementById('articoleList').innerHTML = '<div class="loading">Se încarcă...</div>'
+    const detail = document.getElementById('editieDetail')
+    detail.classList.add('open')
+    document.getElementById('articoleList').innerHTML = '<div class="loading">Se încarcă articolele</div>'
+    window.scrollTo(0, 0)
 
-    const {data: rev} = await sb.from('reviste').select('*').eq('id', revistaId).single()
-    if(rev) {
-      document.getElementById('editieHeader').innerHTML = `
+    // Date ediție
+    const { data: rev } = await sb.from('reviste').select('*').eq('id', revistaId).single()
+    if (rev) {
+      document.getElementById('editieMasthead').innerHTML = `
         ${rev.coperta_url
           ? `<img src="${rev.coperta_url}" alt="${rev.titlu}" />`
-          : `<div class="editie-header-placeholder">📖<br>${rev.editie}</div>`}
-        <div class="editie-meta">
-          <div class="editie-badge" style="margin-bottom:12px;">${rev.editie}</div>
-          <h2>${rev.titlu}</h2>
-          <div class="data">${rev.data_aparitie ? new Date(rev.data_aparitie).toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric'}) : ''}</div>
-          ${rev.descriere ? `<div class="descriere">${rev.descriere}</div>` : ''}
+          : `<div class="masthead-placeholder">
+              <div style="font-size:0.7rem;letter-spacing:3px;opacity:0.6;text-transform:uppercase;">${rev.editie}</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;text-align:center;line-height:1.4;">${rev.titlu}</div>
+              <div style="color:var(--gold-light);letter-spacing:4px;opacity:0.7;">— ✦ —</div>
+            </div>`}
+        <div class="masthead-info">
+          <div class="masthead-numar">${rev.editie}</div>
+          <div class="masthead-titlu">${rev.titlu}</div>
+          <div class="masthead-data">${rev.data_aparitie ? new Date(rev.data_aparitie).toLocaleDateString('ro-RO', {year:'numeric', month:'long', day:'numeric'}) : ''}</div>
+          ${rev.descriere ? `<div class="masthead-descriere">${rev.descriere}</div>` : ''}
+          <div class="masthead-actions">
+            ${rev.pdf_url ? `<a href="${rev.pdf_url}" target="_blank" class="btn-pdf">📄 Descarcă PDF complet</a>` : ''}
+          </div>
         </div>
       `
     }
 
-    const {data: articole} = await sb.from('articole_revista').select('*, autori(nume_complet, institutie)').eq('revista_id', revistaId).eq('status','publicat').order('ordine')
-    if(!articole || articole.length === 0) {
-      document.getElementById('articoleList').innerHTML = '<p style="color:#888;padding:20px;">Nu există articole publicate în această ediție.</p>'
+    // Articole
+    const { data: articole } = await sb
+      .from('articole_revista')
+      .select('*, autori(nume_complet, institutie, bio)')
+      .eq('revista_id', revistaId)
+      .eq('status', 'publicat')
+      .order('ordine')
+
+    if (!articole || articole.length === 0) {
+      document.getElementById('articoleList').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">📭</div>
+          <p>Nu există articole publicate în această ediție.</p>
+        </div>`
       return
     }
+
     document.getElementById('articoleList').innerHTML = articole.map(a => {
-      const isPremium = a.tip_acces === 'premium'
+      const isPremium = a.tip_acces === 'cont'
       const canRead = !isPremium || currentUser
       return `
         <div class="articol-row">
-          <div class="articol-row-header">
+          <div class="articol-top">
             ${a.rubrica ? `<span class="articol-rubrica">${a.rubrica}</span>` : ''}
-            <div>
+            <div class="articol-main">
               <div class="articol-titlu">${a.titlu}</div>
               <div class="articol-autor">${a.autori?.nume_complet || 'Autor necunoscut'}${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}</div>
             </div>
           </div>
           ${a.rezumat ? `<div class="articol-rezumat">${a.rezumat}</div>` : ''}
           <div class="articol-actions">
-            <span class="badge-acces ${isPremium ? 'badge-premium' : 'badge-gratuit'}">${isPremium ? '🔒 Premium' : '✓ Gratuit'}</span>
+            <span class="badge-acces ${isPremium ? 'badge-cont' : 'badge-gratuit'}">${isPremium ? '🔒 Necesită cont' : '✓ Gratuit'}</span>
             ${canRead
               ? `<button class="btn-citeste" onclick="citestArticol('${a.id}')">Citește articolul</button>`
-              : `<button class="btn-citeste" onclick="openModal('login')" title="Autentifică-te pentru a citi">🔒 Autentifică-te</button>`}
-            ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" style="font-size:0.82rem;color:#8B0000;">📄 Descarcă PDF</a>` : ''}
+              : `<button class="btn-citeste" onclick="openModal('login')" title="Creează un cont gratuit">🔒 Autentifică-te</button>`}
+            ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" class="btn-pdf-art">📄 PDF</a>` : ''}
           </div>
-        </div>
-      `
+        </div>`
     }).join('')
   }
 
   function inapoiLaLista() {
     document.getElementById('editieDetail').classList.remove('open')
     document.getElementById('listaEditii').style.display = 'block'
+    window.scrollTo(0, 0)
   }
 
   async function citestArticol(articolId) {
     document.getElementById('articolModal').classList.add('open')
-    document.getElementById('articolModalContent').innerHTML = '<div class="loading">Se încarcă...</div>'
-    const {data: a} = await sb.from('articole_revista').select('*, autori(nume_complet, institutie, bio)').eq('id', articolId).single()
-    if(!a) { document.getElementById('articolModalContent').innerHTML = '<p>Eroare la încărcare.</p>'; return }
+    document.getElementById('articolModalContent').innerHTML = '<div class="loading">Se încarcă articolul</div>'
+    document.body.style.overflow = 'hidden'
+
+    const { data: a } = await sb
+      .from('articole_revista')
+      .select('*, autori(nume_complet, institutie, bio)')
+      .eq('id', articolId)
+      .single()
+
+    if (!a) {
+      document.getElementById('articolModalContent').innerHTML = '<p style="color:#c00;">Eroare la încărcare.</p>'
+      return
+    }
+
     document.getElementById('articolModalContent').innerHTML = `
-      ${a.rubrica ? `<div style="color:#8B0000;font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">${a.rubrica}</div>` : ''}
-      <div class="articol-modal-titlu">${a.titlu}</div>
-      <div class="articol-modal-meta">
-        ${a.autori?.nume_complet || ''} ${a.autori?.institutie ? '— ' + a.autori.institutie : ''} 
-        · ${new Date(a.created_at).toLocaleDateString('ro-RO')}
+      ${a.rubrica ? `<div class="modal-rubrica">${a.rubrica}</div>` : ''}
+      <div class="modal-titlu">${a.titlu}</div>
+      <div class="modal-meta">
+        ${a.autori?.nume_complet || ''}
+        ${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}
+        · ${new Date(a.created_at).toLocaleDateString('ro-RO', {day:'numeric', month:'long', year:'numeric'})}
       </div>
-      ${a.rezumat ? `<div class="articol-modal-rezumat">${a.rezumat}</div>` : ''}
-      ${a.continut ? `<div class="articol-modal-continut">${a.continut}</div>` : ''}
-      ${a.fisier_url ? `<div class="articol-modal-fisier"><a href="${a.fisier_url}" target="_blank" style="background:#8B0000;color:#fff;padding:10px 20px;border-radius:6px;font-size:0.9rem;">📄 Descarcă fișierul atașat</a></div>` : ''}
-      ${a.autori?.bio ? `<div style="margin-top:30px;padding:20px;background:#f9f4f4;border-radius:8px;"><strong style="color:#8B0000;">Despre autor</strong><p style="font-size:0.88rem;color:#555;margin-top:8px;line-height:1.7;">${a.autori.bio}</p></div>` : ''}
+      ${a.rezumat ? `<div class="modal-rezumat">${a.rezumat}</div>` : ''}
+      ${a.continut ? `<div class="modal-continut">${a.continut}</div>` : ''}
+      ${a.fisier_url ? `<div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
+        <a href="${a.fisier_url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 20px;border-radius:3px;font-size:0.88rem;font-family:'Source Serif 4',serif;">
+          📄 Descarcă fișierul atașat
+        </a>
+      </div>` : ''}
+      ${a.autori?.bio ? `<div class="modal-bio">
+        <strong>Despre autor</strong>
+        <p>${a.autori.bio}</p>
+      </div>` : ''}
     `
   }
 
-  function closeArticolModal() { document.getElementById('articolModal').classList.remove('open') }
-  document.getElementById('articolModal').addEventListener('click', function(e) { if(e.target===this) closeArticolModal() })
+  function closeArticolModal() {
+    document.getElementById('articolModal').classList.remove('open')
+    document.body.style.overflow = ''
+  }
+  document.getElementById('articolModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeArticolModal()
+  })
+
+  // ── PAGE TRACKING ──
+  async function trackPageView() {
+    try {
+      const ua = navigator.userAgent
+      let device = 'Desktop'
+      if (/Mobi|Android/i.test(ua)) device = 'Mobil'
+      else if (/Tablet|iPad/i.test(ua)) device = 'Tableta'
+      let browser = 'Altul'
+      if (/Edg/i.test(ua)) browser = 'Edge'
+      else if (/Chrome/i.test(ua)) browser = 'Chrome'
+      else if (/Firefox/i.test(ua)) browser = 'Firefox'
+      else if (/Safari/i.test(ua)) browser = 'Safari'
+      let city = null, country = null, ip = null
+      try {
+        const geo = await fetch('https://ipapi.co/json/').then(r => r.json())
+        city = geo.city; country = geo.country_name; ip = geo.ip
+      } catch(e) {}
+      await sb.from('page_views').insert([{
+        page: 'revista.html', user_agent: ua, device, browser,
+        referrer: document.referrer || null, city, country, ip
+      }])
+    } catch(e) {}
+  }
+  trackPageView()
 
   loadEditii()
 </script>

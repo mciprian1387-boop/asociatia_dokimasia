@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Revista Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --crimson: #8B0000;
+      --crimson-dark: #5a0000;
+      --gold: #b8963e;
+      --ink: #1a1108;
+      --paper: #faf8f4;
+      --paper-dark: #f0ece4;
+      --border: #ddd8cc;
+      --muted: #7a7060;
+      --success: #2e7d32;
+      --error: #c62828;
+      --sidebar-w: 260px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Source Serif 4', Georgia, serif; background: var(--paper); color: var(--ink); }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── AUTH GATE ── */
+    #authGate {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--crimson);
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px);
+    }
+    .auth-box {
+      background: #fff; border-radius: 4px; padding: 48px 40px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+    }
+    .auth-box h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; color: var(--crimson);
+      text-align: center; margin-bottom: 6px;
+    }
+    .auth-box p { text-align: center; font-size: 0.85rem; color: var(--muted); margin-bottom: 28px; font-style: italic; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.8rem; color: #555; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .form-group input {
+      width: 100%; padding: 11px 14px; border: 1px solid var(--border);
+      border-radius: 3px; font-size: 0.93rem;
+      font-family: 'Source Serif 4', serif; outline: none; transition: border 0.2s;
+    }
+    .form-group input:focus { border-color: var(--crimson); }
+    .btn-auth {
+      width: 100%; padding: 12px; background: var(--crimson); color: #fff;
+      border: none; border-radius: 3px; font-size: 0.95rem;
+      font-family: 'Source Serif 4', serif; cursor: pointer;
+      transition: background 0.2s; margin-top: 4px;
+    }
+    .btn-auth:hover { background: var(--crimson-dark); }
+    #authMsg { text-align: center; font-size: 0.83rem; margin-top: 12px; color: var(--error); }
+
+    /* ── ADMIN LAYOUT ── */
+    #adminApp { display: none; min-height: 100vh; }
+
+    .admin-topbar {
+      background: var(--crimson); color: #fff;
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .admin-topbar-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .admin-topbar h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .topbar-badge {
+      background: rgba(255,255,255,0.2);
+      font-size: 0.7rem; padding: 3px 10px; border-radius: 20px;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .admin-topbar-right { display: flex; align-items: center; gap: 12px; }
+    .btn-topbar {
+      background: rgba(255,255,255,0.15); color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 7px 14px; border-radius: 3px;
+      font-size: 0.82rem; font-family: 'Source Serif 4', serif;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-topbar:hover { background: rgba(255,255,255,0.25); }
+
+    .admin-body { display: flex; min-height: calc(100vh - 54px); }
+
+    /* ── SIDEBAR ── */
+    .admin-sidebar {
+      width: var(--sidebar-w); background: #fff;
+      border-right: 1px solid var(--border);
+      padding: 24px 0;
+      flex-shrink: 0;
+      position: sticky; top: 54px;
+      height: calc(100vh - 54px);
+      overflow-y: auto;
+    }
+    .sidebar-section {
+      padding: 0 16px; margin-bottom: 8px;
+    }
+    .sidebar-label {
+      font-size: 0.68rem; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--muted);
+      padding: 8px 8px 6px;
+    }
+    .sidebar-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 10px 12px; border: none;
+      background: none; cursor: pointer; border-radius: 4px;
+      font-family: 'Source Serif 4', serif;
+      font-size: 0.9rem; color: var(--ink);
+      text-align: left; transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-btn:hover { background: var(--paper); color: var(--crimson); }
+    .sidebar-btn.active { background: #fdf0f0; color: var(--crimson); font-weight: 600; }
+    .sidebar-btn .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .editii-list { padding: 4px 16px; }
+    .editie-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px; border-radius: 4px; cursor: pointer;
+      font-size: 0.84rem; color: #444;
+      transition: background 0.15s;
+    }
+    .editie-item:hover { background: var(--paper); color: var(--crimson); }
+    .editie-item.active { background: #fdf0f0; color: var(--crimson); font-weight: 600; }
+    .editie-status {
+      font-size: 0.65rem; padding: 2px 7px; border-radius: 10px;
+    }
+    .status-publicat { background: #e8f5e9; color: var(--success); }
+    .status-draft { background: #fff3e0; color: #e65100; }
+
+    /* ── MAIN CONTENT ── */
+    .admin-main {
+      flex: 1; padding: 32px 36px;
+      max-width: 900px;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; padding-bottom: 16px;
+      border-bottom: 2px solid var(--crimson);
+    }
+    .panel-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      background: var(--crimson); color: #fff;
+      padding: 10px 20px; border: none; border-radius: 3px;
+      font-size: 0.87rem; font-family: 'Source Serif 4', serif;
+      cursor: pointer; transition: background 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary:hover { background: var(--crimson-dark); }
+
+    .btn-secondary {
+      background: #fff; color: var(--crimson);
+      padding: 9px 18px; border: 1.5px solid var(--crimson);
+      border-radius: 3px; font-size: 0.85rem;
+      font-family: 'Source Serif 4', serif; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { background: var(--crimson); color: #fff; }
+
+    .btn-danger {
+      background: none; color: var(--error);
+      padding: 6px 12px; border: 1px solid var(--error);
+      border-radius: 3px; font-size: 0.78rem;
+      font-family: 'Source Serif 4', serif; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-danger:hover { background: var(--error); color: #fff; }
+
+    .btn-success {
+      background: var(--success); color: #fff;
+      padding: 6px 12px; border: none; border-radius: 3px;
+      font-size: 0.78rem; font-family: 'Source Serif 4', serif;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-success:hover { background: #1b5e20; }
+
+    /* ── FORMS ── */
+    .card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 3px; padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--crimson); margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--paper-dark);
+    }
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; font-size: 0.8rem; color: #555;
+      margin-bottom: 6px; letter-spacing: 0.5px;
+    }
+    .field label span { color: var(--error); margin-left: 2px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1px solid var(--border); border-radius: 3px;
+      font-size: 0.92rem; font-family: 'Source Serif 4', serif;
+      outline: none; transition: border 0.2s;
+      background: var(--paper);
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: var(--crimson); background: #fff;
+    }
+    .field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field-hint { font-size: 0.75rem; color: var(--muted); margin-top: 5px; font-style: italic; }
+
+    .form-actions {
+      display: flex; gap: 10px; align-items: center;
+      margin-top: 24px; padding-top: 18px;
+      border-top: 1px solid var(--paper-dark);
+    }
+    #formMsg {
+      font-size: 0.82rem; margin-left: 8px;
+    }
+    #artFormMsg { font-size: 0.82rem; margin-left: 8px; }
+
+    /* ── ARTICOLE LIST ── */
+    .articole-table {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 3px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .table-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 80px 80px 100px;
+      align-items: center; gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--paper-dark);
+      transition: background 0.15s;
+    }
+    .table-row:last-child { border-bottom: none; }
+    .table-row:hover { background: var(--paper); }
+    .table-header {
+      background: var(--paper-dark); font-size: 0.72rem;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--muted); font-weight: 600;
+    }
+    .table-row:hover.table-header { background: var(--paper-dark); }
+    .art-titlu { font-size: 0.9rem; font-weight: 600; color: var(--ink); line-height: 1.3; }
+    .art-autor { font-size: 0.78rem; color: var(--muted); margin-top: 2px; font-style: italic; }
+    .art-rubrica { font-size: 0.75rem; color: var(--crimson); }
+    .art-ordine { font-size: 0.85rem; color: #666; text-align: center; }
+    .art-actions { display: flex; gap: 6px; justify-content: flex-end; }
+
+    .badge {
+      display: inline-block; font-size: 0.68rem; padding: 3px 9px;
+      border-radius: 2px; letter-spacing: 1px; text-transform: uppercase;
+      font-weight: 600;
+    }
+    .badge-draft { background: #fff3e0; color: #e65100; }
+    .badge-pub { background: #e8f5e9; color: var(--success); }
+    .badge-grat { background: #e3f2fd; color: #1565c0; }
+    .badge-cont { background: #fce4ec; color: #880e4f; }
+
+    .btn-icon {
+      background: none; border: 1px solid var(--border);
+      border-radius: 3px; width: 30px; height: 30px;
+      cursor: pointer; font-size: 0.85rem; color: var(--muted);
+      transition: all 0.15s; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-icon:hover { border-color: var(--crimson); color: var(--crimson); }
+    .btn-icon.del:hover { border-color: var(--error); color: var(--error); }
+
+    /* ── AUTORI ── */
+    .autori-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px; margin-top: 4px;
+    }
+    .autor-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 3px; padding: 18px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .autor-name { font-weight: 600; font-size: 0.92rem; color: var(--ink); }
+    .autor-inst { font-size: 0.78rem; color: var(--muted); font-style: italic; }
+    .autor-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--ink); color: #fff;
+      padding: 12px 20px; border-radius: 4px;
+      font-size: 0.88rem; z-index: 9999;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s ease;
+      max-width: 320px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--error); }
+
+    /* ── DASHBOARD STATS ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 3px; padding: 20px 24px;
+      border-left: 4px solid var(--crimson);
+    }
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900; color: var(--crimson);
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+    .divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .admin-sidebar { display: none; }
+      .admin-main { padding: 20px 16px; }
+      .field-row { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .table-row { grid-template-columns: 1fr auto; }
+      .table-header { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="authGate">
+  <div class="auth-box">
+    <h1>Admin Revistă</h1>
+    <p>Asociația Dokimasia — Panou de administrare</p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="email@dokimasia.ro" />
+    </div>
+    <div class="form-group">
+      <label>Parolă</label>
+      <input type="password" id="authPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')authLogin()" />
+    </div>
+    <button class="btn-auth" onclick="authLogin()">Intră în panou</button>
+    <p id="authMsg"></p>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+
+  <!-- TOPBAR -->
+  <div class="admin-topbar">
+    <div class="admin-topbar-left">
+      <h1>Revista Dokimasia</h1>
+      <span class="topbar-badge">Admin</span>
+    </div>
+    <div class="admin-topbar-right">
+      <span id="adminName" style="font-size:0.85rem;opacity:0.8;"></span>
+      <a href="revista.html" class="btn-topbar">👁 Vezi revista</a>
+      <button class="btn-topbar" onclick="adminLogout()">Deconectare</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- SIDEBAR -->
+    <div class="admin-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">General</div>
+        <button class="sidebar-btn active" onclick="showPanel('dashboard')" id="btn-dashboard">
+          <span class="icon">📊</span> Dashboard
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Conținut</div>
+        <button class="sidebar-btn" onclick="showPanel('editii')" id="btn-editii">
+          <span class="icon">📗</span> Ediții
+        </button>
+        <button class="sidebar-btn" onclick="showPanel('autori')" id="btn-autori">
+          <span class="icon">✍️</span> Autori
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Ediții existente</div>
+        <div class="editii-list" id="sidebarEditii"></div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div class="panel active" id="panel-dashboard">
+        <div class="panel-header">
+          <span class="panel-title">Dashboard</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statEditii">—</div>
+            <div class="stat-label">Ediții publicate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statArticole">—</div>
+            <div class="stat-label">Articole publicate</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statAutori">—</div>
+            <div class="stat-label">Autori înregistrați</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pași următori</div>
+          <p style="font-size:0.9rem;color:#555;line-height:1.8;">
+            1. Adaugă <strong>autori</strong> în secțiunea Autori<br>
+            2. Creează o <strong>ediție nouă</strong> în secțiunea Ediții<br>
+            3. Adaugă <strong>articole</strong> la fiecare ediție<br>
+            4. Publică ediția când e gata<br>
+            5. Verifică revista la <a href="revista.html" style="color:var(--crimson);">revista.html</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- EDIȚII -->
+      <div class="panel" id="panel-editii">
+        <div class="panel-header">
+          <span class="panel-title">Ediții</span>
+          <button class="btn-primary" onclick="showEditieForm()">+ Ediție nouă</button>
+        </div>
+
+        <!-- Form ediție -->
+        <div class="card" id="editieFormCard" style="display:none;">
+          <div class="card-title" id="editieFormTitle">Ediție nouă</div>
+          <input type="hidden" id="editieId" />
+          <div class="field-row">
+            <div class="field">
+              <label>Numărul ediției <span>*</span></label>
+              <input type="text" id="editieNr" placeholder="Nr. 1 / 2025" />
+            </div>
+            <div class="field">
+              <label>Data apariției</label>
+              <input type="date" id="editieData" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Titlul tematic <span>*</span></label>
+            <input type="text" id="editieTitlu" placeholder="ex: Educația în era digitală" />
+          </div>
+          <div class="field">
+            <label>Descriere (opțional)</label>
+            <textarea id="editieDescriere" placeholder="Un scurt rezumat al ediției..."></textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>URL Copertă (imagine)</label>
+              <input type="url" id="editieCoperta" placeholder="https://..." />
+              <div class="field-hint">Încarcă imaginea în Supabase Storage și pune URL-ul aici</div>
+            </div>
+            <div class="field">
+              <label>URL PDF complet (opțional)</label>
+              <input type="url" id="editiePdf" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="editieStatus">
+              <option value="draft">Draft (nevizibil pe site)</option>
+              <option value="publicat">Publicat (vizibil pe site)</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="salveazaEditie()">💾 Salvează ediția</button>
+            <button class="btn-secondary" onclick="hideEditieForm()">Anulează</button>
+            <span id="formMsg"></span>
+          </div>
+        </div>
+
+        <!-- Lista ediții -->
+        <div id="editiiListAdmin"></div>
+      </div>
+
+      <!-- ARTICOLE (per ediție) -->
+      <div class="panel" id="panel-articole">
+        <div class="panel-header">
+          <span class="panel-title" id="articoleTitle">Articole</span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" onclick="showPanel('editii')">← Înapoi</button>
+            <button class="btn-primary" onclick="showArtForm()">+ Articol nou</button>
+          </div>
+        </div>
+
+        <!-- Form articol -->
+        <div class="card" id="artFormCard" style="display:none;">
+          <div class="card-title" id="artFormTitle">Articol nou</div>
+          <input type="hidden" id="artId" />
+          <input type="hidden" id="artRevistaId" />
+          <div class="field">
+            <label>Titlul articolului <span>*</span></label>
+            <input type="text" id="artTitlu" placeholder="ex: Strategii didactice moderne în era digitală" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Autor</label>
+              <select id="artAutor">
+                <option value="">— Fără autor —</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Rubrica</label>
+              <input type="text" id="artRubrica" placeholder="ex: Editorial, Didactică, Cercetare" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Rezumat (afișat în cuprins)</label>
+            <textarea id="artRezumat" placeholder="Un scurt rezumat al articolului (2-3 propoziții)..." style="min-height:80px;"></textarea>
+          </div>
+          <div class="field">
+            <label>Conținut complet</label>
+            <textarea id="artContinut" placeholder="Textul integral al articolului..." style="min-height:200px;"></textarea>
+            <div class="field-hint">Acceptă text simplu sau HTML de bază (&lt;p&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;h3&gt;)</div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>URL PDF articol (opțional)</label>
+              <input type="url" id="artFisier" placeholder="https://..." />
+            </div>
+            <div class="field">
+              <label>Ordine în cuprins</label>
+              <input type="number" id="artOrdine" placeholder="1" min="1" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Acces</label>
+              <select id="artAcces">
+                <option value="gratuit">Gratuit (fără cont)</option>
+                <option value="cont">Necesită cont (gratuit)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <select id="artStatus">
+                <option value="draft">Draft</option>
+                <option value="publicat">Publicat</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="salveazaArticol()">💾 Salvează articolul</button>
+            <button class="btn-secondary" onclick="hideArtForm()">Anulează</button>
+            <span id="artFormMsg"></span>
+          </div>
+        </div>
+
+        <!-- Lista articole -->
+        <div class="articole-table" id="articoleListAdmin">
+          <div class="table-row table-header">
+            <div>Titlu / Autor</div>
+            <div>Rubrica</div>
+            <div style="text-align:center;">Nr.</div>
+            <div>Acces</div>
+            <div style="text-align:right;">Acțiuni</div>
+          </div>
+          <div id="articoleRows" style="min-height:60px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-style:italic;font-size:0.9rem;">Selectează o ediție</div>
+        </div>
+      </div>
+
+      <!-- AUTORI -->
+      <div class="panel" id="panel-autori">
+        <div class="panel-header">
+          <span class="panel-title">Autori</span>
+          <button class="btn-primary" onclick="showAutorForm()">+ Autor nou</button>
+        </div>
+
+        <!-- Form autor -->
+        <div class="card" id="autorFormCard" style="display:none;">
+          <div class="card-title" id="autorFormTitle">Autor nou</div>
+          <input type="hidden" id="autorId" />
+          <div class="field-row">
+            <div class="field">
+              <label>Nume complet <span>*</span></label>
+              <input type="text" id="autorNume" placeholder="Prof. Dr. Ion Popescu" />
+            </div>
+            <div class="field">
+              <label>Instituție</label>
+              <input type="text" id="autorInstitutie" placeholder="Universitatea..." />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="autorEmail" placeholder="ion.popescu@univ.ro" />
+            </div>
+            <div class="field">
+              <label>URL Fotografie (opțional)</label>
+              <input type="url" id="autorAvatar" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="field">
+            <label>Biografie scurtă</label>
+            <textarea id="autorBio" placeholder="Câteva rânduri despre autor..." style="min-height:80px;"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" onclick="salveazaAutor()">💾 Salvează autorul</button>
+            <button class="btn-secondary" onclick="hideAutorForm()">Anulează</button>
+            <span id="autorFormMsg"></span>
+          </div>
+        </div>
+
+        <div class="autori-grid" id="autoriGrid"></div>
+      </div>
+
+    </div><!-- /admin-main -->
+  </div><!-- /admin-body -->
+</div><!-- /adminApp -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const sb = supabase.createClient(
+    'https://jaoxhsyplnkanhqevnnr.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
+  )
+
+  const ADMIN_EMAIL = 'm.ciprian1387@gmail.com'
+  let currentEditieId = null
+  let autoriCache = []
+
+  // ── TOAST ──
+  function toast(msg, type = '') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast show ' + type
+    setTimeout(() => { t.className = 'toast' }, 3500)
+  }
+
+  // ── AUTH ──
+  async function authLogin() {
+    const email = document.getElementById('authEmail').value.trim()
+    const password = document.getElementById('authPassword').value
+    const msg = document.getElementById('authMsg')
+    msg.textContent = 'Se conectează...'
+    const { data, error } = await sb.auth.signInWithPassword({ email, password })
+    if (error) { msg.textContent = 'Eroare: ' + error.message; return }
+    if (data.user.email !== ADMIN_EMAIL) {
+      await sb.auth.signOut()
+      msg.textContent = 'Acces restricționat. Doar administratorul poate accesa.'
+      return
+    }
+    initAdmin(data.user)
+  }
+
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session?.user?.email === ADMIN_EMAIL) {
+      initAdmin(session.user)
+    }
+  }
+
+  async function initAdmin(user) {
+    document.getElementById('authGate').style.display = 'none'
+    document.getElementById('adminApp').style.display = 'block'
+    const name = user.user_metadata?.full_name || user.email.split('@')[0]
+    document.getElementById('adminName').textContent = name
+    await loadAll()
+  }
+
+  async function adminLogout() {
+    await sb.auth.signOut()
+    location.reload()
+  }
+
+  // ── LOAD ALL ──
+  async function loadAll() {
+    await Promise.all([loadEditiiAdmin(), loadAutoriAdmin(), loadStats()])
+  }
+
+  async function loadStats() {
+    const [{ count: ce }, { count: ca }, { count: cau }] = await Promise.all([
+      sb.from('reviste').select('*', { count: 'exact', head: true }).eq('status', 'publicat'),
+      sb.from('articole_revista').select('*', { count: 'exact', head: true }).eq('status', 'publicat'),
+      sb.from('autori').select('*', { count: 'exact', head: true })
+    ])
+    document.getElementById('statEditii').textContent = ce || 0
+    document.getElementById('statArticole').textContent = ca || 0
+    document.getElementById('statAutori').textContent = cau || 0
+  }
+
+  // ── PANEL NAVIGATION ──
+  function showPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+    document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'))
+    document.getElementById('panel-' + name).classList.add('active')
+    const btn = document.getElementById('btn-' + name)
+    if (btn) btn.classList.add('active')
+  }
+
+  // ── EDIȚII ──
+  async function loadEditiiAdmin() {
+    const { data } = await sb.from('reviste').select('*').order('data_aparitie', { ascending: false })
+    if (!data) return
+
+    // Sidebar
+    document.getElementById('sidebarEditii').innerHTML = data.map(e => `
+      <div class="editie-item ${currentEditieId === e.id ? 'active' : ''}" onclick="deschideArticole('${e.id}', '${e.titlu.replace(/'/g, "\\'")}')">
+        <span style="font-size:0.82rem;">${e.editie}</span>
+        <span class="editie-status ${e.status === 'publicat' ? 'status-publicat' : 'status-draft'}">${e.status === 'publicat' ? '✓' : '◯'}</span>
+      </div>
+    `).join('') || '<div style="padding:8px;font-size:0.8rem;color:var(--muted);font-style:italic;">Nicio ediție</div>'
+
+    // Lista în panel
+    document.getElementById('editiiListAdmin').innerHTML = data.length === 0
+      ? '<div style="text-align:center;padding:40px;color:var(--muted);font-style:italic;">Nicio ediție creată. Apasă "+ Ediție nouă".</div>'
+      : data.map(e => `
+        <div class="card" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">${e.titlu}</span>
+                <span class="badge ${e.status === 'publicat' ? 'badge-pub' : 'badge-draft'}">${e.status}</span>
+              </div>
+              <div style="font-size:0.8rem;color:var(--muted);">
+                ${e.editie} · ${e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO', {year:'numeric',month:'long'}) : 'fără dată'}
+              </div>
+              ${e.descriere ? `<div style="font-size:0.85rem;color:#555;margin-top:8px;line-height:1.5;">${e.descriere.substring(0,120)}...</div>` : ''}
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
+              <button class="btn-secondary" style="font-size:0.78rem;padding:7px 12px;" onclick="deschideArticole('${e.id}', '${e.titlu.replace(/'/g, "\\'")}')">📝 Articole</button>
+              <button class="btn-secondary" style="font-size:0.78rem;padding:7px 12px;" onclick="editEditie('${e.id}')">✏️ Editează</button>
+              <button class="btn-danger" onclick="stergeEditie('${e.id}')">🗑</button>
+            </div>
+          </div>
+        </div>
+      `).join('')
+  }
+
+  function showEditieForm(clear = true) {
+    if (clear) {
+      document.getElementById('editieId').value = ''
+      document.getElementById('editieNr').value = ''
+      document.getElementById('editieTitlu').value = ''
+      document.getElementById('editieDescriere').value = ''
+      document.getElementById('editieData').value = ''
+      document.getElementById('editieCoperta').value = ''
+      document.getElementById('editiePdf').value = ''
+      document.getElementById('editieStatus').value = 'draft'
+      document.getElementById('editieFormTitle').textContent = 'Ediție nouă'
+    }
+    document.getElementById('editieFormCard').style.display = 'block'
+    document.getElementById('editieFormCard').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function hideEditieForm() { document.getElementById('editieFormCard').style.display = 'none' }
+
+  async function editEditie(id) {
+    const { data } = await sb.from('reviste').select('*').eq('id', id).single()
+    if (!data) return
+    document.getElementById('editieId').value = data.id
+    document.getElementById('editieNr').value = data.editie
+    document.getElementById('editieTitlu').value = data.titlu
+    document.getElementById('editieDescriere').value = data.descriere || ''
+    document.getElementById('editieData').value = data.data_aparitie || ''
+    document.getElementById('editieCoperta').value = data.coperta_url || ''
+    document.getElementById('editiePdf').value = data.pdf_url || ''
+    document.getElementById('editieStatus').value = data.status
+    document.getElementById('editieFormTitle').textContent = 'Editează: ' + data.titlu
+    showEditieForm(false)
+  }
+
+  async function salveazaEditie() {
+    const id = document.getElementById('editieId').value
+    const editie = document.getElementById('editieNr').value.trim()
+    const titlu = document.getElementById('editieTitlu').value.trim()
+    const msg = document.getElementById('formMsg')
+
+    if (!editie || !titlu) { msg.textContent = '⚠ Completează numărul și titlul.'; msg.style.color = 'var(--error)'; return }
+
+    msg.textContent = 'Se salvează...'
+    const payload = {
+      editie, titlu,
+      descriere: document.getElementById('editieDescriere').value.trim() || null,
+      data_aparitie: document.getElementById('editieData').value || null,
+      coperta_url: document.getElementById('editieCoperta').value.trim() || null,
+      pdf_url: document.getElementById('editiePdf').value.trim() || null,
+      status: document.getElementById('editieStatus').value
+    }
+
+    const { error } = id
+      ? await sb.from('reviste').update(payload).eq('id', id)
+      : await sb.from('reviste').insert(payload)
+
+    if (error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = 'var(--error)'; return }
+
+    toast('Ediție salvată cu succes!', 'success')
+    hideEditieForm()
+    await loadEditiiAdmin()
+    await loadStats()
+    msg.textContent = ''
+  }
+
+  async function stergeEditie(id) {
+    if (!confirm('Ești sigur? Se vor șterge și toate articolele din această ediție!')) return
+    const { error } = await sb.from('reviste').delete().eq('id', id)
+    if (error) { toast('Eroare: ' + error.message, 'error'); return }
+    toast('Ediție ștearsă.', 'success')
+    await loadEditiiAdmin()
+    await loadStats()
+  }
+
+  // ── ARTICOLE ──
+  async function deschideArticole(revistaId, revistaTitle) {
+    currentEditieId = revistaId
+    document.getElementById('articoleTitle').textContent = 'Articole — ' + revistaTitle
+    document.getElementById('artRevistaId').value = revistaId
+    showPanel('articole')
+    await loadArticoleAdmin(revistaId)
+    await loadAutoriDropdown()
+    // Update sidebar active
+    document.querySelectorAll('.editie-item').forEach(el => el.classList.remove('active'))
+    await loadEditiiAdmin()
+  }
+
+  async function loadArticoleAdmin(revistaId) {
+    const { data } = await sb
+      .from('articole_revista')
+      .select('*, autori(nume_complet)')
+      .eq('revista_id', revistaId)
+      .order('ordine')
+
+    const rows = document.getElementById('articoleRows')
+    if (!data || data.length === 0) {
+      rows.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-style:italic;">Niciun articol. Apasă "+ Articol nou".</div>'
+      rows.style.display = 'flex'
+      return
+    }
+    rows.style.display = ''
+    rows.innerHTML = data.map(a => `
+      <div class="table-row">
+        <div>
+          <div class="art-titlu">${a.titlu}</div>
+          <div class="art-autor">${a.autori?.nume_complet || '—'}</div>
+        </div>
+        <div class="art-rubrica">${a.rubrica || '—'}</div>
+        <div class="art-ordine">${a.ordine || '—'}</div>
+        <div>
+          <span class="badge ${a.tip_acces === 'cont' ? 'badge-cont' : 'badge-grat'}">${a.tip_acces}</span>
+          <span class="badge ${a.status === 'publicat' ? 'badge-pub' : 'badge-draft'}" style="margin-left:4px;">${a.status}</span>
+        </div>
+        <div class="art-actions">
+          <button class="btn-icon" onclick="editArticol('${a.id}')" title="Editează">✏️</button>
+          <button class="btn-icon del" onclick="stergeArticol('${a.id}')" title="Șterge">🗑</button>
+        </div>
+      </div>
+    `).join('')
+  }
+
+  async function loadAutoriDropdown() {
+    const { data } = await sb.from('autori').select('id, nume_complet').order('nume_complet')
+    autoriCache = data || []
+    const sel = document.getElementById('artAutor')
+    const current = sel.value
+    sel.innerHTML = '<option value="">— Fără autor —</option>' +
+      (data || []).map(a => `<option value="${a.id}" ${a.id === current ? 'selected' : ''}>${a.nume_complet}</option>`).join('')
+  }
+
+  function showArtForm(clear = true) {
+    if (clear) {
+      document.getElementById('artId').value = ''
+      document.getElementById('artTitlu').value = ''
+      document.getElementById('artAutor').value = ''
+      document.getElementById('artRubrica').value = ''
+      document.getElementById('artRezumat').value = ''
+      document.getElementById('artContinut').value = ''
+      document.getElementById('artFisier').value = ''
+      document.getElementById('artOrdine').value = ''
+      document.getElementById('artAcces').value = 'gratuit'
+      document.getElementById('artStatus').value = 'draft'
+      document.getElementById('artFormTitle').textContent = 'Articol nou'
+    }
+    document.getElementById('artFormCard').style.display = 'block'
+    document.getElementById('artFormCard').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function hideArtForm() { document.getElementById('artFormCard').style.display = 'none' }
+
+  async function editArticol(id) {
+    const { data } = await sb.from('articole_revista').select('*').eq('id', id).single()
+    if (!data) return
+    document.getElementById('artId').value = data.id
+    document.getElementById('artTitlu').value = data.titlu
+    document.getElementById('artRubrica').value = data.rubrica || ''
+    document.getElementById('artRezumat').value = data.rezumat || ''
+    document.getElementById('artContinut').value = data.continut || ''
+    document.getElementById('artFisier').value = data.fisier_url || ''
+    document.getElementById('artOrdine').value = data.ordine || ''
+    document.getElementById('artAcces').value = data.tip_acces || 'gratuit'
+    document.getElementById('artStatus').value = data.status || 'draft'
+    await loadAutoriDropdown()
+    document.getElementById('artAutor').value = data.autor_id || ''
+    document.getElementById('artFormTitle').textContent = 'Editează: ' + data.titlu.substring(0, 50)
+    showArtForm(false)
+  }
+
+  async function salveazaArticol() {
+    const id = document.getElementById('artId').value
+    const revistaId = document.getElementById('artRevistaId').value
+    const titlu = document.getElementById('artTitlu').value.trim()
+    const msg = document.getElementById('artFormMsg')
+
+    if (!titlu) { msg.textContent = '⚠ Titlul este obligatoriu.'; msg.style.color = 'var(--error)'; return }
+
+    msg.textContent = 'Se salvează...'
+    const autorId = document.getElementById('artAutor').value || null
+    const payload = {
+      revista_id: revistaId,
+      autor_id: autorId,
+      titlu,
+      rubrica: document.getElementById('artRubrica').value.trim() || null,
+      rezumat: document.getElementById('artRezumat').value.trim() || null,
+      continut: document.getElementById('artContinut').value.trim() || null,
+      fisier_url: document.getElementById('artFisier').value.trim() || null,
+      ordine: parseInt(document.getElementById('artOrdine').value) || 0,
+      tip_acces: document.getElementById('artAcces').value,
+      status: document.getElementById('artStatus').value
+    }
+
+    const { error } = id
+      ? await sb.from('articole_revista').update(payload).eq('id', id)
+      : await sb.from('articole_revista').insert(payload)
+
+    if (error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = 'var(--error)'; return }
+
+    toast('Articol salvat!', 'success')
+    hideArtForm()
+    await loadArticoleAdmin(revistaId)
+    await loadStats()
+    msg.textContent = ''
+  }
+
+  async function stergeArticol(id) {
+    if (!confirm('Ștergi acest articol?')) return
+    const { error } = await sb.from('articole_revista').delete().eq('id', id)
+    if (error) { toast('Eroare: ' + error.message, 'error'); return }
+    toast('Articol șters.', 'success')
+    await loadArticoleAdmin(currentEditieId)
+    await loadStats()
+  }
+
+  // ── AUTORI ──
+  async function loadAutoriAdmin() {
+    const { data } = await sb.from('autori').select('*').order('nume_complet')
+    autoriCache = data || []
+    document.getElementById('autoriGrid').innerHTML = data?.length === 0
+      ? '<div style="color:var(--muted);font-style:italic;font-size:0.9rem;">Niciun autor. Adaugă primul autor.</div>'
+      : (data || []).map(a => `
+        <div class="autor-card">
+          <div class="autor-name">${a.nume_complet}</div>
+          ${a.institutie ? `<div class="autor-inst">${a.institutie}</div>` : ''}
+          ${a.email ? `<div style="font-size:0.75rem;color:var(--muted);">${a.email}</div>` : ''}
+          <div class="autor-actions">
+            <button class="btn-icon" onclick="editAutor('${a.id}')" title="Editează">✏️</button>
+            <button class="btn-icon del" onclick="stergeAutor('${a.id}')" title="Șterge">🗑</button>
+          </div>
+        </div>
+      `).join('') || ''
+  }
+
+  function showAutorForm(clear = true) {
+    if (clear) {
+      document.getElementById('autorId').value = ''
+      document.getElementById('autorNume').value = ''
+      document.getElementById('autorInstitutie').value = ''
+      document.getElementById('autorEmail').value = ''
+      document.getElementById('autorAvatar').value = ''
+      document.getElementById('autorBio').value = ''
+      document.getElementById('autorFormTitle').textContent = 'Autor nou'
+    }
+    document.getElementById('autorFormCard').style.display = 'block'
+    document.getElementById('autorFormCard').scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function hideAutorForm() { document.getElementById('autorFormCard').style.display = 'none' }
+
+  async function editAutor(id) {
+    const a = autoriCache.find(x => x.id === id)
+    if (!a) return
+    document.getElementById('autorId').value = a.id
+    document.getElementById('autorNume').value = a.nume_complet
+    document.getElementById('autorInstitutie').value = a.institutie || ''
+    document.getElementById('autorEmail').value = a.email || ''
+    document.getElementById('autorAvatar').value = a.avatar_url || ''
+    document.getElementById('autorBio').value = a.bio || ''
+    document.getElementById('autorFormTitle').textContent = 'Editează: ' + a.nume_complet
+    showAutorForm(false)
+  }
+
+  async function salveazaAutor() {
+    const id = document.getElementById('autorId').value
+    const nume = document.getElementById('autorNume').value.trim()
+    const msg = document.getElementById('autorFormMsg')
+    if (!nume) { msg.textContent = '⚠ Numele este obligatoriu.'; msg.style.color = 'var(--error)'; return }
+
+    msg.textContent = 'Se salvează...'
+    const payload = {
+      nume_complet: nume,
+      institutie: document.getElementById('autorInstitutie').value.trim() || null,
+      email: document.getElementById('autorEmail').value.trim() || null,
+      avatar_url: document.getElementById('autorAvatar').value.trim() || null,
+      bio: document.getElementById('autorBio').value.trim() || null
+    }
+
+    const { error } = id
+      ? await sb.from('autori').update(payload).eq('id', id)
+      : await sb.from('autori').insert(payload)
+
+    if (error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = 'var(--error)'; return }
+
+    toast('Autor salvat!', 'success')
+    hideAutorForm()
+    await loadAutoriAdmin()
+    await loadStats()
+    msg.textContent = ''
+  }
+
+  async function stergeAutor(id) {
+    if (!confirm('Ștergi acest autor? Articolele asociate vor rămâne fără autor.')) return
+    const { error } = await sb.from('autori').delete().eq('id', id)
+    if (error) { toast('Eroare: ' + error.message, 'error'); return }
+    toast('Autor șters.', 'success')
+    await loadAutoriAdmin()
+    await loadStats()
+  }
+
+  checkSession()
+</script>
+</body>
+</html>
