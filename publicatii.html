@@ -400,6 +400,8 @@
       document.getElementById('loggedIn').style.display = 'none'
     }
   }
+  updateAccountUI()
+
   sb.auth.onAuthStateChange((event, session) => {
     if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
       updateAccountUI()
