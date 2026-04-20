@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Revista Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; background: #fff; color: #222; }
+    a { text-decoration: none; color: inherit; }
+    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+    .header-logo img { height: 80px; width: auto; display: block; }
+    .header-center { text-align: center; }
+    .header-title { display: block; font-size: clamp(1rem,3vw,2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
+    .header-motto { display: block; font-size: clamp(0.65rem,1.5vw,0.95rem); color: #8B0000; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+    .btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
+    .btn-account:hover { background: #6a0000; }
+    .account-wrapper { position: relative; }
+    .account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; padding: 8px 0; }
+    .account-dropdown.open { display: block; }
+    .account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
+    .account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
+    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
+    nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
+    nav.main-nav a:last-child { border-right: none; }
+    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+    .social-icons { display: flex; align-items: center; gap: 10px; }
+    .social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
+    .social-icons a:hover { opacity: 0.7; }
+    .social-icons svg { width: 26px; height: 26px; }
+    /* Hero */
+    .page-hero { background: #8B0000; color: #fff; padding: 40px 40px 30px; text-align: center; }
+    .page-hero h1 { font-size: 2.2rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+    .page-hero p { font-size: 1rem; opacity: 0.85; font-style: italic; }
+    /* Numerele revistei */
+    .revista-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    .editii-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; margin-top: 30px; }
+    .editie-card { border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+    .editie-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .editie-coperta { width: 100%; height: 200px; object-fit: cover; background: #f5e8e8; display: flex; align-items: center; justify-content: center; }
+    .editie-coperta-placeholder { width: 100%; height: 200px; background: linear-gradient(135deg, #8B0000, #c0392b); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; text-align: center; padding: 20px; }
+    .editie-info { padding: 20px; }
+    .editie-badge { display: inline-block; background: #8B0000; color: #fff; font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 1px; }
+    .editie-titlu { font-size: 1.1rem; font-weight: bold; color: #222; margin-bottom: 6px; }
+    .editie-data { font-size: 0.82rem; color: #888; margin-bottom: 10px; }
+    .editie-desc { font-size: 0.85rem; color: #555; line-height: 1.6; }
+    .editie-btn { display: inline-block; margin-top: 14px; background: #8B0000; color: #fff; padding: 8px 18px; border-radius: 6px; font-size: 0.85rem; transition: background 0.2s; }
+    .editie-btn:hover { background: #6a0000; }
+    /* Articole dintr-o ediție */
+    .editie-detail { display: none; max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .editie-detail.open { display: block; }
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #8B0000; font-size: 0.9rem; cursor: pointer; margin-bottom: 20px; border: none; background: none; font-family: 'Georgia', serif; }
+    .back-btn:hover { text-decoration: underline; }
+    .editie-header { display: flex; gap: 30px; align-items: flex-start; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #f0e0e0; }
+    .editie-header img { width: 180px; height: 240px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); flex-shrink: 0; }
+    .editie-header-placeholder { width: 180px; height: 240px; background: linear-gradient(135deg, #8B0000, #c0392b); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; text-align: center; padding: 16px; flex-shrink: 0; }
+    .editie-meta h2 { font-size: 1.6rem; color: #8B0000; margin-bottom: 8px; }
+    .editie-meta .data { color: #888; font-size: 0.9rem; margin-bottom: 12px; }
+    .editie-meta .descriere { font-size: 0.95rem; line-height: 1.7; color: #444; }
+    /* Articole */
+    .articole-titlu { font-size: 1.2rem; font-weight: bold; color: #8B0000; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #f0e0e0; }
+    .articol-row { border: 1px solid #e8e8e8; border-radius: 10px; padding: 20px; margin-bottom: 14px; transition: box-shadow 0.2s; }
+    .articol-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .articol-row-header { display: flex; align-items: flex-start; gap: 16px; }
+    .articol-rubrica { flex-shrink: 0; background: #f5e8e8; color: #8B0000; font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
+    .articol-titlu { font-size: 1rem; font-weight: bold; color: #222; flex: 1; line-height: 1.4; }
+    .articol-autor { font-size: 0.82rem; color: #888; margin-top: 4px; }
+    .articol-rezumat { font-size: 0.88rem; color: #555; line-height: 1.6; margin-top: 10px; }
+    .articol-actions { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+    .badge-acces { font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; }
+    .badge-gratuit { background: #e8f5e9; color: #2e7d32; }
+    .badge-premium { background: #fff3e0; color: #e65100; }
+    .btn-citeste { background: #8B0000; color: #fff; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; border: none; cursor: pointer; font-family: 'Georgia', serif; transition: background 0.2s; }
+    .btn-citeste:hover { background: #6a0000; }
+    .btn-citeste:disabled { background: #ccc; cursor: not-allowed; }
+    /* Modal citire */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
+    .modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; background: none; border: none; }
+    .modal-close:hover { color: #8B0000; }
+    .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e0e0e0; }
+    .modal-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-size: 0.95rem; color: #999; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .modal-tab.active { color: #8B0000; border-bottom-color: #8B0000; font-weight: bold; }
+    .modal-msg { text-align: center; font-size: 0.85rem; margin-top: 12px; min-height: 20px; color: #8B0000; }
+    .btn-primary { background: #8B0000; color: #fff; padding: 12px 30px; border-radius: 6px; font-size: 1rem; font-family: 'Georgia', serif; transition: background 0.2s; display: inline-block; border: none; cursor: pointer; width: 100%; margin-top: 8px; }
+    .btn-primary:hover { background: #6a0000; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 6px; }
+    .form-group input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: 'Georgia', serif; outline: none; transition: border 0.2s; }
+    .form-group input:focus { border-color: #8B0000; }
+    /* Articol complet modal */
+    .articol-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 20px; }
+    .articol-modal.open { display: flex; }
+    .articol-modal-inner { background: #fff; border-radius: 12px; width: 100%; max-width: 800px; margin: auto; padding: 48px; position: relative; }
+    .articol-modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.8rem; cursor: pointer; color: #999; background: none; border: none; }
+    .articol-modal-titlu { font-size: 1.8rem; color: #8B0000; margin-bottom: 8px; line-height: 1.3; }
+    .articol-modal-meta { font-size: 0.85rem; color: #888; margin-bottom: 20px; }
+    .articol-modal-rezumat { font-size: 1rem; color: #555; font-style: italic; border-left: 3px solid #8B0000; padding-left: 16px; margin-bottom: 24px; line-height: 1.7; }
+    .articol-modal-continut { font-size: 0.95rem; line-height: 1.9; color: #333; white-space: pre-wrap; }
+    .articol-modal-fisier { margin-top: 24px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
+    .loading { text-align: center; padding: 60px; color: #888; font-size: 1rem; }
+    footer { background: #8B0000; color: #fff; text-align: center; padding: 30px 20px; font-size: 0.85rem; }
+    footer a { color: #f5c0c0; }
+    /* Newsletter */
+    .newsletter { background: #6a0000; padding: 32px 20px; text-align: center; }
+    /* Mobile */
+    .mobile-header { display: none; }
+    .contact-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .contact-modal-overlay.open { display: flex; }
+    .contact-modal { background: #fff; border-radius: 12px; padding: 40px; width: 100%; max-width: 480px; margin: 20px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .contact-modal h2 { color: #8B0000; font-size: 1.5rem; margin-bottom: 24px; text-align: center; }
+    .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: 'Georgia', serif; outline: none; resize: vertical; min-height: 100px; }
+    @media (max-width: 768px) {
+      .header-top { display: none; }
+      nav.main-nav { display: none !important; }
+      .mobile-header { display: block; background: #fff; border-bottom: 1px solid #e0e0e0; }
+      .mob-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
+      .mob-logo img { height: 50px; }
+      .mob-account-btn { background: #8B0000; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: 'Georgia', serif; font-size: 0.8rem; }
+      .mob-row2 { text-align: center; padding: 6px 16px 2px; }
+      .mob-title { display: block; font-size: 1.05rem; font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 2px; }
+      .mob-motto { display: block; font-size: 0.68rem; color: #8B0000; letter-spacing: 1px; margin-top: 2px; }
+      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid #f0e0e0; }
+      .mob-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
+      .mob-hamburger span { display: block; width: 28px; height: 3px; background: #8B0000; border-radius: 2px; }
+      .mob-nav { display: none; flex-direction: column; background: #8B0000; }
+      .mob-nav.open { display: flex; }
+      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
+      .page-hero { padding: 24px 16px; }
+      .page-hero h1 { font-size: 1.4rem; }
+      .editii-grid { grid-template-columns: 1fr; }
+      .editie-header { flex-direction: column; }
+      .articol-modal-inner { padding: 24px 16px; }
+      .articol-modal-titlu { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <a href="index.html" class="header-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
+    <a href="index.html" class="header-center">
+      <span class="header-title">Asociația Dokimasia</span>
+      <span class="header-motto">Învățare. Implicare. Progres.</span>
+    </a>
+    <div class="header-right">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
+          <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+          <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
+          <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+        </form>
+      </div>
+      <div class="social-icons">
+        <a onclick="openContactModal()" title="Email" style="cursor:pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+      </div>
+      <div class="account-wrapper">
+        <button class="btn-account" onclick="toggleAccount()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="accountLabel">Contul meu</span>
+        </button>
+        <div class="account-dropdown" id="accountDropdown">
+          <div id="loggedOut">
+            <a href="#" onclick="openModal('login')">Autentificare</a>
+            <a href="#" onclick="openModal('register')">Înregistrare</a>
+          </div>
+          <div id="loggedIn" style="display:none">
+            <div id="adminBtn" style="display:none"><a href="admin.html" style="color:#8B0000;font-weight:bold;">⚙ Panou Admin</a></div>
+            <a href="cont.html">Profilul meu</a>
+            <a href="#" onclick="logout()">Deconectare</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="publicatii.html" class="active">Publicații</a>
+    <a href="noutati.html">Noutăți</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</header>
+
+<div class="mobile-header">
+  <div class="mob-row1">
+    <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
+        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
+        <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:0.8rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;">Donează</button>
+      </form>
+      <button class="mob-account-btn" onclick="openModal('login')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="mobAccountLabel">Cont</span>
+      </button>
+    </div>
+  </div>
+  <div class="mob-row2">
+    <span class="mob-title">Asociația Dokimasia</span>
+    <span class="mob-motto">Învățare. Implicare. Progres.</span>
+  </div>
+  <div class="mob-row4">
+    <button class="mob-hamburger" onclick="toggleMobMenu()"><span></span><span></span><span></span></button>
+  </div>
+  <nav class="mob-nav" id="mobNav">
+    <a href="index.html">Acasă</a>
+    <a href="despre.html">Despre noi</a>
+    <a href="proiecte.html">Proiecte</a>
+    <a href="publicatii.html">Publicații</a>
+    <a href="noutati.html">Noutăți</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div>
+
+<div class="page-hero">
+  <h1>📖 Revista Dokimasia</h1>
+  <p>Publicație periodică dedicată educației, formării și implicării civice</p>
+</div>
+
+<!-- Lista ediții -->
+<div class="revista-wrap" id="listaEditii">
+  <div class="loading" id="loadingMsg">Se încarcă edițiile...</div>
+  <div class="editii-grid" id="editiiGrid"></div>
+</div>
+
+<!-- Detaliu ediție -->
+<div class="editie-detail" id="editieDetail">
+  <button class="back-btn" onclick="inapoiLaLista()">← Înapoi la toate edițiile</button>
+  <div class="editie-header" id="editieHeader"></div>
+  <div class="articole-titlu">Articolele acestei ediții</div>
+  <div id="articoleList"><div class="loading">Se încarcă articolele...</div></div>
+</div>
+
+<!-- Newsletter -->
+<div class="newsletter">
+  <div style="max-width:500px;margin:0 auto;">
+    <h3 style="color:#fff;font-size:1.1rem;margin-bottom:8px;letter-spacing:1px;">📧 Abonează-te la newsletter</h3>
+    <p style="color:rgba(255,255,255,0.8);font-size:0.85rem;margin-bottom:16px;">Fii primul care află noutățile asociației.</p>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+      <input type="text" id="subNume" placeholder="Numele tău" style="padding:10px 14px;border-radius:6px;border:none;font-family:'Georgia',serif;font-size:0.9rem;width:160px;" />
+      <input type="email" id="subEmail" placeholder="Email-ul tău" style="padding:10px 14px;border-radius:6px;border:none;font-family:'Georgia',serif;font-size:0.9rem;width:200px;" />
+      <button onclick="subscribe()" style="padding:10px 20px;background:#fff;color:#8B0000;border:none;border-radius:6px;font-family:'Georgia',serif;font-size:0.9rem;font-weight:bold;cursor:pointer;">Abonează-mă</button>
+    </div>
+    <p id="subMsg" style="color:rgba(255,255,255,0.9);font-size:0.82rem;margin-top:10px;min-height:16px;"></p>
+  </div>
+</div>
+<footer>
+  <p>© <span id="year"></span> Asociația Dokimasia. Toate drepturile rezervate.</p>
+  <p style="margin-top:8px"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
+</footer>
+
+<!-- Modal Login -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2>Contul meu</h2>
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Autentificare</div>
+      <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
+    </div>
+    <div id="formLogin">
+      <button onclick="loginWithGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:0.95rem;font-family:'Georgia',serif;margin-bottom:16px;">
+        <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.05 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-3.55-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continuă cu Google
+      </button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;"><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"><span style="font-size:0.8rem;color:#999;">sau</span><hr style="flex:1;border:none;border-top:1px solid #e0e0e0;"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="email@exemplu.ro" /></div>
+      <div class="form-group"><label>Parolă</label><input type="password" id="loginPassword" placeholder="••••••••" /></div>
+      <button class="btn-primary" onclick="login()">Intră în cont</button>
+      <p style="text-align:center;margin-top:10px;"><a href="#" onclick="resetPassword()" style="font-size:0.82rem;color:#8B0000;">Ai uitat parola?</a></p>
+      <p class="modal-msg" id="loginMsg"></p>
+    </div>
+    <div id="formRegister" style="display:none">
+      <div class="form-group"><label>Nume complet</label><input type="text" id="regName" placeholder="Ion Popescu" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="email@exemplu.ro" /></div>
+      <div class="form-group"><label>Parolă</label><input type="password" id="regPassword" placeholder="••••••••" /></div>
+      <button class="btn-primary" onclick="register()">Creează cont</button>
+      <p class="modal-msg" id="registerMsg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Contact -->
+<div class="contact-modal-overlay" id="contactModalOverlay">
+  <div class="contact-modal">
+    <button class="modal-close" onclick="closeContactModal()">×</button>
+    <h2>Trimite-ne un mesaj</h2>
+    <div class="form-group"><label>Numele tău</label><input type="text" id="contactName" placeholder="Ion Popescu" /></div>
+    <div class="form-group"><label>Email-ul tău</label><input type="email" id="contactEmail" placeholder="email@exemplu.ro" /></div>
+    <div class="form-group"><label>Subiect</label><input type="text" id="contactSubject" placeholder="Subiectul mesajului" /></div>
+    <div class="form-group"><label>Mesaj</label><textarea id="contactMessage" placeholder="Scrie mesajul tău aici..."></textarea></div>
+    <button class="btn-primary" onclick="sendEmail()">Trimite mesajul</button>
+    <p class="modal-msg" id="contactMsg"></p>
+  </div>
+</div>
+
+<!-- Modal Articol complet -->
+<div class="articol-modal" id="articolModal">
+  <div class="articol-modal-inner">
+    <button class="articol-modal-close" onclick="closeArticolModal()">×</button>
+    <div id="articolModalContent"></div>
+  </div>
+</div>
+
+<script>
+  emailjs.init({publicKey: 'cPvtBWK6KReX_pqhM'})
+  const { createClient } = supabase
+  const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
+  document.getElementById('year').textContent = new Date().getFullYear()
+
+  let currentUser = null
+
+  function toggleMobMenu() { document.getElementById('mobNav').classList.toggle('open') }
+  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
+  document.addEventListener('click', function(e) {
+    const aw = document.querySelector('.account-wrapper')
+    if (aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open')
+  })
+
+  function openModal(tab) { document.getElementById('modalOverlay').classList.add('open'); switchTab(tab); document.getElementById('accountDropdown').classList.remove('open') }
+  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
+  function switchTab(tab) {
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none'
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none'
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login')
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register')
+  }
+  function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
+  function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
+
+  async function login() {
+    const {error} = await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value, password:document.getElementById('loginPassword').value})
+    if(error){document.getElementById('loginMsg').textContent='Eroare: '+error.message}else{closeModal();updateAccountUI()}
+  }
+  async function register() {
+    const {error} = await sb.auth.signUp({email:document.getElementById('regEmail').value, password:document.getElementById('regPassword').value, options:{data:{full_name:document.getElementById('regName').value}}})
+    document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!'
+  }
+  async function logout() { await sb.auth.signOut(); currentUser = null; updateAccountUI() }
+  async function loginWithGoogle() { await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://dokimasia.ro/revista.html'}}) }
+  async function resetPassword() {
+    const email = document.getElementById('loginEmail').value.trim()
+    const msg = document.getElementById('loginMsg')
+    if(!email){msg.textContent='Introdu emailul mai întâi.';return}
+    const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://dokimasia.ro'})
+    msg.textContent = error ? 'Eroare: '+error.message : 'Email trimis!'
+  }
+  async function updateAccountUI() {
+    const {data:{session}} = await sb.auth.getSession()
+    const user = session?.user
+    currentUser = user || null
+    const label = document.getElementById('accountLabel')
+    const mobLabel = document.getElementById('mobAccountLabel')
+    if(user){
+      const name = user.user_metadata?.full_name||user.user_metadata?.name||user.email
+      const firstName = name.split(' ')[0]
+      if(label) label.textContent = firstName
+      if(mobLabel) mobLabel.textContent = firstName
+      document.getElementById('loggedOut').style.display = 'none'
+      document.getElementById('loggedIn').style.display = 'block'
+      if(user.email==='m.ciprian1387@gmail.com') document.getElementById('adminBtn').style.display = 'block'
+    } else {
+      if(label) label.textContent = 'Contul meu'
+      if(mobLabel) mobLabel.textContent = 'Cont'
+      document.getElementById('loggedOut').style.display = 'block'
+      document.getElementById('loggedIn').style.display = 'none'
+    }
+  }
+  updateAccountUI()
+  sb.auth.onAuthStateChange((event, session) => {
+    if(['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI()
+    if(event==='SIGNED_IN'){ document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')) }
+  })
+
+  async function sendEmail() {
+    const name=document.getElementById('contactName').value, email=document.getElementById('contactEmail').value
+    const subject=document.getElementById('contactSubject').value, message=document.getElementById('contactMessage').value
+    const msg=document.getElementById('contactMsg')
+    if(!name||!email||!message){msg.textContent='Completează toate câmpurile.';return}
+    try {
+      await emailjs.send('service_swl59rb','template_ky5fzal',{from_name:name,from_email:email,subject:subject||'Mesaj nou',message:message,to_name:'Asociația Dokimasia'})
+      await sb.from('messages').insert([{name,email,subject,message}])
+      msg.textContent='Mesaj trimis cu succes!'; msg.style.color='green'
+      setTimeout(()=>{closeContactModal();msg.textContent=''},3000)
+    } catch(e){ msg.textContent='Eroare la trimitere.'; msg.style.color='#c00' }
+  }
+
+  async function subscribe() {
+    const email=document.getElementById('subEmail').value, nume=document.getElementById('subNume').value
+    const msg=document.getElementById('subMsg')
+    if(!email){msg.textContent='Introdu adresa de email.';return}
+    const {error}=await sb.from('abonati').insert([{email,nume}])
+    if(error&&error.code==='23505'){msg.textContent='Ești deja abonat!'}
+    else if(error){msg.textContent='Eroare: '+error.message}
+    else{msg.textContent='Te-ai abonat cu succes! 🎉'}
+  }
+
+  // Tracking
+  async function trackPageView() {
+    try {
+      const ua=navigator.userAgent
+      let device='Desktop'
+      if(/Mobi|Android/i.test(ua)) device='Mobil'
+      else if(/Tablet|iPad/i.test(ua)) device='Tableta'
+      let browser='Altul'
+      if(/Edg/i.test(ua)) browser='Edge'
+      else if(/Chrome/i.test(ua)) browser='Chrome'
+      else if(/Firefox/i.test(ua)) browser='Firefox'
+      else if(/Safari/i.test(ua)) browser='Safari'
+      const referrer=document.referrer||null
+      let city=null,country=null,ip=null
+      try {
+        const geo=await fetch('https://ipapi.co/json/').then(r=>r.json())
+        city=geo.city; country=geo.country_name; ip=geo.ip
+      } catch(e){}
+      await sb.from('page_views').insert([{page:'revista.html',user_agent:ua,device,browser,referrer,city,country,ip}])
+    } catch(e){}
+  }
+  trackPageView()
+
+  // ─── REVISTA LOGIC ───
+  async function loadEditii() {
+    const {data, error} = await sb.from('reviste').select('*').eq('status','publicat').order('data_aparitie', {ascending: false})
+    document.getElementById('loadingMsg').style.display = 'none'
+    if(error || !data || data.length === 0) {
+      document.getElementById('editiiGrid').innerHTML = '<p style="color:#888;text-align:center;padding:40px;font-size:1rem;">Nu există ediții publicate momentan. Reveniți curând!</p>'
+      return
+    }
+    document.getElementById('editiiGrid').innerHTML = data.map(e => `
+      <div class="editie-card" onclick="deschideEditie('${e.id}')">
+        ${e.coperta_url
+          ? `<img src="${e.coperta_url}" alt="${e.titlu}" class="editie-coperta" style="width:100%;height:200px;object-fit:cover;" />`
+          : `<div class="editie-coperta-placeholder">📖 ${e.editie}</div>`}
+        <div class="editie-info">
+          <span class="editie-badge">${e.editie}</span>
+          <div class="editie-titlu">${e.titlu}</div>
+          <div class="editie-data">${e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO',{year:'numeric',month:'long'}) : ''}</div>
+          ${e.descriere ? `<div class="editie-desc">${e.descriere.substring(0,120)}${e.descriere.length>120?'...':''}</div>` : ''}
+          <span class="editie-btn">Citește ediția →</span>
+        </div>
+      </div>
+    `).join('')
+  }
+
+  async function deschideEditie(revistaId) {
+    document.getElementById('listaEditii').style.display = 'none'
+    document.getElementById('editieDetail').classList.add('open')
+    document.getElementById('articoleList').innerHTML = '<div class="loading">Se încarcă...</div>'
+
+    const {data: rev} = await sb.from('reviste').select('*').eq('id', revistaId).single()
+    if(rev) {
+      document.getElementById('editieHeader').innerHTML = `
+        ${rev.coperta_url
+          ? `<img src="${rev.coperta_url}" alt="${rev.titlu}" />`
+          : `<div class="editie-header-placeholder">📖<br>${rev.editie}</div>`}
+        <div class="editie-meta">
+          <div class="editie-badge" style="margin-bottom:12px;">${rev.editie}</div>
+          <h2>${rev.titlu}</h2>
+          <div class="data">${rev.data_aparitie ? new Date(rev.data_aparitie).toLocaleDateString('ro-RO',{year:'numeric',month:'long',day:'numeric'}) : ''}</div>
+          ${rev.descriere ? `<div class="descriere">${rev.descriere}</div>` : ''}
+        </div>
+      `
+    }
+
+    const {data: articole} = await sb.from('articole_revista').select('*, autori(nume_complet, institutie)').eq('revista_id', revistaId).eq('status','publicat').order('ordine')
+    if(!articole || articole.length === 0) {
+      document.getElementById('articoleList').innerHTML = '<p style="color:#888;padding:20px;">Nu există articole publicate în această ediție.</p>'
+      return
+    }
+    document.getElementById('articoleList').innerHTML = articole.map(a => {
+      const isPremium = a.tip_acces === 'premium'
+      const canRead = !isPremium || currentUser
+      return `
+        <div class="articol-row">
+          <div class="articol-row-header">
+            ${a.rubrica ? `<span class="articol-rubrica">${a.rubrica}</span>` : ''}
+            <div>
+              <div class="articol-titlu">${a.titlu}</div>
+              <div class="articol-autor">${a.autori?.nume_complet || 'Autor necunoscut'}${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}</div>
+            </div>
+          </div>
+          ${a.rezumat ? `<div class="articol-rezumat">${a.rezumat}</div>` : ''}
+          <div class="articol-actions">
+            <span class="badge-acces ${isPremium ? 'badge-premium' : 'badge-gratuit'}">${isPremium ? '🔒 Premium' : '✓ Gratuit'}</span>
+            ${canRead
+              ? `<button class="btn-citeste" onclick="citestArticol('${a.id}')">Citește articolul</button>`
+              : `<button class="btn-citeste" onclick="openModal('login')" title="Autentifică-te pentru a citi">🔒 Autentifică-te</button>`}
+            ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" style="font-size:0.82rem;color:#8B0000;">📄 Descarcă PDF</a>` : ''}
+          </div>
+        </div>
+      `
+    }).join('')
+  }
+
+  function inapoiLaLista() {
+    document.getElementById('editieDetail').classList.remove('open')
+    document.getElementById('listaEditii').style.display = 'block'
+  }
+
+  async function citestArticol(articolId) {
+    document.getElementById('articolModal').classList.add('open')
+    document.getElementById('articolModalContent').innerHTML = '<div class="loading">Se încarcă...</div>'
+    const {data: a} = await sb.from('articole_revista').select('*, autori(nume_complet, institutie, bio)').eq('id', articolId).single()
+    if(!a) { document.getElementById('articolModalContent').innerHTML = '<p>Eroare la încărcare.</p>'; return }
+    document.getElementById('articolModalContent').innerHTML = `
+      ${a.rubrica ? `<div style="color:#8B0000;font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">${a.rubrica}</div>` : ''}
+      <div class="articol-modal-titlu">${a.titlu}</div>
+      <div class="articol-modal-meta">
+        ${a.autori?.nume_complet || ''} ${a.autori?.institutie ? '— ' + a.autori.institutie : ''} 
+        · ${new Date(a.created_at).toLocaleDateString('ro-RO')}
+      </div>
+      ${a.rezumat ? `<div class="articol-modal-rezumat">${a.rezumat}</div>` : ''}
+      ${a.continut ? `<div class="articol-modal-continut">${a.continut}</div>` : ''}
+      ${a.fisier_url ? `<div class="articol-modal-fisier"><a href="${a.fisier_url}" target="_blank" style="background:#8B0000;color:#fff;padding:10px 20px;border-radius:6px;font-size:0.9rem;">📄 Descarcă fișierul atașat</a></div>` : ''}
+      ${a.autori?.bio ? `<div style="margin-top:30px;padding:20px;background:#f9f4f4;border-radius:8px;"><strong style="color:#8B0000;">Despre autor</strong><p style="font-size:0.88rem;color:#555;margin-top:8px;line-height:1.7;">${a.autori.bio}</p></div>` : ''}
+    `
+  }
+
+  function closeArticolModal() { document.getElementById('articolModal').classList.remove('open') }
+  document.getElementById('articolModal').addEventListener('click', function(e) { if(e.target===this) closeArticolModal() })
+
+  loadEditii()
+</script>
+</body>
+</html>
