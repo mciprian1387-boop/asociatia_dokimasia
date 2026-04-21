@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revista Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AXquC42BzgOQMjC4eL64SVhQHNcQKj2mFuzdU5OLct9qdxyzgqoaAIHBn2J8C6b0N43OQ76lgazOYG9f&currency=RON&intent=capture"></script>
   <script src="auth.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
@@ -218,6 +219,29 @@
     .tarif-card.featured .t-unit { color:rgba(255,255,255,0.65); }
     .tarif-card.featured .t-cta { color:#fff; border-color:rgba(255,255,255,0.5); }
     .tarif-card.featured:hover .t-cta { background:rgba(255,255,255,0.2); color:#fff; }
+
+    /* Adjust buttons */
+    .t-adjust { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:12px 0 10px; }
+    .t-adj-btn {
+      font-size:0.72rem; font-family:'Source Serif 4',serif; font-weight:600;
+      padding:4px 10px; border-radius:2px; cursor:pointer;
+      border:1px solid var(--crimson); color:var(--crimson); background:transparent;
+      transition:background 0.15s, color 0.15s;
+    }
+    .t-adj-btn:hover { background:var(--crimson); color:#fff; }
+    .t-adj-btn.reset { border-color:var(--muted); color:var(--muted); }
+    .t-adj-btn.reset:hover { background:var(--muted); color:#fff; }
+    .tarif-card.featured .t-adj-btn { border-color:rgba(255,255,255,0.6); color:#fff; }
+    .tarif-card.featured .t-adj-btn:hover { background:rgba(255,255,255,0.2); }
+    .tarif-card.featured .t-adj-btn.reset { border-color:rgba(255,255,255,0.35); color:rgba(255,255,255,0.6); }
+
+    /* PayPal button container */
+    .pp-btn-wrap { margin-top:8px; min-height:42px; }
+
+    /* PayPal success/error msg */
+    .pp-msg { font-size:0.82rem; text-align:center; margin-top:10px; padding:8px 12px; border-radius:3px; }
+    .pp-msg.success { background:#e6f4ea; color:#1e7e34; border:1px solid #b7dfbe; }
+    .pp-msg.error { background:#fdecea; color:#c0392b; border:1px solid #f5c6c6; }
 
     /* FAQ */
     .faq-list { margin-top:20px; border:1px solid var(--border); border-radius:4px; overflow:hidden; }
@@ -674,51 +698,70 @@
       <p>Pentru publicarea materialelor în Revista Dokimasia, se percepe o contribuție editorială fixă. Contribuția editorială se achită înainte de publicare, prin PayPal sau transfer bancar, iar pentru sumele încasate se emite document justificativ de plată. Această contribuție susține activitatea editorială, procesul de pregătire a materialelor pentru publicare, calitatea produsului final, emiterea documentelor aferente, precum și obiectivele și activitățile desfășurate de Asociația Dokimasia în domeniul educației, formării și implicării civice.</p>
 
       <div class="tarife-grid">
-        <div class="tarif-card" style="cursor:pointer;" onclick="document.getElementById('paypal1').submit()">
+
+        <!-- Card 1 -->
+        <div class="tarif-card" id="tc-1">
           <div class="t-titlu">1 articol</div>
-          <div class="t-pret">40</div>
+          <div class="t-pret" id="disp-1">40</div>
           <div class="t-unit">lei</div>
-          <div class="t-cta">Plătește acum →</div>
-          <form id="paypal1" action="https://www.paypal.com/donate" method="post" target="_top" style="display:none;">
-            <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          </form>
+          <div class="t-adjust">
+            <button class="t-adj-btn" onclick="adjustAmount(1,10)">＋ 10 lei</button>
+            <button class="t-adj-btn" onclick="adjustAmount(1,50)">＋ 50 lei</button>
+            <button class="t-adj-btn reset" onclick="resetAmount(1,40)">Reset</button>
+          </div>
+          <div id="pp-btn-1" class="pp-btn-wrap"></div>
         </div>
-        <div class="tarif-card featured" style="cursor:pointer;" onclick="document.getElementById('paypal2').submit()">
+
+        <!-- Card 2 -->
+        <div class="tarif-card featured" id="tc-2">
           <div class="t-titlu">2 articole</div>
-          <div class="t-pret">70</div>
+          <div class="t-pret" id="disp-2">70</div>
           <div class="t-unit">lei</div>
-          <div class="t-cta">Plătește acum →</div>
-          <form id="paypal2" action="https://www.paypal.com/donate" method="post" target="_top" style="display:none;">
-            <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          </form>
+          <div class="t-adjust">
+            <button class="t-adj-btn" onclick="adjustAmount(2,10)">＋ 10 lei</button>
+            <button class="t-adj-btn" onclick="adjustAmount(2,50)">＋ 50 lei</button>
+            <button class="t-adj-btn reset" onclick="resetAmount(2,70)">Reset</button>
+          </div>
+          <div id="pp-btn-2" class="pp-btn-wrap"></div>
         </div>
-        <div class="tarif-card" style="cursor:pointer;" onclick="document.getElementById('paypal3').submit()">
+
+        <!-- Card 3 -->
+        <div class="tarif-card" id="tc-3">
           <div class="t-titlu">3 articole</div>
-          <div class="t-pret">100</div>
+          <div class="t-pret" id="disp-3">100</div>
           <div class="t-unit">lei</div>
-          <div class="t-cta">Plătește acum →</div>
-          <form id="paypal3" action="https://www.paypal.com/donate" method="post" target="_top" style="display:none;">
-            <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          </form>
+          <div class="t-adjust">
+            <button class="t-adj-btn" onclick="adjustAmount(3,10)">＋ 10 lei</button>
+            <button class="t-adj-btn" onclick="adjustAmount(3,50)">＋ 50 lei</button>
+            <button class="t-adj-btn reset" onclick="resetAmount(3,100)">Reset</button>
+          </div>
+          <div id="pp-btn-3" class="pp-btn-wrap"></div>
         </div>
-        <div class="tarif-card" style="cursor:pointer;" onclick="document.getElementById('paypal4').submit()">
+
+        <!-- Card 4 -->
+        <div class="tarif-card" id="tc-4">
           <div class="t-titlu">Extras tipărit + poștă</div>
-          <div class="t-pret">+25</div>
+          <div class="t-pret" id="disp-4">25</div>
           <div class="t-unit">lei suplimentar</div>
-          <div class="t-cta">Plătește acum →</div>
-          <form id="paypal4" action="https://www.paypal.com/donate" method="post" target="_top" style="display:none;">
-            <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          </form>
+          <div class="t-adjust">
+            <button class="t-adj-btn" onclick="adjustAmount(4,10)">＋ 10 lei</button>
+            <button class="t-adj-btn reset" onclick="resetAmount(4,25)">Reset</button>
+          </div>
+          <div id="pp-btn-4" class="pp-btn-wrap"></div>
         </div>
-        <div class="tarif-card" style="cursor:pointer;" onclick="document.getElementById('paypal5').submit()">
+
+        <!-- Card 5 -->
+        <div class="tarif-card" id="tc-5">
           <div class="t-titlu">Revistă tipărită</div>
-          <div class="t-pret">50</div>
+          <div class="t-pret" id="disp-5">50</div>
           <div class="t-unit">lei / exemplar</div>
-          <div class="t-cta">Plătește acum →</div>
-          <form id="paypal5" action="https://www.paypal.com/donate" method="post" target="_top" style="display:none;">
-            <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-          </form>
+          <div class="t-adjust">
+            <button class="t-adj-btn" onclick="adjustAmount(5,50)">＋ 1 exemplar</button>
+            <button class="t-adj-btn reset" onclick="resetAmount(5,50)">Reset</button>
+          </div>
+          <div id="pp-btn-5" class="pp-btn-wrap"></div>
         </div>
+
       </div>
 
       <h3>Ce include contribuția editorială</h3>
@@ -958,7 +1001,71 @@
     document.getElementById('faq-' + i).classList.toggle('open')
   }
 
-  // ADMIN
+  // PAYPAL
+  var ppAmounts = { 1:40, 2:70, 3:100, 4:25, 5:50 }
+  var ppBase    = { 1:40, 2:70, 3:100, 4:25, 5:50 }
+  var ppDesc    = { 1:'Contribuție editorială — 1 articol', 2:'Contribuție editorială — 2 articole', 3:'Contribuție editorială — 3 articole', 4:'Extras tipărit + poștă', 5:'Revistă tipărită' }
+
+  function adjustAmount(id, delta) {
+    ppAmounts[id] += delta
+    document.getElementById('disp-' + id).textContent = ppAmounts[id]
+    // re-render button with new amount
+    var wrap = document.getElementById('pp-btn-' + id)
+    wrap.innerHTML = ''
+    renderPPButton(id)
+  }
+
+  function resetAmount(id, base) {
+    ppAmounts[id] = base
+    document.getElementById('disp-' + id).textContent = base
+    var wrap = document.getElementById('pp-btn-' + id)
+    wrap.innerHTML = ''
+    renderPPButton(id)
+  }
+
+  function renderPPButton(id) {
+    paypal.Buttons({
+      style: { layout:'vertical', color: id===2 ? 'white' : 'gold', shape:'rect', label:'pay', height:38 },
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            description: ppDesc[id],
+            amount: { value: ppAmounts[id].toFixed(2), currency_code:'RON' }
+          }]
+        })
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          var name = details.payer.name.given_name
+          var wrap = document.getElementById('pp-btn-' + id)
+          wrap.innerHTML = '<div class="pp-msg success">✓ Plată confirmată! Mulțumim, ' + name + '.</div>'
+        })
+      },
+      onError: function(err) {
+        var wrap = document.getElementById('pp-btn-' + id)
+        wrap.innerHTML = '<div class="pp-msg error">A apărut o eroare. Încearcă din nou.</div>'
+        console.error(err)
+      }
+    }).render('#pp-btn-' + id)
+  }
+
+  // Render all 5 buttons when tab is opened
+  var ppRendered = false
+  var _origShowTab = showTab
+  showTab = function(id) {
+    _origShowTab(id)
+    if (id === 'contributie' && !ppRendered) {
+      ppRendered = true
+      for (var i = 1; i <= 5; i++) renderPPButton(i)
+    }
+  }
+  // Also render if tab is already active on load
+  if (document.getElementById('panel-contributie').classList.contains('active')) {
+    ppRendered = true
+    for (var i = 1; i <= 5; i++) renderPPButton(i)
+  }
+
+
   window.onUserLoaded = function(user) {
     if (user && user.email === 'm.ciprian1387@gmail.com') {
       document.getElementById('adminBar').classList.add('visible')
