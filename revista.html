@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revista Dokimasia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -725,6 +723,8 @@
       .modal-titlu { font-size: 1.4rem; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -863,13 +863,6 @@
   <p style="margin-top:8px;"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
 </footer>
 
-<!-- MODAL LOGIN -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2>Contul meu</h2>
-    <div class="modal-tabs">
-      <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Autentificare</div>
       <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
     </div>
     <div id="formLogin">
@@ -894,12 +887,6 @@
   </div>
 </div>
 
-<!-- MODAL CONTACT -->
-<div class="contact-modal-overlay" id="contactModalOverlay">
-  <div class="contact-modal">
-    <button class="modal-close" onclick="closeContactModal()">×</button>
-    <h2>Trimite-ne un mesaj</h2>
-    <div class="form-group"><label>Numele tău</label><input type="text" id="contactName" placeholder="Ion Popescu" /></div>
     <div class="form-group"><label>Email-ul tău</label><input type="email" id="contactEmail" placeholder="email@exemplu.ro" /></div>
     <div class="form-group"><label>Subiect</label><input type="text" id="contactSubject" placeholder="Subiectul mesajului" /></div>
     <div class="form-group"><label>Mesaj</label><textarea id="contactMessage" placeholder="Scrie mesajul tău aici..."></textarea></div>
@@ -916,138 +903,14 @@
   </div>
 </div>
 
+
 <script>
-  emailjs.init({publicKey: 'cPvtBWK6KReX_pqhM'})
-  const { createClient } = supabase
-  const sb = createClient(
-    'https://jaoxhsyplnkanhqevnnr.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
-  )
 
-  document.getElementById('year').textContent = new Date().getFullYear()
-  let currentUser = null
+  // currentUser vine din auth.js ca window.currentUser
 
-  // ── AUTH ──
-  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
-  document.addEventListener('click', e => {
-    const aw = document.querySelector('.account-wrapper')
-    if (aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open')
-  })
-  function openModal(tab) {
-    document.getElementById('modalOverlay').classList.add('open')
-    switchTab(tab)
-    document.getElementById('accountDropdown').classList.remove('open')
-  }
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
-  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal() })
-  function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none'
-    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none'
-    document.getElementById('tabLogin').classList.toggle('active', tab === 'login')
-    document.getElementById('tabRegister').classList.toggle('active', tab === 'register')
-  }
-  function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
-  function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
-  document.getElementById('contactModalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeContactModal() })
-
-  async function loginWithGoogle() {
-    await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: 'https://dokimasia.ro/revista.html' } })
-  }
-  async function login() {
-    const msg = document.getElementById('loginMsg')
-    msg.textContent = 'Se conectează...'
-    const { error } = await sb.auth.signInWithPassword({
-      email: document.getElementById('loginEmail').value,
-      password: document.getElementById('loginPassword').value
-    })
-    if (error) { msg.textContent = 'Eroare: ' + error.message }
-    else { closeModal(); updateAccountUI() }
-  }
-  async function register() {
-    const { error } = await sb.auth.signUp({
-      email: document.getElementById('regEmail').value,
-      password: document.getElementById('regPassword').value,
-      options: { data: { full_name: document.getElementById('regName').value } }
-    })
-    document.getElementById('registerMsg').textContent = error
-      ? 'Eroare: ' + error.message
-      : 'Cont creat! Verifică emailul.'
-  }
-  async function logout() { await sb.auth.signOut(); currentUser = null; updateAccountUI() }
-  async function resetPassword() {
-    const email = document.getElementById('loginEmail').value.trim()
-    const msg = document.getElementById('loginMsg')
-    if (!email) { msg.textContent = 'Introdu emailul mai întâi.'; return }
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: 'https://dokimasia.ro' })
-    msg.textContent = error ? 'Eroare: ' + error.message : 'Email de resetare trimis!'
-  }
-
-  async function updateAccountUI() {
-    const { data: { session } } = await sb.auth.getSession()
-    const user = session?.user
-    currentUser = user || null
-    const label = document.getElementById('accountLabel')
-    const mobLabel = document.getElementById('mobAccountLabel')
-    if (user) {
-      const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email
-      const firstName = name.split(' ')[0]
-      if (label) label.textContent = firstName
-      if (mobLabel) mobLabel.textContent = firstName
-      document.getElementById('loggedOut').style.display = 'none'
-      document.getElementById('loggedIn').style.display = 'block'
-      if (user.email === 'm.ciprian1387@gmail.com') {
-        document.getElementById('adminBtn').style.display = 'block'
-      }
-    } else {
-      if (label) label.textContent = 'Contul meu'
-      if (mobLabel) mobLabel.textContent = 'Cont'
-      document.getElementById('loggedOut').style.display = 'block'
-      document.getElementById('loggedIn').style.display = 'none'
-    }
-  }
-  updateAccountUI()
-  sb.auth.onAuthStateChange((event, session) => {
-    if (['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI()
-    if (event === 'SIGNED_IN') document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'))
-  })
-
-  // ── CONTACT ──
-  async function sendEmail() {
-    const name = document.getElementById('contactName').value.trim()
-    const email = document.getElementById('contactEmail').value.trim()
-    const subject = document.getElementById('contactSubject').value.trim()
-    const message = document.getElementById('contactMessage').value.trim()
-    const msg = document.getElementById('contactMsg')
-    if (!name || !email || !message) { msg.textContent = 'Completează toate câmpurile.'; return }
-    try {
-      await emailjs.send('service_4a8gp1c', 'template_wg7nlez', { name, email, title: subject || 'Mesaj nou', message })
-      msg.textContent = 'Mesaj trimis cu succes!'; msg.style.color = 'green'
-      setTimeout(() => { closeContactModal(); msg.textContent = '' }, 3000)
-    } catch(e) { msg.textContent = 'Eroare la trimitere.'; msg.style.color = '#c00' }
-  }
-
-  // ── NEWSLETTER ──
-  async function subscribe() {
-    const email = document.getElementById('subEmail').value.trim()
-    const nume = document.getElementById('subNume').value.trim()
-    const msg = document.getElementById('subMsg')
-    if (!email) { msg.textContent = 'Introdu adresa de email.'; return }
-    const { error } = await sb.from('abonati').insert([{ email, nume }])
-    if (error?.code === '23505') msg.textContent = 'Ești deja abonat!'
-    else if (error) msg.textContent = 'Eroare: ' + error.message
-    else msg.textContent = '✓ Te-ai abonat cu succes!'
-  }
-
-  // ── REVISTA LOGIC ──
   async function loadEditii() {
-    const { data, error } = await sb
-      .from('reviste')
-      .select('*')
-      .eq('status', 'publicat')
-      .order('data_aparitie', { ascending: false })
-
+    const { data, error } = await sb.from('reviste').select('*').eq('status', 'publicat').order('data_aparitie', { ascending: false })
     document.getElementById('loadingMsg').style.display = 'none'
-
     if (error || !data || data.length === 0) {
       document.getElementById('editiiGrid').innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
@@ -1056,9 +919,7 @@
         </div>`
       return
     }
-
     document.getElementById('editiiCount').textContent = data.length + ' ediți' + (data.length === 1 ? 'e' : 'i')
-
     document.getElementById('editiiGrid').innerHTML = data.map(e => `
       <div class="editie-card" onclick="deschideEditie('${e.id}')">
         <div class="coperta-wrap">
@@ -1069,9 +930,7 @@
                 <div class="titlu-cop">${e.titlu}</div>
                 <div class="ornament">— ✦ —</div>
               </div>`}
-          <div class="editie-badge-wrap">
-            <span class="editie-badge">${e.editie}</span>
-          </div>
+          <div class="editie-badge-wrap"><span class="editie-badge">${e.editie}</span></div>
         </div>
         <div class="editie-info">
           <div class="editie-numar">${e.editie}</div>
@@ -1085,13 +944,8 @@
         </div>
       </div>
     `).join('')
-
-    // Număr articole per ediție
     for (const e of data) {
-      const { count } = await sb.from('articole_revista')
-        .select('*', { count: 'exact', head: true })
-        .eq('revista_id', e.id)
-        .eq('status', 'publicat')
+      const { count } = await sb.from('articole_revista').select('*', { count: 'exact', head: true }).eq('revista_id', e.id).eq('status', 'publicat')
       const el = document.getElementById('count-' + e.id)
       if (el) el.textContent = (count || 0) + ' articol' + (count === 1 ? '' : 'e')
     }
@@ -1103,8 +957,6 @@
     detail.classList.add('open')
     document.getElementById('articoleList').innerHTML = '<div class="loading">Se încarcă articolele</div>'
     window.scrollTo(0, 0)
-
-    // Date ediție
     const { data: rev } = await sb.from('reviste').select('*').eq('id', revistaId).single()
     if (rev) {
       document.getElementById('editieMasthead').innerHTML = `
@@ -1126,45 +978,31 @@
         </div>
       `
     }
-
-    // Articole
-    const { data: articole } = await sb
-      .from('articole_revista')
-      .select('*, autori(nume_complet, institutie, bio)')
-      .eq('revista_id', revistaId)
-      .eq('status', 'publicat')
-      .order('ordine')
-
+    const { data: articole } = await sb.from('articole_revista').select('*, autori(nume_complet, institutie, bio)').eq('revista_id', revistaId).eq('status', 'publicat').order('ordine')
     if (!articole || articole.length === 0) {
-      document.getElementById('articoleList').innerHTML = `
-        <div class="empty-state">
-          <div class="icon">📭</div>
-          <p>Nu există articole publicate în această ediție.</p>
-        </div>`
+      document.getElementById('articoleList').innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Nu există articole publicate în această ediție.</p></div>`
       return
     }
-
     document.getElementById('articoleList').innerHTML = articole.map(a => {
       const isPremium = a.tip_acces === 'cont'
-      const canRead = !isPremium || currentUser
-      return `
-        <div class="articol-row">
-          <div class="articol-top">
-            ${a.rubrica ? `<span class="articol-rubrica">${a.rubrica}</span>` : ''}
-            <div class="articol-main">
-              <div class="articol-titlu">${a.titlu}</div>
-              <div class="articol-autor">${a.autori?.nume_complet || 'Autor necunoscut'}${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}</div>
-            </div>
+      const canRead = !isPremium || window.currentUser
+      return `<div class="articol-row">
+        <div class="articol-top">
+          ${a.rubrica ? `<span class="articol-rubrica">${a.rubrica}</span>` : ''}
+          <div class="articol-main">
+            <div class="articol-titlu">${a.titlu}</div>
+            <div class="articol-autor">${a.autori?.nume_complet || 'Autor necunoscut'}${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}</div>
           </div>
-          ${a.rezumat ? `<div class="articol-rezumat">${a.rezumat}</div>` : ''}
-          <div class="articol-actions">
-            <span class="badge-acces ${isPremium ? 'badge-cont' : 'badge-gratuit'}">${isPremium ? '🔒 Necesită cont' : '✓ Gratuit'}</span>
-            ${canRead
-              ? `<button class="btn-citeste" onclick="citestArticol('${a.id}')">Citește articolul</button>`
-              : `<button class="btn-citeste" onclick="openModal('login')" title="Creează un cont gratuit">🔒 Autentifică-te</button>`}
-            ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" class="btn-pdf-art">📄 PDF</a>` : ''}
-          </div>
-        </div>`
+        </div>
+        ${a.rezumat ? `<div class="articol-rezumat">${a.rezumat}</div>` : ''}
+        <div class="articol-actions">
+          <span class="badge-acces ${isPremium ? 'badge-cont' : 'badge-gratuit'}">${isPremium ? '🔒 Necesită cont' : '✓ Gratuit'}</span>
+          ${canRead
+            ? `<button class="btn-citeste" onclick="citestArticol('${a.id}')">Citește articolul</button>`
+            : `<button class="btn-citeste" onclick="openModal('login')">🔒 Autentifică-te</button>`}
+          ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" class="btn-pdf-art">📄 PDF</a>` : ''}
+        </div>
+      </div>`
     }).join('')
   }
 
@@ -1178,18 +1016,8 @@
     document.getElementById('articolModal').classList.add('open')
     document.getElementById('articolModalContent').innerHTML = '<div class="loading">Se încarcă articolul</div>'
     document.body.style.overflow = 'hidden'
-
-    const { data: a } = await sb
-      .from('articole_revista')
-      .select('*, autori(nume_complet, institutie, bio)')
-      .eq('id', articolId)
-      .single()
-
-    if (!a) {
-      document.getElementById('articolModalContent').innerHTML = '<p style="color:#c00;">Eroare la încărcare.</p>'
-      return
-    }
-
+    const { data: a } = await sb.from('articole_revista').select('*, autori(nume_complet, institutie, bio)').eq('id', articolId).single()
+    if (!a) { document.getElementById('articolModalContent').innerHTML = '<p style="color:#c00;">Eroare la încărcare.</p>'; return }
     document.getElementById('articolModalContent').innerHTML = `
       ${a.rubrica ? `<div class="modal-rubrica">${a.rubrica}</div>` : ''}
       <div class="modal-titlu">${a.titlu}</div>
@@ -1201,14 +1029,9 @@
       ${a.rezumat ? `<div class="modal-rezumat">${a.rezumat}</div>` : ''}
       ${a.continut ? `<div class="modal-continut">${a.continut}</div>` : ''}
       ${a.fisier_url ? `<div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
-        <a href="${a.fisier_url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 20px;border-radius:3px;font-size:0.88rem;font-family:'Source Serif 4',serif;">
-          📄 Descarcă fișierul atașat
-        </a>
+        <a href="${a.fisier_url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 20px;border-radius:3px;font-size:0.88rem;">📄 Descarcă fișierul atașat</a>
       </div>` : ''}
-      ${a.autori?.bio ? `<div class="modal-bio">
-        <strong>Despre autor</strong>
-        <p>${a.autori.bio}</p>
-      </div>` : ''}
+      ${a.autori?.bio ? `<div class="modal-bio"><strong>Despre autor</strong><p>${a.autori.bio}</p></div>` : ''}
     `
   }
 
@@ -1216,36 +1039,14 @@
     document.getElementById('articolModal').classList.remove('open')
     document.body.style.overflow = ''
   }
-  document.getElementById('articolModal').addEventListener('click', e => {
+
+  document.getElementById('articolModal')?.addEventListener('click', e => {
     if (e.target === e.currentTarget) closeArticolModal()
   })
 
-  // ── PAGE TRACKING ──
-  async function trackPageView() {
-    try {
-      const ua = navigator.userAgent
-      let device = 'Desktop'
-      if (/Mobi|Android/i.test(ua)) device = 'Mobil'
-      else if (/Tablet|iPad/i.test(ua)) device = 'Tableta'
-      let browser = 'Altul'
-      if (/Edg/i.test(ua)) browser = 'Edge'
-      else if (/Chrome/i.test(ua)) browser = 'Chrome'
-      else if (/Firefox/i.test(ua)) browser = 'Firefox'
-      else if (/Safari/i.test(ua)) browser = 'Safari'
-      let city = null, country = null, ip = null
-      try {
-        const geo = await fetch('https://ipapi.co/json/').then(r => r.json())
-        city = geo.city; country = geo.country_name; ip = geo.ip
-      } catch(e) {}
-      await sb.from('page_views').insert([{
-        page: 'revista.html', user_agent: ua, device, browser,
-        referrer: document.referrer || null, city, country, ip
-      }])
-    } catch(e) {}
-  }
-  trackPageView()
-
   loadEditii()
+
 </script>
 </body>
 </html>
+

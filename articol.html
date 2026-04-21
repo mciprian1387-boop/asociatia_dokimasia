@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Articol — Asociația Dokimasia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
+    <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #f9f9f9; color: #222; }
     a { text-decoration: none; color: inherit; }
@@ -109,6 +108,8 @@
       .article-wrap { padding: 0 16px; margin: 20px auto; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -228,13 +229,6 @@
   <p style="margin-top:8px"><a href="contact.html">contact@dokimasia.ro</a></p>
 </footer>
 
-<!-- MODAL LOGIN -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2>Contul meu</h2>
-    <div class="modal-tabs">
-      <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Autentificare</div>
       <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
     </div>
     <div id="formLogin">
@@ -253,12 +247,6 @@
   </div>
 </div>
 
-<!-- MODAL CONTACT -->
-<div class="contact-modal-overlay" id="contactModalOverlay">
-  <div class="contact-modal">
-    <button class="modal-close" onclick="closeContactModal()">×</button>
-    <h2>Trimite-ne un mesaj</h2>
-    <div class="form-group"><label>Numele tău</label><input type="text" id="contactName" placeholder="Ion Popescu" /></div>
     <div class="form-group"><label>Email-ul tău</label><input type="email" id="contactEmail" placeholder="email@exemplu.ro" /></div>
     <div class="form-group"><label>Subiect</label><input type="text" id="contactSubject" placeholder="Subiectul mesajului" /></div>
     <div class="form-group"><label>Mesaj</label><textarea id="contactMessage" placeholder="Scrie mesajul tău aici..."></textarea></div>
@@ -267,10 +255,11 @@
   </div>
 </div>
 
+
 <script>
-  const { createClient } = supabase
-  const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
-  document.getElementById('year').textContent = new Date().getFullYear()
+
+  function toggleMenu() { document.getElementById('mainNav')?.classList.toggle('open') }
+  function toggleMobMenu() { document.getElementById('mobNav')?.classList.toggle('open') }
 
   function getCatLabel(cat) {
     const map = { noutati:'Noutăți', proiecte:'Proiecte', evenimente:'Evenimente', publicatii:'Publicații' }
@@ -281,19 +270,14 @@
     const params = new URLSearchParams(window.location.search)
     const id = params.get('id')
     if (!id) { location.href = 'noutati.html'; return }
-
     const { data: article, error } = await sb.from('noutati').select('*').eq('id', id).single()
     if (error || !article) {
       document.getElementById('articleMain').innerHTML = '<div class="loading-state">Articolul nu a fost găsit. <a href="noutati.html" style="color:#8B0000;">← Înapoi la Noutăți</a></div>'
       return
     }
-
-    // Update page title
     document.title = article.title + ' — Asociația Dokimasia'
-
-    const date = new Date(article.created_at).toLocaleDateString('ro-RO', { day:'numeric', month:'long', year:'numeric' })
+    const date = new Date(article.created_at).toLocaleDateString('ro-RO',{day:'numeric',month:'long',year:'numeric'})
     const img = article.imagine ? `<img src="${article.imagine}" alt="${article.title}" class="article-hero-img" />` : ''
-
     document.getElementById('articleMain').innerHTML = `
       <div class="breadcrumb">
         <a href="index.html">Acasă</a> › <a href="noutati.html">Noutăți</a> › ${article.title}
@@ -307,8 +291,6 @@
       <div class="article-content">${article.content || ''}</div>
       <a href="noutati.html" class="back-btn">← Înapoi la Noutăți</a>
     `
-
-    // Load recent articles for sidebar
     const { data: recent } = await sb.from('noutati').select('id,title,created_at').neq('id', id).order('created_at', { ascending: false }).limit(5)
     if (recent && recent.length) {
       document.getElementById('recentList').innerHTML = recent.map(a =>
@@ -319,133 +301,9 @@
     }
   }
 
-  // AUTH
-  function toggleMenu() { document.getElementById('mainNav').classList.toggle('open') }
-  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
-  document.addEventListener('click', e => { const aw=document.querySelector('.account-wrapper'); if(aw&&!aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open') })
-  function openModal(tab) { document.getElementById('modalOverlay').classList.add('open'); switchTab(tab); document.getElementById('accountDropdown').classList.remove('open') }
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
-  document.getElementById('modalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal() })
-  function switchTab(tab) {
-    document.getElementById('formLogin').style.display = tab==='login'?'block':'none'
-    document.getElementById('formRegister').style.display = tab==='register'?'block':'none'
-    document.getElementById('tabLogin').classList.toggle('active', tab==='login')
-    document.getElementById('tabRegister').classList.toggle('active', tab==='register')
-  }
-  function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
-  function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
-  document.getElementById('contactModalOverlay').addEventListener('click', e => { if(e.target===e.currentTarget) closeContactModal() })
-  async function login() {
-    const msg = document.getElementById('loginMsg')
-    msg.textContent = 'Se conectează...'
-    const {error} = await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value, password:document.getElementById('loginPassword').value})
-    if(error){msg.textContent='Eroare: '+error.message}else{closeModal();updateAccountUI()}
-  }
-  async function register() {
-    const {error} = await sb.auth.signUp({email:document.getElementById('regEmail').value, password:document.getElementById('regPassword').value, options:{data:{full_name:document.getElementById('regName').value}}})
-    document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!'
-  }
-  async function logout() { await sb.auth.signOut(); updateAccountUI() }
-  async function updateAccountUI() {
-    const {data:{session}} = await sb.auth.getSession()
-    const user = session?.user
-    const label = document.getElementById('accountLabel')
-    const mobLabel = document.getElementById('mobAccountLabel')
-    if(user) {
-      const name = user.user_metadata?.full_name||user.user_metadata?.name||user.email
-      const firstName = name.split(' ')[0]
-      if(label) label.textContent = firstName
-      if(mobLabel) mobLabel.textContent = firstName
-      document.getElementById('loggedOut').style.display = 'none'
-      document.getElementById('loggedIn').style.display = 'block'
-      if(user.email==='m.ciprian1387@gmail.com') document.getElementById('adminBtn').style.display = 'block'
-    } else {
-      if(label) label.textContent = 'Contul meu'
-      if(mobLabel) mobLabel.textContent = 'Cont'
-      document.getElementById('loggedOut').style.display = 'block'
-      document.getElementById('loggedIn').style.display = 'none'
-    }
-  }
-  sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-      updateAccountUI()
-    }
-    if (event === 'SIGNED_IN') {
-      const modals = document.querySelectorAll('.modal-overlay')
-      modals.forEach(m => m.classList.remove('open'))
-    }
-  })
   loadArticle()
-  async function trackPageView() {
-    try {
-      // Device detection
-      const ua = navigator.userAgent
-      let device = 'Desktop'
-      if (/Mobi|Android/i.test(ua)) device = 'Mobil'
-      else if (/Tablet|iPad/i.test(ua)) device = 'Tableta'
 
-      // Browser detection
-      let browser = 'Altul'
-      if (/Edg/i.test(ua)) browser = 'Edge'
-      else if (/OPR|Opera/i.test(ua)) browser = 'Opera'
-      else if (/Chrome/i.test(ua)) browser = 'Chrome'
-      else if (/Firefox/i.test(ua)) browser = 'Firefox'
-      else if (/Safari/i.test(ua)) browser = 'Safari'
-
-      // Referrer
-      const referrer = document.referrer || null
-
-      // Resolution
-      const resolution = window.screen.width + 'x' + window.screen.height
-
-      // Geo location via ipapi.co
-      let city = null, country = null, ip = null
-      try {
-        const geo = await fetch('https://ipapi.co/json/')
-        const gd = await geo.json()
-        city = gd.city || null
-        country = gd.country_name || null
-        ip = gd.ip || null
-      } catch(e) {}
-
-      // Save page view
-      await sb.from('page_views').insert({
-        page: window.location.pathname || '/',
-        user_agent: ua,
-        device,
-        browser,
-        referrer,
-        city,
-        country,
-        ip
-      })
-
-      // Track time spent on page
-      const startTime = Date.now()
-      window.addEventListener('beforeunload', async () => {
-        const time_spent = Math.round((Date.now() - startTime) / 1000)
-        navigator.sendBeacon('https://jaoxhsyplnkanhqevnnr.supabase.co/rest/v1/page_views',
-          JSON.stringify({ time_spent }))
-      })
-    } catch(e) {}
-  }
-  trackPageView()
-
-  async function subscribe() {
-    const email = document.getElementById('subEmail').value.trim()
-    const nume = document.getElementById('subNume').value.trim()
-    const msg = document.getElementById('subMsg')
-    if (!email) { msg.textContent = 'Te rugăm să introduci emailul.'; return }
-    msg.textContent = 'Se procesează...'
-    const { error } = await sb.from('abonati').insert({ email, nume: nume||null })
-    if (error) {
-      msg.textContent = error.code === '23505' ? 'Ești deja abonat!' : 'Eroare: ' + error.message
-    } else {
-      msg.textContent = '✅ Te-ai abonat cu succes! Mulțumim!'
-      document.getElementById('subEmail').value = ''
-      document.getElementById('subNume').value = ''
-    }
-  }
 </script>
 </body>
 </html>
+

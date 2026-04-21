@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cărți și ghiduri — Dokimasia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <style>
+      <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #fff; color: #222; }
     a { text-decoration: none; color: inherit; }
@@ -110,6 +108,8 @@
       .form-row { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -213,13 +213,6 @@
   <p style="margin-top:8px"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
 </footer>
 
-<!-- Modal Login -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <h2>Contul meu</h2>
-    <div class="modal-tabs">
-      <div class="modal-tab active" id="tabLogin" onclick="switchTab('login')">Autentificare</div>
       <div class="modal-tab" id="tabRegister" onclick="switchTab('register')">Înregistrare</div>
     </div>
     <div id="formLogin">
@@ -244,12 +237,6 @@
   </div>
 </div>
 
-<!-- Modal Contact -->
-<div class="contact-modal-overlay" id="contactModalOverlay">
-  <div class="contact-modal">
-    <button class="modal-close" onclick="closeContactModal()">×</button>
-    <h2>Trimite-ne un mesaj</h2>
-    <div class="form-group"><label>Numele tău</label><input type="text" id="contactName" /></div>
     <div class="form-group"><label>Email-ul tău</label><input type="email" id="contactEmail" /></div>
     <div class="form-group"><label>Subiect</label><input type="text" id="contactSubject" /></div>
     <div class="form-group"><label>Mesaj</label><textarea id="contactMessage"></textarea></div>
@@ -314,82 +301,29 @@
   </div>
 </div>
 
+
 <script>
-  emailjs.init({publicKey: 'cPvtBWK6KReX_pqhM'})
-  const { createClient } = supabase
-  const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
-  document.getElementById('year').textContent = new Date().getFullYear()
 
   const R2_WORKER = 'https://r2-upload-dokimasia.m-ciprian1387.workers.dev'
   const R2_SECRET = 'dokimasia-r2-secret-2024'
-  let currentUser = null
 
-  // Auth
-  function toggleMobMenu() { document.getElementById('mobNav').classList.toggle('open') }
-  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
-  document.addEventListener('click', function(e) { const aw = document.querySelector('.account-wrapper'); if(aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open') })
-  function openModal(tab) { document.getElementById('modalOverlay').classList.add('open'); switchTab(tab); document.getElementById('accountDropdown').classList.remove('open') }
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
-  function switchTab(tab) { document.getElementById('formLogin').style.display = tab==='login'?'block':'none'; document.getElementById('formRegister').style.display = tab==='register'?'block':'none'; document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register') }
-  function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
-  function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
-  async function login() { const {error} = await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value, password:document.getElementById('loginPassword').value}); if(error){document.getElementById('loginMsg').textContent='Eroare: '+error.message}else{closeModal();updateAccountUI()} }
-  async function register() { const {error} = await sb.auth.signUp({email:document.getElementById('regEmail').value, password:document.getElementById('regPassword').value, options:{data:{full_name:document.getElementById('regName').value}}}); document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!' }
-  async function logout() { await sb.auth.signOut(); updateAccountUI() }
-  async function loginWithGoogle() { await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://dokimasia.ro/carti.html'}}) }
-  async function resetPassword() { const email = document.getElementById('loginEmail').value.trim(); const msg = document.getElementById('loginMsg'); if(!email){msg.textContent='Introdu emailul mai întâi.';return}; const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://dokimasia.ro'}); msg.textContent = error ? 'Eroare: '+error.message : 'Email trimis!' }
-  async function updateAccountUI() {
-    const {data:{session}} = await sb.auth.getSession()
-    const user = session?.user
-    currentUser = user || null
-    const label = document.getElementById('accountLabel')
-    const mobLabel = document.getElementById('mobAccountLabel')
-    if(user){
-      const name = user.user_metadata?.full_name||user.user_metadata?.name||user.email
-      const firstName = name.split(' ')[0]
-      if(label) label.textContent = firstName
-      if(mobLabel) mobLabel.textContent = firstName
-      document.getElementById('loggedOut').style.display = 'none'
-      document.getElementById('loggedIn').style.display = 'block'
-      if(user.email==='m.ciprian1387@gmail.com') document.getElementById('adminBtn').style.display = 'block'
-    } else {
-      if(label) label.textContent = 'Contul meu'
-      if(mobLabel) mobLabel.textContent = 'Cont'
-      document.getElementById('loggedOut').style.display = 'block'
-      document.getElementById('loggedIn').style.display = 'none'
-    }
-  }
-  updateAccountUI()
-  sb.auth.onAuthStateChange((event, session) => { if(['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI(); if(event==='SIGNED_IN') document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')) })
+  function toggleMobMenu() { document.getElementById('mobNav')?.classList.toggle('open') }
 
-  async function sendEmail() {
-    const name=document.getElementById('contactName').value, email=document.getElementById('contactEmail').value
-    const subject=document.getElementById('contactSubject').value, message=document.getElementById('contactMessage').value
-    const msg=document.getElementById('contactMsg')
-    if(!name||!email||!message){msg.textContent='Completează toate câmpurile.';return}
-    try { await emailjs.send('service_swl59rb','template_ky5fzal',{from_name:name,from_email:email,subject:subject||'Mesaj nou',message:message,to_name:'Asociația Dokimasia'}); await sb.from('messages').insert([{name,email,subject,message}]); msg.textContent='Mesaj trimis!'; msg.style.color='green'; setTimeout(()=>{closeContactModal();msg.textContent=''},3000) } catch(e){ msg.textContent='Eroare.'; msg.style.color='#c00' }
+  // currentUser vine din auth.js via window.currentUser
+  // Setăm callback pentru când sesiunea e gata
+  window.onUserLoaded = function(user) {
+    // re-render dacă e nevoie
   }
-  async function subscribe() {
-    const email=document.getElementById('subEmail').value, nume=document.getElementById('subNume').value
-    const msg=document.getElementById('subMsg')
-    if(!email){msg.textContent='Introdu adresa de email.';return}
-    const {error}=await sb.from('abonati').insert([{email,nume}])
-    if(error&&error.code==='23505'){msg.textContent='Ești deja abonat!'}
-    else if(error){msg.textContent='Eroare: '+error.message}
-    else{msg.textContent='Te-ai abonat cu succes! 🎉'}
-  }
-  async function trackPageView() {
-    try { const ua=navigator.userAgent; let device='Desktop'; if(/Mobi|Android/i.test(ua)) device='Mobil'; else if(/Tablet|iPad/i.test(ua)) device='Tableta'; let browser='Altul'; if(/Edg/i.test(ua)) browser='Edge'; else if(/Chrome/i.test(ua)) browser='Chrome'; else if(/Firefox/i.test(ua)) browser='Firefox'; else if(/Safari/i.test(ua)) browser='Safari'; let city=null,country=null,ip=null; try { const geo=await fetch('https://ipapi.co/json/').then(r=>r.json()); city=geo.city; country=geo.country_name; ip=geo.ip } catch(e){}; await sb.from('page_views').insert([{page:'carti.html',user_agent:ua,device,browser,referrer:document.referrer||null,city,country,ip}]) } catch(e){}
-  }
-  trackPageView()
 
-  // ─── CĂRȚI ───
   async function loadCarti() {
     const {data} = await sb.from('carti').select('*').eq('status','publicat').order('created_at', {ascending: false})
-    if(!data || !data.length) { document.getElementById('cartiGrid').innerHTML = '<p style="color:#888;text-align:center;padding:60px;">Nu există cărți publicate momentan. Fii primul care publică!</p>'; return }
+    if(!data || !data.length) {
+      document.getElementById('cartiGrid').innerHTML = '<p style="color:#888;text-align:center;padding:60px;">Nu există cărți publicate momentan. Fii primul care publică!</p>'
+      return
+    }
     document.getElementById('cartiGrid').innerHTML = `<div class="carti-grid">${data.map(c => `
       <div class="carte-card" onclick="deschidCarte('${c.id}')">
-        ${c.coperta_url ? `<img src="${c.coperta_url}" alt="${c.titlu}" class="carte-coperta" onerror="this.outerHTML='<div class=carte-coperta-placeholder>📚</div>'" />` : `<div class="carte-coperta-placeholder">📚</div>`}
+        ${c.coperta_url ? `<img src="${c.coperta_url}" alt="${c.titlu}" class="carte-coperta" onerror="this.outerHTML='<div class=carte-coperta-placeholder>📚</div>'" />` : '<div class="carte-coperta-placeholder">📚</div>'}
         <div class="carte-info">
           <div class="carte-titlu">${c.titlu}</div>
           <div class="carte-autor">${c.autor||''}</div>
@@ -397,43 +331,42 @@
       </div>
     `).join('')}</div>`
   }
-  loadCarti()
 
   async function deschidCarte(id) {
     document.getElementById('carteModalOverlay').classList.add('open')
     document.getElementById('carteDetailContent').innerHTML = '<div class="loading">Se încarcă...</div>'
     const {data: c} = await sb.from('carti').select('*').eq('id', id).single()
     if(!c) { document.getElementById('carteDetailContent').innerHTML = '<p>Eroare.</p>'; return }
-    const canDownload = currentUser !== null
+    const canDownload = window.currentUser !== null
     document.getElementById('carteDetailContent').innerHTML = `
       <div class="carte-detail">
-        ${c.coperta_url ? `<img src="${c.coperta_url}" alt="${c.titlu}" onerror="this.outerHTML='<div class=no-cover>📚</div>'" />` : `<div class="no-cover">📚</div>`}
+        ${c.coperta_url ? `<img src="${c.coperta_url}" alt="${c.titlu}" onerror="this.outerHTML='<div class=no-cover>📚</div>'" />` : '<div class="no-cover">📚</div>'}
         <div class="carte-meta">
           <h2>${c.titlu}</h2>
           <div class="autor">de ${c.autor||'Autor necunoscut'}</div>
           <div class="detalii">
             ${c.an_publicare ? `<span>📅 ${c.an_publicare}</span>` : ''}
             ${c.nr_pagini ? `<span>📄 ${c.nr_pagini} pagini</span>` : ''}
-            ${c.isbn ? `<span>ISBN: ${c.isbn}</span>` : ''}
+            ${c.isbn ? `<span>📋 ISBN: ${c.isbn}</span>` : ''}
           </div>
-          <div class="desc">${c.descriere||''}</div>
-          ${c.pdf_url ? (canDownload
-            ? `<a href="${c.pdf_url}" target="_blank" download style="display:inline-block;background:#2c3e50;color:#fff;padding:12px 24px;border-radius:8px;font-weight:bold;font-size:0.9rem;">⬇ Descarcă PDF</a>`
-            : `<div class="download-gate"><p>🔒 Pentru a descărca cartea, autentifică-te gratuit.</p><button class="btn-primary" style="max-width:200px;" onclick="closeCarteDetail();openModal('login')">Autentificare</button></div>`) : ''}
+          ${c.descriere ? `<div class="descriere">${c.descriere}</div>` : ''}
+          <div class="actiuni">
+            ${canDownload && c.pdf_url
+              ? `<a href="${c.pdf_url}" target="_blank" class="btn-download">📖 Citește / Descarcă</a>`
+              : !canDownload
+                ? `<button class="btn-download" onclick="openModal('login')">🔒 Autentifică-te pentru a descărca</button>`
+                : '<p style="color:#888;font-size:0.9rem;">Fișierul nu este disponibil.</p>'
+            }
+          </div>
         </div>
       </div>
-      ${c.pdf_url ? `<div class="carte-pdf"><h3 style="color:#2c3e50;margin-bottom:12px;">📖 Previzualizare</h3><iframe src="${c.pdf_url}#toolbar=0" title="${c.titlu}"></iframe></div>` : ''}
     `
   }
 
   function closeCarteDetail() { document.getElementById('carteModalOverlay').classList.remove('open') }
-  document.getElementById('carteModalOverlay').addEventListener('click', function(e) { if(e.target===this) closeCarteDetail() })
 
-  // ─── PUBLICARE ───
   function deschidePublicare() {
-    if(!currentUser) { openModal('login'); return }
-    document.getElementById('publishStep1').style.display = 'block'
-    document.getElementById('publishStep2').style.display = 'none'
+    if(!window.currentUser) { openModal('login'); return }
     document.getElementById('publishModalOverlay').classList.add('open')
   }
   function closePublicare() { document.getElementById('publishModalOverlay').classList.remove('open') }
@@ -441,49 +374,61 @@
   async function uploadFisier(input, tip) {
     const file = input.files[0]
     if(!file) return
-    const msg = document.getElementById(tip + '-msg')
-    msg.textContent = '⏳ Se uploadează...'
-    msg.style.color = '#888'
+    const msgEl = document.getElementById(tip === 'pdf' ? 'uploadPdfMsg' : 'uploadCopertaMsg')
+    msgEl.textContent = '⏳ Se uploadează...'
     try {
-      const key = 'carti/' + tip + '/' + Date.now() + '_' + file.name.replace(/\s+/g,'_')
+      const key = tip + '/' + Date.now() + '_' + file.name.replace(/\s+/g,'_')
       const res = await fetch(R2_WORKER + '/' + key, {
         method: 'PUT',
         headers: {'Authorization': 'Bearer ' + R2_SECRET, 'Content-Type': file.type},
         body: file
       })
       const data = await res.json()
-      const url = data.url || 'https://cdn.dokimasia.ro/' + key
-      if(tip === 'coperta') document.getElementById('pubCopertaUrl').value = url
-      else document.getElementById('pubPdfUrl').value = url
-      msg.textContent = '✓ Uploadat cu succes'
-      msg.style.color = 'green'
-    } catch(e) { msg.textContent = 'Eroare upload: ' + e.message; msg.style.color = '#c00' }
+      document.getElementById(tip === 'pdf' ? 'pdfUrl' : 'copertaUrl').value = data.url || ''
+      msgEl.textContent = '✓ Uploadat cu succes!'
+      msgEl.style.color = 'green'
+    } catch(e) {
+      msgEl.textContent = 'Eroare: ' + e.message
+      msgEl.style.color = '#c00'
+    }
   }
 
   async function trimiteCartea() {
-    if(!currentUser) { openModal('login'); return }
-    const titlu = document.getElementById('pubTitlu').value.trim()
-    const autor = document.getElementById('pubAutor').value.trim()
-    const descriere = document.getElementById('pubDescriere').value.trim()
-    const pdfUrl = document.getElementById('pubPdfUrl').value
     const msg = document.getElementById('publishMsg')
-    if(!titlu || !autor || !descriere) { msg.textContent = 'Completează titlul, autorul și descrierea!'; msg.style.color='#c00'; return }
-    if(!pdfUrl) { msg.textContent = 'Uploadează fișierul PDF al cărții!'; msg.style.color='#c00'; return }
-    const payload = {
-      user_id: currentUser.id,
-      titlu, autor, descriere,
-      coperta_url: document.getElementById('pubCopertaUrl').value || null,
-      pdf_url: pdfUrl,
-      an_publicare: parseInt(document.getElementById('pubAn').value) || null,
-      nr_pagini: parseInt(document.getElementById('pubPagini').value) || null,
-      isbn: document.getElementById('pubIsbn').value.trim() || null,
-      status: 'trimis',
-      platit: false
+    const titlu = document.getElementById('carteTitle').value.trim()
+    const autor = document.getElementById('carteAutor').value.trim()
+    if(!titlu || !autor) { msg.textContent = 'Titlul și autorul sunt obligatorii.'; return }
+    msg.textContent = 'Se trimite...'
+    const { error } = await sb.from('carti').insert([{
+      titlu,
+      autor,
+      descriere: document.getElementById('carteDescriere').value.trim() || null,
+      an_publicare: document.getElementById('carteAn').value || null,
+      nr_pagini: document.getElementById('carteNrPagini').value || null,
+      isbn: document.getElementById('carteISBN').value.trim() || null,
+      pdf_url: document.getElementById('pdfUrl').value.trim() || null,
+      coperta_url: document.getElementById('copertaUrl').value.trim() || null,
+      user_id: window.currentUser.id,
+      status: 'trimis'
+    }])
+    if(error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color = '#c00' }
+    else {
+      msg.textContent = '✅ Cartea a fost trimisă spre publicare!'
+      msg.style.color = 'green'
+      setTimeout(() => closePublicare(), 3000)
     }
-    const {error} = await sb.from('carti').insert([payload])
-    if(error) { msg.textContent = 'Eroare: ' + error.message; msg.style.color='#c00' }
-    else { document.getElementById('publishStep1').style.display='none'; document.getElementById('publishStep2').style.display='block' }
   }
+
+  document.getElementById('carteModalOverlay')?.addEventListener('click', e => {
+    if(e.target === e.currentTarget) closeCarteDetail()
+  })
+  document.getElementById('publishModalOverlay')?.addEventListener('click', e => {
+    if(e.target === e.currentTarget) closePublicare()
+  })
+
+  loadCarti()
+
 </script>
 </body>
 </html>
+

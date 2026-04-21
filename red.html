@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resurse educaționale deschise — Dokimasia</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <style>
+      <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #fff; color: #222; }
     a { text-decoration: none; color: inherit; }
@@ -91,6 +89,8 @@
       .resursa-btn { width: 100%; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -236,81 +236,11 @@
   </div>
 </div>
 
+
 <script>
-  emailjs.init({publicKey: 'cPvtBWK6KReX_pqhM'})
-  const { createClient } = supabase
-  const sb = createClient('https://jaoxhsyplnkanhqevnnr.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw')
-  document.getElementById('year').textContent = new Date().getFullYear()
 
-  // Auth
-  function toggleMobMenu() { document.getElementById('mobNav').classList.toggle('open') }
-  function toggleAccount() { document.getElementById('accountDropdown').classList.toggle('open') }
-  document.addEventListener('click', function(e) { const aw = document.querySelector('.account-wrapper'); if(aw && !aw.contains(e.target)) document.getElementById('accountDropdown').classList.remove('open') })
-  function openModal(tab) { document.getElementById('modalOverlay').classList.add('open'); switchTab(tab); document.getElementById('accountDropdown').classList.remove('open') }
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('open') }
-  function switchTab(tab) { document.getElementById('formLogin').style.display = tab==='login'?'block':'none'; document.getElementById('formRegister').style.display = tab==='register'?'block':'none'; document.getElementById('tabLogin').classList.toggle('active', tab==='login'); document.getElementById('tabRegister').classList.toggle('active', tab==='register') }
-  function openContactModal() { document.getElementById('contactModalOverlay').classList.add('open') }
-  function closeContactModal() { document.getElementById('contactModalOverlay').classList.remove('open') }
-  async function login() { const {error} = await sb.auth.signInWithPassword({email:document.getElementById('loginEmail').value, password:document.getElementById('loginPassword').value}); if(error){document.getElementById('loginMsg').textContent='Eroare: '+error.message}else{closeModal();updateAccountUI()} }
-  async function register() { const {error} = await sb.auth.signUp({email:document.getElementById('regEmail').value, password:document.getElementById('regPassword').value, options:{data:{full_name:document.getElementById('regName').value}}}); document.getElementById('registerMsg').textContent = error ? 'Eroare: '+error.message : 'Cont creat!' }
-  async function logout() { await sb.auth.signOut(); updateAccountUI() }
-  async function loginWithGoogle() { await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://dokimasia.ro/red.html'}}) }
-  async function resetPassword() { const email = document.getElementById('loginEmail').value.trim(); const msg = document.getElementById('loginMsg'); if(!email){msg.textContent='Introdu emailul mai întâi.';return}; const {error} = await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://dokimasia.ro'}); msg.textContent = error ? 'Eroare: '+error.message : 'Email trimis!' }
-  async function updateAccountUI() {
-    const {data:{session}} = await sb.auth.getSession()
-    const user = session?.user
-    const label = document.getElementById('accountLabel')
-    const mobLabel = document.getElementById('mobAccountLabel')
-    if(user){
-      const name = user.user_metadata?.full_name||user.user_metadata?.name||user.email
-      const firstName = name.split(' ')[0]
-      if(label) label.textContent = firstName
-      if(mobLabel) mobLabel.textContent = firstName
-      document.getElementById('loggedOut').style.display = 'none'
-      document.getElementById('loggedIn').style.display = 'block'
-      if(user.email==='m.ciprian1387@gmail.com') document.getElementById('adminBtn').style.display = 'block'
-    } else {
-      if(label) label.textContent = 'Contul meu'
-      if(mobLabel) mobLabel.textContent = 'Cont'
-      document.getElementById('loggedOut').style.display = 'block'
-      document.getElementById('loggedIn').style.display = 'none'
-    }
-  }
-  updateAccountUI()
-  sb.auth.onAuthStateChange((event, session) => {
-    if(['INITIAL_SESSION','SIGNED_IN','SIGNED_OUT','TOKEN_REFRESHED'].includes(event)) updateAccountUI()
-    if(event==='SIGNED_IN') document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'))
-  })
+  function toggleMobMenu() { document.getElementById('mobNav')?.classList.toggle('open') }
 
-  async function sendEmail() {
-    const name=document.getElementById('contactName').value, email=document.getElementById('contactEmail').value
-    const subject=document.getElementById('contactSubject').value, message=document.getElementById('contactMessage').value
-    const msg=document.getElementById('contactMsg')
-    if(!name||!email||!message){msg.textContent='Completează toate câmpurile.';return}
-    try { await emailjs.send('service_swl59rb','template_ky5fzal',{from_name:name,from_email:email,subject:subject||'Mesaj nou',message:message,to_name:'Asociația Dokimasia'}); await sb.from('messages').insert([{name,email,subject,message}]); msg.textContent='Mesaj trimis!'; msg.style.color='green'; setTimeout(()=>{closeContactModal();msg.textContent=''},3000) } catch(e){ msg.textContent='Eroare.'; msg.style.color='#c00' }
-  }
-  async function subscribe() {
-    const email=document.getElementById('subEmail').value, nume=document.getElementById('subNume').value
-    const msg=document.getElementById('subMsg')
-    if(!email){msg.textContent='Introdu adresa de email.';return}
-    const {error}=await sb.from('abonati').insert([{email,nume}])
-    if(error&&error.code==='23505'){msg.textContent='Ești deja abonat!'}
-    else if(error){msg.textContent='Eroare: '+error.message}
-    else{msg.textContent='Te-ai abonat cu succes! 🎉'}
-  }
-  async function trackPageView() {
-    try {
-      const ua=navigator.userAgent
-      let device='Desktop'; if(/Mobi|Android/i.test(ua)) device='Mobil'; else if(/Tablet|iPad/i.test(ua)) device='Tableta'
-      let browser='Altul'; if(/Edg/i.test(ua)) browser='Edge'; else if(/Chrome/i.test(ua)) browser='Chrome'; else if(/Firefox/i.test(ua)) browser='Firefox'; else if(/Safari/i.test(ua)) browser='Safari'
-      let city=null,country=null,ip=null
-      try { const geo=await fetch('https://ipapi.co/json/').then(r=>r.json()); city=geo.city; country=geo.country_name; ip=geo.ip } catch(e){}
-      await sb.from('page_views').insert([{page:'red.html',user_agent:ua,device,browser,referrer:document.referrer||null,city,country,ip}])
-    } catch(e){}
-  }
-  trackPageView()
-
-  // ─── RED LOGIC ───
   let allResurse = []
   let currentCat = 'toate'
 
@@ -322,9 +252,9 @@
     }
     allResurse = data
     const cats = [...new Set(data.map(r => r.categorie).filter(Boolean))]
-    document.getElementById('filterBar').innerHTML = 
+    document.getElementById('filterBar').innerHTML =
       `<button class="filter-btn active" onclick="filtreazaResurse('toate', this)">Toate (${data.length})</button>` +
-      cats.map(c => `<button class="filter-btn" onclick="filtreazaResurse('${c.replace(/'/g,"\\'")}', this)">${c}</button>`).join('')
+      cats.map(c => `<button class="filter-btn" onclick="filtreazaResurse('${c.replace(/'/g,"\\'")}", this)">${c}</button>`).join('')
     renderResurse()
   }
 
@@ -341,20 +271,22 @@
       document.getElementById('resurseList').innerHTML = '<p style="color:#888;padding:40px;">Nu există resurse în această categorie.</p>'
       return
     }
-    document.getElementById('resurseList').innerHTML = filtered.map(r => `
-      <div class="resursa-item">
+    document.getElementById('resurseList').innerHTML = `<div class="resurse-grid">${filtered.map(r => `
+      <div class="resursa-card">
         <div class="resursa-icon">📄</div>
         <div class="resursa-info">
-          ${r.categorie ? `<span class="resursa-cat">${r.categorie}</span>` : ''}
           <div class="resursa-titlu">${r.titlu}</div>
+          ${r.categorie ? `<div class="resursa-cat">${r.categorie}</div>` : ''}
           ${r.descriere ? `<div class="resursa-desc">${r.descriere}</div>` : ''}
         </div>
-        ${r.fisier_url ? `<a href="${r.fisier_url}" target="_blank" class="resursa-btn">⬇ Descarcă</a>` : '<span style="color:#999;font-size:0.85rem;">Fără fișier</span>'}
+        ${r.fisier_url ? `<a href="${r.fisier_url}" target="_blank" class="btn-descarca">⬇ Descarcă</a>` : ''}
       </div>
-    `).join('')
+    `).join('')}</div>`
   }
 
   loadResurse()
+
 </script>
 </body>
 </html>
+
