@@ -307,10 +307,18 @@ async function trackPageView() {
 
     let city = null, country = null, ip = null
     try {
-      const geo = await fetch('https://ipapi.co/json/').then(r => r.json())
-      city = geo.city || null
-      country = geo.country_name || null
-      ip = geo.ip || null
+      // Cache în sessionStorage — un singur apel per sesiune browser, nu per pagină
+      const cached = sessionStorage.getItem('dok_geo')
+      if (cached) {
+        const g = JSON.parse(cached)
+        city = g.city; country = g.country; ip = g.ip
+      } else {
+        const geo = await fetch('https://ipapi.co/json/').then(r => r.json())
+        city = geo.city || null
+        country = geo.country_name || null
+        ip = geo.ip || null
+        sessionStorage.setItem('dok_geo', JSON.stringify({ city, country, ip }))
+      }
     } catch (e) {}
 
     await sb.from('page_views').insert([{
@@ -346,20 +354,27 @@ function setYear() {
 // ── INIT ───────────────────────────────────────────────────
 // Rulează când DOM-ul e gata
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   setYear()
   injectModals()
+
+  // Supabase detectează automat tokenul din URL (#access_token=...)
+  // după un redirect Google OAuth — getSession() îl preia și salvează în localStorage
+  await sb.auth.getSession()
+
   updateAccountUI()
   trackPageView()
 
-  // Ascultă schimbările de sesiune (login Google redirect, token refresh etc.)
   sb.auth.onAuthStateChange((event, session) => {
     if (['INITIAL_SESSION', 'SIGNED_IN', 'SIGNED_OUT', 'TOKEN_REFRESHED'].includes(event)) {
       updateAccountUI()
     }
-    // Închide modalele la login
     if (event === 'SIGNED_IN') {
       closeModal()
+      // Curăță hash-ul din URL după login cu Google
+      if (window.location.hash.includes('access_token')) {
+        history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
     }
   })
 })
