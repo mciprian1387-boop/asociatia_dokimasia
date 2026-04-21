@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor Pagină — Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --crimson:#8B0000; --crimson-dark:#5a0000;
+      --gold:#b8963e; --ink:#1a1108;
+      --paper:#faf8f4; --border:#ddd8cc;
+      --muted:#7a7060; --sidebar:260px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Georgia,serif; background:var(--paper); color:var(--ink); height:100vh; display:flex; flex-direction:column; }
+
+    /* TOPBAR */
+    .topbar { background:var(--crimson); color:#fff; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+    .topbar-left { display:flex; align-items:center; gap:14px; }
+    .topbar h1 { font-size:1.05rem; font-weight:bold; letter-spacing:1px; }
+    .topbar-page { background:rgba(255,255,255,0.15); font-size:0.78rem; padding:3px 10px; border-radius:12px; letter-spacing:1px; }
+    .topbar-right { display:flex; gap:10px; align-items:center; }
+    .btn-topbar { background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); padding:7px 16px; border-radius:3px; font-size:0.82rem; font-family:Georgia,serif; cursor:pointer; transition:background 0.2s; }
+    .btn-topbar:hover { background:rgba(255,255,255,0.25); }
+    .btn-save { background:var(--gold); border:none; }
+    .btn-save:hover { background:#c9a84c; }
+    #saveMsg { font-size:0.8rem; opacity:0.8; }
+
+    /* LAYOUT */
+    .editor-body { display:flex; flex:1; overflow:hidden; }
+
+    /* SIDEBAR BLOCURI */
+    .blocks-sidebar { width:var(--sidebar); background:#fff; border-right:1px solid var(--border); padding:20px 16px; overflow-y:auto; flex-shrink:0; }
+    .sidebar-title { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; font-weight:bold; }
+    .block-type {
+      display:flex; align-items:center; gap:10px;
+      background:var(--paper); border:1px solid var(--border);
+      border-radius:4px; padding:11px 13px; margin-bottom:8px;
+      cursor:grab; user-select:none; font-size:0.88rem;
+      transition:border-color 0.15s, box-shadow 0.15s;
+    }
+    .block-type:hover { border-color:var(--crimson); box-shadow:0 2px 8px rgba(139,0,0,0.08); }
+    .block-type:active { cursor:grabbing; }
+    .block-type .icon { font-size:1.1rem; width:22px; text-align:center; }
+    .block-type .label { font-size:0.85rem; color:var(--ink); }
+    .block-type .desc { font-size:0.72rem; color:var(--muted); margin-top:1px; }
+    .btn-add-block { width:100%; background:var(--crimson); color:#fff; border:none; border-radius:3px; padding:10px; font-family:Georgia,serif; font-size:0.85rem; cursor:pointer; margin-top:4px; }
+    .btn-add-block:hover { background:var(--crimson-dark); }
+
+    /* CANVAS */
+    .canvas-wrap { flex:1; overflow-y:auto; padding:28px; }
+    .canvas { max-width:860px; margin:0 auto; }
+    .canvas-empty { text-align:center; padding:80px 20px; color:var(--muted); border:2px dashed var(--border); border-radius:6px; font-style:italic; }
+
+    /* SECȚIUNI */
+    .section-block {
+      background:#fff; border:1px solid var(--border);
+      border-radius:4px; margin-bottom:14px;
+      box-shadow:0 1px 4px rgba(0,0,0,0.04);
+      transition:border-color 0.15s;
+    }
+    .section-block.drag-over { border-color:var(--crimson); border-style:dashed; }
+    .section-block.dragging { opacity:0.4; }
+
+    .section-header-bar {
+      display:flex; align-items:center; gap:10px;
+      padding:12px 16px; border-bottom:1px solid var(--border);
+      background:var(--paper); border-radius:4px 4px 0 0;
+      cursor:default;
+    }
+    .drag-handle { cursor:grab; color:var(--muted); font-size:1rem; padding:2px 4px; }
+    .drag-handle:active { cursor:grabbing; }
+    .section-type-badge { font-size:0.68rem; letter-spacing:1.5px; text-transform:uppercase; background:var(--crimson); color:#fff; padding:3px 9px; border-radius:2px; font-weight:bold; }
+    .section-title-display { flex:1; font-size:0.88rem; color:#444; font-style:italic; }
+    .section-actions { display:flex; gap:6px; }
+    .btn-section { background:none; border:1px solid var(--border); border-radius:3px; width:28px; height:28px; cursor:pointer; font-size:0.82rem; color:var(--muted); transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+    .btn-section:hover { border-color:var(--crimson); color:var(--crimson); }
+    .btn-section.del:hover { border-color:#c00; color:#c00; }
+    .vis-toggle { font-size:0.7rem; }
+
+    /* FIELDS */
+    .section-body { padding:18px 16px; }
+    .field { margin-bottom:14px; }
+    .field label { display:block; font-size:0.75rem; color:var(--muted); margin-bottom:5px; letter-spacing:0.5px; text-transform:uppercase; }
+    .field input, .field select, .field textarea {
+      width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:3px;
+      font-size:0.9rem; font-family:Georgia,serif; outline:none; background:var(--paper); transition:border 0.15s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--crimson); background:#fff; }
+    .field textarea { resize:vertical; min-height:90px; line-height:1.6; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .field-hint { font-size:0.72rem; color:var(--muted); margin-top:4px; font-style:italic; }
+
+    /* PREVIEW PANEL */
+    .preview-sidebar { width:320px; background:#fff; border-left:1px solid var(--border); padding:20px; overflow-y:auto; flex-shrink:0; }
+    .preview-title { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:16px; font-weight:bold; }
+    .preview-frame { border:1px solid var(--border); border-radius:4px; overflow:hidden; }
+    .preview-block { padding:12px 14px; border-bottom:1px solid var(--border); font-size:0.82rem; }
+    .preview-block:last-child { border-bottom:none; }
+    .preview-block .pb-type { font-size:0.65rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--crimson); margin-bottom:4px; }
+    .preview-block .pb-title { font-weight:bold; color:var(--ink); }
+    .preview-block .pb-desc { color:var(--muted); font-style:italic; font-size:0.78rem; }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:24px; right:24px; background:var(--ink); color:#fff; padding:11px 20px; border-radius:4px; font-size:0.86rem; z-index:9999; box-shadow:0 4px 16px rgba(0,0,0,0.2); transform:translateY(80px); opacity:0; transition:all 0.3s ease; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.ok { background:#2e7d32; }
+    .toast.err { background:#c62828; }
+
+    /* AUTH CHECK */
+    #authCheck { display:flex; align-items:center; justify-content:center; height:100vh; background:var(--crimson); }
+    .auth-box { background:#fff; border-radius:4px; padding:40px; max-width:360px; width:90%; text-align:center; box-shadow:0 16px 48px rgba(0,0,0,0.25); }
+    .auth-box h2 { color:var(--crimson); font-size:1.3rem; margin-bottom:8px; }
+    .auth-box p { color:var(--muted); font-size:0.88rem; margin-bottom:20px; }
+    .auth-box a { color:var(--crimson); }
+
+    @media (max-width:900px) { .preview-sidebar { display:none; } }
+    @media (max-width:600px) { .blocks-sidebar { width:200px; } }
+  </style>
+</head>
+<body>
+
+<div id="authCheck">
+  <div class="auth-box">
+    <h2>🔒 Acces restricționat</h2>
+    <p>Se verifică accesul...</p>
+    <p><a href="index.html">← Înapoi la site</a></p>
+  </div>
+</div>
+
+<div id="editorApp" style="display:none;flex:1;flex-direction:column;height:100vh;">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Editor Pagină</h1>
+      <span class="topbar-page" id="pageLabel">—</span>
+    </div>
+    <div class="topbar-right">
+      <span id="saveMsg"></span>
+      <button class="btn-topbar" onclick="previzualizeaza()">👁 Previzualizare</button>
+      <button class="btn-topbar btn-save" onclick="salveaza()">💾 Salvează</button>
+      <a id="backLink" href="revista.html" class="btn-topbar">✕ Închide</a>
+    </div>
+  </div>
+
+  <div class="editor-body">
+
+    <!-- SIDEBAR TIPURI BLOCURI -->
+    <div class="blocks-sidebar">
+      <div class="sidebar-title">Adaugă bloc</div>
+      <div id="blockTypes"></div>
+    </div>
+
+    <!-- CANVAS -->
+    <div class="canvas-wrap">
+      <div class="canvas" id="canvas">
+        <div class="canvas-empty" id="canvasEmpty">
+          Niciun bloc adăugat. Apasă un tip de bloc din stânga pentru a începe.
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-sidebar">
+      <div class="preview-title">Structura paginii</div>
+      <div class="preview-frame" id="previewFrame"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SUPABASE_URL = 'https://jaoxhsyplnkanhqevnnr.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
+  const ADMIN_EMAIL = 'm.ciprian1387@gmail.com'
+  const { createClient } = supabase
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth:{ persistSession:true, storageKey:'dokimasia-auth', autoRefreshToken:true } })
+
+  const pageId = new URLSearchParams(window.location.search).get('page') || 'revista'
+  let sections = []
+  let dragSrcIdx = null
+
+  // TIPURI DE BLOCURI
+  const BLOCK_TYPES = [
+    { type:'hero', icon:'🎯', label:'Hero', desc:'Titlu mare + subtitlu + fundal', fields:[
+      { key:'titlu', label:'Titlu', type:'text', placeholder:'Revista Dokimasia' },
+      { key:'subtitlu', label:'Subtitlu', type:'text', placeholder:'Publicație periodică...' },
+      { key:'label', label:'Label mic (deasupra)', type:'text', placeholder:'Publicație periodică · ...' },
+      { key:'culoare_fundal', label:'Culoare fundal (hex)', type:'text', placeholder:'#8B0000' },
+      { key:'imagine_url', label:'URL imagine fundal (opțional)', type:'text', placeholder:'https://...' },
+    ]},
+    { type:'text', icon:'📝', label:'Bloc text', desc:'Titlu + paragraf de text', fields:[
+      { key:'titlu', label:'Titlu (opțional)', type:'text', placeholder:'' },
+      { key:'continut', label:'Conținut', type:'textarea', placeholder:'Scrie textul...' },
+      { key:'aliniere', label:'Aliniere', type:'select', options:['stânga','centru','dreapta'] },
+    ]},
+    { type:'imagine', icon:'🖼️', label:'Imagine', desc:'Imagine cu legendă opțională', fields:[
+      { key:'url', label:'URL imagine', type:'text', placeholder:'https://...' },
+      { key:'legenda', label:'Legendă (opțional)', type:'text', placeholder:'' },
+      { key:'latime', label:'Lățime', type:'select', options:['completă','medie','mică'] },
+    ]},
+    { type:'cta', icon:'🔘', label:'CTA / Buton', desc:'Chemare la acțiune cu buton', fields:[
+      { key:'titlu', label:'Titlu', type:'text', placeholder:'Abonează-te acum' },
+      { key:'text', label:'Text descriptiv', type:'textarea', placeholder:'' },
+      { key:'buton_text', label:'Text buton', type:'text', placeholder:'Citește acum →' },
+      { key:'buton_url', label:'URL buton', type:'text', placeholder:'https://...' },
+      { key:'culoare', label:'Culoare fundal', type:'text', placeholder:'#8B0000' },
+    ]},
+    { type:'editii_grid', icon:'📚', label:'Grilă ediții', desc:'Afișează automat toate edițiile', fields:[
+      { key:'titlu', label:'Titlu secțiune', type:'text', placeholder:'Toate edițiile' },
+      { key:'nr_max', label:'Nr. maxim ediții (0=toate)', type:'text', placeholder:'0' },
+    ]},
+    { type:'featured', icon:'⭐', label:'Ediție Featured', desc:'Ultimul număr, proeminent', fields:[
+      { key:'titlu_sectiune', label:'Label deasupra', type:'text', placeholder:'Ultimul număr' },
+    ]},
+    { type:'cuprins', icon:'📋', label:'Cuprins', desc:'Cuprinsul articolelor ediției', fields:[
+      { key:'titlu', label:'Titlu', type:'text', placeholder:'Cuprins' },
+    ]},
+    { type:'separator', icon:'—', label:'Separator', desc:'Linie decorativă', fields:[
+      { key:'stil', label:'Stil', type:'select', options:['linie simplă','ornament','spațiu'] },
+    ]},
+    { type:'galerie', icon:'🖼️', label:'Galerie foto', desc:'Grid de imagini', fields:[
+      { key:'titlu', label:'Titlu (opțional)', type:'text', placeholder:'' },
+      { key:'imagini', label:'URL-uri imagini (câte unul pe linie)', type:'textarea', placeholder:'https://imagine1.jpg\nhttps://imagine2.jpg' },
+      { key:'coloane', label:'Coloane', type:'select', options:['2','3','4'] },
+    ]},
+  ]
+
+  // AUTH CHECK
+  async function checkAuth() {
+    var r = await sb.auth.getSession()
+    var user = r.data.session ? r.data.session.user : null
+    if (!user || user.email !== ADMIN_EMAIL) {
+      document.getElementById('authCheck').querySelector('p').textContent = 'Nu ai acces. Trebuie să fii logat ca administrator.'
+      return
+    }
+    document.getElementById('authCheck').style.display = 'none'
+    document.getElementById('editorApp').style.display = 'flex'
+
+    var pageLabels = { 'revista':'Revista Dokimasia (pagina principală)' }
+    var label = pageLabels[pageId] || (pageId.startsWith('editie-') ? 'Ediție: ' + pageId.replace('editie-','') : pageId)
+    document.getElementById('pageLabel').textContent = label
+
+    if (pageId.startsWith('editie-')) {
+      var editieId = pageId.replace('editie-','')
+      document.getElementById('backLink').href = 'editie.html?id=' + editieId
+    }
+
+    renderBlockTypes()
+    await loadSections()
+  }
+
+  function renderBlockTypes() {
+    document.getElementById('blockTypes').innerHTML = BLOCK_TYPES.map(function(bt) {
+      return '<div class="block-type" onclick="addBlock(\'' + bt.type + '\')" title="' + bt.desc + '">' +
+        '<div>' +
+          '<span class="icon">' + bt.icon + '</span>' +
+        '</div>' +
+        '<div>' +
+          '<div class="label">' + bt.label + '</div>' +
+          '<div class="desc">' + bt.desc + '</div>' +
+        '</div>' +
+      '</div>'
+    }).join('')
+  }
+
+  // LOAD / SAVE
+  async function loadSections() {
+    var r = await sb.from('page_sections').select('*').eq('page_id', pageId).order('ordine')
+    sections = r.data || []
+    renderCanvas()
+  }
+
+  async function salveaza() {
+    var msg = document.getElementById('saveMsg')
+    msg.textContent = 'Se salvează...'
+    try {
+      // Șterge secțiunile existente și reinserează în ordine
+      await sb.from('page_sections').delete().eq('page_id', pageId)
+      if (sections.length > 0) {
+        var toInsert = sections.map(function(s, i) {
+          return { page_id:pageId, type:s.type, content:s.content, ordine:i, vizibil:s.vizibil !== false }
+        })
+        var r = await sb.from('page_sections').insert(toInsert)
+        if (r.error) throw r.error
+      }
+      msg.textContent = '✓ Salvat'
+      toast('Pagina a fost salvată!', 'ok')
+      setTimeout(function() { msg.textContent = '' }, 3000)
+    } catch(e) {
+      msg.textContent = 'Eroare!'
+      toast('Eroare: ' + e.message, 'err')
+    }
+  }
+
+  function previzualizeaza() {
+    if (pageId === 'revista') window.open('revista.html', '_blank')
+    else if (pageId.startsWith('editie-')) window.open('editie.html?id=' + pageId.replace('editie-',''), '_blank')
+  }
+
+  // CANVAS RENDER
+  function renderCanvas() {
+    var canvas = document.getElementById('canvas')
+    var empty = document.getElementById('canvasEmpty')
+
+    if (sections.length === 0) {
+      empty.style.display = 'block'
+      // Remove all section blocks
+      canvas.querySelectorAll('.section-block').forEach(function(el) { el.remove() })
+      renderPreview()
+      return
+    }
+    empty.style.display = 'none'
+
+    canvas.querySelectorAll('.section-block').forEach(function(el) { el.remove() })
+
+    sections.forEach(function(s, idx) {
+      var bt = BLOCK_TYPES.find(function(b) { return b.type === s.type }) || { icon:'?', label:s.type, fields:[] }
+      var titlePreview = s.content && s.content.titlu ? s.content.titlu : (s.content && s.content.continut ? s.content.continut.substring(0,40)+'...' : '—')
+
+      var el = document.createElement('div')
+      el.className = 'section-block'
+      el.setAttribute('data-idx', idx)
+      el.draggable = true
+
+      el.innerHTML =
+        '<div class="section-header-bar">' +
+          '<span class="drag-handle" title="Trage pentru a reordona">⠿</span>' +
+          '<span class="section-type-badge">' + bt.icon + ' ' + bt.label + '</span>' +
+          '<span class="section-title-display">' + titlePreview + '</span>' +
+          '<div class="section-actions">' +
+            '<button class="btn-section vis-toggle" onclick="toggleVis(' + idx + ')" title="' + (s.vizibil !== false ? 'Ascunde' : 'Afișează') + '">' + (s.vizibil !== false ? '👁' : '🚫') + '</button>' +
+            '<button class="btn-section" onclick="moveUp(' + idx + ')" title="Sus">↑</button>' +
+            '<button class="btn-section" onclick="moveDown(' + idx + ')" title="Jos">↓</button>' +
+            '<button class="btn-section del" onclick="deleteSection(' + idx + ')" title="Șterge">🗑</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="section-body">' + renderFields(s, idx, bt) + '</div>'
+
+      // Drag events
+      el.addEventListener('dragstart', function() {
+        dragSrcIdx = idx
+        setTimeout(function() { el.classList.add('dragging') }, 0)
+      })
+      el.addEventListener('dragend', function() {
+        el.classList.remove('dragging')
+        document.querySelectorAll('.section-block').forEach(function(e) { e.classList.remove('drag-over') })
+      })
+      el.addEventListener('dragover', function(e) { e.preventDefault(); el.classList.add('drag-over') })
+      el.addEventListener('dragleave', function() { el.classList.remove('drag-over') })
+      el.addEventListener('drop', function(e) {
+        e.preventDefault()
+        el.classList.remove('drag-over')
+        if (dragSrcIdx === null || dragSrcIdx === idx) return
+        var moved = sections.splice(dragSrcIdx, 1)[0]
+        sections.splice(idx, 0, moved)
+        dragSrcIdx = null
+        renderCanvas()
+      })
+
+      canvas.appendChild(el)
+    })
+
+    renderPreview()
+  }
+
+  function renderFields(s, idx, bt) {
+    if (!bt.fields || bt.fields.length === 0) return '<p style="color:var(--muted);font-size:0.85rem;font-style:italic;">Niciun câmp editabil pentru acest tip.</p>'
+    return bt.fields.map(function(f) {
+      var val = (s.content && s.content[f.key]) ? s.content[f.key] : ''
+      var id = 'f_' + idx + '_' + f.key
+
+      if (f.type === 'textarea') {
+        return '<div class="field"><label>' + f.label + '</label><textarea id="' + id + '" placeholder="' + (f.placeholder||'') + '" onchange="updateField(' + idx + ',\'' + f.key + '\',this.value)" oninput="updateField(' + idx + ',\'' + f.key + '\',this.value)">' + escHtml(val) + '</textarea></div>'
+      }
+      if (f.type === 'select') {
+        var opts = (f.options||[]).map(function(o) { return '<option value="' + o + '"' + (val===o?' selected':'') + '>' + o + '</option>' }).join('')
+        return '<div class="field"><label>' + f.label + '</label><select id="' + id + '" onchange="updateField(' + idx + ',\'' + f.key + '\',this.value)">' + opts + '</select></div>'
+      }
+      return '<div class="field"><label>' + f.label + '</label><input type="text" id="' + id + '" value="' + escHtml(val) + '" placeholder="' + (f.placeholder||'') + '" onchange="updateField(' + idx + ',\'' + f.key + '\',this.value)" oninput="updateField(' + idx + ',\'' + f.key + '\',this.value)" /></div>'
+    }).join('')
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+  }
+
+  function updateField(idx, key, value) {
+    if (!sections[idx].content) sections[idx].content = {}
+    sections[idx].content[key] = value
+    renderPreview()
+  }
+
+  function renderPreview() {
+    var frame = document.getElementById('previewFrame')
+    if (sections.length === 0) { frame.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-style:italic;font-size:0.82rem;">Niciun bloc</div>'; return }
+    frame.innerHTML = sections.map(function(s, i) {
+      var bt = BLOCK_TYPES.find(function(b) { return b.type === s.type }) || { icon:'?', label:s.type }
+      var t = s.content && s.content.titlu ? s.content.titlu : (s.content && s.content.continut ? s.content.continut.substring(0,35)+'...' : '')
+      return '<div class="preview-block" style="' + (s.vizibil===false?'opacity:0.4':'') + '">' +
+        '<div class="pb-type">' + bt.icon + ' ' + bt.label + '</div>' +
+        '<div class="pb-title">' + (t || '(fără titlu)') + '</div>' +
+      '</div>'
+    }).join('')
+  }
+
+  // ACTIONS
+  function addBlock(type) {
+    var bt = BLOCK_TYPES.find(function(b) { return b.type === type })
+    var content = {}
+    if (bt && bt.fields) bt.fields.forEach(function(f) { content[f.key] = f.placeholder || '' })
+    // Clear placeholder values
+    Object.keys(content).forEach(function(k) { content[k] = '' })
+    sections.push({ type:type, content:content, vizibil:true, page_id:pageId, ordine:sections.length })
+    renderCanvas()
+    // Scroll to bottom
+    setTimeout(function() {
+      var cw = document.querySelector('.canvas-wrap')
+      cw.scrollTop = cw.scrollHeight
+    }, 100)
+  }
+
+  function deleteSection(idx) {
+    if (!confirm('Ștergi acest bloc?')) return
+    sections.splice(idx, 1)
+    renderCanvas()
+  }
+
+  function toggleVis(idx) {
+    sections[idx].vizibil = sections[idx].vizibil === false ? true : false
+    renderCanvas()
+  }
+
+  function moveUp(idx) {
+    if (idx === 0) return
+    var tmp = sections[idx]; sections[idx] = sections[idx-1]; sections[idx-1] = tmp
+    renderCanvas()
+  }
+
+  function moveDown(idx) {
+    if (idx >= sections.length-1) return
+    var tmp = sections[idx]; sections[idx] = sections[idx+1]; sections[idx+1] = tmp
+    renderCanvas()
+  }
+
+  // TOAST
+  function toast(msg, type) {
+    var t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast show ' + (type||'')
+    setTimeout(function() { t.className = 'toast' }, 3500)
+  }
+
+  // KEYBOARD SHORTCUT
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); salveaza() }
+  })
+
+  checkAuth()
+</script>
+</body>
+</html>

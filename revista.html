@@ -4,727 +4,179 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revista Dokimasia</title>
-      <link rel="preconnect" href="https://fonts.googleapis.com">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --crimson: #8B0000;
-      --crimson-dark: #5a0000;
-      --crimson-light: #c0392b;
-      --ink: #1a1108;
-      --paper: #faf8f4;
-      --paper-dark: #f0ece4;
-      --gold: #b8963e;
-      --gold-light: #d4af6a;
-      --muted: #7a7060;
-      --border: #ddd8cc;
+      --crimson: #8B0000; --crimson-dark: #5a0000;
+      --gold: #b8963e; --gold-light: #d4af6a;
+      --ink: #1a1108; --paper: #faf8f4; --paper-dark: #f0ece4;
+      --muted: #7a7060; --border: #ddd8cc;
     }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Source Serif 4',Georgia,serif; background:var(--paper); color:var(--ink); }
+    a { text-decoration:none; color:inherit; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    header { background:#fff; border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .header-top { display:grid; grid-template-columns:auto 1fr auto; align-items:center; padding:12px 40px; gap:16px; }
+    .header-logo img { height:80px; width:auto; display:block; }
+    .header-center { text-align:center; }
+    .header-title { display:block; font-family:'Playfair Display',serif; font-size:clamp(1rem,3vw,2rem); font-weight:900; color:var(--crimson); text-transform:uppercase; letter-spacing:3px; }
+    .header-motto { display:block; font-size:clamp(0.65rem,1.5vw,0.9rem); color:var(--crimson); letter-spacing:2px; margin-top:4px; font-style:italic; }
+    .header-right { display:flex; align-items:center; gap:12px; justify-content:flex-end; }
+    .social-icons { display:flex; align-items:center; gap:10px; }
+    .social-icons a { display:flex; align-items:center; transition:opacity 0.2s; cursor:pointer; }
+    .social-icons a:hover { opacity:0.7; }
+    .social-icons svg { width:24px; height:24px; }
+    .btn-account { display:flex; align-items:center; gap:6px; background:var(--crimson); color:#fff; padding:8px 16px; border-radius:4px; font-size:0.83rem; font-family:'Source Serif 4',serif; cursor:pointer; border:none; transition:background 0.2s; white-space:nowrap; }
+    .btn-account:hover { background:var(--crimson-dark); }
+    .account-wrapper { position:relative; }
+    .account-dropdown { display:none; position:absolute; top:110%; right:0; background:#fff; border:1px solid var(--border); border-radius:6px; box-shadow:0 4px 20px rgba(0,0,0,0.12); min-width:190px; z-index:200; padding:6px 0; }
+    .account-dropdown.open { display:block; }
+    .account-dropdown a { display:block; padding:10px 18px; font-size:0.88rem; color:#444; transition:background 0.15s; }
+    .account-dropdown a:hover { background:var(--paper); color:var(--crimson); }
+    nav.main-nav { background:var(--crimson); display:flex; width:100%; }
+    nav.main-nav a { flex:1; color:#fff; font-size:0.85rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; text-align:center; padding:13px 0; transition:background 0.2s; border-right:1px solid rgba(255,255,255,0.25); font-family:'Source Serif 4',serif; }
+    nav.main-nav a:last-child { border-right:none; }
+    nav.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); }
 
-    body {
-      font-family: 'Source Serif 4', Georgia, serif;
-      background: var(--paper);
-      color: var(--ink);
-    }
-
-    a { text-decoration: none; color: inherit; }
-
-    /* ── HEADER ── */
-    header {
-      background: #fff;
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .header-top {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      align-items: center;
-      padding: 12px 40px;
-      gap: 16px;
-    }
-
-    .header-logo img { height: 80px; width: auto; display: block; }
-    .header-center { text-align: center; }
-    .header-title {
-      display: block;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1rem, 3vw, 2rem);
-      font-weight: 900;
-      color: var(--crimson);
-      text-transform: uppercase;
-      letter-spacing: 3px;
-    }
-    .header-motto {
-      display: block;
-      font-size: clamp(0.65rem, 1.5vw, 0.9rem);
-      color: var(--crimson);
-      letter-spacing: 2px;
-      margin-top: 4px;
-      font-style: italic;
-    }
-
-    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
-    .social-icons { display: flex; align-items: center; gap: 10px; }
-    .social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
-    .social-icons a:hover { opacity: 0.7; }
-    .social-icons svg { width: 24px; height: 24px; }
-
-    .btn-account {
-      display: flex; align-items: center; gap: 6px;
-      background: var(--crimson); color: #fff;
-      padding: 8px 16px; border-radius: 4px;
-      font-size: 0.83rem; font-family: 'Source Serif 4', serif;
-      cursor: pointer; border: none; transition: background 0.2s;
-      white-space: nowrap;
-    }
-    .btn-account:hover { background: var(--crimson-dark); }
-    .account-wrapper { position: relative; }
-    .account-dropdown {
-      display: none; position: absolute; top: 110%; right: 0;
-      background: #fff; border: 1px solid var(--border);
-      border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      min-width: 190px; z-index: 200; padding: 6px 0;
-    }
-    .account-dropdown.open { display: block; }
-    .account-dropdown a {
-      display: block; padding: 10px 18px;
-      font-size: 0.88rem; color: #444; transition: background 0.15s;
-    }
-    .account-dropdown a:hover { background: var(--paper); color: var(--crimson); }
-
-    nav.main-nav {
-      background: var(--crimson);
-      display: flex; width: 100%;
-    }
-    nav.main-nav a {
-      flex: 1; color: #fff; font-size: 0.85rem;
-      font-weight: 600; letter-spacing: 1.5px;
-      text-transform: uppercase; text-align: center;
-      padding: 13px 0; transition: background 0.2s;
-      border-right: 1px solid rgba(255,255,255,0.25);
-      font-family: 'Source Serif 4', serif;
-    }
-    nav.main-nav a:last-child { border-right: none; }
-    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
-
-    /* ── HERO REVISTĂ ── */
+    /* HERO — compact */
     .revista-hero {
-      background: var(--crimson);
+      background:var(--crimson);
       background-image:
-        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px),
-        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.04) 39px, rgba(255,255,255,0.04) 40px);
-      padding: 56px 40px 48px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
+        repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px),
+        repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px);
+      padding:24px 40px 20px;
+      text-align:center;
     }
-    .revista-hero::before {
-      content: '';
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-      width: 1px; height: 100%;
-      background: rgba(255,255,255,0.12);
-    }
-    .revista-hero-label {
-      display: inline-block;
-      font-family: 'Source Serif 4', serif;
-      font-size: 0.75rem; letter-spacing: 4px;
-      text-transform: uppercase; color: var(--gold-light);
-      margin-bottom: 16px;
-    }
-    .revista-hero h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2.2rem, 5vw, 3.8rem);
-      font-weight: 900;
-      color: #fff;
-      line-height: 1.1;
-      margin-bottom: 16px;
-    }
-    .revista-hero p {
-      font-size: 1rem;
-      color: rgba(255,255,255,0.75);
-      font-style: italic;
-      max-width: 520px;
-      margin: 0 auto;
-      line-height: 1.7;
-    }
-    .hero-ornament {
-      color: var(--gold-light);
-      font-size: 1.4rem;
-      margin: 20px 0 0;
-      letter-spacing: 8px;
-      opacity: 0.6;
-    }
+    .revista-hero-label { display:inline-block; font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold-light); margin-bottom:8px; }
+    .revista-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,3.5vw,2.5rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:8px; }
+    .revista-hero p { font-size:0.88rem; color:rgba(255,255,255,0.7); font-style:italic; max-width:460px; margin:0 auto; line-height:1.6; }
+    .hero-ornament { color:var(--gold-light); font-size:0.9rem; margin:10px 0 0; letter-spacing:8px; opacity:0.6; }
 
-    /* ── LISTA EDIȚII ── */
-    .revista-wrap { max-width: 1200px; margin: 0 auto; padding: 56px 24px; }
+    /* ADMIN BAR */
+    .admin-bar { display:none; background:#111; color:#fff; padding:9px 24px; align-items:center; justify-content:space-between; font-size:0.82rem; }
+    .admin-bar.visible { display:flex; }
+    .btn-edit-page { display:inline-flex; align-items:center; gap:6px; background:var(--gold); color:#fff; padding:6px 14px; border-radius:3px; font-size:0.8rem; font-family:'Source Serif 4',serif; border:none; cursor:pointer; text-decoration:none; }
+    .btn-edit-page:hover { background:var(--gold-light); }
 
-    .section-header {
-      display: flex; align-items: baseline;
-      justify-content: space-between;
-      margin-bottom: 36px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--crimson);
-      position: relative;
-    }
-    .section-header::after {
-      content: '';
-      position: absolute; bottom: -6px; left: 0;
-      width: 60px; height: 2px;
-      background: var(--gold);
-    }
-    .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem; font-weight: 700;
-      color: var(--ink);
-      letter-spacing: 1px;
-    }
-    .section-count {
-      font-size: 0.8rem; color: var(--muted);
-      letter-spacing: 1px; text-transform: uppercase;
-    }
+    /* FEATURED */
+    .featured-wrap { max-width:1100px; margin:44px auto 0; padding:0 24px; }
+    .section-label { font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--crimson); font-weight:600; margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
 
-    .editii-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 32px;
-    }
+    .featured-card { display:grid; grid-template-columns:260px 1fr; background:#fff; border:1px solid var(--border); box-shadow:0 4px 24px rgba(0,0,0,0.08); overflow:hidden; }
+    .featured-coperta { height:360px; overflow:hidden; background:var(--crimson); }
+    .featured-coperta img { width:100%; height:100%; object-fit:cover; }
+    .featured-placeholder { width:100%; height:100%; background:linear-gradient(160deg,var(--crimson),var(--crimson-dark)); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:12px; padding:28px; }
+    .featured-placeholder .fp-nr { font-size:0.68rem; letter-spacing:4px; text-transform:uppercase; opacity:0.6; }
+    .featured-placeholder .fp-titlu { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; text-align:center; line-height:1.4; }
+    .featured-placeholder .fp-orn { color:var(--gold-light); letter-spacing:6px; opacity:0.7; }
 
-    .editie-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      cursor: pointer;
-      display: flex; flex-direction: column;
-    }
-    .editie-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(139,0,0,0.12);
-    }
+    .featured-info { padding:36px 44px; display:flex; flex-direction:column; justify-content:center; }
+    .featured-badge { display:inline-block; background:var(--gold); color:#fff; font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; padding:4px 10px; border-radius:2px; margin-bottom:14px; align-self:flex-start; }
+    .featured-nr { font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--crimson); font-weight:600; margin-bottom:10px; }
+    .featured-titlu { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2.2rem); font-weight:900; color:var(--ink); line-height:1.25; margin-bottom:10px; }
+    .featured-data { font-size:0.8rem; color:var(--muted); font-style:italic; margin-bottom:16px; }
+    .featured-desc { font-size:0.92rem; line-height:1.75; color:#444; margin-bottom:28px; flex:1; }
+    .featured-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    .btn-featured { display:inline-flex; align-items:center; gap:8px; background:var(--crimson); color:#fff; padding:11px 26px; border-radius:3px; font-size:0.88rem; font-family:'Source Serif 4',serif; transition:background 0.2s; font-weight:600; }
+    .btn-featured:hover { background:var(--crimson-dark); }
+    .feat-art-count { font-size:0.76rem; color:var(--muted); }
 
-    .coperta-wrap {
-      position: relative;
-      height: 240px;
-      overflow: hidden;
-      background: var(--crimson);
-    }
-    .coperta-wrap img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-    .editie-card:hover .coperta-wrap img { transform: scale(1.04); }
+    /* GRILA */
+    .revista-wrap { max-width:1200px; margin:44px auto 0; padding:0 24px 56px; }
+    .section-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:32px; padding-bottom:14px; border-bottom:2px solid var(--crimson); position:relative; }
+    .section-header::after { content:''; position:absolute; bottom:-6px; left:0; width:56px; height:2px; background:var(--gold); }
+    .section-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--ink); }
+    .section-count { font-size:0.78rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+    .editii-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:26px; }
 
-    .coperta-placeholder {
-      width: 100%; height: 100%;
-      background: linear-gradient(160deg, var(--crimson) 0%, var(--crimson-dark) 100%);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      color: #fff; gap: 12px;
-      padding: 24px;
-    }
-    .coperta-placeholder .nr {
-      font-family: 'Playfair Display', serif;
-      font-size: 0.75rem; letter-spacing: 4px;
-      text-transform: uppercase; opacity: 0.6;
-    }
-    .coperta-placeholder .titlu-cop {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem; font-weight: 700;
-      text-align: center; line-height: 1.4;
-    }
-    .coperta-placeholder .ornament {
-      color: var(--gold-light); font-size: 1rem;
-      letter-spacing: 6px; opacity: 0.7;
-    }
+    .editie-card { background:#fff; border:1px solid var(--border); border-radius:2px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.05); transition:transform 0.25s,box-shadow 0.25s; cursor:pointer; display:flex; flex-direction:column; }
+    .editie-card:hover { transform:translateY(-5px); box-shadow:0 10px 28px rgba(139,0,0,0.1); }
+    .coperta-wrap { position:relative; height:210px; overflow:hidden; background:var(--crimson); }
+    .coperta-wrap img { width:100%; height:100%; object-fit:cover; transition:transform 0.4s; }
+    .editie-card:hover .coperta-wrap img { transform:scale(1.04); }
+    .coperta-placeholder { width:100%; height:100%; background:linear-gradient(160deg,var(--crimson),var(--crimson-dark)); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:10px; padding:20px; }
+    .coperta-placeholder .nr { font-size:0.68rem; letter-spacing:4px; text-transform:uppercase; opacity:0.6; }
+    .coperta-placeholder .titlu-cop { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; text-align:center; line-height:1.4; }
+    .coperta-placeholder .ornament { color:var(--gold-light); font-size:0.85rem; letter-spacing:6px; opacity:0.7; }
+    .editie-badge-wrap { position:absolute; top:10px; right:10px; }
+    .editie-badge { display:inline-block; background:var(--gold); color:#fff; font-size:0.63rem; letter-spacing:1.5px; text-transform:uppercase; padding:3px 8px; border-radius:2px; }
+    .editie-info { padding:18px 18px 14px; flex:1; display:flex; flex-direction:column; }
+    .editie-numar { font-size:0.68rem; letter-spacing:3px; text-transform:uppercase; color:var(--crimson); margin-bottom:6px; font-weight:600; }
+    .editie-titlu { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--ink); line-height:1.4; margin-bottom:4px; }
+    .editie-data { font-size:0.74rem; color:var(--muted); margin-bottom:8px; font-style:italic; }
+    .editie-desc { font-size:0.82rem; color:#555; line-height:1.6; flex:1; }
+    .editie-footer { display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--paper-dark); }
+    .editie-art-count { font-size:0.71rem; color:var(--muted); }
+    .btn-explore { display:inline-flex; align-items:center; gap:5px; background:var(--crimson); color:#fff; padding:6px 13px; border-radius:3px; font-size:0.76rem; font-family:'Source Serif 4',serif; transition:background 0.2s; }
+    .btn-explore:hover { background:var(--crimson-dark); }
 
-    .editie-badge-wrap {
-      position: absolute; top: 12px; right: 12px;
-    }
-    .editie-badge {
-      display: inline-block;
-      background: var(--gold);
-      color: #fff;
-      font-size: 0.68rem; letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border-radius: 2px;
-      font-family: 'Source Serif 4', serif;
-    }
+    /* NEWSLETTER */
+    .newsletter { background:#5a0000; padding:38px 20px; text-align:center; }
+    .newsletter h3 { font-family:'Playfair Display',serif; font-size:1.2rem; color:#fff; margin-bottom:6px; }
+    .newsletter p { color:rgba(255,255,255,0.7); font-size:0.86rem; margin-bottom:16px; font-style:italic; }
+    .newsletter-form { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+    .newsletter-form input { padding:10px 14px; border-radius:3px; border:none; font-family:'Source Serif 4',serif; font-size:0.88rem; }
+    .newsletter-form input:first-child { width:145px; }
+    .newsletter-form input:nth-child(2) { width:205px; }
+    .newsletter-form button { padding:10px 18px; background:var(--gold); color:#fff; border:none; border-radius:3px; font-family:'Source Serif 4',serif; font-size:0.88rem; font-weight:600; cursor:pointer; }
+    #subMsg { color:rgba(255,255,255,0.85); font-size:0.8rem; margin-top:10px; min-height:16px; }
 
-    .editie-info {
-      padding: 24px 24px 20px;
-      flex: 1; display: flex; flex-direction: column;
-    }
-    .editie-numar {
-      font-size: 0.72rem; letter-spacing: 3px;
-      text-transform: uppercase; color: var(--crimson);
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    .editie-titlu {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem; font-weight: 700;
-      color: var(--ink); line-height: 1.4;
-      margin-bottom: 6px;
-    }
-    .editie-data {
-      font-size: 0.78rem; color: var(--muted);
-      margin-bottom: 12px;
-      font-style: italic;
-    }
-    .editie-desc {
-      font-size: 0.87rem; color: #555;
-      line-height: 1.65; flex: 1;
-    }
-    .editie-footer {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-top: 18px; padding-top: 14px;
-      border-top: 1px solid var(--paper-dark);
-    }
-    .editie-art-count {
-      font-size: 0.75rem; color: var(--muted);
-      letter-spacing: 1px;
-    }
-    .btn-explore {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--crimson); color: #fff;
-      padding: 8px 16px; border-radius: 3px;
-      font-size: 0.8rem; font-family: 'Source Serif 4', serif;
-      transition: background 0.2s;
-      letter-spacing: 0.5px;
-    }
-    .btn-explore:hover { background: var(--crimson-dark); }
-    .btn-explore .arrow { transition: transform 0.2s; }
-    .editie-card:hover .btn-explore .arrow { transform: translateX(3px); }
+    footer { background:var(--crimson); color:#fff; text-align:center; padding:26px 20px; font-size:0.84rem; }
+    footer a { color:rgba(255,255,255,0.7); }
+    footer a:hover { color:#fff; }
 
-    /* ── DETALIU EDIȚIE ── */
-    .editie-detail {
-      display: none;
-      max-width: 1100px; margin: 0 auto;
-      padding: 40px 24px;
-      animation: fadeUp 0.3s ease;
-    }
-    .editie-detail.open { display: block; }
+    .loading { text-align:center; padding:50px 20px; color:var(--muted); font-style:italic; }
+    .empty-state { text-align:center; padding:50px 20px; color:var(--muted); }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    /* MODAL CSS */
+    .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:8px; padding:40px; width:100%; max-width:400px; margin:20px; position:relative; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
+    .modal h2 { color:var(--crimson); font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:24px; text-align:center; }
+    .modal-close { position:absolute; top:16px; right:20px; font-size:1.5rem; cursor:pointer; color:#999; background:none; border:none; }
+    .modal-tabs { display:flex; margin-bottom:24px; border-bottom:2px solid #e0e0e0; }
+    .modal-tab { flex:1; text-align:center; padding:10px; cursor:pointer; font-size:0.9rem; color:#999; border-bottom:3px solid transparent; margin-bottom:-2px; }
+    .modal-tab.active { color:var(--crimson); border-bottom-color:var(--crimson); font-weight:bold; }
+    .modal-msg { text-align:center; font-size:0.85rem; margin-top:12px; color:var(--crimson); }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:0.82rem; color:#555; margin-bottom:6px; }
+    .form-group input { width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:4px; font-size:0.95rem; font-family:'Source Serif 4',serif; outline:none; }
+    .form-group input:focus { border-color:var(--crimson); }
+    .btn-primary { background:var(--crimson); color:#fff; padding:12px 30px; border-radius:4px; font-size:0.95rem; font-family:'Source Serif 4',serif; border:none; cursor:pointer; width:100%; margin-top:8px; }
+    .btn-primary:hover { background:var(--crimson-dark); }
+    .contact-modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+    .contact-modal-overlay.open { display:flex; }
 
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--crimson); font-size: 0.85rem;
-      cursor: pointer; margin-bottom: 32px;
-      border: none; background: none;
-      font-family: 'Source Serif 4', serif;
-      transition: gap 0.2s;
-    }
-    .back-btn:hover { gap: 12px; }
-
-    .editie-masthead {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 40px;
-      align-items: start;
-      padding: 32px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--crimson);
-      margin-bottom: 40px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .editie-masthead img {
-      width: 200px; height: 270px;
-      object-fit: cover; border-radius: 2px;
-      box-shadow: 4px 4px 20px rgba(0,0,0,0.18);
-    }
-    .masthead-placeholder {
-      width: 200px; height: 270px;
-      background: linear-gradient(160deg, var(--crimson), var(--crimson-dark));
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      color: #fff; gap: 10px; padding: 20px;
-      border-radius: 2px;
-      box-shadow: 4px 4px 20px rgba(0,0,0,0.18);
-    }
-    .masthead-info { padding: 8px 0; }
-    .masthead-numar {
-      font-size: 0.72rem; letter-spacing: 4px;
-      text-transform: uppercase; color: var(--crimson);
-      margin-bottom: 12px; font-weight: 600;
-    }
-    .masthead-titlu {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem; font-weight: 900;
-      color: var(--ink); line-height: 1.2;
-      margin-bottom: 8px;
-    }
-    .masthead-data {
-      font-size: 0.85rem; color: var(--muted);
-      font-style: italic; margin-bottom: 16px;
-    }
-    .masthead-descriere {
-      font-size: 0.95rem; line-height: 1.75;
-      color: #444; margin-bottom: 20px;
-    }
-    .masthead-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn-pdf {
-      display: inline-flex; align-items: center; gap: 6px;
-      border: 1.5px solid var(--crimson); color: var(--crimson);
-      padding: 8px 16px; border-radius: 3px;
-      font-size: 0.82rem; font-family: 'Source Serif 4', serif;
-      transition: all 0.2s;
-    }
-    .btn-pdf:hover { background: var(--crimson); color: #fff; }
-
-    /* Cuprins */
-    .cuprins-header {
-      display: flex; align-items: center; gap: 16px;
-      margin-bottom: 24px;
-    }
-    .cuprins-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem; font-weight: 700; color: var(--ink);
-    }
-    .cuprins-line {
-      flex: 1; height: 1px; background: var(--border);
-    }
-
-    .articol-row {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 2px;
-      padding: 22px 24px;
-      margin-bottom: 12px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      position: relative;
-    }
-    .articol-row:hover {
-      border-color: #c8b8b8;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
-    .articol-row::before {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: transparent;
-      transition: background 0.2s;
-      border-radius: 2px 0 0 2px;
-    }
-    .articol-row:hover::before { background: var(--crimson); }
-
-    .articol-top { display: flex; align-items: flex-start; gap: 14px; }
-    .articol-rubrica {
-      flex-shrink: 0;
-      background: var(--paper-dark);
-      color: var(--crimson);
-      font-size: 0.68rem; padding: 4px 10px;
-      border-radius: 2px; letter-spacing: 1.5px;
-      text-transform: uppercase; font-weight: 600;
-      margin-top: 3px;
-    }
-    .articol-main { flex: 1; }
-    .articol-titlu {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem; font-weight: 700;
-      color: var(--ink); line-height: 1.4;
-      margin-bottom: 4px;
-    }
-    .articol-autor {
-      font-size: 0.8rem; color: var(--muted);
-      font-style: italic;
-    }
-    .articol-rezumat {
-      font-size: 0.87rem; color: #555;
-      line-height: 1.65; margin-top: 10px;
-    }
-    .articol-actions {
-      display: flex; align-items: center;
-      gap: 10px; margin-top: 14px; flex-wrap: wrap;
-    }
-    .badge-acces {
-      font-size: 0.7rem; padding: 3px 10px;
-      border-radius: 2px; letter-spacing: 1px;
-      text-transform: uppercase; font-weight: 600;
-    }
-    .badge-gratuit { background: #e8f5e9; color: #2e7d32; }
-    .badge-cont { background: #fff3e0; color: #e65100; }
-
-    .btn-citeste {
-      background: var(--crimson); color: #fff;
-      padding: 7px 16px; border-radius: 3px;
-      font-size: 0.8rem; border: none; cursor: pointer;
-      font-family: 'Source Serif 4', serif;
-      transition: background 0.2s; letter-spacing: 0.5px;
-    }
-    .btn-citeste:hover { background: var(--crimson-dark); }
-    .btn-citeste.locked {
-      background: #aaa; cursor: default;
-    }
-    .btn-citeste.locked:hover { background: #999; }
-
-    .btn-pdf-art {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 0.78rem; color: var(--crimson);
-      border: 1px solid #dcc;
-      padding: 6px 12px; border-radius: 3px;
-      transition: background 0.2s;
-    }
-    .btn-pdf-art:hover { background: var(--paper); }
-
-    /* ── MODAL ARTICOL ── */
-    .articol-modal {
-      display: none; position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(20,10,5,0.65);
-      z-index: 2000; justify-content: center;
-      align-items: flex-start; overflow-y: auto; padding: 32px 16px;
-    }
-    .articol-modal.open { display: flex; }
-    .articol-modal-inner {
-      background: var(--paper);
-      border-radius: 2px;
-      width: 100%; max-width: 780px;
-      margin: auto; padding: 56px 60px;
-      position: relative;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.25);
-      animation: fadeUp 0.3s ease;
-    }
-    .articol-modal-close {
-      position: absolute; top: 20px; right: 24px;
-      font-size: 1.6rem; cursor: pointer; color: var(--muted);
-      background: none; border: none; line-height: 1;
-      transition: color 0.2s;
-    }
-    .articol-modal-close:hover { color: var(--crimson); }
-    .modal-rubrica {
-      font-size: 0.72rem; letter-spacing: 3px;
-      text-transform: uppercase; color: var(--crimson);
-      margin-bottom: 12px; font-weight: 600;
-    }
-    .modal-titlu {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem; font-weight: 900;
-      color: var(--ink); line-height: 1.25;
-      margin-bottom: 10px;
-    }
-    .modal-meta {
-      font-size: 0.82rem; color: var(--muted);
-      font-style: italic; margin-bottom: 24px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-    .modal-rezumat {
-      font-size: 1.05rem; line-height: 1.75;
-      color: #444; font-style: italic;
-      border-left: 3px solid var(--crimson);
-      padding-left: 20px; margin-bottom: 28px;
-    }
-    .modal-continut {
-      font-size: 0.97rem; line-height: 1.9;
-      color: #333; white-space: pre-wrap;
-    }
-    .modal-continut p { margin-bottom: 16px; }
-    .modal-bio {
-      margin-top: 36px; padding: 20px 24px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--gold);
-      border-radius: 2px;
-    }
-    .modal-bio strong {
-      font-family: 'Playfair Display', serif;
-      color: var(--crimson); font-size: 0.85rem;
-      letter-spacing: 1px; display: block;
-      margin-bottom: 8px;
-    }
-    .modal-bio p { font-size: 0.88rem; color: #555; line-height: 1.65; }
-
-    /* ── MODAL LOGIN ── */
-    .modal-overlay {
-      display: none; position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 3000; justify-content: center; align-items: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: #fff; border-radius: 4px;
-      padding: 40px; width: 100%; max-width: 400px;
-      margin: 20px; position: relative;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
-    }
-    .modal h2 {
-      font-family: 'Playfair Display', serif;
-      color: var(--crimson); font-size: 1.5rem;
-      margin-bottom: 24px; text-align: center;
-    }
-    .modal-close {
-      position: absolute; top: 16px; right: 20px;
-      font-size: 1.5rem; cursor: pointer;
-      color: #999; background: none; border: none;
-    }
-    .modal-close:hover { color: var(--crimson); }
-    .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e0e0e0; }
-    .modal-tab {
-      flex: 1; text-align: center; padding: 10px;
-      cursor: pointer; font-size: 0.9rem; color: #999;
-      border-bottom: 3px solid transparent; margin-bottom: -2px;
-    }
-    .modal-tab.active { color: var(--crimson); border-bottom-color: var(--crimson); font-weight: bold; }
-    .modal-msg { text-align: center; font-size: 0.85rem; margin-top: 12px; color: var(--crimson); }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 0.82rem; color: #555; margin-bottom: 6px; }
-    .form-group input {
-      width: 100%; padding: 10px 14px;
-      border: 1px solid #ddd; border-radius: 3px;
-      font-size: 0.95rem; font-family: 'Source Serif 4', serif;
-      outline: none; transition: border 0.2s;
-    }
-    .form-group input:focus { border-color: var(--crimson); }
-    .btn-primary {
-      background: var(--crimson); color: #fff;
-      padding: 12px 30px; border-radius: 3px;
-      font-size: 0.95rem; font-family: 'Source Serif 4', serif;
-      border: none; cursor: pointer; width: 100%; margin-top: 8px;
-      transition: background 0.2s;
-    }
-    .btn-primary:hover { background: var(--crimson-dark); }
-
-    /* ── MODAL CONTACT ── */
-    .contact-modal-overlay {
-      display: none; position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 3000; justify-content: center; align-items: center;
-    }
-    .contact-modal-overlay.open { display: flex; }
-    .contact-modal {
-      background: #fff; border-radius: 4px;
-      padding: 40px; width: 100%; max-width: 480px;
-      margin: 20px; position: relative;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
-    }
-    .contact-modal h2 {
-      font-family: 'Playfair Display', serif;
-      color: var(--crimson); font-size: 1.4rem;
-      margin-bottom: 24px; text-align: center;
-    }
-    .form-group textarea {
-      width: 100%; padding: 10px 14px;
-      border: 1px solid #ddd; border-radius: 3px;
-      font-size: 0.92rem; font-family: 'Source Serif 4', serif;
-      outline: none; resize: vertical; min-height: 100px;
-      transition: border 0.2s;
-    }
-    .form-group textarea:focus { border-color: var(--crimson); }
-
-    /* ── NEWSLETTER ── */
-    .newsletter {
-      background: var(--crimson-dark);
-      background-image: repeating-linear-gradient(
-        45deg, transparent, transparent 20px,
-        rgba(255,255,255,0.02) 20px, rgba(255,255,255,0.02) 21px
-      );
-      padding: 48px 20px; text-align: center;
-    }
-    .newsletter h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem; color: #fff;
-      margin-bottom: 8px;
-    }
-    .newsletter p { color: rgba(255,255,255,0.7); font-size: 0.88rem; margin-bottom: 20px; font-style: italic; }
-    .newsletter-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-    .newsletter-form input {
-      padding: 11px 16px; border-radius: 3px; border: none;
-      font-family: 'Source Serif 4', serif; font-size: 0.9rem;
-    }
-    .newsletter-form input:first-child { width: 160px; }
-    .newsletter-form input:nth-child(2) { width: 220px; }
-    .newsletter-form button {
-      padding: 11px 22px;
-      background: var(--gold); color: #fff;
-      border: none; border-radius: 3px;
-      font-family: 'Source Serif 4', serif;
-      font-size: 0.9rem; font-weight: 600;
-      cursor: pointer; transition: background 0.2s;
-      letter-spacing: 0.5px;
-    }
-    .newsletter-form button:hover { background: var(--gold-light); }
-    #subMsg { color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-top: 10px; min-height: 16px; }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--crimson);
-      color: #fff; text-align: center;
-      padding: 32px 20px; font-size: 0.85rem;
-    }
-    footer a { color: rgba(255,255,255,0.7); }
-    footer a:hover { color: #fff; }
-
-    /* ── LOADING / EMPTY ── */
-    .loading {
-      text-align: center; padding: 80px 20px;
-      color: var(--muted); font-style: italic; font-size: 1rem;
-    }
-    .loading::after {
-      content: '';
-      display: inline-block; width: 20px; height: 20px;
-      border: 2px solid var(--border);
-      border-top-color: var(--crimson);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-left: 10px; vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .empty-state {
-      text-align: center; padding: 80px 20px;
-      color: var(--muted);
-    }
-    .empty-state .icon { font-size: 3rem; margin-bottom: 16px; }
-    .empty-state p { font-style: italic; }
-
-    /* ── MOBILE HEADER ── */
-    .mobile-header { display: none; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      .header-top { display: none; }
-      nav.main-nav { display: none !important; }
-      .mobile-header {
-        display: block; background: #fff;
-        border-bottom: 1px solid var(--border);
-        box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-      }
-      .mob-row1 { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; }
-      .mob-logo img { height: 50px; }
-      .mob-row2 { text-align: center; padding: 6px 16px 2px; }
-      .mob-title { display: block; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 900; color: var(--crimson); text-transform: uppercase; letter-spacing: 2px; }
-      .mob-motto { display: block; font-size: 0.68rem; color: var(--crimson); letter-spacing: 1px; margin-top: 2px; font-style: italic; }
-      .mob-row4 { display: flex; justify-content: center; padding: 6px 16px 10px; border-top: 1px solid var(--paper-dark); }
-      .mob-hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 6px; }
-      .mob-hamburger span { display: block; width: 28px; height: 3px; background: var(--crimson); border-radius: 2px; }
-      .mob-nav { display: none; flex-direction: column; background: var(--crimson); }
-      .mob-nav.open { display: flex; }
-      .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.88rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
-
-      .revista-hero { padding: 36px 20px 28px; }
-      .revista-hero h1 { font-size: 2rem; }
-      .editii-grid { grid-template-columns: 1fr; }
-      .editie-masthead { grid-template-columns: 1fr; }
-      .editie-masthead img, .masthead-placeholder { width: 100%; height: 200px; }
-      .articol-modal-inner { padding: 32px 20px; }
-      .modal-titlu { font-size: 1.4rem; }
+    /* MOBILE */
+    .mobile-header { display:none; }
+    @media (max-width:768px) {
+      .header-top { display:none; }
+      nav.main-nav { display:none !important; }
+      .mobile-header { display:block; background:#fff; border-bottom:1px solid var(--border); }
+      .mob-row1 { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; }
+      .mob-logo img { height:50px; }
+      .mob-row2 { text-align:center; padding:6px 16px 2px; }
+      .mob-title { display:block; font-family:'Playfair Display',serif; font-size:1rem; font-weight:900; color:var(--crimson); text-transform:uppercase; letter-spacing:2px; }
+      .mob-motto { display:block; font-size:0.68rem; color:var(--crimson); letter-spacing:1px; margin-top:2px; font-style:italic; }
+      .mob-row4 { display:flex; justify-content:center; padding:6px 16px 10px; border-top:1px solid var(--paper-dark); }
+      .mob-hamburger { display:flex; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:6px; }
+      .mob-hamburger span { display:block; width:28px; height:3px; background:var(--crimson); border-radius:2px; }
+      .mob-nav { display:none; flex-direction:column; background:var(--crimson); }
+      .mob-nav.open { display:flex; }
+      .mob-nav a { color:#fff; text-align:center; padding:14px; font-size:0.88rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.2); }
+      .revista-hero { padding:18px 16px 14px; }
+      .featured-card { grid-template-columns:1fr; }
+      .featured-coperta { height:200px; }
+      .featured-info { padding:22px 18px; }
+      .featured-wrap, .revista-wrap { padding-left:14px; padding-right:14px; }
+      .editii-grid { grid-template-columns:1fr; }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="auth.js"></script>
 </head>
 <body>
 
@@ -739,7 +191,7 @@
     <div class="header-right">
       <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
         <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-        <button type="submit" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:8px 18px;font-size:0.85rem;font-family:'Source Serif 4',serif;cursor:pointer;font-weight:600;letter-spacing:0.5px;">Donează</button>
+        <button type="submit" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:8px 16px;font-size:0.84rem;font-family:'Source Serif 4',serif;cursor:pointer;font-weight:600;">Donează</button>
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
       <div class="social-icons">
@@ -762,7 +214,7 @@
           </div>
           <div id="loggedIn" style="display:none">
             <div id="adminBtn" style="display:none">
-              <a href="admin-revista.html" style="color:var(--crimson);font-weight:bold;">⚙ Admin Revistă</a>
+              <a href="admin.html" style="color:var(--crimson);font-weight:bold;">⚙ Admin</a>
             </div>
             <a href="cont.html">Profilul meu</a>
             <a href="#" onclick="logout()">Deconectare</a>
@@ -786,10 +238,6 @@
   <div class="mob-row1">
     <a href="index.html" class="mob-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
     <div style="display:flex;align-items:center;gap:8px;">
-      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
-        <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
-        <button type="submit" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:7px 12px;font-size:0.78rem;font-family:'Source Serif 4',serif;cursor:pointer;font-weight:600;">Donează</button>
-      </form>
       <button onclick="toggleAccount()" style="background:var(--crimson);color:#fff;border:none;border-radius:3px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:'Source Serif 4',serif;font-size:0.78rem;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         <span id="mobAccountLabel">Cont</span>
@@ -815,6 +263,12 @@
   </nav>
 </div>
 
+<!-- ADMIN BAR -->
+<div class="admin-bar" id="adminBar">
+  <span style="opacity:0.6;">✏️ Mod admin — Revista Dokimasia</span>
+  <a href="editor-pagina.html?page=revista" class="btn-edit-page">Editează pagina →</a>
+</div>
+
 <!-- HERO -->
 <div class="revista-hero">
   <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
@@ -823,32 +277,26 @@
   <div class="hero-ornament">— ✦ —</div>
 </div>
 
-<!-- LISTA EDIȚII -->
-<div class="revista-wrap" id="listaEditii">
-  <div class="section-header">
-    <span class="section-title">Edițiile revistei</span>
-    <span class="section-count" id="editiiCount"></span>
-  </div>
-  <div class="loading" id="loadingMsg">Se încarcă edițiile</div>
-  <div class="editii-grid" id="editiiGrid"></div>
+<!-- FEATURED -->
+<div class="featured-wrap">
+  <div class="section-label">Ultimul număr</div>
+  <div id="featuredSection"><div class="loading">Se încarcă...</div></div>
 </div>
 
-<!-- DETALIU EDIȚIE -->
-<div class="editie-detail" id="editieDetail">
-  <button class="back-btn" onclick="inapoiLaLista()">← Înapoi la toate edițiile</button>
-  <div class="editie-masthead" id="editieMasthead"></div>
-  <div class="cuprins-header">
-    <span class="cuprins-title">Cuprins</span>
-    <div class="cuprins-line"></div>
+<!-- GRILA -->
+<div class="revista-wrap">
+  <div class="section-header">
+    <span class="section-title">Toate edițiile</span>
+    <span class="section-count" id="editiiCount"></span>
   </div>
-  <div id="articoleList"><div class="loading">Se încarcă articolele</div></div>
+  <div id="editiiGrid"><div class="loading">Se încarcă edițiile...</div></div>
 </div>
 
 <!-- NEWSLETTER -->
 <div class="newsletter">
-  <div style="max-width:520px;margin:0 auto;">
+  <div style="max-width:500px;margin:0 auto;">
     <h3>Abonează-te la newsletter</h3>
-    <p>Fii primul care primește noile ediții și noutățile asociației.</p>
+    <p>Fii primul care primește noile ediții ale revistei.</p>
     <div class="newsletter-form">
       <input type="text" id="subNume" placeholder="Numele tău" />
       <input type="email" id="subEmail" placeholder="Email-ul tău" />
@@ -862,148 +310,95 @@
   <p>© <span id="year"></span> Asociația Dokimasia. Toate drepturile rezervate.</p>
   <p style="margin-top:8px;"><a href="#" onclick="openContactModal()">contact@dokimasia.ro</a></p>
 </footer>
+
 <script>
-
-  // currentUser vine din auth.js ca window.currentUser
-
-  async function loadEditii() {
-    const { data, error } = await sb.from('reviste').select('*').eq('status', 'publicat').order('data_aparitie', { ascending: false })
-    document.getElementById('loadingMsg').style.display = 'none'
-    if (error || !data || data.length === 0) {
-      document.getElementById('editiiGrid').innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
-          <div class="icon">📖</div>
-          <p>Nu există ediții publicate momentan. Reveniți curând!</p>
-        </div>`
-      return
-    }
-    document.getElementById('editiiCount').textContent = data.length + ' ediți' + (data.length === 1 ? 'e' : 'i')
-    document.getElementById('editiiGrid').innerHTML = data.map(e => `
-      <div class="editie-card" onclick="deschideEditie('${e.id}')">
-        <div class="coperta-wrap">
-          ${e.coperta_url
-            ? `<img src="${e.coperta_url}" alt="${e.titlu}" />`
-            : `<div class="coperta-placeholder">
-                <div class="nr">${e.editie}</div>
-                <div class="titlu-cop">${e.titlu}</div>
-                <div class="ornament">— ✦ —</div>
-              </div>`}
-          <div class="editie-badge-wrap"><span class="editie-badge">${e.editie}</span></div>
-        </div>
-        <div class="editie-info">
-          <div class="editie-numar">${e.editie}</div>
-          <div class="editie-titlu">${e.titlu}</div>
-          <div class="editie-data">${e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO', {year:'numeric', month:'long'}) : ''}</div>
-          ${e.descriere ? `<div class="editie-desc">${e.descriere.substring(0, 140)}${e.descriere.length > 140 ? '...' : ''}</div>` : ''}
-          <div class="editie-footer">
-            <span class="editie-art-count" id="count-${e.id}">Se încarcă...</span>
-            <span class="btn-explore">Citește ediția <span class="arrow">→</span></span>
-          </div>
-        </div>
-      </div>
-    `).join('')
-    for (const e of data) {
-      const { count } = await sb.from('articole_revista').select('*', { count: 'exact', head: true }).eq('revista_id', e.id).eq('status', 'publicat')
-      const el = document.getElementById('count-' + e.id)
-      if (el) el.textContent = (count || 0) + ' articol' + (count === 1 ? '' : 'e')
+  window.onUserLoaded = function(user) {
+    if (user && user.email === 'm.ciprian1387@gmail.com') {
+      document.getElementById('adminBar').classList.add('visible')
     }
   }
 
-  async function deschideEditie(revistaId) {
-    document.getElementById('listaEditii').style.display = 'none'
-    const detail = document.getElementById('editieDetail')
-    detail.classList.add('open')
-    document.getElementById('articoleList').innerHTML = '<div class="loading">Se încarcă articolele</div>'
-    window.scrollTo(0, 0)
-    const { data: rev } = await sb.from('reviste').select('*').eq('id', revistaId).single()
-    if (rev) {
-      document.getElementById('editieMasthead').innerHTML = `
-        ${rev.coperta_url
-          ? `<img src="${rev.coperta_url}" alt="${rev.titlu}" />`
-          : `<div class="masthead-placeholder">
-              <div style="font-size:0.7rem;letter-spacing:3px;opacity:0.6;text-transform:uppercase;">${rev.editie}</div>
-              <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;text-align:center;line-height:1.4;">${rev.titlu}</div>
-              <div style="color:var(--gold-light);letter-spacing:4px;opacity:0.7;">— ✦ —</div>
-            </div>`}
-        <div class="masthead-info">
-          <div class="masthead-numar">${rev.editie}</div>
-          <div class="masthead-titlu">${rev.titlu}</div>
-          <div class="masthead-data">${rev.data_aparitie ? new Date(rev.data_aparitie).toLocaleDateString('ro-RO', {year:'numeric', month:'long', day:'numeric'}) : ''}</div>
-          ${rev.descriere ? `<div class="masthead-descriere">${rev.descriere}</div>` : ''}
-          <div class="masthead-actions">
-            ${rev.pdf_url ? `<a href="${rev.pdf_url}" target="_blank" class="btn-pdf">📄 Descarcă PDF complet</a>` : ''}
-          </div>
-        </div>
-      `
-    }
-    const { data: articole } = await sb.from('articole_revista').select('*, autori(nume_complet, institutie, bio)').eq('revista_id', revistaId).eq('status', 'publicat').order('ordine')
-    if (!articole || articole.length === 0) {
-      document.getElementById('articoleList').innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Nu există articole publicate în această ediție.</p></div>`
+  async function getCount(revistaId) {
+    var r = await sb.from('articole_revista').select('*', { count:'exact', head:true }).eq('revista_id', revistaId).eq('status','publicat')
+    return r.count || 0
+  }
+
+  async function loadRevista() {
+    var r = await sb.from('reviste').select('*').eq('status','publicat').order('data_aparitie', { ascending:false })
+    var data = r.data
+
+    if (!data || data.length === 0) {
+      document.getElementById('featuredSection').innerHTML = '<div class="empty-state"><div class="icon">📖</div><p>Nu există ediții publicate momentan.</p></div>'
+      document.getElementById('editiiGrid').innerHTML = ''
       return
     }
-    document.getElementById('articoleList').innerHTML = articole.map(a => {
-      const isPremium = a.tip_acces === 'cont'
-      const canRead = !isPremium || window.currentUser
-      return `<div class="articol-row">
-        <div class="articol-top">
-          ${a.rubrica ? `<span class="articol-rubrica">${a.rubrica}</span>` : ''}
-          <div class="articol-main">
-            <div class="articol-titlu">${a.titlu}</div>
-            <div class="articol-autor">${a.autori?.nume_complet || 'Autor necunoscut'}${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}</div>
-          </div>
-        </div>
-        ${a.rezumat ? `<div class="articol-rezumat">${a.rezumat}</div>` : ''}
-        <div class="articol-actions">
-          <span class="badge-acces ${isPremium ? 'badge-cont' : 'badge-gratuit'}">${isPremium ? '🔒 Necesită cont' : '✓ Gratuit'}</span>
-          ${canRead
-            ? `<button class="btn-citeste" onclick="citestArticol('${a.id}')">Citește articolul</button>`
-            : `<button class="btn-citeste" onclick="openModal('login')">🔒 Autentifică-te</button>`}
-          ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" class="btn-pdf-art">📄 PDF</a>` : ''}
-        </div>
-      </div>`
+
+    var featured = data[0]
+    var fc = await getCount(featured.id)
+    var dataFmt = featured.data_aparitie ? new Date(featured.data_aparitie).toLocaleDateString('ro-RO',{year:'numeric',month:'long'}) : ''
+
+    document.getElementById('featuredSection').innerHTML =
+      '<div class="featured-card">' +
+        '<div class="featured-coperta">' +
+          (featured.coperta_url
+            ? '<img src="' + featured.coperta_url + '" alt="' + featured.titlu + '" />'
+            : '<div class="featured-placeholder"><div class="fp-nr">' + featured.editie + '</div><div class="fp-titlu">' + featured.titlu + '</div><div class="fp-orn">— ✦ —</div></div>') +
+        '</div>' +
+        '<div class="featured-info">' +
+          '<span class="featured-badge">Ultimul număr</span>' +
+          '<div class="featured-nr">' + featured.editie + '</div>' +
+          '<div class="featured-titlu">' + featured.titlu + '</div>' +
+          '<div class="featured-data">' + dataFmt + '</div>' +
+          (featured.descriere ? '<div class="featured-desc">' + featured.descriere + '</div>' : '') +
+          '<div class="featured-actions">' +
+            '<a href="editie.html?id=' + featured.id + '" class="btn-featured">Citește ediția →</a>' +
+            (featured.pdf_url ? '<a href="' + featured.pdf_url + '" target="_blank" style="font-size:0.8rem;color:var(--crimson);border:1px solid var(--crimson);padding:9px 14px;border-radius:3px;">📄 PDF</a>' : '') +
+            '<span class="feat-art-count">' + fc + ' articol' + (fc !== 1 ? 'e' : '') + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+
+    var rest = data.slice(1)
+    document.getElementById('editiiCount').textContent = rest.length > 0 ? rest.length + ' ediți' + (rest.length === 1 ? 'e' : 'i') : ''
+
+    if (rest.length === 0) {
+      document.getElementById('editiiGrid').innerHTML = '<p style="color:var(--muted);font-style:italic;font-size:0.88rem;">Aceasta este singura ediție publicată până acum.</p>'
+      return
+    }
+
+    document.getElementById('editiiGrid').innerHTML = rest.map(function(e) {
+      var d = e.data_aparitie ? new Date(e.data_aparitie).toLocaleDateString('ro-RO',{year:'numeric',month:'long'}) : ''
+      return '<div class="editie-card" onclick="location.href=\'editie.html?id=' + e.id + '\'">' +
+        '<div class="coperta-wrap">' +
+          (e.coperta_url
+            ? '<img src="' + e.coperta_url + '" alt="' + e.titlu + '" />'
+            : '<div class="coperta-placeholder"><div class="nr">' + e.editie + '</div><div class="titlu-cop">' + e.titlu + '</div><div class="ornament">— ✦ —</div></div>') +
+          '<div class="editie-badge-wrap"><span class="editie-badge">' + e.editie + '</span></div>' +
+        '</div>' +
+        '<div class="editie-info">' +
+          '<div class="editie-numar">' + e.editie + '</div>' +
+          '<div class="editie-titlu">' + e.titlu + '</div>' +
+          '<div class="editie-data">' + d + '</div>' +
+          (e.descriere ? '<div class="editie-desc">' + e.descriere.substring(0,110) + (e.descriere.length>110?'...':'') + '</div>' : '') +
+          '<div class="editie-footer">' +
+            '<span class="editie-art-count" id="cnt-' + e.id + '">...</span>' +
+            '<a href="editie.html?id=' + e.id + '" class="btn-explore">Citește →</a>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
     }).join('')
+
+    for (var i = 0; i < rest.length; i++) {
+      (function(e) {
+        getCount(e.id).then(function(n) {
+          var el = document.getElementById('cnt-' + e.id)
+          if (el) el.textContent = n + ' articol' + (n !== 1 ? 'e' : '')
+        })
+      })(rest[i])
+    }
   }
 
-  function inapoiLaLista() {
-    document.getElementById('editieDetail').classList.remove('open')
-    document.getElementById('listaEditii').style.display = 'block'
-    window.scrollTo(0, 0)
-  }
-
-  async function citestArticol(articolId) {
-    document.getElementById('articolModal').classList.add('open')
-    document.getElementById('articolModalContent').innerHTML = '<div class="loading">Se încarcă articolul</div>'
-    document.body.style.overflow = 'hidden'
-    const { data: a } = await sb.from('articole_revista').select('*, autori(nume_complet, institutie, bio)').eq('id', articolId).single()
-    if (!a) { document.getElementById('articolModalContent').innerHTML = '<p style="color:#c00;">Eroare la încărcare.</p>'; return }
-    document.getElementById('articolModalContent').innerHTML = `
-      ${a.rubrica ? `<div class="modal-rubrica">${a.rubrica}</div>` : ''}
-      <div class="modal-titlu">${a.titlu}</div>
-      <div class="modal-meta">
-        ${a.autori?.nume_complet || ''}
-        ${a.autori?.institutie ? ' — ' + a.autori.institutie : ''}
-        · ${new Date(a.created_at).toLocaleDateString('ro-RO', {day:'numeric', month:'long', year:'numeric'})}
-      </div>
-      ${a.rezumat ? `<div class="modal-rezumat">${a.rezumat}</div>` : ''}
-      ${a.continut ? `<div class="modal-continut">${a.continut}</div>` : ''}
-      ${a.fisier_url ? `<div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);">
-        <a href="${a.fisier_url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 20px;border-radius:3px;font-size:0.88rem;">📄 Descarcă fișierul atașat</a>
-      </div>` : ''}
-      ${a.autori?.bio ? `<div class="modal-bio"><strong>Despre autor</strong><p>${a.autori.bio}</p></div>` : ''}
-    `
-  }
-
-  function closeArticolModal() {
-    document.getElementById('articolModal').classList.remove('open')
-    document.body.style.overflow = ''
-  }
-
-  document.getElementById('articolModal')?.addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeArticolModal()
-  })
-
-  loadEditii()
-
+  loadRevista()
 </script>
 </body>
 </html>
