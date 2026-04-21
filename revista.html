@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revista Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://www.paypal.com/sdk/js?client-id=AXquC42BzgOQMjC4eL64SVhQHNcQKj2mFuzdU5OLct9qdxyzgqoaAIHBn2J8C6b0N43OQ76lgazOYG9f&currency=EUR&intent=capture"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AXquC42BzgOQMjC4eL64SVhQHNcQKj2mFuzdU5OLct9qdxyzgqoaAIHBn2J8C6b0N43OQ76lgazOYG9f&currency=EUR&intent=capture&disable-funding=credit,paylater&commit=false"></script>
   <script src="auth.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
@@ -888,8 +888,14 @@
   function renderPPButton(id) {
     paypal.Buttons({
       style: { layout:'vertical', color: id===2 ? 'white' : 'gold', shape:'rect', label:'pay', height:38 },
+      fundingSource: paypal.FUNDING.PAYPAL,
       createOrder: function(data, actions) {
         return actions.order.create({
+          application_context: {
+            shipping_preference: 'NO_SHIPPING',
+            user_action: 'PAY_NOW',
+            landing_page: 'BILLING'
+          },
           purchase_units: [{
             description: ppDesc[id],
             amount: { value: ppAmounts[id].toFixed(2), currency_code: 'EUR' }
