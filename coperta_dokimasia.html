@@ -4,202 +4,122 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Copertă Revista Dokimasia</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --visiniu:       #5a0a1e;
+      --auriu:         #c9a84c;
+      --auriu-deschis: #e2c97e;
+      --argintiu:      #c8cdd4;
+      --argintiu-d:    #e8ecf0;
+      --alb:           #ffffff;
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#e8e4dc; display:flex; justify-content:center; align-items:center; min-height:100vh; font-family:'Source Serif 4', Georgia, serif; }
+    body { background:#2a1a22; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px 20px; }
 
     .coperta {
-      width:420px;
-      height:594px; /* A4 proporție */
-      background:#8B0000;
+      width:420px; height:594px;
+      background:var(--visiniu);
       position:relative;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:space-between;
-      padding:36px 32px 32px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.35);
+      display:flex; flex-direction:column; align-items:center;
+      overflow:hidden;
+      box-shadow:0 30px 80px rgba(0,0,0,0.6);
     }
 
-    /* Bordură aurie interioară */
-    .coperta::before {
-      content:'';
-      position:absolute;
-      inset:14px;
-      border:0.8px solid rgba(184,150,62,0.45);
-      pointer-events:none;
-    }
+    .banda { width:100%; }
+    .banda.sus { height:6px; background:linear-gradient(to right, var(--visiniu), var(--auriu), var(--auriu-deschis), var(--auriu), var(--visiniu)); }
+    .banda.sus-arg { height:1.5px; background:linear-gradient(to right, transparent, var(--argintiu), transparent); opacity:0.45; }
+    .banda.jos-arg { height:1.5px; background:linear-gradient(to right, transparent, var(--argintiu), transparent); opacity:0.45; }
+    .banda.jos { height:6px; background:linear-gradient(to right, var(--visiniu), var(--auriu), var(--auriu-deschis), var(--auriu), var(--visiniu)); }
 
-    /* Zona superioară */
-    .zona-sus {
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:10px;
-      width:100%;
-    }
+    .continut { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:30px 40px 26px; width:100%; }
 
-    .logo {
-      height:90px;
-      width:auto;
-      filter: brightness(0) invert(1);
-      opacity:0.92;
-    }
+    /* Colțuri */
+    .colt { position:absolute; width:22px; height:22px; }
+    .colt.tl { top:16px; left:16px; border-top:1px solid var(--argintiu); border-left:1px solid var(--argintiu); opacity:0.45; }
+    .colt.tr { top:16px; right:16px; border-top:1px solid var(--argintiu); border-right:1px solid var(--argintiu); opacity:0.45; }
+    .colt.bl { bottom:16px; left:16px; border-bottom:1px solid var(--argintiu); border-left:1px solid var(--argintiu); opacity:0.45; }
+    .colt.br { bottom:16px; right:16px; border-bottom:1px solid var(--argintiu); border-right:1px solid var(--argintiu); opacity:0.45; }
 
-    .linie-aur {
-      width:200px;
-      height:1px;
-      background:linear-gradient(to right, transparent, #b8963e, transparent);
-    }
+    /* Sus */
+    .zona-sus { display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; }
+    .romb { width:14px; height:14px; background:var(--auriu); transform:rotate(45deg); opacity:0.9; }
+    .asociatia { font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:5px; color:var(--argintiu-d); text-transform:uppercase; font-weight:300; }
+    .ornament-linie { display:flex; align-items:center; gap:8px; width:100%; justify-content:center; }
+    .ornament-linie .linie { width:70px; height:0.7px; }
+    .ornament-linie .linie.a { background:linear-gradient(to right, transparent, var(--auriu)); }
+    .ornament-linie .linie.ar { background:linear-gradient(to left, transparent, var(--auriu)); }
+    .ornament-linie .d { width:5px; height:5px; background:var(--auriu); transform:rotate(45deg); }
 
-    .linie-aur.scurta { width:100px; }
+    /* Titlu */
+    .zona-titlu { display:flex; flex-direction:column; align-items:center; width:100%; }
+    .eticheta { font-family:'Cormorant Garamond',serif; font-size:9px; letter-spacing:6px; color:var(--auriu); text-transform:uppercase; font-weight:400; margin-bottom:10px; }
+    .t-revista { font-family:'Playfair Display',serif; font-size:54px; font-weight:900; color:var(--alb); letter-spacing:4px; text-transform:uppercase; line-height:1.0; text-align:center; }
+    .t-dokimasia { font-family:'Playfair Display',serif; font-size:33px; font-weight:400; color:var(--argintiu-d); letter-spacing:9px; text-transform:uppercase; text-align:center; margin-top:4px; }
+    .sep { display:flex; flex-direction:column; align-items:center; gap:5px; margin:16px 0 14px; }
+    .sep .l1 { width:250px; height:1px; background:linear-gradient(to right, transparent, var(--auriu), transparent); }
+    .sep .l2 { width:170px; height:0.5px; background:linear-gradient(to right, transparent, var(--argintiu), transparent); opacity:0.55; }
+    .motto { font-family:'Playfair Display',serif; font-size:13.5px; font-style:italic; color:var(--argintiu-d); letter-spacing:0.5px; text-align:center; opacity:0.92; }
 
-    .asociatia {
-      font-family:'Source Serif 4', sans-serif;
-      font-size:9px;
-      letter-spacing:4px;
-      color:rgba(255,255,255,0.7);
-      text-transform:uppercase;
-    }
+    /* Jos */
+    .zona-jos { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; }
+    .sep-jos { width:100%; height:0.5px; background:linear-gradient(to right, transparent, rgba(200,205,212,0.25), transparent); }
+    .numar { font-family:'Cormorant Garamond',serif; font-size:11px; letter-spacing:4px; color:var(--argintiu); text-transform:uppercase; font-weight:300; }
+    .issn { font-family:'Cormorant Garamond',serif; font-size:10px; letter-spacing:3px; color:var(--auriu); }
+    .stea-ornament { display:flex; align-items:center; gap:10px; }
+    .stea-ornament .ls { width:36px; height:0.7px; }
+    .stea-ornament .ls.a { background:linear-gradient(to right, transparent, var(--auriu)); }
+    .stea-ornament .ls.ar { background:linear-gradient(to left, transparent, var(--auriu)); }
+    .stea-ornament .s { font-size:9px; color:var(--auriu); opacity:0.65; }
 
-    /* Titlu principal */
-    .zona-titlu {
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:0;
-      width:100%;
-    }
-
-    .titlu-revista {
-      font-family:'Playfair Display', serif;
-      font-size:42px;
-      font-weight:900;
-      color:#ffffff;
-      letter-spacing:4px;
-      text-transform:uppercase;
-      line-height:1.1;
-      text-align:center;
-    }
-
-    .titlu-revista span {
-      display:block;
-    }
-
-    .linie-aur-dubla {
-      margin:14px 0 12px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:4px;
-    }
-    .linie-aur-dubla .l1 { width:220px; height:1.5px; background:#b8963e; }
-    .linie-aur-dubla .l2 { width:160px; height:0.5px; background:rgba(184,150,62,0.5); }
-
-    .motto {
-      font-family:'Playfair Display', serif;
-      font-size:14px;
-      font-style:italic;
-      color:rgba(255,255,255,0.88);
-      letter-spacing:0.5px;
-      text-align:center;
-    }
-
-    /* Zona inferioară */
-    .zona-jos {
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-      width:100%;
-    }
-
-    .separator {
-      width:100%;
-      height:0.4px;
-      background:rgba(255,255,255,0.18);
-    }
-
-    .numar {
-      font-family:'Source Serif 4', sans-serif;
-      font-size:10px;
-      letter-spacing:4px;
-      color:rgba(255,255,255,0.65);
-      text-transform:uppercase;
-    }
-
-    .issn {
-      font-family:'Source Serif 4', sans-serif;
-      font-size:9px;
-      letter-spacing:3px;
-      color:#b8963e;
-    }
-
-    .ornament {
-      font-family:'Playfair Display', serif;
-      font-size:12px;
-      color:rgba(255,255,255,0.18);
-      letter-spacing:6px;
-    }
-
-    /* Buton print */
-    .print-btn {
-      position:fixed;
-      bottom:24px;
-      right:24px;
-      background:#8B0000;
-      color:#fff;
-      border:none;
-      padding:10px 20px;
-      font-family:'Source Serif 4', serif;
-      font-size:13px;
-      cursor:pointer;
-      border-radius:4px;
-      box-shadow:0 4px 14px rgba(0,0,0,0.2);
-    }
-    .print-btn:hover { background:#5a0000; }
-
-    @media print {
-      body { background:white; }
-      .print-btn { display:none; }
-      .coperta { box-shadow:none; }
-    }
+    .print-btn { position:fixed; bottom:24px; right:24px; background:var(--auriu); color:var(--visiniu); border:none; padding:10px 22px; font-family:'Cormorant Garamond',serif; font-size:14px; font-weight:600; letter-spacing:1px; cursor:pointer; border-radius:2px; box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+    .print-btn:hover { background:var(--auriu-deschis); }
+    @media print { body { background:white; padding:0; } .print-btn { display:none; } .coperta { box-shadow:none; margin:0 auto; } }
   </style>
 </head>
 <body>
-
 <div class="coperta">
+  <div class="colt tl"></div><div class="colt tr"></div>
+  <div class="colt bl"></div><div class="colt br"></div>
 
-  <div class="zona-sus">
-    <img src="Logo.gif" alt="Logo Asociația Dokimasia" class="logo"/>
-    <div class="linie-aur"></div>
-    <div class="asociatia">Asociația Dokimasia</div>
-  </div>
+  <div class="banda sus"></div>
+  <div class="banda sus-arg"></div>
 
-  <div class="zona-titlu">
-    <div class="titlu-revista">
-      <span>Revista</span>
-      <span>Dokimasia</span>
+  <div class="continut">
+    <div class="zona-sus">
+      <div class="romb"></div>
+      <div class="asociatia">Asociația Dokimasia</div>
+      <div class="ornament-linie">
+        <div class="linie a"></div>
+        <div class="d"></div>
+        <div class="linie ar"></div>
+      </div>
     </div>
-    <div class="linie-aur-dubla">
-      <div class="l1"></div>
-      <div class="l2"></div>
+
+    <div class="zona-titlu">
+      <div class="eticheta">Publicație periodică</div>
+      <div class="t-revista">Revista</div>
+      <div class="t-dokimasia">Dokimasia</div>
+      <div class="sep"><div class="l1"></div><div class="l2"></div></div>
+      <div class="motto">Învățare. Implicare. Progres.</div>
     </div>
-    <div class="motto">Învățare. Implicare. Progres.</div>
+
+    <div class="zona-jos">
+      <div class="sep-jos"></div>
+      <div class="numar">Nr. 1 &nbsp;·&nbsp; Februarie 2025</div>
+      <div class="issn">ISSN 0000-0000</div>
+      <div class="stea-ornament">
+        <div class="ls a"></div>
+        <div class="s">✦</div>
+        <div class="ls ar"></div>
+      </div>
+    </div>
   </div>
 
-  <div class="zona-jos">
-    <div class="separator"></div>
-    <div class="numar">Nr. 1 &nbsp;·&nbsp; Februarie 2025</div>
-    <div class="linie-aur scurta"></div>
-    <div class="issn">ISSN 0000-0000</div>
-    <div class="ornament">— ✦ —</div>
-  </div>
-
+  <div class="banda jos-arg"></div>
+  <div class="banda jos"></div>
 </div>
 
-<button class="print-btn" onclick="window.print()">Printează / Salvează PDF</button>
-
+<button class="print-btn" onclick="window.print()">Salvează PDF</button>
 </body>
 </html>
