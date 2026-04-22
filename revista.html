@@ -20,7 +20,7 @@
     body { font-family:'Source Serif 4',Georgia,serif; background:var(--paper); color:var(--ink); }
     a { text-decoration:none; color:inherit; }
 
-    header { background:#fff; border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    header { background:#fff; border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); position:sticky; top:0; z-index:200; }
     .header-top { display:grid; grid-template-columns:auto 1fr auto; align-items:center; padding:12px 40px; gap:16px; }
     .header-logo img { height:80px; width:auto; display:block; }
     .header-center { text-align:center; }
@@ -49,21 +49,24 @@
       background-image:
         repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px),
         repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px);
-      padding:28px 40px 24px;
+      padding:14px 40px 12px;
     }
-    .revista-hero-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 200px; gap:36px; align-items:center; }
-    .revista-hero-label { display:inline-block; font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold-light); margin-bottom:8px; }
-    .revista-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,3.5vw,2.5rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:8px; }
-    .revista-hero-subtitle { font-size:0.93rem; color:rgba(255,255,255,0.85); font-style:italic; margin-bottom:12px; line-height:1.55; text-align:justify; }
+    .revista-hero-inner { max-width:1200px; margin:0 auto; display:flex; justify-content:center; text-align:center; }
+    .revista-hero-label { display:block; font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold-light); margin-bottom:8px; text-align:center; }
+    .revista-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,3.5vw,2.5rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:8px; text-align:center; }
+    .revista-hero-subtitle { font-size:0.93rem; color:rgba(255,255,255,0.85); font-style:italic; margin-bottom:12px; line-height:1.55; text-align:center; }
     .revista-hero-desc { font-size:0.84rem; color:rgba(255,255,255,0.7); line-height:1.75; text-align:justify; }
     .hero-ornament { color:var(--gold-light); font-size:0.9rem; margin:10px 0 0; letter-spacing:8px; opacity:0.6; }
-    /* Mini copertă placeholder */
-    .hero-cover-placeholder { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.2); border-radius:2px; height:260px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px; text-align:center; color:#fff; flex-shrink:0; }
-    .hero-cover-placeholder .hcp-nr { font-size:0.62rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold-light); opacity:0.8; }
-    .hero-cover-placeholder .hcp-title { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; line-height:1.4; }
-    .hero-cover-placeholder .hcp-orn { color:var(--gold-light); letter-spacing:6px; opacity:0.6; font-size:0.8rem; }
-    .hero-cover-placeholder .hcp-btn { margin-top:8px; font-size:0.72rem; letter-spacing:1px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 14px; border-radius:2px; cursor:pointer; transition:background 0.2s; text-decoration:none; }
-    .hero-cover-placeholder .hcp-btn:hover { background:rgba(255,255,255,0.25); }
+    .hero-nav-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px; }
+    .hero-nav-btn { background:#fff; border:2px solid #fff; color:var(--crimson); padding:9px 10px; border-radius:3px; font-size:0.76rem; font-family:'Source Serif 4',serif; font-weight:700; letter-spacing:0.5px; cursor:pointer; transition:background 0.2s, color 0.2s, border-color 0.2s; white-space:nowrap; text-align:center; width:100%; }
+    .hero-nav-btn:hover { background:var(--gold); border-color:var(--gold); color:#fff; }
+    /* Hero cards */
+    .hero-card { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.25); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center; color:#fff; min-width:150px; }
+    .hero-card .hc-label { font-size:0.62rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold-light); }
+    .hero-card .hc-title { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; line-height:1.3; }
+    .hero-card .hc-orn { color:var(--gold-light); letter-spacing:4px; opacity:0.6; font-size:0.75rem; }
+    .hero-card .hc-btn { margin-top:4px; font-size:0.75rem; font-weight:700; background:#fff; border:none; color:var(--crimson); padding:7px 16px; border-radius:3px; cursor:pointer; transition:background 0.2s, color 0.2s; text-decoration:none; font-family:'Source Serif 4',serif; display:inline-block; }
+    .hero-card .hc-btn:hover { background:var(--gold); color:#fff; }
 
     /* ADMIN BAR */
     .admin-bar { display:none; background:#111; color:#fff; padding:9px 24px; align-items:center; justify-content:space-between; font-size:0.82rem; }
@@ -73,6 +76,10 @@
 
     /* INFO TABS */
     .info-section { background:#fff; border-bottom:1px solid var(--border); }
+    /* Revista subnav */
+    .revista-subnav { background:var(--crimson); padding:8px 40px; display:grid; grid-template-columns:repeat(6,1fr); gap:6px; border-top:1px solid rgba(255,255,255,0.15); }
+    .revista-subnav .hero-nav-btn { font-size:0.73rem; padding:8px 6px; }
+    .revista-subnav .hero-nav-btn.active { background:var(--gold); border-color:var(--gold); color:#fff; }
     .info-tabs { display:grid; grid-template-columns:repeat(4,1fr); max-width:1200px; margin:0 auto; border-bottom:1px solid var(--border); }
     .info-tab { padding:12px 10px; font-size:0.76rem; letter-spacing:0.8px; text-transform:uppercase; font-weight:600; color:var(--muted); cursor:pointer; border-bottom:3px solid transparent; transition:color 0.2s, border-color 0.2s, background 0.2s; text-align:center; font-family:'Source Serif 4',serif; border-right:1px solid var(--border); }
     .info-tab:nth-child(4n) { border-right:none; }
@@ -336,6 +343,20 @@
     <a href="noutati.html">Noutăți</a>
     <a href="contact.html">Contact</a>
   </nav>
+  <div class="revista-subnav">
+    <button class="hero-nav-btn" onclick="showTab('despre')">Despre revistă</button>
+    <button class="hero-nav-btn" onclick="showTab('domenii')">Domenii și secțiuni</button>
+    <button class="hero-nav-btn" onclick="showTab('ghid')">Ghid pentru autori</button>
+    <button class="hero-nav-btn" onclick="showTab('procedura')">Procedura de trimitere</button>
+    <button class="hero-nav-btn" onclick="showTab('adeverinte')">Adeverințe și documente</button>
+    <button class="hero-nav-btn" onclick="showTab('contributie')">Contribuție editorială</button>
+    <button class="hero-nav-btn" onclick="showTab('trimitere')">Trimitere articol</button>
+    <button class="hero-nav-btn" onclick="showTab('faq')">Întrebări frecvente</button>
+    <button class="hero-nav-btn" onclick="showTab('etica')">Politică editorială</button>
+    <button class="hero-nav-btn" onclick="showTab('documente')">Documente</button>
+    <button class="hero-nav-btn" onclick="showTab('colegiu')">Colegiul editorial</button>
+    <button class="hero-nav-btn" onclick="showTab('arhiva')">Arhivă reviste</button>
+  </div>
 </header>
 
 <!-- HEADER MOBIL -->
@@ -376,38 +397,34 @@
 
 <!-- HERO -->
 <div class="revista-hero">
-  <div class="revista-hero-inner">
-    <div>
+  <div class="revista-hero-inner" style="display:grid;grid-template-columns:160px 1fr 160px;gap:24px;align-items:center;max-width:1200px;margin:0 auto;">
+    <!-- Card stânga: Ultimul număr -->
+    <div class="hero-card" onclick="showTab('arhiva')" style="cursor:pointer;">
+      <div class="hc-label">Nr. 1 · 2025</div>
+      <div class="hc-orn">— ✦ —</div>
+      <div class="hc-title">Revista Dokimasia</div>
+      <a class="hc-btn" onclick="showTab('arhiva');event.stopPropagation();">Ultimul număr</a>
+    </div>
+    <!-- Centru: titlu -->
+    <div style="text-align:center;">
       <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
       <h1>Revista Dokimasia</h1>
-      <p class="revista-hero-subtitle">Educație, formare și implicare civică — articole scrise de cadre didactice, cercetători, experți în managementul școlar și alți specialiști din domeniul educației.</p>
-      <p class="revista-hero-desc">Revista Dokimasia „Educație, formare și implicare civică" este o publicație dedicată promovării bunelor practici din educație, a inițiativelor de formare și a modelelor de implicare activă în viața școlii și a comunității. Revista reunește articole scrise de cadre didactice, cercetători, experți în managementul școlar și alți specialiști din domeniul educației, oferind exemple relevante, perspective aplicate și resurse utile pentru dezvoltarea unui mediu educațional modern, incluziv și orientat spre progres. Prin temele abordate, publicația susține dialogul profesional, schimbul de experiență și consolidarea unei culturi organizaționale bazate pe responsabilitate, colaborare și implicare civică.</p>
+      <p class="revista-hero-subtitle">Educație, formare și implicare civică</p>
     </div>
-    <div class="hero-cover-placeholder">
-      <div class="hcp-nr">Nr. 1 · 2025</div>
-      <div class="hcp-title">Revista Dokimasia</div>
-      <div class="hcp-orn">— ✦ —</div>
-      <a href="#panel-despre" class="hcp-btn" onclick="showTab('despre');return false;">Ultimul număr</a>
+    <!-- Card dreapta: Publică -->
+    <div class="hero-card" onclick="showTab('trimitere')" style="cursor:pointer;">
+      <div class="hc-label">Contribuie</div>
+      <div class="hc-orn">— ✦ —</div>
+      <div class="hc-title">Trimite un articol</div>
+      <a class="hc-btn" onclick="showTab('trimitere');event.stopPropagation();">Publică</a>
     </div>
   </div>
 </div>
 
 <!-- INFO TABS -->
+
+<!-- INFO TABS -->
 <div class="info-section">
-  <div class="info-tabs">
-    <div class="info-tab active" onclick="showTab('despre')">Despre revistă</div>
-    <div class="info-tab" onclick="showTab('domenii')">Domenii și secțiuni</div>
-    <div class="info-tab" onclick="showTab('ghid')">Ghid pentru autori</div>
-    <div class="info-tab" onclick="showTab('procedura')">Procedura de trimitere</div>
-    <div class="info-tab" onclick="showTab('adeverinte')">Adeverințe și documente</div>
-    <div class="info-tab" onclick="showTab('contributie')">Contribuție editorială</div>
-    <div class="info-tab" onclick="showTab('trimitere')">Trimitere articol</div>
-    <div class="info-tab" onclick="showTab('faq')">Întrebări frecvente</div>
-    <div class="info-tab" onclick="showTab('etica')">Politică editorială</div>
-    <div class="info-tab" onclick="showTab('documente')">Documente</div>
-    <div class="info-tab" onclick="showTab('colegiu')">Colegiul editorial</div>
-    <div class="info-tab" onclick="showTab('arhiva')">Arhivă reviste</div>
-  </div>
 
   <div class="info-panels">
 
@@ -776,15 +793,32 @@
 </footer>
 
 <script>
+  // Set hero height CSS variable for info-section height calc
+  function setHeroHeight() {
+    var h = document.querySelector('.revista-hero').offsetHeight
+    // also account for header
+    var header = document.querySelector('header')
+    var headerH = header ? header.offsetHeight : 0
+    var adminBar = document.getElementById('adminBar')
+    var adminH = (adminBar && adminBar.classList.contains('visible')) ? adminBar.offsetHeight : 0
+    document.documentElement.style.setProperty('--hero-h', (h + headerH + adminH) + 'px')
+  }
+  window.addEventListener('load', setHeroHeight)
+  window.addEventListener('resize', setHeroHeight)
+
   // TABS
   function showTab(id) {
-    document.querySelectorAll('.info-tab').forEach(function(t) {
-      t.classList.remove('active')
-      if (t.getAttribute('onclick') === 'showTab(\'' + id + '\')') t.classList.add('active')
+    document.querySelectorAll('.revista-subnav .hero-nav-btn').forEach(function(btn) {
+      btn.classList.remove('active')
+      if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf("'" + id + "'") !== -1) {
+        btn.classList.add('active')
+      }
     })
     document.querySelectorAll('.info-panel').forEach(function(p) { p.classList.remove('active') })
     var panel = document.getElementById('panel-' + id)
     if (panel) panel.classList.add('active')
+    var sec = document.querySelector('.info-section')
+    if (sec) sec.scrollTop = 0
     if (id === 'arhiva') loadArhiva()
   }
 
@@ -852,6 +886,10 @@
 
   function toggleFaq(i) {
     document.getElementById('faq-' + i).classList.toggle('open')
+  }
+
+  function scrollToTabs() {
+    document.querySelector('.info-section').scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   // ADMIN
