@@ -10,17 +10,23 @@
  *   R2_BUCKET        — binding-ul R2 (configurat în wrangler.toml, nu ca env var)
  */
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin') || '';
+  const allowed = ['https://dokimasia.ro', 'https://www.dokimasia.ro'];
+  const allowedOrigin = allowed.includes(origin) ? origin : '*';
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin',
+  };
+}
 
 export default {
   async fetch(request, env) {
     // Preflight CORS
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: CORS_HEADERS });
+      return new Response(null, { headers: getCorsHeaders(request) });
     }
 
     if (request.method !== 'POST') {
@@ -49,7 +55,7 @@ export default {
       if (!autor.nume || !autor.email) {
         return new Response(
           JSON.stringify({ success: false, error: 'Câmpurile obligatorii lipsesc.' }),
-          { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...getCorsHeaders(request), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -58,7 +64,7 @@ export default {
       if (!fisiere || fisiere.length === 0) {
         return new Response(
           JSON.stringify({ success: false, error: 'Niciun fișier atașat.' }),
-          { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...getCorsHeaders(request), 'Content-Type': 'application/json' } }
         );
       }
 
@@ -114,20 +120,20 @@ export default {
         // Fișierele sunt deja în R2, dar emailul a eșuat — returnăm succes parțial
         return new Response(
           JSON.stringify({ success: true, warning: 'Fișierele au fost primite, dar emailul de notificare nu a putut fi trimis.' }),
-          { headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+          { headers: { ...getCorsHeaders(request), 'Content-Type': 'application/json' } }
         );
       }
 
       return new Response(
         JSON.stringify({ success: true }),
-        { headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        { headers: { ...getCorsHeaders(request), 'Content-Type': 'application/json' } }
       );
 
     } catch (err) {
       console.error('Worker error:', err);
       return new Response(
         JSON.stringify({ success: false, error: 'Eroare internă. Vă rugăm încercați din nou.' }),
-        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        { status: 500, headers: { ...getCorsHeaders(request), 'Content-Type': 'application/json' } }
       );
     }
   },
