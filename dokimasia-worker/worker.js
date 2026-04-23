@@ -93,6 +93,7 @@ export default {
           nume: fisier.name,
           marime: formatBytes(fisier.size),
           key,
+          url: `https://cdn.dokimasia.ro/${key}`,
         });
       }
 
@@ -160,7 +161,9 @@ function formatBytes(bytes) {
 function buildEmailHtml(autor, fisiere, folderKey) {
   const fisList = fisiere.map(f =>
     `<tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #eee;">📄 ${f.nume}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;">
+        <a href="${f.url}" style="color:#8B0000;font-weight:600;">📄 ${f.nume}</a>
+      </td>
       <td style="padding:8px 12px;border-bottom:1px solid #eee;color:#666;">${f.marime}</td>
     </tr>`
   ).join('');
