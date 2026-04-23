@@ -6,6 +6,7 @@
   <title>Revista Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://www.paypal.com/sdk/js?client-id=AXquC42BzgOQMjC4eL64SVhQHNcQKj2mFuzdU5OLct9qdxyzgqoaAIHBn2J8C6b0N43OQ76lgazOYG9f&currency=RON&intent=capture&disable-funding=credit,paylater&commit=false"></script>
+  <script src="https://js.stripe.com/v3/"></script>
   <script src="auth.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
@@ -714,14 +715,26 @@
 
             <!-- Tabs plată -->
             <div class="tr-pay-tabs">
-              <button class="tr-pay-tab active" onclick="switchPayTab('paypal', this)">💳 PayPal</button>
+              <button class="tr-pay-tab active" onclick="switchPayTab('card', this)">💳 Card bancar</button>
+              <button class="tr-pay-tab" onclick="switchPayTab('paypal', this)">🅿 PayPal</button>
               <button class="tr-pay-tab" onclick="switchPayTab('iban', this)">🏦 Transfer bancar</button>
             </div>
 
+            <!-- CARD STRIPE -->
+            <div id="tr-card-wrap" style="margin-top:16px;max-width:420px;">
+              <div id="stripe-card-element" style="border:1px solid var(--border);border-radius:3px;padding:12px 14px;background:#fff;"></div>
+              <div id="stripe-card-error" style="color:#c0392b;font-size:0.85rem;margin-top:8px;"></div>
+              <button onclick="platesteCard()" id="btn-card-pay"
+                style="margin-top:14px;width:100%;background:var(--crimson);color:#fff;border:none;padding:13px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;">
+                Plătește <span id="card-pay-suma">40</span> lei cu cardul
+              </button>
+              <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">🔒 Plată securizată prin Stripe. Acceptăm Visa, Mastercard.</p>
+            </div>
+
             <!-- PayPal -->
-            <div id="tr-paypal-wrap" style="margin-top:16px;max-width:300px;">
+            <div id="tr-paypal-wrap" style="display:none;margin-top:16px;max-width:300px;">
               <div id="tr-pp-btn"></div>
-              <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal. Nu este necesar cont PayPal.</p>
+              <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal.</p>
             </div>
 
             <!-- IBAN -->
@@ -1342,17 +1355,25 @@
     document.getElementById('tr-iban-suma2').textContent = p.suma + ' lei';
     document.getElementById('tr-step2').style.display = 'block';
     document.getElementById('tr-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    // Render buton PayPal
+    // Update suma pe butonul card
+    var cardSumaEl = document.getElementById('card-pay-suma');
+    if (cardSumaEl) cardSumaEl.textContent = p.suma;
+    // Init Stripe card
+    setTimeout(initStripeCard, 100);
+    // Reset PayPal
     document.getElementById('tr-pp-btn').innerHTML = '';
-    renderTrPayPal(nr, p.suma);
   }
 
   function switchPayTab(tab, el) {
     trMetodaPlata = tab;
     document.querySelectorAll('.tr-pay-tab').forEach(function(b) { b.classList.remove('active'); });
     el.classList.add('active');
+    document.getElementById('tr-card-wrap').style.display = tab === 'card' ? 'block' : 'none';
     document.getElementById('tr-paypal-wrap').style.display = tab === 'paypal' ? 'block' : 'none';
     document.getElementById('tr-iban-wrap').style.display = tab === 'iban' ? 'block' : 'none';
+    if (tab === 'paypal' && trPachetSelectat > 0 && document.getElementById('tr-pp-btn').children.length === 0) {
+      renderTrPayPal(trPachetSelectat, trPachete[trPachetSelectat].suma);
+    }
   }
 
   function renderTrPayPal(nr, suma) {
@@ -1392,6 +1413,74 @@
     document.getElementById('tr-plata-confirmare').textContent = msg;
     document.getElementById('trimitereForm').style.display = 'block';
     document.getElementById('trimitereForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+
+  // =====================
+  // STRIPE CARD
+  // =====================
+  var stripe = Stripe('pk_test_51TPR5aPIOkEFAdg8HWzxkzniSijdicLeUQG29dbttZ7WHcACewTB8djdYoXDOGsUf50W945ljAeeRsqzR0n0vL3X00ossKKxbn');
+  var stripeElements = null;
+  var stripeCardElement = null;
+
+  function initStripeCard() {
+    if (stripeElements) return; // deja initializat
+    stripeElements = stripe.elements();
+    stripeCardElement = stripeElements.create('card', {
+      style: {
+        base: {
+          fontFamily: "'Source Serif 4', Georgia, serif",
+          fontSize: '16px',
+          color: '#1a1108',
+          '::placeholder': { color: '#aaa' }
+        },
+        invalid: { color: '#c0392b' }
+      },
+      hidePostalCode: true
+    });
+    stripeCardElement.mount('#stripe-card-element');
+    stripeCardElement.on('change', function(e) {
+      document.getElementById('stripe-card-error').textContent = e.error ? e.error.message : '';
+    });
+  }
+
+  async function platesteCard() {
+    var btn = document.getElementById('btn-card-pay');
+    var errorEl = document.getElementById('stripe-card-error');
+    btn.disabled = true;
+    btn.textContent = 'Se procesează...';
+    errorEl.textContent = '';
+
+    try {
+      var suma = trPachete[trPachetSelectat].suma;
+      var label = trPachete[trPachetSelectat].label;
+
+      // Creează PaymentIntent via Worker
+      var resp = await fetch('https://dokimasia-articole.m-ciprian1387.workers.dev/stripe-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suma: suma, label: label })
+      });
+      var data = await resp.json();
+
+      if (!data.clientSecret) throw new Error('Eroare la inițializarea plății.');
+
+      var result = await stripe.confirmCardPayment(data.clientSecret, {
+        payment_method: { card: stripeCardElement }
+      });
+
+      if (result.error) {
+        errorEl.textContent = result.error.message;
+        btn.disabled = false;
+        btn.innerHTML = 'Plătește <span id="card-pay-suma">' + suma + '</span> lei cu cardul';
+      } else if (result.paymentIntent.status === 'succeeded') {
+        deblocheazaFormular('Plată cu cardul confirmată! Poți trimite acum articolul.');
+      }
+    } catch(e) {
+      errorEl.textContent = 'Eroare: ' + e.message;
+      btn.disabled = false;
+      btn.innerHTML = 'Plătește ' + (trPachete[trPachetSelectat] ? trPachete[trPachetSelectat].suma : '') + ' lei cu cardul';
+    }
   }
 
 </script>
