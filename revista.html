@@ -312,6 +312,19 @@
     @media (max-width:768px) {
       .form-row-2, .form-row-3 { grid-template-columns:1fr; }
     }
+
+    /* PACHETE TRIMITERE */
+    .tr-pachete { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:8px; }
+    .tr-pachet { border:2px solid var(--border); border-radius:6px; padding:20px; text-align:center; cursor:pointer; transition:border-color 0.2s, background 0.2s; background:#fff; }
+    .tr-pachet:hover { border-color:var(--crimson); background:var(--paper); }
+    .tr-pachet.selected { border-color:var(--crimson); background:#fff3f3; }
+    .tr-pach-nr { font-size:0.85rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+    .tr-pach-pret { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:900; color:var(--crimson); line-height:1; }
+    .tr-pach-pret span { font-size:1rem; font-weight:400; color:var(--muted); }
+    .tr-pay-tabs { display:flex; gap:8px; margin-bottom:4px; }
+    .tr-pay-tab { padding:10px 20px; border-radius:3px; border:2px solid var(--border); background:#fff; font-family:'Source Serif 4',serif; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); }
+    .tr-pay-tab.active { border-color:var(--crimson); color:var(--crimson); background:#fff3f3; }
+    @media (max-width:768px) { .tr-pachete { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -669,12 +682,79 @@
     <!-- TRIMITERE -->
     <div class="info-panel" id="panel-trimitere">
       <h2>Trimite un articol</h2>
-      <p>Completează formularul de mai jos pentru a transmite materialul spre evaluare editorială. Poți atașa unul sau mai multe fișiere (articole, studii, ghiduri etc.). Articolele trebuie redactate conform cerințelor din secțiunea <a href="#" onclick="showTab('ghid');return false;" style="color:var(--crimson);">Ghid pentru autori</a>.</p>
+      <p>Pentru a publica în Revista Dokimasia, te rugăm să achitați contribuția editorială înainte de trimiterea materialului. După confirmarea plății, formularul de trimitere devine disponibil automat.</p>
 
-      <div id="trimitereForm" style="margin-top:28px;">
+      <!-- PASUL 1: Selectare număr articole -->
+      <div id="tr-step1">
+        <div class="form-section">
+          <div class="form-section-title">Pasul 1 — Selectează numărul de articole</div>
+          <div class="tr-pachete">
+            <div class="tr-pachet" onclick="selectPachet(1)" id="pach-1">
+              <div class="tr-pach-nr">1 articol</div>
+              <div class="tr-pach-pret">40 <span>lei</span></div>
+            </div>
+            <div class="tr-pachet" onclick="selectPachet(2)" id="pach-2">
+              <div class="tr-pach-nr">2 articole</div>
+              <div class="tr-pach-pret">70 <span>lei</span></div>
+            </div>
+            <div class="tr-pachet" onclick="selectPachet(3)" id="pach-3">
+              <div class="tr-pach-nr">3 articole</div>
+              <div class="tr-pach-pret">100 <span>lei</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASUL 2: Plată -->
+        <div id="tr-step2" style="display:none;">
+          <div class="form-section">
+            <div class="form-section-title">Pasul 2 — Achită contribuția editorială</div>
+            <p style="font-size:0.95rem;color:#555;margin-bottom:20px;line-height:1.7;">
+              Ai selectat <strong id="tr-pach-label">1 articol</strong>. Contribuția editorială este de <strong id="tr-pach-suma">40 lei</strong>.
+            </p>
+
+            <!-- Tabs plată -->
+            <div class="tr-pay-tabs">
+              <button class="tr-pay-tab active" onclick="switchPayTab('paypal', this)">💳 PayPal</button>
+              <button class="tr-pay-tab" onclick="switchPayTab('iban', this)">🏦 Transfer bancar</button>
+            </div>
+
+            <!-- PayPal -->
+            <div id="tr-paypal-wrap" style="margin-top:16px;max-width:300px;">
+              <div id="tr-pp-btn"></div>
+              <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal. Nu este necesar cont PayPal.</p>
+            </div>
+
+            <!-- IBAN -->
+            <div id="tr-iban-wrap" style="display:none;margin-top:16px;">
+              <div style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;">
+                <div style="font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Date transfer bancar</div>
+                <table style="font-size:0.95rem;border-collapse:collapse;width:100%;">
+                  <tr><td style="padding:5px 0;color:#666;width:140px;">Beneficiar</td><td style="padding:5px 0;font-weight:600;">Asociația Dokimasia</td></tr>
+                  <tr><td style="padding:5px 0;color:#666;">IBAN</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">RO00 XXXX 0000 0000 0000 0000</td></tr>
+                  <tr><td style="padding:5px 0;color:#666;">Bancă</td><td style="padding:5px 0;">—</td></tr>
+                  <tr><td style="padding:5px 0;color:#666;">Suma</td><td style="padding:5px 0;font-weight:600;" id="tr-iban-suma">40 lei</td></tr>
+                  <tr><td style="padding:5px 0;color:#666;">Referință</td><td style="padding:5px 0;">Contribuție editorială Dokimasia</td></tr>
+                </table>
+              </div>
+              <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
+                <input type="checkbox" id="tr-iban-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
+                <span style="font-size:0.92rem;color:#444;line-height:1.65;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
+              </label>
+              <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASUL 3: Formular trimitere (apare după plată) -->
+      <div id="trimitereForm" style="display:none;margin-top:8px;">
+        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:1.3rem;">✅</span>
+          <span style="font-size:0.95rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare">Plată confirmată! Poți trimite acum articolul.</span>
+        </div>
 
         <div class="form-section">
-          <div class="form-section-title">1. Date autor</div>
+          <div class="form-section-title">Pasul 3 — Date autor</div>
           <div class="form-row-2">
             <div class="fld-group">
               <label class="fld-label">Nume și prenume <span class="req">*</span></label>
@@ -712,7 +792,7 @@
         </div>
 
         <div class="form-section">
-          <div class="form-section-title">2. Detalii despre material</div>
+          <div class="form-section-title">Pasul 4 — Detalii despre material</div>
           <div class="form-row-2">
             <div class="fld-group">
               <label class="fld-label">Secțiunea tematică <span class="req">*</span></label>
@@ -763,7 +843,7 @@
         </div>
 
         <div class="form-section">
-          <div class="form-section-title">3. Fișiere atașate</div>
+          <div class="form-section-title">Pasul 5 — Fișiere atașate</div>
           <p style="font-size:0.95rem;color:#555;margin-bottom:16px;line-height:1.7;">
             Atașează unul sau mai multe fișiere. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
           </p>
@@ -794,9 +874,9 @@
           </button>
           <span id="trimitereMsg" style="font-size:0.92rem;"></span>
         </div>
-
       </div>
 
+      <!-- Succes final -->
       <div id="trimitereSuccess" style="display:none;text-align:center;padding:48px 20px;">
         <div style="font-size:3rem;margin-bottom:16px;">✅</div>
         <h3 style="font-family:'Playfair Display',serif;color:var(--crimson);font-size:1.4rem;margin-bottom:10px;">Articolul a fost trimis cu succes!</h3>
@@ -806,7 +886,7 @@
 
     </div>
 
-    <!-- FAQ -->
+        <!-- FAQ -->
     <div class="info-panel" id="panel-faq">
       <h2>Întrebări frecvente</h2>
       <div class="faq-list" id="faqList"></div>
@@ -1192,7 +1272,7 @@
 
     try {
       // ÎNLOCUIEȘTE cu URL-ul real al Worker-ului tău Cloudflare
-var WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
+      var WORKER_URL = 'https://dokimasia-articole.CONTUL-TAU.workers.dev';
 
       var resp = await fetch(WORKER_URL, { method: 'POST', body: fd });
       var data = await resp.json();
@@ -1218,6 +1298,11 @@ var WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
   }
 
   function resetTrimitere() {
+    trPachetSelectat = 0;
+    trPlataConfirmata = false;
+    [1,2,3].forEach(function(i) { document.getElementById('pach-' + i).classList.remove('selected'); });
+    document.getElementById('tr-step2').style.display = 'none';
+    document.getElementById('tr-pp-btn').innerHTML = '';
     selectedFiles = [];
     renderFileList();
     ['tr-nume','tr-email','tr-institutie','tr-functie','tr-localitate','tr-judet','tr-telefon'].forEach(function(id) {
@@ -1234,6 +1319,79 @@ var WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
     btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
     document.getElementById('trimitereForm').style.display = 'block';
     document.getElementById('trimitereSuccess').style.display = 'none';
+  }
+
+
+  // =====================
+  // FLUX PLATĂ → TRIMITERE
+  // =====================
+  var trPachetSelectat = 0;
+  var trPlataConfirmata = false;
+  var trMetodaPlata = 'paypal';
+  var trPachete = { 1: { label: '1 articol', suma: 40 }, 2: { label: '2 articole', suma: 70 }, 3: { label: '3 articole', suma: 100 } };
+
+  function selectPachet(nr) {
+    trPachetSelectat = nr;
+    [1,2,3].forEach(function(i) {
+      document.getElementById('pach-' + i).classList.toggle('selected', i === nr);
+    });
+    var p = trPachete[nr];
+    document.getElementById('tr-pach-label').textContent = p.label;
+    document.getElementById('tr-pach-suma').textContent = p.suma + ' lei';
+    document.getElementById('tr-iban-suma').textContent = p.suma + ' lei';
+    document.getElementById('tr-iban-suma2').textContent = p.suma + ' lei';
+    document.getElementById('tr-step2').style.display = 'block';
+    document.getElementById('tr-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Render buton PayPal
+    document.getElementById('tr-pp-btn').innerHTML = '';
+    renderTrPayPal(nr, p.suma);
+  }
+
+  function switchPayTab(tab, el) {
+    trMetodaPlata = tab;
+    document.querySelectorAll('.tr-pay-tab').forEach(function(b) { b.classList.remove('active'); });
+    el.classList.add('active');
+    document.getElementById('tr-paypal-wrap').style.display = tab === 'paypal' ? 'block' : 'none';
+    document.getElementById('tr-iban-wrap').style.display = tab === 'iban' ? 'block' : 'none';
+  }
+
+  function renderTrPayPal(nr, suma) {
+    if (typeof paypal === 'undefined') return;
+    paypal.Buttons({
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 40 },
+      fundingSource: paypal.FUNDING.PAYPAL,
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          application_context: { shipping_preference: 'NO_SHIPPING', user_action: 'PAY_NOW', landing_page: 'BILLING' },
+          purchase_units: [{ description: 'Contribuție editorială — ' + trPachete[nr].label, amount: { value: suma.toFixed(2), currency_code: 'EUR' } }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          var name = details.payer.name.given_name;
+          deblocheazaFormular('Plată PayPal confirmată! Bună ziua, ' + name + '. Poți trimite acum articolul.');
+        });
+      },
+      onError: function(err) {
+        document.getElementById('tr-pp-btn').innerHTML = '<div class="pp-msg error">A apărut o eroare la plată. Încearcă din nou sau folosește transferul bancar.</div>';
+        console.error(err);
+      }
+    }).render('#tr-pp-btn');
+  }
+
+  function confirmIban() {
+    if (!document.getElementById('tr-iban-confirm').checked) {
+      alert('Te rugăm să confirmi că ai efectuat transferul bancar.');
+      return;
+    }
+    deblocheazaFormular('Transfer bancar înregistrat! Redacția va verifica plata. Poți trimite acum articolul.');
+  }
+
+  function deblocheazaFormular(msg) {
+    trPlataConfirmata = true;
+    document.getElementById('tr-plata-confirmare').textContent = msg;
+    document.getElementById('trimitereForm').style.display = 'block';
+    document.getElementById('trimitereForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
 </script>
