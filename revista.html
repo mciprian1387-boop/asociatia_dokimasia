@@ -288,6 +288,30 @@
     .pp-msg { font-size:0.82rem; text-align:center; margin-top:10px; padding:8px 12px; border-radius:3px; }
     .pp-msg.success { background:#e6f4ea; color:#1e7e34; border:1px solid #b7dfbe; }
     .pp-msg.error { background:#fdecea; color:#c0392b; border:1px solid #f5c6c6; }
+
+    /* FORMULAR TRIMITERE ARTICOL */
+    .form-section { margin-bottom:28px; }
+    .form-section-title { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--crimson); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px; }
+    .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:14px; }
+    .fld-group { display:flex; flex-direction:column; }
+    .fld-label { font-size:0.88rem; font-weight:600; color:#444; margin-bottom:6px; }
+    .req { color:var(--crimson); }
+    .fld-input { padding:10px 13px; border:1px solid var(--border); border-radius:3px; font-family:'Source Serif 4',serif; font-size:0.95rem; color:var(--ink); background:#fff; outline:none; transition:border-color 0.2s; }
+    .fld-input:focus { border-color:var(--crimson); }
+    .fld-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B0000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+    .file-item { display:flex; align-items:center; justify-content:space-between; background:var(--paper); border:1px solid var(--border); border-radius:3px; padding:10px 14px; font-size:0.88rem; }
+    .file-item .fi-name { display:flex; align-items:center; gap:8px; color:#333; font-weight:500; }
+    .file-item .fi-size { color:var(--muted); font-size:0.82rem; margin-left:8px; }
+    .file-item .fi-remove { background:none; border:none; color:#999; cursor:pointer; font-size:1rem; padding:0 4px; transition:color 0.15s; }
+    .file-item .fi-remove:hover { color:var(--crimson); }
+    #dropZone:hover { border-color:var(--crimson); background:var(--paper-dark); }
+    #dropZone.drag-over { border-color:var(--crimson); background:#fff3f3; }
+    #btnTrimite:hover { background:var(--crimson-dark); }
+    #btnTrimite:disabled { background:var(--muted); cursor:not-allowed; }
+    @media (max-width:768px) {
+      .form-row-2, .form-row-3 { grid-template-columns:1fr; }
+    }
   </style>
 </head>
 <body>
@@ -644,28 +668,142 @@
 
     <!-- TRIMITERE -->
     <div class="info-panel" id="panel-trimitere">
-      <h2>Trimitere articol</h2>
-      <p>Materialele destinate publicării în Revista Dokimasia se transmit de către autori prin formularul disponibil pe site sau prin e-mail, la adresa indicată de redacție. Articolele trebuie redactate în conformitate cu cerințele prevăzute în secțiunea Ghid pentru autori și trebuie să se încadreze în profilul tematic al revistei.</p>
-      <p>La transmiterea materialului, autorul va menționa în mod clar numele și prenumele, afilierea instituțională, datele de contact, titlul articolului și secțiunea tematică în care consideră că se încadrează lucrarea. După caz, redacția poate solicita și documente suplimentare, precum declarația de originalitate sau alte informații necesare procesului editorial.</p>
-      <p>Transmiterea articolului presupune acordul autorului cu privire la evaluarea editorială, publicarea materialului în cadrul revistei și prelucrarea datelor necesare desfășurării activității editoriale, în condițiile prevăzute de publicație.</p>
-      <h3>Informații solicitate în formularul de trimitere</h3>
-      <ul>
-        <li>Nume și prenume autor</li>
-        <li>Instituția de proveniență</li>
-        <li>Funcția didactică sau profesională</li>
-        <li>Localitatea și județul</li>
-        <li>Adresa de e-mail</li>
-        <li>Număr de telefon</li>
-        <li>Titlul articolului</li>
-        <li>Secțiunea tematică</li>
-        <li>Numărul de autori</li>
-        <li>Tipul materialului transmis</li>
-        <li>Solicitarea documentelor aferente publicării</li>
-        <li>Opțiunea pentru exemplar tipărit, dacă este cazul</li>
-      </ul>
-      <div style="margin-top:24px;">
-        <a href="contact.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:12px 28px;border-radius:3px;font-size:0.9rem;font-family:'Source Serif 4',serif;font-weight:600;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite articol →</a>
+      <h2>Trimite un articol</h2>
+      <p>Completează formularul de mai jos pentru a transmite materialul spre evaluare editorială. Poți atașa unul sau mai multe fișiere (articole, studii, ghiduri etc.). Articolele trebuie redactate conform cerințelor din secțiunea <a href="#" onclick="showTab('ghid');return false;" style="color:var(--crimson);">Ghid pentru autori</a>.</p>
+
+      <div id="trimitereForm" style="margin-top:28px;">
+
+        <div class="form-section">
+          <div class="form-section-title">1. Date autor</div>
+          <div class="form-row-2">
+            <div class="fld-group">
+              <label class="fld-label">Nume și prenume <span class="req">*</span></label>
+              <input type="text" id="tr-nume" class="fld-input" placeholder="ex. Ionescu Maria" />
+            </div>
+            <div class="fld-group">
+              <label class="fld-label">Adresă e-mail <span class="req">*</span></label>
+              <input type="email" id="tr-email" class="fld-input" placeholder="ex. maria.ionescu@scoala.ro" />
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="fld-group">
+              <label class="fld-label">Instituție de proveniență</label>
+              <input type="text" id="tr-institutie" class="fld-input" placeholder="ex. Școala Gimnazială Nr. 1" />
+            </div>
+            <div class="fld-group">
+              <label class="fld-label">Funcție didactică / profesională</label>
+              <input type="text" id="tr-functie" class="fld-input" placeholder="ex. profesor titular" />
+            </div>
+          </div>
+          <div class="form-row-3">
+            <div class="fld-group">
+              <label class="fld-label">Localitate</label>
+              <input type="text" id="tr-localitate" class="fld-input" placeholder="ex. Cluj-Napoca" />
+            </div>
+            <div class="fld-group">
+              <label class="fld-label">Județ</label>
+              <input type="text" id="tr-judet" class="fld-input" placeholder="ex. Cluj" />
+            </div>
+            <div class="fld-group">
+              <label class="fld-label">Număr de telefon</label>
+              <input type="tel" id="tr-telefon" class="fld-input" placeholder="ex. 07xx xxx xxx" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">2. Detalii despre material</div>
+          <div class="form-row-2">
+            <div class="fld-group">
+              <label class="fld-label">Secțiunea tematică <span class="req">*</span></label>
+              <select id="tr-sectiune" class="fld-input fld-select">
+                <option value="">— Selectează secțiunea —</option>
+                <option>Didactică și practici de predare</option>
+                <option>Evaluare și progres școlar</option>
+                <option>Literație, competențe de bază și învățare remedială</option>
+                <option>Educație incluzivă și sprijin educațional</option>
+                <option>Consiliere, orientare și dezvoltare personală</option>
+                <option>Management educațional și leadership</option>
+                <option>Digitalizare și inovare în educație</option>
+                <option>Formare continuă și dezvoltare profesională</option>
+                <option>Proiecte educaționale și parteneriate</option>
+                <option>Educație civică și implicare în comunitate</option>
+                <option>Cercetare și perspective interdisciplinare</option>
+                <option>Recenzii, interviuri și resurse educaționale</option>
+              </select>
+            </div>
+            <div class="fld-group">
+              <label class="fld-label">Tipul materialului <span class="req">*</span></label>
+              <select id="tr-tip" class="fld-input fld-select">
+                <option value="">— Selectează tipul —</option>
+                <option>Articol științific / de cercetare</option>
+                <option>Studiu de caz</option>
+                <option>Exemplu de bună practică</option>
+                <option>Ghid metodic</option>
+                <option>Auxiliar curricular</option>
+                <option>Suport educațional</option>
+                <option>Analiză / Reflecție profesională</option>
+                <option>Recenzie</option>
+                <option>Interviu</option>
+                <option>Alt tip de material</option>
+              </select>
+            </div>
+          </div>
+          <div class="fld-group">
+            <label class="fld-label">Dorești exemplar tipărit al revistei?</label>
+            <div style="display:flex;gap:20px;margin-top:8px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.95rem;">
+                <input type="radio" name="exemplar" value="Nu" checked style="accent-color:var(--crimson);"> Nu
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.95rem;">
+                <input type="radio" name="exemplar" value="Da (50 lei/exemplar)" style="accent-color:var(--crimson);"> Da (50 lei/exemplar)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">3. Fișiere atașate</div>
+          <p style="font-size:0.95rem;color:#555;margin-bottom:16px;line-height:1.7;">
+            Atașează unul sau mai multe fișiere. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
+          </p>
+          <div id="dropZone" onclick="document.getElementById('tr-fisiere').click()"
+               style="border:2px dashed var(--border);border-radius:4px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--paper);">
+            <div style="font-size:2rem;margin-bottom:10px;">📎</div>
+            <div style="font-size:1rem;color:#555;margin-bottom:6px;">Trage fișierele aici sau <span style="color:var(--crimson);font-weight:600;">apasă pentru a selecta</span></div>
+            <div style="font-size:0.82rem;color:var(--muted);">.doc · .docx · .pdf · max. 50 MB / fișier · oricâte fișiere</div>
+          </div>
+          <input type="file" id="tr-fisiere" multiple accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" style="display:none;" onchange="handleTrimitereFiles(this.files)" />
+          <div id="fileList" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+
+        <div class="form-section" style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:18px 20px;">
+          <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
+            <input type="checkbox" id="tr-gdpr" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
+            <span style="font-size:0.92rem;color:#444;line-height:1.65;">
+              Sunt de acord cu transmiterea materialului spre evaluare editorială și cu publicarea acestuia în Revista Dokimasia, precum și cu prelucrarea datelor mele cu caracter personal în scopul desfășurării activității editoriale. <span class="req">*</span>
+            </span>
+          </label>
+        </div>
+
+        <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <button id="btnTrimite" onclick="trimitereArticol()"
+            style="display:inline-flex;align-items:center;gap:10px;background:var(--crimson);color:#fff;padding:14px 36px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:background 0.2s;">
+            <span>Trimite articolul</span>
+            <span style="font-size:1.1rem;">→</span>
+          </button>
+          <span id="trimitereMsg" style="font-size:0.92rem;"></span>
+        </div>
+
       </div>
+
+      <div id="trimitereSuccess" style="display:none;text-align:center;padding:48px 20px;">
+        <div style="font-size:3rem;margin-bottom:16px;">✅</div>
+        <h3 style="font-family:'Playfair Display',serif;color:var(--crimson);font-size:1.4rem;margin-bottom:10px;">Articolul a fost trimis cu succes!</h3>
+        <p style="font-size:1rem;color:#555;line-height:1.75;max-width:480px;margin:0 auto 24px;">Redacția Revistei Dokimasia a primit materialul tău și te va contacta în cel mai scurt timp la adresa de e-mail indicată.</p>
+        <button onclick="resetTrimitere()" style="background:var(--crimson);color:#fff;border:none;padding:11px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;cursor:pointer;">Trimite alt articol</button>
+      </div>
+
     </div>
 
     <!-- FAQ -->
@@ -959,6 +1097,145 @@
       for (var i = 1; i <= 5; i++) renderPPButton(i)
     }
   }
+
+  // =====================
+  // TRIMITERE ARTICOL
+  // =====================
+  var selectedFiles = [];
+
+  // Drag & drop
+  var dz = document.getElementById('dropZone');
+  if (dz) {
+    dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
+    dz.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dz.classList.remove('drag-over');
+      handleTrimitereFiles(e.dataTransfer.files);
+    });
+  }
+
+  function handleTrimitereFiles(files) {
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      // Evită duplicate
+      var exists = selectedFiles.some(function(x) { return x.name === f.name && x.size === f.size; });
+      if (!exists) selectedFiles.push(f);
+    }
+    renderFileList();
+  }
+
+  function renderFileList() {
+    var list = document.getElementById('fileList');
+    if (!list) return;
+    if (selectedFiles.length === 0) { list.innerHTML = ''; return; }
+    list.innerHTML = selectedFiles.map(function(f, i) {
+      return '<div class="file-item">' +
+        '<span class="fi-name">📄 ' + escHtml(f.name) + '<span class="fi-size">' + fmtBytes(f.size) + '</span></span>' +
+        '<button class="fi-remove" onclick="removeFile(' + i + ')" title="Elimină">✕</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function removeFile(i) {
+    selectedFiles.splice(i, 1);
+    renderFileList();
+  }
+
+  function fmtBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(1) + ' MB';
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function trimitereArticol() {
+    var msg = document.getElementById('trimitereMsg');
+    var btn = document.getElementById('btnTrimite');
+
+    // Validare
+    var nume = document.getElementById('tr-nume').value.trim();
+    var email = document.getElementById('tr-email').value.trim();
+    var sectiune = document.getElementById('tr-sectiune').value;
+    var tip = document.getElementById('tr-tip').value;
+    var gdpr = document.getElementById('tr-gdpr').checked;
+
+    if (!nume) { setMsg(msg, 'error', '⚠ Introduceți numele și prenumele.'); return; }
+    if (!email || !email.includes('@')) { setMsg(msg, 'error', '⚠ Introduceți o adresă de e-mail validă.'); return; }
+    if (!sectiune) { setMsg(msg, 'error', '⚠ Selectați secțiunea tematică.'); return; }
+    if (!tip) { setMsg(msg, 'error', '⚠ Selectați tipul materialului.'); return; }
+    if (selectedFiles.length === 0) { setMsg(msg, 'error', '⚠ Atașați cel puțin un fișier.'); return; }
+    if (!gdpr) { setMsg(msg, 'error', '⚠ Bifați acordul pentru prelucrarea datelor.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>Se trimite...</span>';
+    setMsg(msg, 'info', '⏳ Se încarcă fișierele, vă rugăm așteptați...');
+
+    var fd = new FormData();
+    fd.append('nume', nume);
+    fd.append('email', email);
+    fd.append('institutie', document.getElementById('tr-institutie').value.trim());
+    fd.append('functie', document.getElementById('tr-functie').value.trim());
+    fd.append('localitate', document.getElementById('tr-localitate').value.trim());
+    fd.append('judet', document.getElementById('tr-judet').value.trim());
+    fd.append('telefon', document.getElementById('tr-telefon').value.trim());
+    fd.append('sectiune', sectiune);
+    fd.append('tip_material', tip);
+    fd.append('exemplar', document.querySelector('input[name="exemplar"]:checked').value);
+    fd.append('gdpr', 'da');
+    for (var i = 0; i < selectedFiles.length; i++) {
+      fd.append('fisiere', selectedFiles[i]);
+    }
+
+    try {
+      // ÎNLOCUIEȘTE cu URL-ul real al Worker-ului tău Cloudflare
+      var WORKER_URL = 'https://dokimasia-articole.CONTUL-TAU.workers.dev';
+
+      var resp = await fetch(WORKER_URL, { method: 'POST', body: fd });
+      var data = await resp.json();
+
+      if (data.success) {
+        document.getElementById('trimitereForm').style.display = 'none';
+        document.getElementById('trimitereSuccess').style.display = 'block';
+      } else {
+        setMsg(msg, 'error', '⚠ ' + (data.error || 'A apărut o eroare. Încearcă din nou.'));
+        btn.disabled = false;
+        btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
+      }
+    } catch(e) {
+      setMsg(msg, 'error', '⚠ Conexiune eșuată. Verificați internetul și încercați din nou.');
+      btn.disabled = false;
+      btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
+    }
+  }
+
+  function setMsg(el, type, text) {
+    el.textContent = text;
+    el.style.color = type === 'error' ? '#c0392b' : type === 'info' ? '#b8963e' : '#1e7e34';
+  }
+
+  function resetTrimitere() {
+    selectedFiles = [];
+    renderFileList();
+    ['tr-nume','tr-email','tr-institutie','tr-functie','tr-localitate','tr-judet','tr-telefon'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('tr-sectiune').value = '';
+    document.getElementById('tr-tip').value = '';
+    document.getElementById('tr-gdpr').checked = false;
+    document.querySelector('input[name="exemplar"][value="Nu"]').checked = true;
+    document.getElementById('trimitereMsg').textContent = '';
+    var btn = document.getElementById('btnTrimite');
+    btn.disabled = false;
+    btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
+    document.getElementById('trimitereForm').style.display = 'block';
+    document.getElementById('trimitereSuccess').style.display = 'none';
+  }
+
 </script>
 </body>
 </html>
