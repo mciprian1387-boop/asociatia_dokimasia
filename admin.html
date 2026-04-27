@@ -668,7 +668,10 @@
       <div class="section" id="sec-revista">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h2 style="color:#8B0000;font-size:1.3rem;">📖 Revistă</h2>
-          <button class="btn btn-red" onclick="showFormEditie()">+ Ediție nouă</button>
+          <div style="display:flex;gap:10px;">
+            <a href="admin-revista.html"><button class="btn btn-outline" style="display:flex;align-items:center;gap:6px;">🎛️ Admin Revistă Complet</button></a>
+            <button class="btn btn-red" onclick="showFormEditie()">+ Ediție nouă</button>
+          </div>
         </div>
         <div id="formEditie" style="display:none;background:#f9f4f4;border:1px solid #e0c0c0;border-radius:10px;padding:24px;margin-bottom:24px;">
           <h3 style="color:#8B0000;margin-bottom:16px;" id="formEditieTitlu">Ediție nouă</h3>
