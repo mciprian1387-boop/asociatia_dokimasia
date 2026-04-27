@@ -10,9 +10,25 @@ const CORS = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
+// ---- Helper: Supabase REST insert ----
+async function supabaseInsert(env, table, data) {
+  const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': env.SUPABASE_SERVICE_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
+      'Prefer': 'return=representation',
+    },
+    body: JSON.stringify(data),
+  });
+  const result = await resp.json();
+  if (!resp.ok) throw new Error(JSON.stringify(result));
+  return Array.isArray(result) ? result[0] : result;
+}
+
 export default {
   async fetch(request, env) {
-    // Preflight CORS
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: CORS });
     }
@@ -62,30 +78,30 @@ export default {
       }
     }
 
+    // ---- Endpoint principal: upload articole ----
     try {
       const formData = await request.formData();
 
-      // ---- Date autor ----
-      const nume        = formData.get('nume')        || '—';
-      const email       = formData.get('email')       || '—';
-      const institutie  = formData.get('institutie')  || '—';
-      const functie     = formData.get('functie')     || '—';
-      const localitate  = formData.get('localitate')  || '—';
-      const judet       = formData.get('judet')       || '—';
-      const telefon     = formData.get('telefon')     || '—';
-      const sectiune    = formData.get('sectiune')    || '—';
-      const tip_material = formData.get('tip_material') || '—';
-      const nr_articole = formData.get('nr_articole') || '—';
-      const optiune_plata = formData.get('optiune_plata') || '—';
+      const nume          = formData.get('nume')          || '';
+      const email         = formData.get('email')         || '';
+      const institutie    = formData.get('institutie')    || '';
+      const functie       = formData.get('functie')       || '';
+      const localitate    = formData.get('localitate')    || '';
+      const judet         = formData.get('judet')         || '';
+      const telefon       = formData.get('telefon')       || '';
+      const sectiune      = formData.get('sectiune')      || '';
+      const tip_material  = formData.get('tip_material')  || '';
+      const nr_articole   = parseInt(formData.get('nr_articole') || '1');
+      const optiune_plata = formData.get('optiune_plata') || 'tarziu';
 
-      // ---- Upload fișiere în R2 ----
       const fisiere = formData.getAll('fisiere');
       if (!fisiere || fisiere.length === 0) {
-        return new Response(JSON.stringify({ success: false, error: 'Niciun fișier primit.' }), {
+        return new Response(JSON.stringify({ success: false, error: 'Niciun fisier primit.' }), {
           status: 400, headers: { ...CORS, 'Content-Type': 'application/json' }
         });
       }
 
+      // ---- Upload R2 ----
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
       const slugNume  = nume.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').slice(0, 30);
       const linkuri   = [];
@@ -94,66 +110,72 @@ export default {
         const file = fisiere[i];
         const ext  = file.name.split('.').pop();
         const key  = `articole/${timestamp}_${slugNume}_art${i + 1}.${ext}`;
-
         const arrayBuffer = await file.arrayBuffer();
         await env.R2_BUCKET.put(key, arrayBuffer, {
           httpMetadata: { contentType: file.type || 'application/octet-stream' },
-          customMetadata: {
-            autor: nume,
-            email: email,
-            originalName: file.name,
-          },
+          customMetadata: { autor: nume, email: email, originalName: file.name },
         });
-
         linkuri.push(`https://cdn.dokimasia.ro/${key}`);
       }
 
-      // ---- Trimite email via EmailJS REST API ----
-      const linkuriText = linkuri.map((l, i) => `Articol ${i + 1}: ${l}`).join('\n');
+      // ---- Salvează în Supabase ----
+      let supabaseOk = true;
+      try {
+        for (let i = 0; i < nr_articole; i++) {
+          await supabaseInsert(env, 'articole_revista', {
+            titlu:         `Articol ${i + 1} – ${nume}`,
+            rubrica:       sectiune,
+            tip_acces:     'premium',
+            status:        'trimis',
+            platit:        optiune_plata === 'acum',
+            email_autor:   email,
+            nume_autor:    nume,
+            institutie:    institutie,
+            functie:       functie,
+            localitate:    localitate,
+            judet:         judet,
+            telefon:       telefon,
+            nr_articole:   nr_articole,
+            optiune_plata: optiune_plata,
+            fisiere_links: linkuri,
+            fisier_url:    linkuri[i] || linkuri[0] || null,
+            tip_fisier:    tip_material,
+          });
+        }
+      } catch(e) {
+        supabaseOk = false;
+        console.error('Supabase error:', e.message);
+      }
 
+      // ---- EmailJS ----
+      const linkuriText = linkuri.map((l, i) => `Articol ${i + 1}: ${l}`).join('\n');
       const emailPayload = {
         service_id:  env.EJS_SERVICE_ID,
         template_id: env.EJS_TEMPLATE_ID,
         user_id:     env.EJS_PUBLIC_KEY,
         accessToken: env.EJS_PRIVATE_KEY,
         template_params: {
-          nume,
-          email,
-          institutie,
-          functie,
-          localitate,
-          judet,
-          telefon,
-          sectiune,
-          tip_material,
-          nr_articole,
+          nume, email, institutie, functie, localitate, judet, telefon,
+          sectiune, tip_material,
+          nr_articole: String(nr_articole),
           optiune_plata,
           fisiere:  linkuriText,
-          message:  `Articol nou primit – ${nume}\nSecțiune: ${sectiune}\nTip: ${tip_material}\nNr. articole: ${nr_articole}\nPlată: ${optiune_plata}\n\nFișiere:\n${linkuriText}`,
-          title:    `Articol nou Dokimasia – ${nume}`,
+          message:  `Articol nou - ${nume} | ${sectiune} | ${tip_material} | ${nr_articole} art. | Plata: ${optiune_plata}\n\nFisiere:\n${linkuriText}`,
+          title:    `Articol nou Dokimasia - ${nume}`,
         }
       };
 
-      const ejsResp = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(emailPayload),
       });
 
-      if (!ejsResp.ok) {
-        const errText = await ejsResp.text();
-        console.error('EmailJS error:', errText);
-        // Fișierele s-au urcat OK, dar emailul a eșuat — returnăm success oricum
-        return new Response(JSON.stringify({
-          success: true,
-          warning: 'Fișierele au fost salvate dar emailul nu s-a trimis: ' + errText,
-          linkuri,
-        }), { headers: { ...CORS, 'Content-Type': 'application/json' } });
-      }
-
-      return new Response(JSON.stringify({ success: true, linkuri }), {
-        headers: { ...CORS, 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({
+        success: true,
+        linkuri,
+        supabase: supabaseOk ? 'ok' : 'warning',
+      }), { headers: { ...CORS, 'Content-Type': 'application/json' } });
 
     } catch (err) {
       console.error('Worker error:', err);
