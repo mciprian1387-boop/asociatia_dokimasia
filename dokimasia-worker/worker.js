@@ -74,6 +74,7 @@ export default {
         service_id:  env.EJS_SERVICE_ID,
         template_id: env.EJS_TEMPLATE_ID,
         user_id:     env.EJS_PUBLIC_KEY,
+        accessToken: env.EJS_PRIVATE_KEY,
         template_params: {
           nume,
           email,
