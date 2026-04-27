@@ -21,6 +21,47 @@ export default {
       return new Response('Method not allowed', { status: 405, headers: CORS });
     }
 
+    const url = new URL(request.url);
+
+    // ---- Endpoint Stripe PaymentIntent ----
+    if (url.pathname === '/stripe-intent') {
+      try {
+        const body = await request.json();
+        const suma = Math.round(body.suma * 100);
+        const label = body.label || 'Contributie editoriale Dokimasia';
+
+        const stripeResp = await fetch('https://api.stripe.com/v1/payment_intents', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${btoa(env.STRIPE_SECRET_KEY + ':')}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            amount: suma,
+            currency: 'ron',
+            description: label,
+            'automatic_payment_methods[enabled]': 'true',
+          }).toString()
+        });
+
+        const intent = await stripeResp.json();
+
+        if (intent.error) {
+          return new Response(JSON.stringify({ error: intent.error.message }), {
+            status: 400, headers: { ...CORS, 'Content-Type': 'application/json' }
+          });
+        }
+
+        return new Response(JSON.stringify({ clientSecret: intent.client_secret }), {
+          headers: { ...CORS, 'Content-Type': 'application/json' }
+        });
+      } catch(err) {
+        return new Response(JSON.stringify({ error: 'Eroare Stripe: ' + err.message }), {
+          status: 500, headers: { ...CORS, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
     try {
       const formData = await request.formData();
 
