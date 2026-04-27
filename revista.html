@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Revista Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://www.paypal.com/sdk/js?client-id=AXquC42BzgOQMjC4eL64SVhQHNcQKj2mFuzdU5OLct9qdxyzgqoaAIHBn2J8C6b0N43OQ76lgazOYG9f&currency=RON&intent=capture&disable-funding=credit,paylater&commit=false"></script>
   <script src="https://js.stripe.com/v3/"></script>
   <script src="auth.js"></script>
@@ -708,52 +709,85 @@
         <!-- PASUL 2: Plată -->
         <div id="tr-step2" style="display:none;">
           <div class="form-section">
-            <div class="form-section-title">Pasul 2 — Achită contribuția editorială</div>
+            <div class="form-section-title">Pasul 2 — Contribuția editorială</div>
             <p style="font-size:0.95rem;color:#555;margin-bottom:20px;line-height:1.7;">
               Ai selectat <strong id="tr-pach-label">1 articol</strong>. Contribuția editorială este de <strong id="tr-pach-suma">40 lei</strong>.
             </p>
 
-            <!-- Tabs plată -->
-            <div class="tr-pay-tabs">
-              <button class="tr-pay-tab active" onclick="switchPayTab('card', this)">💳 Card bancar</button>
-              <button class="tr-pay-tab" onclick="switchPayTab('paypal', this)">🅿 PayPal</button>
-              <button class="tr-pay-tab" onclick="switchPayTab('iban', this)">🏦 Transfer bancar</button>
-            </div>
+            <!-- Opțiuni plată: două secțiuni -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
 
-            <!-- CARD STRIPE -->
-            <div id="tr-card-wrap" style="margin-top:16px;max-width:420px;">
-              <div id="stripe-card-element" style="border:1px solid var(--border);border-radius:3px;padding:12px 14px;background:#fff;"></div>
-              <div id="stripe-card-error" style="color:#c0392b;font-size:0.85rem;margin-top:8px;"></div>
-              <button onclick="platesteCard()" id="btn-card-pay"
-                style="margin-top:14px;width:100%;background:var(--crimson);color:#fff;border:none;padding:13px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;">
-                Plătește <span id="card-pay-suma">40</span> lei cu cardul
-              </button>
-              <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">🔒 Plată securizată prin Stripe. Acceptăm Visa, Mastercard.</p>
-            </div>
+              <!-- PLĂTEȘTE ACUM -->
+              <div id="sectiune-plateste-acum" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('acum')">
+                <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
+                  <input type="radio" name="optiune-plata" id="radio-acum" style="accent-color:var(--crimson);" />
+                  <label for="radio-acum" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">💳 Plătește acum</label>
+                </div>
+                <div id="continut-plateste-acum" style="display:none;padding:16px 18px;">
+                  <!-- Tabs plată -->
+                  <div class="tr-pay-tabs">
+                    <button class="tr-pay-tab active" onclick="switchPayTab('card', this)">💳 Card bancar</button>
+                    <button class="tr-pay-tab" onclick="switchPayTab('paypal', this)">🅿 PayPal</button>
+                    <button class="tr-pay-tab" onclick="switchPayTab('iban', this)">🏦 Transfer bancar</button>
+                  </div>
 
-            <!-- PayPal -->
-            <div id="tr-paypal-wrap" style="display:none;margin-top:16px;max-width:300px;">
-              <div id="tr-pp-btn"></div>
-              <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal.</p>
-            </div>
+                  <!-- CARD STRIPE -->
+                  <div id="tr-card-wrap" style="margin-top:16px;max-width:420px;">
+                    <div id="stripe-card-element" style="border:1px solid var(--border);border-radius:3px;padding:12px 14px;background:#fff;"></div>
+                    <div id="stripe-card-error" style="color:#c0392b;font-size:0.85rem;margin-top:8px;"></div>
+                    <button onclick="platesteCard()" id="btn-card-pay"
+                      style="margin-top:14px;width:100%;background:var(--crimson);color:#fff;border:none;padding:13px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;">
+                      Plătește <span id="card-pay-suma">40</span> lei cu cardul
+                    </button>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">🔒 Plată securizată prin Stripe. Acceptăm Visa, Mastercard.</p>
+                  </div>
 
-            <!-- IBAN -->
-            <div id="tr-iban-wrap" style="display:none;margin-top:16px;">
-              <div style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;">
-                <div style="font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Date transfer bancar</div>
-                <table style="font-size:0.95rem;border-collapse:collapse;width:100%;">
-                  <tr><td style="padding:5px 0;color:#666;width:140px;">Beneficiar</td><td style="padding:5px 0;font-weight:600;">Asociația Dokimasia</td></tr>
-                  <tr><td style="padding:5px 0;color:#666;">IBAN</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">RO00 XXXX 0000 0000 0000 0000</td></tr>
-                  <tr><td style="padding:5px 0;color:#666;">Bancă</td><td style="padding:5px 0;">—</td></tr>
-                  <tr><td style="padding:5px 0;color:#666;">Suma</td><td style="padding:5px 0;font-weight:600;" id="tr-iban-suma">40 lei</td></tr>
-                  <tr><td style="padding:5px 0;color:#666;">Referință</td><td style="padding:5px 0;">Contribuție editorială Dokimasia</td></tr>
-                </table>
+                  <!-- PayPal -->
+                  <div id="tr-paypal-wrap" style="display:none;margin-top:16px;max-width:300px;">
+                    <div id="tr-pp-btn"></div>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal.</p>
+                  </div>
+
+                  <!-- IBAN -->
+                  <div id="tr-iban-wrap" style="display:none;margin-top:16px;">
+                    <div style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;">
+                      <div style="font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Date transfer bancar</div>
+                      <table style="font-size:0.95rem;border-collapse:collapse;width:100%;">
+                        <tr><td style="padding:5px 0;color:#666;width:140px;">Beneficiar</td><td style="padding:5px 0;font-weight:600;">Asociația Dokimasia</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">IBAN</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">RO00 XXXX 0000 0000 0000 0000</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">Bancă</td><td style="padding:5px 0;">—</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">Suma</td><td style="padding:5px 0;font-weight:600;" id="tr-iban-suma">40 lei</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">Referință</td><td style="padding:5px 0;">Contribuție editorială Dokimasia</td></tr>
+                      </table>
+                    </div>
+                    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
+                      <input type="checkbox" id="tr-iban-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
+                      <span style="font-size:0.92rem;color:#444;line-height:1.65;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
+                    </label>
+                    <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
+                  </div>
+                </div>
               </div>
-              <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
-                <input type="checkbox" id="tr-iban-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
-                <span style="font-size:0.92rem;color:#444;line-height:1.65;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
-              </label>
-              <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
+
+              <!-- PLĂTEȘTE MAI TÂRZIU -->
+              <div id="sectiune-plateste-mai-tarziu" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('tarziu')">
+                <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
+                  <input type="radio" name="optiune-plata" id="radio-tarziu" style="accent-color:var(--crimson);" />
+                  <label for="radio-tarziu" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">🕐 Plătește mai târziu</label>
+                </div>
+                <div id="continut-plateste-tarziu" style="display:none;padding:16px 18px;">
+                  <p style="font-size:0.92rem;color:#555;line-height:1.7;margin-bottom:16px;">
+                    Poți trimite articolul acum și achita contribuția editorială ulterior. Redacția va procesa materialul după confirmarea plății.
+                  </p>
+                  <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
+                    <input type="checkbox" id="tr-tarziu-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" onchange="handleTarziuConfirm(this)" />
+                    <span style="font-size:0.92rem;color:#444;line-height:1.65;">
+                      Am luat la cunoștință că articolul va fi procesat după achitarea contribuției editoriale de <strong id="tr-tarziu-suma">40 lei</strong> și confirm că voi efectua plata ulterior. <span class="req">*</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -768,6 +802,11 @@
 
         <div class="form-section">
           <div class="form-section-title">Pasul 3 — Date autor</div>
+          <!-- Notificare date salvate -->
+          <div id="autor-saved-notif" style="display:none;align-items:center;justify-content:space-between;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:10px 14px;margin-bottom:16px;font-size:0.87rem;color:#5d4037;transition:opacity 0.5s;">
+            <span>💾 Datele tale au fost completate automat din vizita anterioară.</span>
+            <button onclick="stergeeDateAutor()" style="background:none;border:none;cursor:pointer;color:#8B0000;font-size:0.82rem;font-weight:600;padding:0 4px;text-decoration:underline;">Șterge datele salvate</button>
+          </div>
           <div class="form-row-2">
             <div class="fld-group">
               <label class="fld-label">Nume și prenume <span class="req">*</span></label>
@@ -858,16 +897,9 @@
         <div class="form-section">
           <div class="form-section-title">Pasul 5 — Fișiere atașate</div>
           <p style="font-size:0.95rem;color:#555;margin-bottom:16px;line-height:1.7;">
-            Atașează unul sau mai multe fișiere. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
+            Atașează câte un fișier pentru fiecare articol. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
           </p>
-          <div id="dropZone" onclick="document.getElementById('tr-fisiere').click()"
-               style="border:2px dashed var(--border);border-radius:4px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:var(--paper);">
-            <div style="font-size:2rem;margin-bottom:10px;">📎</div>
-            <div style="font-size:1rem;color:#555;margin-bottom:6px;">Trage fișierele aici sau <span style="color:var(--crimson);font-weight:600;">apasă pentru a selecta</span></div>
-            <div style="font-size:0.82rem;color:var(--muted);">.doc · .docx · .pdf · max. 50 MB / fișier · oricâte fișiere</div>
-          </div>
-          <input type="file" id="tr-fisiere" multiple accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" style="display:none;" onchange="handleTrimitereFiles(this.files)" />
-          <div id="fileList" style="margin-top:14px;display:flex;flex-direction:column;gap:8px;"></div>
+          <div id="articole-fisiere-wrap" style="display:flex;flex-direction:column;gap:16px;"></div>
         </div>
 
         <div class="form-section" style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:18px 20px;">
@@ -1194,45 +1226,135 @@
   // =====================
   // TRIMITERE ARTICOL
   // =====================
-  var selectedFiles = [];
+  // selectedFiles[i] = File object pentru articolul i (0-indexed), sau null
+  var selectedFiles = [null, null, null];
 
-  // Drag & drop
-  var dz = document.getElementById('dropZone');
-  if (dz) {
-    dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('drag-over'); });
-    dz.addEventListener('dragleave', function() { dz.classList.remove('drag-over'); });
-    dz.addEventListener('drop', function(e) {
-      e.preventDefault();
-      dz.classList.remove('drag-over');
-      handleTrimitereFiles(e.dataTransfer.files);
+  // =====================
+  // SALVARE DATE AUTOR
+  // =====================
+  var AUTOR_FIELDS = ['tr-nume','tr-email','tr-institutie','tr-functie','tr-localitate','tr-judet','tr-telefon'];
+  var AUTOR_KEY = 'dokimasia_autor';
+
+  function salveazaDateAutor() {
+    var data = {};
+    AUTOR_FIELDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) data[id] = el.value;
     });
+    try { localStorage.setItem(AUTOR_KEY, JSON.stringify(data)); } catch(e) {}
   }
 
-  function handleTrimitereFiles(files) {
-    for (var i = 0; i < files.length; i++) {
-      var f = files[i];
-      // Evită duplicate
-      var exists = selectedFiles.some(function(x) { return x.name === f.name && x.size === f.size; });
-      if (!exists) selectedFiles.push(f);
+  function restaureazaDateAutor() {
+    try {
+      var raw = localStorage.getItem(AUTOR_KEY);
+      if (!raw) return;
+      var data = JSON.parse(raw);
+      AUTOR_FIELDS.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && data[id]) el.value = data[id];
+      });
+      // Arată notificare discretă
+      var notif = document.getElementById('autor-saved-notif');
+      if (notif) {
+        notif.style.display = 'flex';
+        setTimeout(function() { notif.style.opacity = '0'; setTimeout(function(){ notif.style.display='none'; notif.style.opacity='1'; }, 500); }, 4000);
+      }
+    } catch(e) {}
+  }
+
+  function stergeeDateAutor() {
+    try { localStorage.removeItem(AUTOR_KEY); } catch(e) {}
+    AUTOR_FIELDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    var notif = document.getElementById('autor-saved-notif');
+    if (notif) notif.style.display = 'none';
+  }
+
+  // Atașează autosave la fiecare câmp autor (la blur)
+  document.addEventListener('DOMContentLoaded', function() {
+    AUTOR_FIELDS.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.addEventListener('blur', salveazaDateAutor);
+    });
+  });
+
+  function renderArticoleFisiere(nrArticole) {
+    var wrap = document.getElementById('articole-fisiere-wrap');
+    if (!wrap) return;
+    // Reset files array pentru sloturile noi
+    selectedFiles = [];
+    for (var i = 0; i < nrArticole; i++) selectedFiles.push(null);
+
+    wrap.innerHTML = '';
+    for (var idx = 0; idx < nrArticole; idx++) {
+      (function(i) {
+        var label = nrArticole === 1 ? 'Articolul tău' : 'Articolul ' + (i + 1);
+        var div = document.createElement('div');
+        div.id = 'slot-articol-' + i;
+        div.style.cssText = 'border:2px dashed var(--border);border-radius:4px;padding:20px;background:var(--paper);transition:border-color 0.2s;';
+        div.innerHTML =
+          '<div style="font-size:0.78rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">' + label + '</div>' +
+          '<div id="slot-drop-' + i + '" style="display:flex;align-items:center;gap:12px;cursor:pointer;">' +
+            '<div style="font-size:1.8rem;">📎</div>' +
+            '<div>' +
+              '<div style="font-size:0.93rem;color:#555;">Apasă pentru a selecta sau trage fișierul aici</div>' +
+              '<div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">.doc · .docx · .pdf · max. 50 MB</div>' +
+            '</div>' +
+          '</div>' +
+          '<input type="file" id="slot-input-' + i + '" ' +
+            'accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" ' +
+            'style="display:none;" />' +
+          '<div id="slot-preview-' + i + '" style="margin-top:10px;display:none;"></div>';
+
+        wrap.appendChild(div);
+
+        // Input change
+        var input = document.getElementById('slot-input-' + i);
+        input.addEventListener('change', function() {
+          if (this.files[0]) setSlotFile(i, this.files[0]);
+        });
+
+        // Click pe zona de upload -> deschide file picker
+        var dropEl = document.getElementById('slot-drop-' + i);
+        dropEl.addEventListener('click', function() {
+          document.getElementById('slot-input-' + i).click();
+        });
+
+        // Drag & drop pe slot
+        div.addEventListener('dragover', function(e) { e.preventDefault(); div.style.borderColor = 'var(--crimson)'; });
+        div.addEventListener('dragleave', function() { div.style.borderColor = selectedFiles[i] ? 'var(--crimson)' : 'var(--border)'; });
+        div.addEventListener('drop', function(e) {
+          e.preventDefault();
+          if (e.dataTransfer.files[0]) setSlotFile(i, e.dataTransfer.files[0]);
+        });
+      })(idx);
     }
-    renderFileList();
   }
 
-  function renderFileList() {
-    var list = document.getElementById('fileList');
-    if (!list) return;
-    if (selectedFiles.length === 0) { list.innerHTML = ''; return; }
-    list.innerHTML = selectedFiles.map(function(f, i) {
-      return '<div class="file-item">' +
-        '<span class="fi-name">📄 ' + escHtml(f.name) + '<span class="fi-size">' + fmtBytes(f.size) + '</span></span>' +
-        '<button class="fi-remove" onclick="removeFile(' + i + ')" title="Elimină">✕</button>' +
-      '</div>';
-    }).join('');
+  function setSlotFile(i, file) {
+    selectedFiles[i] = file;
+    var slotDiv = document.getElementById('slot-articol-' + i);
+    var preview = document.getElementById('slot-preview-' + i);
+    if (slotDiv) slotDiv.style.borderColor = 'var(--crimson)';
+    if (preview) {
+      preview.style.display = 'flex';
+      preview.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--border);border-radius:3px;padding:8px 12px;margin-top:10px;';
+      preview.innerHTML =
+        '<span style="font-size:0.88rem;color:#333;">📄 ' + escHtml(file.name) + ' <span style="color:var(--muted);font-size:0.78rem;">(' + fmtBytes(file.size) + ')</span></span>' +
+        '<button onclick="clearSlotFile(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0 4px;" title="Elimină">✕</button>';
+    }
   }
 
-  function removeFile(i) {
-    selectedFiles.splice(i, 1);
-    renderFileList();
+  function clearSlotFile(i) {
+    selectedFiles[i] = null;
+    var slotDiv = document.getElementById('slot-articol-' + i);
+    var input = document.getElementById('slot-input-' + i);
+    var preview = document.getElementById('slot-preview-' + i);
+    if (slotDiv) slotDiv.style.borderColor = 'var(--border)';
+    if (input) input.value = '';
+    if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
   }
 
   function fmtBytes(b) {
@@ -1245,48 +1367,52 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  var WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
+
   async function trimitereArticol() {
     var msg = document.getElementById('trimitereMsg');
     var btn = document.getElementById('btnTrimite');
 
     // Validare
-    var nume = document.getElementById('tr-nume').value.trim();
-    var email = document.getElementById('tr-email').value.trim();
+    var nume     = document.getElementById('tr-nume').value.trim();
+    var email    = document.getElementById('tr-email').value.trim();
     var sectiune = document.getElementById('tr-sectiune').value;
-    var tip = document.getElementById('tr-tip').value;
-    var gdpr = document.getElementById('tr-gdpr').checked;
+    var tip      = document.getElementById('tr-tip').value;
+    var gdpr     = document.getElementById('tr-gdpr').checked;
 
-    if (!nume) { setMsg(msg, 'error', '⚠ Introduceți numele și prenumele.'); return; }
+    if (!nume)     { setMsg(msg, 'error', '⚠ Introduceți numele și prenumele.'); return; }
     if (!email || !email.includes('@')) { setMsg(msg, 'error', '⚠ Introduceți o adresă de e-mail validă.'); return; }
     if (!sectiune) { setMsg(msg, 'error', '⚠ Selectați secțiunea tematică.'); return; }
-    if (!tip) { setMsg(msg, 'error', '⚠ Selectați tipul materialului.'); return; }
-    if (selectedFiles.length === 0) { setMsg(msg, 'error', '⚠ Atașați cel puțin un fișier.'); return; }
-    if (!gdpr) { setMsg(msg, 'error', '⚠ Bifați acordul pentru prelucrarea datelor.'); return; }
+    if (!tip)      { setMsg(msg, 'error', '⚠ Selectați tipul materialului.'); return; }
+    var missingFile = selectedFiles.some(function(f) { return !f; });
+    if (missingFile) { setMsg(msg, 'error', '⚠ Atașați câte un fișier pentru fiecare articol selectat.'); return; }
+    if (!gdpr)     { setMsg(msg, 'error', '⚠ Bifați acordul pentru prelucrarea datelor.'); return; }
 
     btn.disabled = true;
-    btn.innerHTML = '<span>Se trimite...</span>';
-    setMsg(msg, 'info', '⏳ Se încarcă fișierele, vă rugăm așteptați...');
+    btn.innerHTML = '<span>⏳ Se încarcă fișierele...</span>';
+    setMsg(msg, 'info', '⏳ Se încarcă fișierele în cloud, vă rugăm așteptați...');
+
+    var optiunePlata = (document.getElementById('radio-tarziu') && document.getElementById('radio-tarziu').checked)
+      ? 'Plătește mai târziu' : 'Plătește acum';
 
     var fd = new FormData();
-    fd.append('nume', nume);
-    fd.append('email', email);
-    fd.append('institutie', document.getElementById('tr-institutie').value.trim());
-    fd.append('functie', document.getElementById('tr-functie').value.trim());
-    fd.append('localitate', document.getElementById('tr-localitate').value.trim());
-    fd.append('judet', document.getElementById('tr-judet').value.trim());
-    fd.append('telefon', document.getElementById('tr-telefon').value.trim());
-    fd.append('sectiune', sectiune);
-    fd.append('tip_material', tip);
-    fd.append('exemplar', document.querySelector('input[name="exemplar"]:checked').value);
-    fd.append('gdpr', 'da');
+    fd.append('nume',          nume);
+    fd.append('email',         email);
+    fd.append('institutie',    document.getElementById('tr-institutie').value.trim() || '—');
+    fd.append('functie',       document.getElementById('tr-functie').value.trim()    || '—');
+    fd.append('localitate',    document.getElementById('tr-localitate').value.trim() || '—');
+    fd.append('judet',         document.getElementById('tr-judet').value.trim()      || '—');
+    fd.append('telefon',       document.getElementById('tr-telefon').value.trim()    || '—');
+    fd.append('sectiune',      sectiune);
+    fd.append('tip_material',  tip);
+    fd.append('nr_articole',   selectedFiles.filter(Boolean).length);
+    fd.append('optiune_plata', optiunePlata);
+
     for (var i = 0; i < selectedFiles.length; i++) {
-      fd.append('fisiere', selectedFiles[i]);
+      if (selectedFiles[i]) fd.append('fisiere', selectedFiles[i]);
     }
 
     try {
-      // ÎNLOCUIEȘTE cu URL-ul real al Worker-ului tău Cloudflare
-      var WORKER_URL = 'https://dokimasia-articole.CONTUL-TAU.workers.dev';
-
       var resp = await fetch(WORKER_URL, { method: 'POST', body: fd });
       var data = await resp.json();
 
@@ -1299,6 +1425,7 @@
         btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
       }
     } catch(e) {
+      console.error('Worker error:', e);
       setMsg(msg, 'error', '⚠ Conexiune eșuată. Verificați internetul și încercați din nou.');
       btn.disabled = false;
       btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
@@ -1316,8 +1443,16 @@
     [1,2,3].forEach(function(i) { document.getElementById('pach-' + i).classList.remove('selected'); });
     document.getElementById('tr-step2').style.display = 'none';
     document.getElementById('tr-pp-btn').innerHTML = '';
+    document.getElementById('radio-acum').checked = false;
+    document.getElementById('radio-tarziu').checked = false;
+    document.getElementById('continut-plateste-acum').style.display = 'none';
+    document.getElementById('continut-plateste-tarziu').style.display = 'none';
+    document.getElementById('sectiune-plateste-acum').style.borderColor = 'var(--border)';
+    document.getElementById('sectiune-plateste-mai-tarziu').style.borderColor = 'var(--border)';
+    var trzCheck = document.getElementById('tr-tarziu-confirm');
+    if (trzCheck) trzCheck.checked = false;
     selectedFiles = [];
-    renderFileList();
+    document.getElementById('articole-fisiere-wrap').innerHTML = '';
     ['tr-nume','tr-email','tr-institutie','tr-functie','tr-localitate','tr-judet','tr-telefon'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = '';
@@ -1353,15 +1488,46 @@
     document.getElementById('tr-pach-suma').textContent = p.suma + ' lei';
     document.getElementById('tr-iban-suma').textContent = p.suma + ' lei';
     document.getElementById('tr-iban-suma2').textContent = p.suma + ' lei';
+    var trzSuma = document.getElementById('tr-tarziu-suma');
+    if (trzSuma) trzSuma.textContent = p.suma + ' lei';
     document.getElementById('tr-step2').style.display = 'block';
+    // Render fisiere per articol
+    renderArticoleFisiere(nr);
     document.getElementById('tr-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     // Update suma pe butonul card
     var cardSumaEl = document.getElementById('card-pay-suma');
     if (cardSumaEl) cardSumaEl.textContent = p.suma;
-    // Init Stripe card
-    setTimeout(initStripeCard, 100);
+    // Reset optiuni plata
+    document.getElementById('radio-acum').checked = false;
+    document.getElementById('radio-tarziu').checked = false;
+    document.getElementById('continut-plateste-acum').style.display = 'none';
+    document.getElementById('continut-plateste-tarziu').style.display = 'none';
+    document.getElementById('sectiune-plateste-acum').style.borderColor = 'var(--border)';
+    document.getElementById('sectiune-plateste-mai-tarziu').style.borderColor = 'var(--border)';
     // Reset PayPal
     document.getElementById('tr-pp-btn').innerHTML = '';
+  }
+
+  function selectOptiunePlata(optiune) {
+    // Vizual: borduri active
+    document.getElementById('sectiune-plateste-acum').style.borderColor = optiune === 'acum' ? 'var(--crimson)' : 'var(--border)';
+    document.getElementById('sectiune-plateste-mai-tarziu').style.borderColor = optiune === 'tarziu' ? 'var(--crimson)' : 'var(--border)';
+    // Radio buttons
+    document.getElementById('radio-acum').checked = optiune === 'acum';
+    document.getElementById('radio-tarziu').checked = optiune === 'tarziu';
+    // Conținut vizibil
+    document.getElementById('continut-plateste-acum').style.display = optiune === 'acum' ? 'block' : 'none';
+    document.getElementById('continut-plateste-tarziu').style.display = optiune === 'tarziu' ? 'block' : 'none';
+    // Dacă acum: init Stripe
+    if (optiune === 'acum') {
+      setTimeout(initStripeCard, 100);
+    }
+  }
+
+  function handleTarziuConfirm(checkbox) {
+    if (checkbox.checked) {
+      deblocheazaFormular('Ai ales să plătești mai târziu. Poți trimite acum articolul — redacția va procesa materialul după confirmarea plății.');
+    }
   }
 
   function switchPayTab(tab, el) {
@@ -1413,6 +1579,7 @@
     document.getElementById('tr-plata-confirmare').textContent = msg;
     document.getElementById('trimitereForm').style.display = 'block';
     document.getElementById('trimitereForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    restaureazaDateAutor();
   }
 
 
