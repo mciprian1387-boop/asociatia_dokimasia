@@ -307,6 +307,7 @@
     <div class="sidebar-item" id="sb-calendar" onclick="showSection('calendar');renderCalendar()">📅 Calendar</div>
     <div class="sidebar-item" id="sb-autori" onclick="showSection('autori')">👤 Autori</div>
     <div class="sidebar-item" id="sb-raport" onclick="showSection('raport')">📈 Raport</div>
+    <div class="sidebar-item" id="sb-istoric" onclick="showSection('istoric');loadIstoric()">🗂️ Istoric șters</div>
     <div class="sidebar-item" onclick="window.location='adeverinte.html'">📋 Adeverințe ↗</div>
   </div>
 
@@ -467,6 +468,15 @@
         <button class="btn btn-outline btn-sm" onclick="loadRaport()">Încarcă</button>
       </div>
       <div id="raport-content"></div>
+    </div>
+
+    <!-- ═══════════════ ISTORIC ȘTERS ═══════════════ -->
+    <div class="section" id="section-istoric">
+      <div class="page-title">🗂️ Istoric articole șterse</div>
+      <div class="table-wrap">
+        <div class="table-header"><h3>Articole șterse</h3></div>
+        <div id="tabel-istoric"></div>
+      </div>
     </div>
 
   </div><!-- /content -->
@@ -965,16 +975,56 @@ async function salveazaFinal() {
 // ════════════════════════════════════════════════
 async function stergeArticol(id, autor) {
   const autor_display = autor || 'acest articol';
-  if (!confirm(`⚠️ Ești sigur că vrei să ștergi definitiv articolul lui "${autor_display}"?\n\nAceastă acțiune este ireversibilă!`)) return;
+  if (!confirm(`⚠️ Ești sigur că vrei să ștergi articolul lui "${autor_display}"?\n\nArticolul va fi salvat în Istoric și poate fi restaurat.`)) return;
+  const articol = allArticole.find(a => a.id === id);
+  if (!articol) return;
+  // Salvează în istoric înainte de ștergere
+  await sb.from('articole_sterse').insert([{ articol_id: id, date: articol }]);
   const { error } = await sb.from('articole_revista').delete().eq('id', id);
-  if (error) {
-    toast('Eroare la ștergere: ' + error.message, 'error');
-    return;
-  }
+  if (error) { toast('Eroare la ștergere: ' + error.message, 'error'); return; }
   allArticole = allArticole.filter(a => a.id !== id);
-  toast(`Articolul lui "${autor_display}" a fost șters definitiv.`, 'info');
+  toast(`Articolul lui "${autor_display}" a fost șters și salvat în istoric.`, 'info');
   refreshViews();
   loadPlati();
+}
+
+// ════════════════════════════════════════════════
+// ISTORIC ARTICOLE ȘTERSE
+// ════════════════════════════════════════════════
+async function loadIstoric() {
+  const wrap = document.getElementById('tabel-istoric');
+  wrap.innerHTML = '<div style="padding:20px;color:#888">Se încarcă...</div>';
+  const { data, error } = await sb.from('articole_sterse').select('*').order('sters_la', { ascending: false });
+  if (error) { wrap.innerHTML = `<div style="padding:20px;color:#c62828">Eroare: ${error.message}</div>`; return; }
+  if (!data || !data.length) { wrap.innerHTML = '<div style="text-align:center;padding:30px;color:#888">Niciun articol șters.</div>'; return; }
+  const rows = data.map(r => {
+    const a = r.date || {};
+    return `<tr>
+      <td><strong>${a.nume_autor||'—'}</strong><div style="font-size:.75rem;color:#888">${a.email_autor||''}</div></td>
+      <td style="font-size:.78rem">${a.rubrica||'—'}</td>
+      <td>${badge(a.status||'trimis')}</td>
+      <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
+      <td style="font-size:.75rem;color:#c62828">${fmtDateTime(r.sters_la)}</td>
+      <td>
+        <button class="btn btn-sm btn-green" onclick="restaureazaArticol('${r.id}')">♻️ Restaurează</button>
+      </td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Data trimiterii</th><th>Șters la</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function restaureazaArticol(istoricId) {
+  if (!confirm('Restaurezi acest articol? Va fi readăugat în lista de articole.')) return;
+  const { data, error } = await sb.from('articole_sterse').select('*').eq('id', istoricId).single();
+  if (error || !data) { toast('Eroare la restaurare', 'error'); return; }
+  const articol = data.date;
+  delete articol.id; // lasă Supabase să genereze un ID nou
+  const { error: insErr } = await sb.from('articole_revista').insert([articol]);
+  if (insErr) { toast('Eroare la restaurare: ' + insErr.message, 'error'); return; }
+  await sb.from('articole_sterse').delete().eq('id', istoricId);
+  toast('Articolul a fost restaurat cu succes!', 'success');
+  await loadArticole();
+  loadIstoric();
 }
 
 // ════════════════════════════════════════════════
