@@ -924,10 +924,74 @@ async function detaliiArticol(id) {
 // ════════════════════════════════════════════════
 // EMAIL
 // ════════════════════════════════════════════════
+function buildEmailHtml(nume, paragraphs, mesajPersonalizat) {
+  const paragrafeHtml = paragraphs.map(p => `<p style="margin:0 0 14px 0;color:#333;font-size:15px;line-height:1.7">${p}</p>`).join('');
+  const extras = mesajPersonalizat
+    ? `<div style="border-left:3px solid #8B0000;padding:10px 16px;margin:18px 0;background:#fdf5f5;border-radius:0 4px 4px 0">
+        <p style="margin:0;color:#555;font-size:14px;line-height:1.7;font-style:italic">${mesajPersonalizat.replace(/\n/g,'<br>')}</p>
+       </div>`
+    : '';
+  return `<!DOCTYPE html>
+<html lang="ro"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Georgia,serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 0">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.1)">
+
+        <!-- HEADER -->
+        <tr><td style="background:#8B0000;padding:28px 36px;text-align:center">
+          <p style="margin:0;font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:3px;text-transform:uppercase">Asociația Dokimasia</p>
+          <p style="margin:6px 0 0;font-size:12px;color:rgba(255,255,255,0.75);letter-spacing:2px">Revista Dokimasia</p>
+        </td></tr>
+
+        <!-- BODY -->
+        <tr><td style="padding:36px 36px 24px">
+          <p style="margin:0 0 20px 0;color:#333;font-size:15px">Stimate(ă) <strong>${nume || 'autor(ă)'}</strong>,</p>
+          ${paragrafeHtml}
+          ${extras}
+        </td></tr>
+
+        <!-- SEPARATOR -->
+        <tr><td style="padding:0 36px"><hr style="border:none;border-top:1px solid #e0e0e0;margin:0"></td></tr>
+
+        <!-- FOOTER -->
+        <tr><td style="padding:24px 36px;background:#fafafa;text-align:center">
+          <p style="margin:0 0 4px;font-size:13px;font-weight:bold;color:#8B0000">Redacția Revistei Dokimasia</p>
+          <p style="margin:0;font-size:12px;color:#999">Asociația Dokimasia &nbsp;|&nbsp; <a href="mailto:contact@dokimasia.ro" style="color:#8B0000;text-decoration:none">contact@dokimasia.ro</a></p>
+          <p style="margin:8px 0 0;font-size:11px;color:#ccc">Acest email a fost generat automat de platforma editorială Dokimasia.</p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
 const emailTemplates = {
-  acceptat: { subj:'Articolul dumneavoastră a fost acceptat — Revista Dokimasia', body:'Stimate(ă) autor(ă),\n\nCu deosebită plăcere vă informăm că articolul trimis spre publicare în Revista Dokimasia a fost acceptat de comitetul editorial.\n\nVă vom contacta cu detalii privind numărul în care va apărea materialul dumneavoastră.\n\nCu stimă,\nRedacția Revista Dokimasia' },
-  revizuire: { subj:'Solicitare revizuire articol — Revista Dokimasia', body:'Stimate(ă) autor(ă),\n\nVă mulțumim pentru trimiterea articolului la Revista Dokimasia. În urma evaluării, comitetul editorial solicită revizuirea materialului conform observațiilor atașate.\n\nVă rugăm să trimiteți versiunea revizuită în termen de 14 zile.\n\nCu stimă,\nRedacția Revista Dokimasia' },
-  respins: { subj:'Comunicare decizie editorială — Revista Dokimasia', body:'Stimate(ă) autor(ă),\n\nVă mulțumim pentru interesul acordat Revistei Dokimasia. Ne pare rău să vă informăm că, în urma procesului de evaluare, articolul dumneavoastră nu a putut fi acceptat pentru publicare în numărul curent.\n\nVă încurajăm să trimiteți materiale viitoare.\n\nCu stimă,\nRedacția Revista Dokimasia' }
+  acceptat: {
+    subj: 'Articolul dumneavoastră a fost acceptat — Revista Dokimasia',
+    paragraphs: [
+      'Cu deosebită plăcere vă informăm că articolul trimis spre publicare în <strong>Revista Dokimasia</strong> a fost <strong style="color:#2e7d32">acceptat</strong> de comitetul editorial.',
+      'Vă vom contacta în cel mai scurt timp cu detalii privind numărul în care va apărea materialul dumneavoastră.',
+      'Vă mulțumim pentru contribuția adusă și vă felicităm pentru calitatea lucrării!'
+    ]
+  },
+  revizuire: {
+    subj: 'Solicitare revizuire articol — Revista Dokimasia',
+    paragraphs: [
+      'Vă mulțumim pentru trimiterea articolului la <strong>Revista Dokimasia</strong>.',
+      'În urma evaluării, comitetul editorial solicită <strong>revizuirea materialului</strong> conform observațiilor menționate mai jos.',
+      'Vă rugăm să trimiteți versiunea revizuită în termen de <strong>14 zile</strong> de la primirea acestui mesaj.'
+    ]
+  },
+  respins: {
+    subj: 'Comunicare decizie editorială — Revista Dokimasia',
+    paragraphs: [
+      'Vă mulțumim pentru interesul acordat <strong>Revistei Dokimasia</strong> și pentru efortul depus în elaborarea materialului.',
+      'Ne pare rău să vă informăm că, în urma procesului de evaluare, articolul dumneavoastră <strong style="color:#c62828">nu a putut fi acceptat</strong> pentru publicare în numărul curent.',
+      'Vă încurajăm să continuați activitatea de cercetare și să trimiteți materiale viitoare.'
+    ]
+  }
 };
 
 function openEmail(id, email, nume) {
@@ -945,24 +1009,38 @@ function selectTpl(tpl) {
   selectedTpl = tpl;
   document.querySelectorAll('.email-tpl').forEach(t=>t.classList.remove('selected'));
   document.getElementById('tpl-'+tpl).classList.add('selected');
-  document.getElementById('email-mesaj').value = emailTemplates[tpl]?.body || '';
+  // Afișăm un preview text simplu în textarea
+  const previews = {
+    acceptat: 'Articolul dumneavoastră a fost acceptat de comitetul editorial. Vă vom contacta cu detalii privind numărul în care va apărea materialul.',
+    revizuire: 'Comitetul editorial solicită revizuirea materialului. Vă rugăm să trimiteți versiunea revizuită în termen de 14 zile.',
+    respins: 'Ne pare rău să vă informăm că articolul nu a putut fi acceptat pentru publicare în numărul curent. Vă încurajăm să trimiteți materiale viitoare.'
+  };
+  document.getElementById('email-mesaj').value = previews[tpl] || '';
 }
 
 async function trimiteMail() {
   const email = document.getElementById('email-autor-email').value;
   const nume  = document.getElementById('email-autor-nume').value;
-  const mesaj = document.getElementById('email-mesaj').value.trim();
-  if (!email || !mesaj) { document.getElementById('notif-email').innerHTML='<div class="notif notif-error">Selectează un template sau scrie un mesaj.</div>'; return; }
+  const mesajPersonalizat = document.getElementById('email-mesaj').value.trim();
+  if (!email || (!selectedTpl && !mesajPersonalizat)) {
+    document.getElementById('notif-email').innerHTML='<div class="notif notif-error">Selectează un template sau scrie un mesaj.</div>';
+    return;
+  }
 
-  const tpl = emailTemplates[selectedTpl] || { subj:'Mesaj de la Redacția Dokimasia' };
+  const tpl = emailTemplates[selectedTpl];
+  const subj = tpl ? tpl.subj : 'Mesaj de la Redacția Dokimasia';
+  const paragraphs = tpl ? tpl.paragraphs : [];
+  const htmlBody = buildEmailHtml(nume, paragraphs, mesajPersonalizat);
+
   try {
     await emailjs.send(EJS_SVC, EJS_TPL, {
       to_email: email,
       to_name: nume,
-      subject: tpl.subj,
-      message: mesaj,
+      subject: subj,
+      message: mesajPersonalizat || subj,
+      message_html: htmlBody,
       from_name: 'Redacția Revista Dokimasia',
-      title: tpl.subj,
+      title: subj,
       nume: nume,
       email: email,
     });
