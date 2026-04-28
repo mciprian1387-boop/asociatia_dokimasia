@@ -6,281 +6,567 @@
   <title>Admin Revistă — Asociația Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Georgia', serif; background: #f5f5f5; color: #222; }
-    a { text-decoration: none; color: inherit; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Georgia',serif;background:#f5f5f5;color:#222;min-height:100vh}
+    a{text-decoration:none;color:inherit}
 
-    header { border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); background: #fff; }
-    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; }
-    .header-logo img { height: 80px; width: auto; display: block; }
-    .header-center { text-align: center; }
-    .header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; }
-    .header-motto { display: block; font-size: 0.9rem; color: #8B0000; letter-spacing: 2px; margin-top: 4px; }
-    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
-    .btn-back { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; }
+    /* HEADER */
+    header{border-bottom:1px solid #e0e0e0;box-shadow:0 2px 6px rgba(0,0,0,.07);background:#fff;position:sticky;top:0;z-index:100}
+    .header-top{display:grid;grid-template-columns:auto 1fr auto;align-items:center;padding:10px 28px;gap:16px}
+    .header-logo img{height:60px;width:auto;display:block}
+    .header-center{text-align:center}
+    .header-title{display:block;font-size:clamp(.9rem,2.5vw,1.6rem);font-weight:bold;color:#8B0000;text-transform:uppercase;letter-spacing:3px}
+    .header-motto{display:block;font-size:.8rem;color:#8B0000;letter-spacing:2px;margin-top:2px}
+    .header-right{display:flex;align-items:center;gap:10px;justify-content:flex-end}
 
-    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
-    nav.main-nav a { flex: 1; color: #fff; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
-    nav.main-nav a:last-child { border-right: none; }
-    nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+    /* SEARCH */
+    .global-search{position:relative}
+    .global-search input{padding:7px 14px 7px 34px;border:1px solid #ddd;border-radius:20px;font-size:.85rem;font-family:'Georgia',serif;outline:none;width:220px;transition:border-color .2s}
+    .global-search input:focus{border-color:#8B0000}
+    .global-search .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#999;font-size:.9rem}
+    .search-results{position:absolute;top:110%;left:0;right:0;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);max-height:300px;overflow-y:auto;z-index:200;display:none}
+    .search-results.open{display:block}
+    .search-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;font-size:.85rem}
+    .search-item:hover{background:#fdf5f5}
+    .search-item strong{color:#8B0000}
 
-    .admin-wrap { display: flex; min-height: calc(100vh - 160px); }
+    /* NOTIF BELL */
+    .notif-bell{position:relative;cursor:pointer;padding:6px;border-radius:6px;transition:background .2s}
+    .notif-bell:hover{background:#fdf5f5}
+    .notif-bell .badge{position:absolute;top:0;right:0;background:#8B0000;color:#fff;font-size:.6rem;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center}
+    .notif-dropdown{position:absolute;top:120%;right:0;width:320px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;display:none}
+    .notif-dropdown.open{display:block}
+    .notif-header{padding:12px 16px;border-bottom:1px solid #eee;font-weight:bold;font-size:.85rem;color:#333;display:flex;justify-content:space-between;align-items:center}
+    .notif-list{max-height:300px;overflow-y:auto}
+    .notif-item{padding:10px 16px;border-bottom:1px solid #f5f5f5;font-size:.82rem;cursor:pointer}
+    .notif-item:hover{background:#fdf5f5}
+    .notif-item.unread{background:#fff8f8;border-left:3px solid #8B0000}
+    .notif-item .ni-time{font-size:.75rem;color:#999;margin-top:2px}
+    .notif-empty{padding:20px;text-align:center;color:#999;font-size:.85rem}
 
-    /* Sidebar */
-    .sidebar { width: 220px; background: #fff; border-right: 1px solid #e0e0e0; padding: 20px 0; flex-shrink: 0; }
-    .sidebar-title { font-size: 0.7rem; font-weight: bold; color: #999; letter-spacing: 2px; text-transform: uppercase; padding: 0 16px 10px; border-bottom: 1px solid #f0e0e0; margin-bottom: 6px; }
-    .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 11px 16px; cursor: pointer; transition: all 0.2s; font-size: 0.88rem; color: #444; border-left: 3px solid transparent; }
-    .sidebar-item:hover { background: #fdf5f5; color: #8B0000; }
-    .sidebar-item.active { background: #fdf5f5; color: #8B0000; border-left-color: #8B0000; font-weight: bold; }
-    .sidebar-badge { margin-left: auto; background: #8B0000; color: #fff; font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; }
+    /* TOAST */
+    .toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+    .toast{background:#fff;border:1px solid #e0e0e0;border-left:4px solid #8B0000;border-radius:8px;padding:14px 18px;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:280px;max-width:360px;animation:slideIn .3s ease;font-size:.85rem}
+    .toast.success{border-left-color:#2e7d32}
+    .toast.error{border-left-color:#c62828}
+    .toast.info{border-left-color:#1565c0}
+    .toast strong{display:block;margin-bottom:3px;color:#333}
+    @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-    /* Content */
-    .content { flex: 1; padding: 28px; overflow-x: auto; }
-    .section { display: none; }
-    .section.active { display: block; }
-    .page-title { font-size: 1.4rem; font-weight: bold; color: #8B0000; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f0e0e0; display: flex; align-items: center; justify-content: space-between; }
+    /* LAYOUT */
+    .admin-wrap{display:flex;min-height:calc(100vh - 120px)}
 
-    /* Cards stats */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: #fff; border-radius: 8px; padding: 18px; border: 1px solid #e0e0e0; text-align: center; }
-    .stat-number { font-size: 1.8rem; font-weight: bold; color: #8B0000; }
-    .stat-label { font-size: 0.78rem; color: #888; margin-top: 4px; }
+    /* SIDEBAR */
+    .sidebar{width:230px;background:#fff;border-right:1px solid #e0e0e0;padding:16px 0;flex-shrink:0;position:sticky;top:80px;height:calc(100vh - 80px);overflow-y:auto}
+    .sidebar-title{font-size:.65rem;font-weight:bold;color:#bbb;letter-spacing:2px;text-transform:uppercase;padding:0 16px 8px;border-bottom:1px solid #f5f5f5;margin-bottom:4px}
+    .sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:all .2s;font-size:.85rem;color:#555;border-left:3px solid transparent}
+    .sidebar-item:hover{background:#fdf5f5;color:#8B0000}
+    .sidebar-item.active{background:#fdf5f5;color:#8B0000;border-left-color:#8B0000;font-weight:bold}
+    .sidebar-badge{margin-left:auto;background:#8B0000;color:#fff;font-size:.65rem;padding:2px 6px;border-radius:10px}
 
-    /* Tables */
-    .table-wrap { background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; overflow: hidden; margin-bottom: 20px; }
-    .table-header { padding: 14px 18px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-    .table-header h3 { font-size: 0.95rem; color: #333; }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #fdf5f5; color: #8B0000; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid #e0e0e0; }
-    td { padding: 10px 14px; font-size: 0.85rem; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fdfafa; }
+    /* CONTENT */
+    .content{flex:1;padding:24px;overflow-x:auto}
+    .section{display:none}
+    .section.active{display:block}
+    .page-title{font-size:1.3rem;font-weight:bold;color:#8B0000;margin-bottom:20px;padding-bottom:10px;border-bottom:2px solid #f0e0e0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
-    /* Badges status */
-    .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
-    .badge-trimis { background: #e3f2fd; color: #1565c0; }
-    .badge-evaluare { background: #fff3e0; color: #e65100; }
-    .badge-acceptat { background: #e8f5e9; color: #2e7d32; }
-    .badge-respins { background: #ffebee; color: #c62828; }
-    .badge-publicat { background: #f3e5f5; color: #6a1b9a; }
-    .badge-platit { background: #e8f5e9; color: #2e7d32; }
-    .badge-nepla { background: #ffebee; color: #c62828; }
-    .badge-draft { background: #f5f5f5; color: #666; }
+    /* STATS */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+    .stat-card{background:#fff;border-radius:8px;padding:16px;border:1px solid #e0e0e0;text-align:center;transition:box-shadow .2s;cursor:default}
+    .stat-card:hover{box-shadow:0 4px 12px rgba(139,0,0,.1)}
+    .stat-number{font-size:1.8rem;font-weight:bold;color:#8B0000}
+    .stat-label{font-size:.75rem;color:#888;margin-top:4px}
+    .stat-sub{font-size:.7rem;color:#aaa;margin-top:2px}
 
-    /* Buttons */
-    .btn { padding: 7px 14px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.82rem; font-family: 'Georgia', serif; transition: all 0.2s; }
-    .btn-primary { background: #8B0000; color: #fff; }
-    .btn-primary:hover { background: #6a0000; }
-    .btn-sm { padding: 4px 10px; font-size: 0.78rem; }
-    .btn-outline { background: #fff; color: #8B0000; border: 1px solid #8B0000; }
-    .btn-outline:hover { background: #fdf5f5; }
-    .btn-danger { background: #c62828; color: #fff; }
-    .btn-green { background: #2e7d32; color: #fff; }
+    /* TABLES */
+    .table-wrap{background:#fff;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;margin-bottom:20px}
+    .table-header{padding:12px 16px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .table-header h3{font-size:.9rem;color:#333}
+    table{width:100%;border-collapse:collapse}
+    th{background:#fdf5f5;color:#8B0000;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;padding:9px 12px;text-align:left;border-bottom:1px solid #e0e0e0;white-space:nowrap}
+    td{padding:9px 12px;font-size:.83rem;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#fdfafa}
 
-    /* Filters */
-    .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .filters select, .filters input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; font-family: 'Georgia', serif; outline: none; }
-    .filters select:focus, .filters input:focus { border-color: #8B0000; }
+    /* INLINE EDIT */
+    .editable{cursor:pointer;border-radius:3px;padding:2px 4px;transition:background .15s}
+    .editable:hover{background:#f0e0e0}
+    .editable.editing{background:#fff;border:1px solid #8B0000;padding:2px 6px;outline:none;cursor:text;border-radius:3px;font-family:'Georgia',serif;font-size:.83rem}
 
-    /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .modal-overlay.open { display: flex; }
-    .modal-box { background: #fff; border-radius: 10px; padding: 28px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; }
-    .modal-title { font-size: 1.1rem; font-weight: bold; color: #8B0000; margin-bottom: 20px; }
-    .modal-close { position: absolute; top: 14px; right: 14px; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 0.82rem; color: #666; margin-bottom: 4px; font-weight: bold; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; font-family: 'Georgia', serif; outline: none; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #8B0000; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    /* BADGES */
+    .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:.72rem;font-weight:bold;white-space:nowrap}
+    .b-trimis{background:#e3f2fd;color:#1565c0}
+    .b-evaluare{background:#fff3e0;color:#e65100}
+    .b-acceptat{background:#e8f5e9;color:#2e7d32}
+    .b-respins{background:#ffebee;color:#c62828}
+    .b-publicat{background:#f3e5f5;color:#6a1b9a}
+    .b-draft{background:#f5f5f5;color:#666}
+    .b-platit{background:#e8f5e9;color:#2e7d32}
+    .b-neplatit{background:#ffebee;color:#c62828}
+    .b-acum{background:#e8f5e9;color:#2e7d32}
+    .b-tarziu{background:#fff3e0;color:#e65100}
 
-    /* Articol detalii */
-    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-    .detail-item label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-    .detail-item p { font-size: 0.9rem; color: #333; margin-top: 2px; }
-    .fisier-link { display: inline-flex; align-items: center; gap: 6px; color: #8B0000; font-size: 0.85rem; padding: 4px 10px; border: 1px solid #8B0000; border-radius: 4px; margin: 2px; }
-    .fisier-link:hover { background: #fdf5f5; }
+    /* BUTTONS */
+    .btn{padding:6px 13px;border:none;border-radius:4px;cursor:pointer;font-size:.8rem;font-family:'Georgia',serif;transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+    .btn-primary{background:#8B0000;color:#fff}
+    .btn-primary:hover{background:#6a0000}
+    .btn-sm{padding:3px 9px;font-size:.75rem}
+    .btn-outline{background:#fff;color:#8B0000;border:1px solid #8B0000}
+    .btn-outline:hover{background:#fdf5f5}
+    .btn-danger{background:#c62828;color:#fff}
+    .btn-danger:hover{background:#a31515}
+    .btn-green{background:#2e7d32;color:#fff}
+    .btn-green:hover{background:#1b5e20}
+    .btn-blue{background:#1565c0;color:#fff}
+    .btn-blue:hover{background:#0d47a1}
+    .btn-gray{background:#757575;color:#fff}
 
-    /* Categorii articole */
-    .categoria-header { background: #fdf5f5; padding: 10px 14px; font-weight: bold; font-size: 0.85rem; color: #8B0000; border-bottom: 1px solid #e0e0e0; }
+    /* FILTERS */
+    .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .filters select,.filters input{padding:5px 9px;border:1px solid #ddd;border-radius:4px;font-size:.82rem;font-family:'Georgia',serif;outline:none}
+    .filters select:focus,.filters input:focus{border-color:#8B0000}
 
-    /* Loading */
-    .loading { text-align: center; padding: 40px; color: #888; font-size: 0.9rem; }
+    /* MODALS */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:10px;padding:24px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;position:relative}
+    .modal-box.wide{max-width:820px}
+    .modal-title{font-size:1.1rem;font-weight:bold;color:#8B0000;margin-bottom:18px}
+    .modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#999}
+    .modal-close:hover{color:#333}
+    .form-group{margin-bottom:12px}
+    .form-group label{display:block;font-size:.78rem;color:#666;margin-bottom:3px;font-weight:bold}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:4px;font-size:.88rem;font-family:'Georgia',serif;outline:none}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#8B0000}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
-    /* Access denied */
-    .access-denied { text-align: center; padding: 80px 20px; }
-    .access-denied h2 { font-size: 1.5rem; color: #8B0000; margin-bottom: 12px; }
-    .access-denied p { color: #666; }
+    /* KANBAN */
+    .kanban-board{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;min-height:400px}
+    .kanban-col{background:#f9f9f9;border-radius:8px;padding:10px}
+    .kanban-col-header{font-size:.75rem;font-weight:bold;text-transform:uppercase;letter-spacing:1px;padding:6px 8px;border-radius:6px;margin-bottom:8px;text-align:center}
+    .kh-trimis{background:#e3f2fd;color:#1565c0}
+    .kh-evaluare{background:#fff3e0;color:#e65100}
+    .kh-acceptat{background:#e8f5e9;color:#2e7d32}
+    .kh-respins{background:#ffebee;color:#c62828}
+    .kh-publicat{background:#f3e5f5;color:#6a1b9a}
+    .kanban-card{background:#fff;border-radius:6px;padding:10px;margin-bottom:8px;border:1px solid #e0e0e0;cursor:grab;font-size:.8rem;transition:box-shadow .2s;user-select:none}
+    .kanban-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.1)}
+    .kanban-card.dragging{opacity:.5;cursor:grabbing}
+    .kanban-col.drag-over{background:#f0e8e8;border:2px dashed #8B0000}
+    .kc-autor{font-weight:bold;color:#333;margin-bottom:3px}
+    .kc-rubrica{font-size:.72rem;color:#888}
+    .kc-actions{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
 
-    /* Notif */
-    .notif { padding: 10px 16px; border-radius: 4px; font-size: 0.85rem; margin-bottom: 14px; }
-    .notif-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-    .notif-error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+    /* STARS */
+    .stars{display:inline-flex;gap:2px;cursor:pointer}
+    .star{font-size:1rem;color:#ddd;transition:color .1s}
+    .star.on{color:#f59e0b}
+    .star:hover{color:#f59e0b}
 
-    /* Numar revista card */
-    .numar-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 18px; margin-bottom: 12px; }
-    .numar-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .numar-card-title { font-size: 1rem; font-weight: bold; color: #8B0000; }
-    .numar-card-meta { font-size: 0.8rem; color: #888; margin-top: 2px; }
-    .numar-card-cats { display: flex; flex-wrap: wrap; gap: 6px; }
-    .cat-tag { background: #fdf5f5; color: #8B0000; border: 1px solid #f0d0d0; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; }
+    /* DETAIL GRID */
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+    .detail-item label{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:1px}
+    .detail-item p{font-size:.88rem;color:#333;margin-top:1px}
+    .fisier-link{display:inline-flex;align-items:center;gap:5px;color:#8B0000;font-size:.82rem;padding:3px 9px;border:1px solid #8B0000;border-radius:4px;margin:2px}
+    .fisier-link:hover{background:#fdf5f5}
 
-    @media (max-width: 768px) {
-      .admin-wrap { flex-direction: column; }
-      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e0e0e0; }
-      .form-grid { grid-template-columns: 1fr; }
-      .detail-grid { grid-template-columns: 1fr; }
+    /* CHART */
+    .chart-wrap{background:#fff;border-radius:8px;border:1px solid #e0e0e0;padding:20px;margin-bottom:20px}
+
+    /* CALENDAR */
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+    .cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+    .cal-day-name{text-align:center;font-size:.7rem;color:#888;font-weight:bold;padding:4px}
+    .cal-day{min-height:60px;background:#fff;border:1px solid #f0f0f0;border-radius:4px;padding:4px;font-size:.75rem}
+    .cal-day.today{border-color:#8B0000;background:#fff8f8}
+    .cal-day.other-month{background:#f9f9f9;color:#ccc}
+    .cal-day-num{font-weight:bold;color:#333;margin-bottom:2px}
+    .cal-event{background:#8B0000;color:#fff;border-radius:3px;padding:1px 4px;font-size:.65rem;margin-bottom:1px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer}
+    .cal-event.ev-green{background:#2e7d32}
+    .cal-event.ev-blue{background:#1565c0}
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .cal-nav h3{font-size:1rem;color:#333}
+
+    /* NOTES */
+    .notes-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .note-item{background:#fffde7;border-left:3px solid #f59e0b;padding:8px 12px;border-radius:4px;font-size:.83rem}
+    .note-item .note-time{font-size:.72rem;color:#999;margin-top:3px}
+    .note-item .note-del{float:right;background:none;border:none;cursor:pointer;color:#ccc;font-size:.9rem}
+    .note-item .note-del:hover{color:#c62828}
+
+    /* EMAIL TEMPLATES */
+    .email-tpl{border:1px solid #e0e0e0;border-radius:8px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+    .email-tpl:hover{border-color:#8B0000;background:#fdf5f5}
+    .email-tpl.selected{border-color:#8B0000;background:#fdf5f5}
+    .email-tpl-title{font-weight:bold;font-size:.88rem;color:#333}
+    .email-tpl-preview{font-size:.78rem;color:#888;margin-top:4px}
+
+    /* CHECKLIST */
+    .checklist{display:flex;flex-direction:column;gap:6px}
+    .check-item{display:flex;align-items:center;gap:8px;font-size:.85rem;cursor:pointer}
+    .check-item input[type=checkbox]{accent-color:#8B0000;width:14px;height:14px}
+
+    /* NUMAR CARD */
+    .numar-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;margin-bottom:10px}
+    .numar-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:10px}
+    .numar-card-title{font-size:.95rem;font-weight:bold;color:#8B0000}
+    .numar-card-meta{font-size:.78rem;color:#888;margin-top:2px}
+    .cat-tag{background:#fdf5f5;color:#8B0000;border:1px solid #f0d0d0;padding:2px 8px;border-radius:12px;font-size:.74rem}
+
+    /* ACCESS DENIED */
+    .access-denied{text-align:center;padding:80px 20px}
+    .access-denied h2{font-size:1.4rem;color:#8B0000;margin-bottom:10px}
+    .access-denied p{color:#666}
+
+    /* NOTIF inline */
+    .notif{padding:9px 14px;border-radius:4px;font-size:.83rem;margin-bottom:12px}
+    .notif-success{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+    .notif-error{background:#ffebee;color:#c62828;border:1px solid #ef9a9a}
+
+    /* VIEW TOGGLE */
+    .view-toggle{display:flex;gap:4px}
+    .view-btn{padding:5px 10px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:.8rem;border-radius:4px;transition:all .2s}
+    .view-btn.active{background:#8B0000;color:#fff;border-color:#8B0000}
+
+    @media(max-width:900px){
+      .kanban-board{grid-template-columns:1fr 1fr}
+      .form-grid{grid-template-columns:1fr}
+      .detail-grid{grid-template-columns:1fr}
+      .sidebar{width:100%;position:relative;height:auto}
+      .admin-wrap{flex-direction:column}
     }
   </style>
 </head>
 <body>
 
-<!-- Header -->
+<!-- HEADER -->
 <header>
   <div class="header-top">
     <div class="header-logo"><a href="index.html"><img src="Logo.gif" alt="Logo" /></a></div>
     <div class="header-center">
       <span class="header-title">Asociația Dokimasia</span>
-      <span class="header-motto">Învățare. Implicare. Progres.</span>
+      <span class="header-motto">Panou de control — Revistă</span>
     </div>
     <div class="header-right">
-      <a href="admin.html"><button class="btn-back">← Admin General</button></a>
+      <!-- Căutare globală -->
+      <div class="global-search">
+        <span class="si">🔍</span>
+        <input type="text" id="globalSearch" placeholder="Caută oriunde..." oninput="globalSearchFn(this.value)" onblur="setTimeout(()=>document.getElementById('searchResults').classList.remove('open'),200)" />
+        <div class="search-results" id="searchResults"></div>
+      </div>
+      <!-- Notificări -->
+      <div class="notif-bell" onclick="toggleNotifDropdown()" id="notifBell">
+        🔔 <span class="badge" id="notifCount">0</span>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-header">
+            Notificări
+            <button onclick="markAllRead()" style="background:none;border:none;cursor:pointer;font-size:.75rem;color:#8B0000;">Marchează citite</button>
+          </div>
+          <div class="notif-list" id="notifList"><div class="notif-empty">Nicio notificare</div></div>
+        </div>
+      </div>
+      <a href="admin.html"><button class="btn btn-outline" style="white-space:nowrap">← Admin</button></a>
     </div>
   </div>
-  <nav class="main-nav">
-    <a href="#" onclick="showSection('articole')" id="nav-articole" class="active">📄 Articole trimise</a>
-    <a href="#" onclick="showSection('plati')" id="nav-plati">💳 Plăți</a>
-    <a href="#" onclick="showSection('numere')" id="nav-numere">📚 Numere revistă</a>
-    <a href="#" onclick="showSection('publicate')" id="nav-publicate">✅ Publicate</a>
-    <a href="#" onclick="showSection('autori')" id="nav-autori">👤 Autori</a>
-  </nav>
 </header>
 
-<!-- Loading / Access Denied -->
-<div id="loadingScreen" style="text-align:center;padding:80px;font-size:1rem;color:#888;">Se verifică accesul...</div>
-<div id="accessDenied" style="display:none;">
-  <div class="access-denied">
-    <h2>🔒 Acces restricționat</h2>
-    <p>Această pagină este disponibilă doar pentru administratori.</p>
-  </div>
-</div>
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
 
-<!-- Admin Panel -->
-<div id="adminPanel" style="display:none;">
+<!-- LOADING / ACCESS DENIED -->
+<div id="loadingScreen" style="text-align:center;padding:80px;color:#888;">Se verifică accesul...</div>
+<div id="accessDenied" style="display:none"><div class="access-denied"><h2>🔒 Acces restricționat</h2><p>Disponibil doar pentru administratori.</p></div></div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none">
 <div class="admin-wrap">
 
-  <!-- Sidebar -->
+  <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sidebar-title">Revistă Dokimasia</div>
-    <div class="sidebar-item active" id="sb-articole" onclick="showSection('articole')">📄 Articole trimise <span class="sidebar-badge" id="badge-articole">0</span></div>
+    <div class="sidebar-title">Revistă</div>
+    <div class="sidebar-item active" id="sb-dashboard" onclick="showSection('dashboard')">📊 Dashboard</div>
+    <div class="sidebar-item" id="sb-articole" onclick="showSection('articole')">📄 Articole <span class="sidebar-badge" id="badge-articole">0</span></div>
+    <div class="sidebar-item" id="sb-kanban" onclick="showSection('kanban')">📌 Kanban</div>
     <div class="sidebar-item" id="sb-plati" onclick="showSection('plati')">💳 Plăți <span class="sidebar-badge" id="badge-plati">0</span></div>
     <div class="sidebar-item" id="sb-numere" onclick="showSection('numere')">📚 Numere revistă</div>
     <div class="sidebar-item" id="sb-publicate" onclick="showSection('publicate')">✅ Publicate</div>
+    <div class="sidebar-item" id="sb-calendar" onclick="showSection('calendar');renderCalendar()">📅 Calendar</div>
     <div class="sidebar-item" id="sb-autori" onclick="showSection('autori')">👤 Autori</div>
+    <div class="sidebar-item" id="sb-raport" onclick="showSection('raport')">📈 Raport</div>
+    <div class="sidebar-item" onclick="window.location='adeverinte.html'">📋 Adeverințe ↗</div>
   </div>
 
-  <!-- Content -->
+  <!-- CONTENT -->
   <div class="content">
 
-    <!-- ═══ ARTICOLE TRIMISE ═══ -->
-    <div class="section active" id="section-articole">
-      <div class="page-title">
-        Articole trimise
-        <div class="filters">
-          <select id="filter-status" onchange="loadArticole()">
-            <option value="">Toate statusurile</option>
-            <option value="trimis">Trimis</option>
-            <option value="in_evaluare">În evaluare</option>
-            <option value="acceptat">Acceptat</option>
-            <option value="respins">Respins</option>
-            <option value="publicat">Publicat</option>
-          </select>
-          <select id="filter-rubrica" onchange="loadArticole()">
-            <option value="">Toate categoriile</option>
-            <option>Didactică și metodică</option>
-            <option>Pedagogie generală</option>
-            <option>Psihologie educațională</option>
-            <option>Management și leadership școlar</option>
-            <option>Educație incluzivă și specială</option>
-            <option>Tehnologie și inovație în educație</option>
-            <option>Educație timpurie și preșcolară</option>
-            <option>Învățământ primar</option>
-            <option>Învățământ gimnazial și liceal</option>
-            <option>Educație non-formală și informală</option>
-            <option>Cercetare educațională</option>
-            <option>Recenzii și note de lectură</option>
-          </select>
-          <input type="text" id="filter-search" placeholder="Caută autor..." oninput="loadArticole()" style="width:160px;" />
+    <!-- ═══════════════ DASHBOARD ═══════════════ -->
+    <div class="section active" id="section-dashboard">
+      <div class="page-title">📊 Dashboard <span id="dash-date" style="font-size:.8rem;font-weight:normal;color:#888"></span></div>
+      <div class="stats-grid" id="dash-stats"></div>
+      <div class="chart-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <strong style="font-size:.9rem;color:#333">Articole trimise — ultimele 30 zile</strong>
         </div>
+        <canvas id="chartArticole" height="80"></canvas>
       </div>
-
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-number" id="cnt-trimis">0</div><div class="stat-label">Trimise</div></div>
-        <div class="stat-card"><div class="stat-number" id="cnt-evaluare">0</div><div class="stat-label">În evaluare</div></div>
-        <div class="stat-card"><div class="stat-number" id="cnt-acceptat">0</div><div class="stat-label">Acceptate</div></div>
-        <div class="stat-card"><div class="stat-number" id="cnt-publicat">0</div><div class="stat-label">Publicate</div></div>
-      </div>
-
-      <div class="table-wrap">
-        <div class="table-header"><h3>Lista articole</h3></div>
-        <div id="tabel-articole"><div class="loading">Se încarcă...</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="table-wrap">
+          <div class="table-header"><h3>🆕 Ultimele articole</h3></div>
+          <div id="dash-recent"></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header"><h3>💳 Plăți în așteptare</h3></div>
+          <div id="dash-plati-pend"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ═══ PLĂȚI ═══ -->
+    <!-- ═══════════════ ARTICOLE ═══════════════ -->
+    <div class="section" id="section-articole">
+      <div class="page-title">
+        📄 Articole trimise
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="view-toggle">
+            <button class="view-btn active" id="vt-table" onclick="setView('table')">≡ Tabel</button>
+            <button class="view-btn" id="vt-cards" onclick="setView('cards')">⊞ Carduri</button>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        </div>
+      </div>
+      <div class="filters" style="margin-bottom:14px">
+        <select id="f-status" onchange="loadArticole()">
+          <option value="">Toate statusurile</option>
+          <option value="trimis">Trimis</option>
+          <option value="in_evaluare">În evaluare</option>
+          <option value="acceptat">Acceptat</option>
+          <option value="respins">Respins</option>
+          <option value="publicat">Publicat</option>
+        </select>
+        <select id="f-rubrica" onchange="loadArticole()">
+          <option value="">Toate categoriile</option>
+          <option>Didactică și metodică</option>
+          <option>Pedagogie generală</option>
+          <option>Psihologie educațională</option>
+          <option>Management și leadership școlar</option>
+          <option>Educație incluzivă și specială</option>
+          <option>Tehnologie și inovație în educație</option>
+          <option>Educație timpurie și preșcolară</option>
+          <option>Învățământ primar</option>
+          <option>Învățământ gimnazial și liceal</option>
+          <option>Educație non-formală și informală</option>
+          <option>Cercetare educațională</option>
+          <option>Recenzii și note de lectură</option>
+        </select>
+        <select id="f-platit" onchange="loadArticole()">
+          <option value="">Toate plățile</option>
+          <option value="true">Plătit</option>
+          <option value="false">Neplătit</option>
+        </select>
+        <input type="text" id="f-search" placeholder="Caută autor..." oninput="loadArticole()" style="width:150px" />
+      </div>
+      <div id="articole-view"></div>
+    </div>
+
+    <!-- ═══════════════ KANBAN ═══════════════ -->
+    <div class="section" id="section-kanban">
+      <div class="page-title">📌 Kanban — Flux editorial</div>
+      <div class="kanban-board" id="kanban-board"></div>
+    </div>
+
+    <!-- ═══════════════ PLĂȚI ═══════════════ -->
     <div class="section" id="section-plati">
-      <div class="page-title">Plăți contribuții editoriale</div>
+      <div class="page-title">
+        💳 Plăți
+        <button class="btn btn-outline btn-sm" onclick="exportCSVPlati()">⬇ Export CSV</button>
+      </div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-number" id="cnt-platit">0</div><div class="stat-label">Plătite</div></div>
         <div class="stat-card"><div class="stat-number" id="cnt-neplatit">0</div><div class="stat-label">Neplătite</div></div>
         <div class="stat-card"><div class="stat-number" id="suma-totala">0</div><div class="stat-label">Lei încasați (est.)</div></div>
+        <div class="stat-card"><div class="stat-number" id="cnt-tarziu">0</div><div class="stat-label">Plătesc mai târziu</div></div>
       </div>
       <div class="table-wrap">
         <div class="table-header"><h3>Situație plăți</h3></div>
-        <div id="tabel-plati"><div class="loading">Se încarcă...</div></div>
+        <div id="tabel-plati"></div>
       </div>
     </div>
 
-    <!-- ═══ NUMERE REVISTĂ ═══ -->
+    <!-- ═══════════════ NUMERE ═══════════════ -->
     <div class="section" id="section-numere">
       <div class="page-title">
-        Numere revistă
-        <button class="btn btn-primary" onclick="openModalNumar()">+ Număr nou</button>
+        📚 Numere revistă
+        <button class="btn btn-primary btn-sm" onclick="openModalNumar()">+ Număr nou</button>
       </div>
-      <div id="lista-numere"><div class="loading">Se încarcă...</div></div>
+      <div id="lista-numere"></div>
     </div>
 
-    <!-- ═══ ARTICOLE PUBLICATE ═══ -->
+    <!-- ═══════════════ PUBLICATE ═══════════════ -->
     <div class="section" id="section-publicate">
-      <div class="page-title">Articole publicate pe categorii</div>
-      <div class="filters" style="margin-bottom:16px;">
-        <select id="filter-numar-pub" onchange="loadPublicate()">
-          <option value="">Toate numerele</option>
-        </select>
+      <div class="page-title">✅ Articole publicate pe categorii</div>
+      <div class="filters" style="margin-bottom:14px">
+        <select id="f-numar-pub" onchange="loadPublicate()"><option value="">Toate numerele</option></select>
       </div>
-      <div id="publicate-categorii"><div class="loading">Se încarcă...</div></div>
+      <div id="publicate-categorii"></div>
     </div>
 
-    <!-- ═══ AUTORI ═══ -->
+    <!-- ═══════════════ CALENDAR ═══════════════ -->
+    <div class="section" id="section-calendar">
+      <div class="page-title">📅 Calendar editorial</div>
+      <div class="cal-nav">
+        <button class="btn btn-outline btn-sm" onclick="prevMonth()">‹ Luna anterioară</button>
+        <h3 id="cal-title"></h3>
+        <button class="btn btn-outline btn-sm" onclick="nextMonth()">Luna următoare ›</button>
+      </div>
+      <div class="cal-header">
+        <div class="cal-day-name">Lun</div><div class="cal-day-name">Mar</div><div class="cal-day-name">Mie</div>
+        <div class="cal-day-name">Joi</div><div class="cal-day-name">Vin</div><div class="cal-day-name">Sâm</div>
+        <div class="cal-day-name">Dum</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div style="display:flex;gap:16px;margin-top:12px;font-size:.78rem;flex-wrap:wrap">
+        <span><span style="background:#8B0000;color:#fff;padding:1px 6px;border-radius:3px">■</span> Articol trimis</span>
+        <span><span style="background:#2e7d32;color:#fff;padding:1px 6px;border-radius:3px">■</span> Număr publicat</span>
+        <span><span style="background:#1565c0;color:#fff;padding:1px 6px;border-radius:3px">■</span> Apariție revistă</span>
+      </div>
+    </div>
+
+    <!-- ═══════════════ AUTORI ═══════════════ -->
     <div class="section" id="section-autori">
-      <div class="page-title">Autori înregistrați</div>
+      <div class="page-title">👤 Autori</div>
       <div class="table-wrap">
         <div class="table-header"><h3>Lista autori</h3></div>
-        <div id="tabel-autori"><div class="loading">Se încarcă...</div></div>
+        <div id="tabel-autori"></div>
       </div>
+    </div>
+
+    <!-- ═══════════════ RAPORT ═══════════════ -->
+    <div class="section" id="section-raport">
+      <div class="page-title">📈 Raport lunar <button class="btn btn-primary btn-sm" onclick="genereazaRaport()">⬇ Generează PDF</button></div>
+      <div class="filters" style="margin-bottom:16px">
+        <select id="raport-luna">
+          <option value="0">Ianuarie</option><option value="1">Februarie</option><option value="2">Martie</option>
+          <option value="3">Aprilie</option><option value="4">Mai</option><option value="5">Iunie</option>
+          <option value="6">Iulie</option><option value="7">August</option><option value="8">Septembrie</option>
+          <option value="9">Octombrie</option><option value="10">Noiembrie</option><option value="11">Decembrie</option>
+        </select>
+        <select id="raport-an"><option value="2025">2025</option><option value="2026">2026</option></select>
+        <button class="btn btn-outline btn-sm" onclick="loadRaport()">Încarcă</button>
+      </div>
+      <div id="raport-content"></div>
     </div>
 
   </div><!-- /content -->
 </div><!-- /admin-wrap -->
 </div><!-- /adminPanel -->
 
+<!-- ═══════════ MODALS ═══════════ -->
+
 <!-- Modal: Detalii articol -->
 <div class="modal-overlay" id="modalArticol">
-  <div class="modal-box">
+  <div class="modal-box wide">
     <button class="modal-close" onclick="closeModal('modalArticol')">✕</button>
     <div class="modal-title">📄 Detalii articol</div>
     <div id="modal-articol-content"></div>
+  </div>
+</div>
+
+<!-- Modal: Email autor -->
+<div class="modal-overlay" id="modalEmail">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEmail')">✕</button>
+    <div class="modal-title">📧 Trimite email autorului</div>
+    <div id="notif-email"></div>
+    <div style="margin-bottom:12px">
+      <div class="email-tpl" onclick="selectTpl('acceptat')" id="tpl-acceptat">
+        <div class="email-tpl-title">✅ Articol acceptat</div>
+        <div class="email-tpl-preview">Felicitări! Articolul dumneavoastră a fost acceptat...</div>
+      </div>
+      <div class="email-tpl" onclick="selectTpl('revizuire')" id="tpl-revizuire">
+        <div class="email-tpl-title">✏️ Solicităm revizuire</div>
+        <div class="email-tpl-preview">Vă rugăm să revizuiți materialul conform observațiilor...</div>
+      </div>
+      <div class="email-tpl" onclick="selectTpl('respins')" id="tpl-respins">
+        <div class="email-tpl-title">❌ Articol respins</div>
+        <div class="email-tpl-preview">Ne pare rău să vă informăm că articolul nu a fost acceptat...</div>
+      </div>
+    </div>
+    <div class="form-group"><label>Mesaj personalizat (opțional)</label><textarea id="email-mesaj" rows="4" placeholder="Adaugă un mesaj personalizat..."></textarea></div>
+    <input type="hidden" id="email-autor-email" />
+    <input type="hidden" id="email-autor-nume" />
+    <input type="hidden" id="email-articol-id" />
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-outline" onclick="closeModal('modalEmail')">Anulează</button>
+      <button class="btn btn-primary" onclick="trimiteMail()">Trimite email</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Note interne -->
+<div class="modal-overlay" id="modalNote">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalNote')">✕</button>
+    <div class="modal-title">📝 Note interne</div>
+    <div class="notes-list" id="notes-list"></div>
+    <div class="form-group"><textarea id="nota-noua" rows="3" placeholder="Adaugă o notă internă..."></textarea></div>
+    <input type="hidden" id="nota-articol-id" />
+    <button class="btn btn-primary btn-sm" onclick="adaugaNota()">Adaugă notă</button>
+  </div>
+</div>
+
+<!-- Modal: Evaluare -->
+<div class="modal-overlay" id="modalEvaluare">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalEvaluare')">✕</button>
+    <div class="modal-title">⭐ Evaluare articol</div>
+    <div class="form-group">
+      <label>Scor general</label>
+      <div class="stars" id="eval-stars">
+        <span class="star" onclick="setStar(1)">★</span>
+        <span class="star" onclick="setStar(2)">★</span>
+        <span class="star" onclick="setStar(3)">★</span>
+        <span class="star" onclick="setStar(4)">★</span>
+        <span class="star" onclick="setStar(5)">★</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Criterii de evaluare</label>
+      <div class="checklist" id="eval-checklist">
+        <label class="check-item"><input type="checkbox" id="ec1" /> Originalitate și noutate</label>
+        <label class="check-item"><input type="checkbox" id="ec2" /> Structură și coerență</label>
+        <label class="check-item"><input type="checkbox" id="ec3" /> Calitate bibliografie</label>
+        <label class="check-item"><input type="checkbox" id="ec4" /> Relevanță pentru domeniu</label>
+        <label class="check-item"><input type="checkbox" id="ec5" /> Respectare norme redacționale</label>
+        <label class="check-item"><input type="checkbox" id="ec6" /> Claritate și stil</label>
+      </div>
+    </div>
+    <div class="form-group"><label>Observații evaluator</label><textarea id="eval-obs" rows="3"></textarea></div>
+    <input type="hidden" id="eval-articol-id" />
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-outline" onclick="closeModal('modalEvaluare')">Anulează</button>
+      <button class="btn btn-primary" onclick="salveazaEvaluare()">Salvează evaluarea</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Asignare la număr -->
+<div class="modal-overlay" id="modalAsignare">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalAsignare')">✕</button>
+    <div class="modal-title">📌 Asignează la număr</div>
+    <div id="notif-asignare"></div>
+    <div class="form-group"><label>Articol</label><input type="text" id="as-titlu" readonly style="background:#f5f5f5" /></div>
+    <div class="form-group"><label>Număr revistă</label><select id="as-numar"></select></div>
+    <div class="form-group"><label>Status</label>
+      <select id="as-status"><option value="acceptat">Acceptat</option><option value="publicat">Publicat</option></select>
+    </div>
+    <div class="form-group"><label>Feedback editor</label><textarea id="as-feedback" rows="3"></textarea></div>
+    <input type="hidden" id="as-id" />
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-outline" onclick="closeModal('modalAsignare')">Anulează</button>
+      <button class="btn btn-primary" onclick="salveazaAsignare()">Salvează</button>
+    </div>
   </div>
 </div>
 
@@ -291,476 +577,872 @@
     <div class="modal-title" id="modal-numar-title">📚 Număr nou</div>
     <div id="notif-numar"></div>
     <div class="form-grid">
-      <div class="form-group"><label>Titlu</label><input type="text" id="n-titlu" placeholder="ex: Nr. 1/2025" /></div>
-      <div class="form-group"><label>Ediție</label><input type="text" id="n-editie" placeholder="ex: 1/2025" /></div>
+      <div class="form-group"><label>Titlu *</label><input type="text" id="n-titlu" placeholder="Nr. 1/2025" /></div>
+      <div class="form-group"><label>Ediție *</label><input type="text" id="n-editie" placeholder="1/2025" /></div>
       <div class="form-group"><label>Data apariției</label><input type="date" id="n-data" /></div>
-      <div class="form-group"><label>Status</label>
-        <select id="n-status"><option value="draft">Draft</option><option value="publicat">Publicat</option></select>
-      </div>
+      <div class="form-group"><label>Status</label><select id="n-status"><option value="draft">Draft</option><option value="publicat">Publicat</option></select></div>
     </div>
-    <div class="form-group"><label>URL Copertă</label><input type="text" id="n-coperta" placeholder="https://cdn.dokimasia.ro/..." /></div>
+    <div class="form-group"><label>URL Copertă</label><input type="text" id="n-coperta" /></div>
     <div class="form-group"><label>Descriere</label><textarea id="n-descriere" rows="3"></textarea></div>
     <input type="hidden" id="n-id" />
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-outline" onclick="closeModal('modalNumar')">Anulează</button>
       <button class="btn btn-primary" onclick="salveazaNumar()">Salvează</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Asignare articol la număr -->
-<div class="modal-overlay" id="modalAsignare">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modalAsignare')">✕</button>
-    <div class="modal-title">📌 Asignează la număr</div>
-    <div id="notif-asignare"></div>
-    <div class="form-group"><label>Articol</label><input type="text" id="as-articol-titlu" readonly style="background:#f5f5f5;" /></div>
-    <div class="form-group"><label>Număr revistă</label>
-      <select id="as-numar-select"><option value="">Selectează numărul...</option></select>
-    </div>
-    <div class="form-group"><label>Status nou</label>
-      <select id="as-status">
-        <option value="acceptat">Acceptat</option>
-        <option value="publicat">Publicat</option>
-      </select>
-    </div>
-    <div class="form-group"><label>Feedback editor (opțional)</label><textarea id="as-feedback" rows="3"></textarea></div>
-    <input type="hidden" id="as-articol-id" />
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
-      <button class="btn btn-outline" onclick="closeModal('modalAsignare')">Anulează</button>
-      <button class="btn btn-primary" onclick="salveazaAsignare()">Salvează</button>
-    </div>
-  </div>
-</div>
-
 <script>
-  const SUPABASE_URL  = 'https://jaoxhsyplnkanhqevnnr.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw';
-  const ADMIN_EMAIL   = 'm.ciprian1387@gmail.com';
+// ════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════
+const SB_URL  = 'https://jaoxhsyplnkanhqevnnr.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw';
+const ADMIN_EMAIL = 'm.ciprian1387@gmail.com';
+const EJS_SVC = 'service_4a8gp1c';
+const EJS_TPL = 'template_wg7nlez';
+const EJS_PUB = 'cPvtBWK6KReX_pqhM';
+const EJS_PRV = '10BoQnIOrBEDaG_qDeDSo';
 
-  const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: { persistSession: true, storageKey: 'dokimasia-auth', storage: window.localStorage, autoRefreshToken: true }
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_ANON, {
+  auth:{ persistSession:true, storageKey:'dokimasia-auth', storage:window.localStorage, autoRefreshToken:true },
+  realtime:{ params:{ eventsPerSecond:10 } }
+});
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+let allArticole = [];
+let allNumere   = [];
+let notifications = [];
+let currentView = 'table';
+let currentStar = 0;
+let selectedTpl = '';
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let chartInstance = null;
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+async function init() {
+  const { data:{ user } } = await sb.auth.getUser();
+  document.getElementById('loadingScreen').style.display = 'none';
+  if (!user || user.email !== ADMIN_EMAIL) {
+    document.getElementById('accessDenied').style.display = 'block';
+    return;
+  }
+  document.getElementById('adminPanel').style.display = 'block';
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('ro-RO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // Set luna curenta in raport
+  const now = new Date();
+  document.getElementById('raport-luna').value = now.getMonth();
+  document.getElementById('raport-an').value = now.getFullYear();
+
+  emailjs.init(EJS_PUB);
+  await loadAll();
+  initRealtime();
+}
+
+async function loadAll() {
+  await Promise.all([loadArticole(), loadNumere(), loadAutori()]);
+  loadDashboard();
+  loadPlati();
+}
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  document.getElementById('sb-'+id) && document.getElementById('sb-'+id).classList.add('active');
+  if (id==='kanban') renderKanban();
+  if (id==='publicate') loadPublicate();
+  if (id==='raport') loadRaport();
+}
+
+// ════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════
+function toast(msg, type='info', title='') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `${title?`<strong>${title}</strong>`:''}${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, 4000);
+}
+
+// ════════════════════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════════════════════
+function addNotification(msg, type='info') {
+  notifications.unshift({ msg, type, time: new Date(), read: false });
+  if (notifications.length > 50) notifications.pop();
+  updateNotifUI();
+}
+
+function updateNotifUI() {
+  const unread = notifications.filter(n=>!n.read).length;
+  document.getElementById('notifCount').textContent = unread;
+  const list = document.getElementById('notifList');
+  if (!notifications.length) { list.innerHTML='<div class="notif-empty">Nicio notificare</div>'; return; }
+  list.innerHTML = notifications.slice(0,20).map((n,i) => `
+    <div class="notif-item ${n.read?'':'unread'}" onclick="readNotif(${i})">
+      ${n.msg}
+      <div class="ni-time">${n.time.toLocaleTimeString('ro-RO')}</div>
+    </div>`).join('');
+}
+
+function readNotif(i){ notifications[i].read=true; updateNotifUI(); }
+function markAllRead(){ notifications.forEach(n=>n.read=true); updateNotifUI(); }
+function toggleNotifDropdown(e){
+  const d=document.getElementById('notifDropdown');
+  d.classList.toggle('open');
+}
+document.addEventListener('click',e=>{ if(!document.getElementById('notifBell').contains(e.target)) document.getElementById('notifDropdown').classList.remove('open'); });
+
+// ════════════════════════════════════════════════
+// REALTIME
+// ════════════════════════════════════════════════
+function initRealtime() {
+  sb.channel('articole-changes')
+    .on('postgres_changes',{ event:'INSERT', schema:'public', table:'articole_revista' }, payload => {
+      const a = payload.new;
+      allArticole.unshift(a);
+      const msg = `📄 Articol nou de la <strong>${a.nume_autor||'autor'}</strong> — ${a.rubrica||''}`;
+      addNotification(msg, 'info');
+      toast(msg, 'info', 'Articol nou!');
+      refreshViews();
+    })
+    .on('postgres_changes',{ event:'UPDATE', schema:'public', table:'articole_revista' }, payload => {
+      const idx = allArticole.findIndex(a=>a.id===payload.new.id);
+      if (idx>-1) allArticole[idx] = payload.new;
+      refreshViews();
+    })
+    .subscribe();
+}
+
+function refreshViews() {
+  renderArticoleView();
+  loadDashboard();
+  if (document.getElementById('section-kanban').classList.contains('active')) renderKanban();
+}
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+function badge(status) {
+  const m={trimis:'b-trimis',in_evaluare:'b-evaluare',acceptat:'b-acceptat',respins:'b-respins',publicat:'b-publicat',draft:'b-draft'};
+  const l={trimis:'Trimis',in_evaluare:'În evaluare',acceptat:'Acceptat',respins:'Respins',publicat:'Publicat',draft:'Draft'};
+  return `<span class="badge ${m[status]||''}">${l[status]||status}</span>`;
+}
+function fmtDate(d){ return d ? new Date(d).toLocaleDateString('ro-RO') : '—'; }
+function fmtDateTime(d){ return d ? new Date(d).toLocaleString('ro-RO') : '—'; }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ════════════════════════════════════════════════
+// ARTICOLE
+// ════════════════════════════════════════════════
+async function loadArticole() {
+  const { data, error } = await sb.from('articole_revista').select('*').order('created_at',{ascending:false});
+  if (!error) allArticole = data || [];
+  document.getElementById('badge-articole').textContent = allArticole.filter(a=>a.status==='trimis').length;
+  renderArticoleView();
+}
+
+function getFilteredArticole() {
+  const s = document.getElementById('f-status')?.value || '';
+  const r = document.getElementById('f-rubrica')?.value || '';
+  const p = document.getElementById('f-platit')?.value || '';
+  const q = (document.getElementById('f-search')?.value || '').toLowerCase();
+  return allArticole.filter(a => {
+    if (s && a.status!==s) return false;
+    if (r && a.rubrica!==r) return false;
+    if (p==='true' && !a.platit) return false;
+    if (p==='false' && a.platit) return false;
+    if (q && !(a.nume_autor||'').toLowerCase().includes(q) && !(a.email_autor||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function setView(v){ currentView=v; document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active')); document.getElementById('vt-'+v).classList.add('active'); renderArticoleView(); }
+
+function renderArticoleView() {
+  const data = getFilteredArticole();
+  const wrap = document.getElementById('articole-view');
+  if (!data.length){ wrap.innerHTML='<div style="text-align:center;padding:40px;color:#888">Niciun articol găsit.</div>'; return; }
+  if (currentView==='table') renderArticoleTable(data, wrap);
+  else renderArticoleCards(data, wrap);
+}
+
+function renderArticoleTable(data, wrap) {
+  const rows = data.map(a => `
+    <tr>
+      <td>
+        <strong class="editable" title="Click pentru editare" contenteditable="false" onblur="saveInline('${a.id}','titlu',this)">${a.nome_autor||a.titlu||'—'}</strong>
+        <div style="font-size:.75rem;color:#888">${a.email_autor||''}</div>
+      </td>
+      <td style="font-size:.78rem">${a.rubrica||'—'}</td>
+      <td>
+        <select class="editable-select" onchange="saveInlineField('${a.id}','status',this.value)" style="border:1px solid #ddd;border-radius:4px;padding:2px 6px;font-size:.78rem;font-family:'Georgia',serif">
+          ${['trimis','in_evaluare','acceptat','respins','publicat'].map(s=>`<option value="${s}" ${a.status===s?'selected':''}>${{trimis:'Trimis',in_evaluare:'În evaluare',acceptat:'Acceptat',respins:'Respins',publicat:'Publicat'}[s]}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="editable-select" onchange="saveInlineField('${a.id}','platit',this.value==='true')" style="border:1px solid #ddd;border-radius:4px;padding:2px 6px;font-size:.78rem;font-family:'Georgia',serif">
+          <option value="true" ${a.platit?'selected':''}>✅ Plătit</option>
+          <option value="false" ${!a.platit?'selected':''}>❌ Neplatit</option>
+        </select>
+      </td>
+      <td>${renderStarsSmall(a.scor_evaluare||0)}</td>
+      <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">👁</button>
+        <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧</button>
+        <button class="btn btn-sm btn-outline" onclick="openNote('${a.id}')">📝</button>
+        <button class="btn btn-sm btn-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐</button>
+        <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌</button>
+      </td>
+    </tr>`).join('');
+  wrap.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Scor</th><th>Data</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderArticoleCards(data, wrap) {
+  const cards = data.map(a => `
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+        <div>
+          <strong style="color:#333">${a.nome_autor||a.titlu||'—'}</strong>
+          <div style="font-size:.78rem;color:#888">${a.email_autor||''} • ${a.institutie||''}</div>
+          <div style="margin-top:4px">${badge(a.status)} <span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'Plătit':'Neplatit'}</span></div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.78rem;color:#888">${a.rubrica||'—'}</div>
+          <div style="font-size:.75rem;color:#aaa">${fmtDate(a.created_at)}</div>
+          ${renderStarsSmall(a.scor_evaluare||0)}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">👁 Detalii</button>
+        <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧 Email</button>
+        <button class="btn btn-sm btn-outline" onclick="openNote('${a.id}')">📝 Note</button>
+        <button class="btn btn-sm btn-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
+        <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
+      </div>
+    </div>`).join('');
+  wrap.innerHTML = cards;
+}
+
+function renderStarsSmall(n) {
+  return `<span style="font-size:.85rem">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span>`;
+}
+
+// INLINE EDIT
+async function saveInline(id, field, el) {
+  const val = el.textContent.trim();
+  el.classList.remove('editing');
+  const { error } = await sb.from('articole_revista').update({[field]:val}).eq('id',id);
+  if (!error) { toast('Salvat!','success'); const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; }
+  else toast('Eroare la salvare','error');
+}
+
+async function saveInlineField(id, field, val) {
+  const { error } = await sb.from('articole_revista').update({[field]:val}).eq('id',id);
+  if (!error) { const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; loadDashboard(); loadPlati(); }
+  else toast('Eroare la salvare','error');
+}
+
+// ════════════════════════════════════════════════
+// DETALII ARTICOL
+// ════════════════════════════════════════════════
+async function detaliiArticol(id) {
+  const a = allArticole.find(x=>x.id===id);
+  if (!a) return;
+  const fisiere = (a.fisiere_links||[]).map(l=>`<a href="${l}" target="_blank" class="fisier-link">📄 ${l.split('/').pop()}</a>`).join('') || (a.fisier_url?`<a href="${a.fisier_url}" target="_blank" class="fisier-link">📄 Fișier</a>`:'—');
+  document.getElementById('modal-articol-content').innerHTML = `
+    <div class="detail-grid">
+      <div class="detail-item"><label>Autor</label><p>${a.nome_autor||'—'}</p></div>
+      <div class="detail-item"><label>Email</label><p>${a.email_autor||'—'}</p></div>
+      <div class="detail-item"><label>Instituție</label><p>${a.institutie||'—'}</p></div>
+      <div class="detail-item"><label>Funcție</label><p>${a.functie||'—'}</p></div>
+      <div class="detail-item"><label>Localitate</label><p>${a.localitate||'—'}, ${a.judet||'—'}</p></div>
+      <div class="detail-item"><label>Telefon</label><p>${a.telefon||'—'}</p></div>
+      <div class="detail-item"><label>Categorie</label><p>${a.rubrica||'—'}</p></div>
+      <div class="detail-item"><label>Tip material</label><p>${a.tip_fisier||'—'}</p></div>
+      <div class="detail-item"><label>Nr. articole</label><p>${a.nr_articole||1}</p></div>
+      <div class="detail-item"><label>Opțiune plată</label><p>${a.optiune_plata||'—'}</p></div>
+      <div class="detail-item"><label>Status</label><p>${badge(a.status)}</p></div>
+      <div class="detail-item"><label>Plătit</label><p><span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'Da':'Nu'}</span></p></div>
+      <div class="detail-item"><label>Data trimiterii</label><p>${fmtDateTime(a.created_at)}</p></div>
+      <div class="detail-item"><label>Scor evaluare</label><p>${renderStarsSmall(a.scor_evaluare||0)}</p></div>
+    </div>
+    <div class="form-group"><label>Fișiere</label><div>${fisiere}</div></div>
+    ${a.feedback_editor?`<div class="form-group"><label>Feedback editor</label><p style="font-size:.85rem">${a.feedback_editor}</p></div>`:''}
+    <div style="margin-top:14px">
+      <div style="font-size:.78rem;color:#666;margin-bottom:6px;font-weight:bold">ACȚIUNI RAPIDE</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-outline" onclick="saveInlineField('${a.id}','status','in_evaluare')">→ În evaluare</button>
+        <button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','status','acceptat')">✓ Acceptat</button>
+        <button class="btn btn-sm btn-danger" onclick="saveInlineField('${a.id}','status','respins')">✗ Respins</button>
+        <button class="btn btn-sm btn-primary" onclick="saveInlineField('${a.id}','status','publicat')">★ Publicat</button>
+        ${!a.platit?`<button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','platit',true)">💳 Marchează plătit</button>`:''}
+        <button class="btn btn-sm btn-blue" onclick="closeModal('modalArticol');openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧 Email</button>
+        <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openNote('${a.id}')">📝 Note</button>
+        <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
+        <button class="btn btn-sm btn-primary" onclick="closeModal('modalArticol');openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
+      </div>
+    </div>`;
+  openModal('modalArticol');
+}
+
+// ════════════════════════════════════════════════
+// EMAIL
+// ════════════════════════════════════════════════
+const emailTemplates = {
+  acceptat: { subj:'Articolul dumneavoastră a fost acceptat — Revista Dokimasia', body:'Stimate(ă) autor(ă),\n\nCu deosebită plăcere vă informăm că articolul trimis spre publicare în Revista Dokimasia a fost acceptat de comitetul editorial.\n\nVă vom contacta cu detalii privind numărul în care va apărea materialul dumneavoastră.\n\nCu stimă,\nRedacția Revista Dokimasia' },
+  revizuire: { subj:'Solicitare revizuire articol — Revista Dokimasia', body:'Stimate(ă) autor(ă),\n\nVă mulțumim pentru trimiterea articolului la Revista Dokimasia. În urma evaluării, comitetul editorial solicită revizuirea materialului conform observațiilor atașate.\n\nVă rugăm să trimiteți versiunea revizuită în termen de 14 zile.\n\nCu stimă,\nRedacția Revista Dokimasia' },
+  respins: { subj:'Comunicare decizie editorială — Revista Dokimasia', body:'Stimate(ă) autor(ă),\n\nVă mulțumim pentru interesul acordat Revistei Dokimasia. Ne pare rău să vă informăm că, în urma procesului de evaluare, articolul dumneavoastră nu a putut fi acceptat pentru publicare în numărul curent.\n\nVă încurajăm să trimiteți materiale viitoare.\n\nCu stimă,\nRedacția Revista Dokimasia' }
+};
+
+function openEmail(id, email, nume) {
+  document.getElementById('email-articol-id').value = id;
+  document.getElementById('email-autor-email').value = email;
+  document.getElementById('email-autor-nume').value = nume;
+  document.getElementById('email-mesaj').value = '';
+  document.getElementById('notif-email').innerHTML = '';
+  selectedTpl = '';
+  document.querySelectorAll('.email-tpl').forEach(t=>t.classList.remove('selected'));
+  openModal('modalEmail');
+}
+
+function selectTpl(tpl) {
+  selectedTpl = tpl;
+  document.querySelectorAll('.email-tpl').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('tpl-'+tpl).classList.add('selected');
+  document.getElementById('email-mesaj').value = emailTemplates[tpl]?.body || '';
+}
+
+async function trimiteMail() {
+  const email = document.getElementById('email-autor-email').value;
+  const nume  = document.getElementById('email-autor-nume').value;
+  const mesaj = document.getElementById('email-mesaj').value.trim();
+  if (!email || !mesaj) { document.getElementById('notif-email').innerHTML='<div class="notif notif-error">Selectează un template sau scrie un mesaj.</div>'; return; }
+
+  const tpl = emailTemplates[selectedTpl] || { subj:'Mesaj de la Redacția Dokimasia' };
+  try {
+    await emailjs.send(EJS_SVC, EJS_TPL, {
+      to_email: email,
+      to_name: nume,
+      subject: tpl.subj,
+      message: mesaj,
+      from_name: 'Redacția Revista Dokimasia',
+      title: tpl.subj,
+      nume: nume,
+      email: email,
+    });
+    toast('Email trimis cu succes!','success');
+    closeModal('modalEmail');
+  } catch(e) {
+    document.getElementById('notif-email').innerHTML=`<div class="notif notif-error">Eroare: ${e.text||e.message}</div>`;
+  }
+}
+
+// ════════════════════════════════════════════════
+// NOTE INTERNE
+// ════════════════════════════════════════════════
+let noteCache = {};
+
+async function openNote(id) {
+  document.getElementById('nota-articol-id').value = id;
+  document.getElementById('nota-noua').value = '';
+  // Încarcă note din feedback_editor (stocat ca JSON)
+  const a = allArticole.find(x=>x.id===id);
+  noteCache[id] = [];
+  try { if (a?.note_interne) noteCache[id] = JSON.parse(a.note_interne); } catch(e){}
+  renderNote(id);
+  openModal('modalNote');
+}
+
+function renderNote(id) {
+  const notes = noteCache[id]||[];
+  const list = document.getElementById('notes-list');
+  if (!notes.length){ list.innerHTML='<div style="color:#aaa;font-size:.83rem;text-align:center;padding:10px">Nicio notă</div>'; return; }
+  list.innerHTML = notes.map((n,i)=>`
+    <div class="note-item">
+      <button class="note-del" onclick="stergeNota('${id}',${i})">✕</button>
+      ${n.text}
+      <div class="note-time">${n.time}</div>
+    </div>`).join('');
+}
+
+async function adaugaNota() {
+  const id   = document.getElementById('nota-articol-id').value;
+  const text = document.getElementById('nota-noua').value.trim();
+  if (!text) return;
+  if (!noteCache[id]) noteCache[id]=[];
+  noteCache[id].push({ text, time: new Date().toLocaleString('ro-RO') });
+  await sb.from('articole_revista').update({ note_interne: JSON.stringify(noteCache[id]) }).eq('id',id);
+  document.getElementById('nota-noua').value='';
+  renderNote(id);
+  toast('Notă adăugată','success');
+}
+
+async function stergeNota(id, idx) {
+  noteCache[id].splice(idx,1);
+  await sb.from('articole_revista').update({ note_interne: JSON.stringify(noteCache[id]) }).eq('id',id);
+  renderNote(id);
+}
+
+// ════════════════════════════════════════════════
+// EVALUARE
+// ════════════════════════════════════════════════
+function openEvaluare(id, scor) {
+  document.getElementById('eval-articol-id').value = id;
+  currentStar = scor||0;
+  updateStars(currentStar);
+  ['ec1','ec2','ec3','ec4','ec5','ec6'].forEach(c=>document.getElementById(c).checked=false);
+  document.getElementById('eval-obs').value='';
+  openModal('modalEvaluare');
+}
+
+function setStar(n){ currentStar=n; updateStars(n); }
+function updateStars(n){ document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<n)); }
+
+async function salveazaEvaluare() {
+  const id = document.getElementById('eval-articol-id').value;
+  const obs = document.getElementById('eval-obs').value.trim();
+  const criterii = ['Originalitate','Structură','Bibliografie','Relevanță','Norme redacționale','Claritate'].filter((_,i)=>document.getElementById('ec'+(i+1)).checked);
+  await sb.from('articole_revista').update({ scor_evaluare: currentStar, feedback_editor: obs || (criterii.length?`Criterii: ${criterii.join(', ')}`:null) }).eq('id',id);
+  const a = allArticole.find(x=>x.id===id);
+  if (a){ a.scor_evaluare=currentStar; a.feedback_editor=obs; }
+  toast('Evaluare salvată!','success');
+  closeModal('modalEvaluare');
+  renderArticoleView();
+}
+
+// ════════════════════════════════════════════════
+// ASIGNARE
+// ════════════════════════════════════════════════
+function openAsignare(id, titlu) {
+  document.getElementById('as-id').value = id;
+  document.getElementById('as-titlu').value = titlu;
+  document.getElementById('as-feedback').value = '';
+  document.getElementById('notif-asignare').innerHTML = '';
+  const opts = allNumere.map(n=>`<option value="${n.id}">${n.titlu} (${n.editie})</option>`).join('');
+  document.getElementById('as-numar').innerHTML = '<option value="">Selectează...</option>'+opts;
+  openModal('modalAsignare');
+}
+
+async function salveazaAsignare() {
+  const id      = document.getElementById('as-id').value;
+  const numarId = document.getElementById('as-numar').value;
+  const status  = document.getElementById('as-status').value;
+  const fb      = document.getElementById('as-feedback').value.trim();
+  if (!numarId){ document.getElementById('notif-asignare').innerHTML='<div class="notif notif-error">Selectează un număr.</div>'; return; }
+  const { error } = await sb.from('articole_revista').update({ revista_id:numarId, status, feedback_editor:fb||null }).eq('id',id);
+  if (error){ document.getElementById('notif-asignare').innerHTML=`<div class="notif notif-error">${error.message}</div>`; return; }
+  const a = allArticole.find(x=>x.id===id);
+  if (a){ a.revista_id=numarId; a.status=status; a.feedback_editor=fb; }
+  toast('Articol asignat cu succes!','success');
+  closeModal('modalAsignare');
+  renderArticoleView();
+}
+
+// ════════════════════════════════════════════════
+// KANBAN
+// ════════════════════════════════════════════════
+function renderKanban() {
+  const cols = [
+    {id:'trimis',label:'Trimis',cls:'kh-trimis'},
+    {id:'in_evaluare',label:'În evaluare',cls:'kh-evaluare'},
+    {id:'acceptat',label:'Acceptat',cls:'kh-acceptat'},
+    {id:'respins',label:'Respins',cls:'kh-respins'},
+    {id:'publicat',label:'Publicat',cls:'kh-publicat'},
+  ];
+  const board = document.getElementById('kanban-board');
+  board.innerHTML = cols.map(col => {
+    const arts = allArticole.filter(a=>a.status===col.id);
+    const cards = arts.map(a=>`
+      <div class="kanban-card" draggable="true" data-id="${a.id}" data-status="${a.status}"
+        ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+        <div class="kc-autor">${a.nome_autor||a.titlu||'—'}</div>
+        <div class="kc-rubrica">${a.rubrica||'—'} • ${fmtDate(a.created_at)}</div>
+        <div style="font-size:.72rem;margin-top:4px">${renderStarsSmall(a.scor_evaluare||0)} ${a.platit?'<span class="badge b-platit" style="font-size:.65rem">✓ Plătit</span>':''}</div>
+        <div class="kc-actions">
+          <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">👁</button>
+          <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">📧</button>
+        </div>
+      </div>`).join('');
+    return `<div class="kanban-col" data-status="${col.id}" ondragover="dragOver(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
+      <div class="kanban-col-header ${col.cls}">${col.label} <strong>(${arts.length})</strong></div>
+      ${cards}
+    </div>`;
+  }).join('');
+}
+
+let draggedId = null;
+function dragStart(e){ draggedId=e.currentTarget.dataset.id; e.currentTarget.classList.add('dragging'); }
+function dragEnd(e){ e.currentTarget.classList.remove('dragging'); }
+function dragOver(e){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+async function drop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const newStatus = e.currentTarget.dataset.status;
+  if (!draggedId || !newStatus) return;
+  await saveInlineField(draggedId,'status',newStatus);
+  renderKanban();
+  toast(`Status schimbat → ${newStatus}`,'success');
+  draggedId = null;
+}
+
+// ════════════════════════════════════════════════
+// PLĂȚI
+// ════════════════════════════════════════════════
+function loadPlati() {
+  const platite   = allArticole.filter(a=>a.platit);
+  const neplatite = allArticole.filter(a=>!a.platit);
+  const tarziu    = allArticole.filter(a=>a.optiune_plata==='Plătește mai târziu'||a.optiune_plata==='tarziu');
+  document.getElementById('cnt-platit').textContent   = platite.length;
+  document.getElementById('cnt-neplatit').textContent = neplatite.length;
+  document.getElementById('suma-totala').textContent  = platite.length*40;
+  document.getElementById('cnt-tarziu').textContent   = tarziu.length;
+  document.getElementById('badge-plati').textContent  = neplatite.length;
+
+  const rows = allArticole.map(a=>`
+    <tr>
+      <td><strong>${a.nome_autor||'—'}</strong><div style="font-size:.75rem;color:#888">${a.email_autor||''}</div></td>
+      <td style="font-size:.78rem">${a.rubrica||'—'}</td>
+      <td><span class="badge ${a.optiune_plata==='acum'||a.optiune_plata==='Plătește acum'?'b-acum':'b-tarziu'}">${a.optiune_plata||'—'}</span></td>
+      <td>
+        <select onchange="saveInlineField('${a.id}','platit',this.value==='true')" style="border:1px solid #ddd;border-radius:4px;padding:2px 6px;font-size:.78rem;font-family:'Georgia',serif">
+          <option value="true" ${a.platit?'selected':''}>✅ Plătit</option>
+          <option value="false" ${!a.platit?'selected':''}>❌ Neplatit</option>
+        </select>
+      </td>
+      <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
+    </tr>`).join('');
+  document.getElementById('tabel-plati').innerHTML=`<table><thead><tr><th>Autor</th><th>Categorie</th><th>Opțiune</th><th>Status plată</th><th>Data</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// ════════════════════════════════════════════════
+// NUMERE
+// ════════════════════════════════════════════════
+async function loadNumere() {
+  const { data } = await sb.from('reviste').select('*').order('data_aparitie',{ascending:false});
+  allNumere = data||[];
+  renderNumere();
+}
+
+function renderNumere() {
+  const wrap = document.getElementById('lista-numere');
+  if (!allNumere.length){ wrap.innerHTML='<div style="text-align:center;padding:40px;color:#888">Niciun număr creat. Apasă "+ Număr nou".</div>'; return; }
+  const opts = allNumere.map(n=>`<option value="${n.id}">${n.titlu} (${n.editie})</option>`).join('');
+  document.getElementById('f-numar-pub').innerHTML='<option value="">Toate numerele</option>'+opts;
+
+  wrap.innerHTML = allNumere.map(n => {
+    const arts = allArticole.filter(a=>a.revista_id===n.id);
+    const cats = [...new Set(arts.map(a=>a.rubrica).filter(Boolean))];
+    return `<div class="numar-card">
+      <div class="numar-card-header">
+        <div>
+          <div class="numar-card-title">📚 ${n.titlu}</div>
+          <div class="numar-card-meta">Ediție: ${n.editie} | Data: ${fmtDate(n.data_aparitie)} | ${badge(n.status)} | ${arts.length} articole</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${n.status==='draft'?`<button class="btn btn-sm btn-green" onclick="publicaNumar('${n.id}')">🚀 Publică</button>`:''}
+          <button class="btn btn-sm btn-outline" onclick="editNumar('${n.id}')">✏️ Editează</button>
+          <button class="btn btn-sm btn-danger" onclick="stergeNumar('${n.id}')">🗑️</button>
+        </div>
+      </div>
+      ${n.descriere?`<p style="font-size:.83rem;color:#666;margin-bottom:8px">${n.descriere}</p>`:''}
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${cats.map(c=>`<span class="cat-tag">${c}</span>`).join('')||'<span style="font-size:.78rem;color:#aaa">Niciun articol asignat</span>'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function publicaNumar(id) {
+  if (!confirm('Publici acest număr? Toate articolele acceptate vor fi marcate ca publicate.')) return;
+  await sb.from('articole_revista').update({status:'publicat'}).eq('revista_id',id).eq('status','acceptat');
+  await sb.from('reviste').update({status:'publicat'}).eq('id',id);
+  await loadNumere();
+  await loadArticole();
+  toast('Numărul a fost publicat!','success','🎉 Publicat!');
+  addNotification(`📚 Numărul a fost publicat cu succes!`,'success');
+}
+
+function openModalNumar() {
+  ['n-id','n-titlu','n-editie','n-coperta','n-descriere'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('n-data').value='';
+  document.getElementById('n-status').value='draft';
+  document.getElementById('modal-numar-title').textContent='📚 Număr nou';
+  document.getElementById('notif-numar').innerHTML='';
+  openModal('modalNumar');
+}
+
+function editNumar(id) {
+  const n = allNumere.find(x=>x.id===id);
+  if (!n) return;
+  document.getElementById('n-id').value=n.id;
+  document.getElementById('n-titlu').value=n.titlu||'';
+  document.getElementById('n-editie').value=n.editie||'';
+  document.getElementById('n-data').value=n.data_aparitie||'';
+  document.getElementById('n-status').value=n.status||'draft';
+  document.getElementById('n-coperta').value=n.coperta_url||'';
+  document.getElementById('n-descriere').value=n.descriere||'';
+  document.getElementById('modal-numar-title').textContent='✏️ Editează număr';
+  document.getElementById('notif-numar').innerHTML='';
+  openModal('modalNumar');
+}
+
+async function salveazaNumar() {
+  const id     = document.getElementById('n-id').value;
+  const titlu  = document.getElementById('n-titlu').value.trim();
+  const editie = document.getElementById('n-editie').value.trim();
+  if (!titlu||!editie){ document.getElementById('notif-numar').innerHTML='<div class="notif notif-error">Titlul și ediția sunt obligatorii.</div>'; return; }
+  const p = { titlu, editie, data_aparitie:document.getElementById('n-data').value||null, status:document.getElementById('n-status').value, coperta_url:document.getElementById('n-coperta').value.trim()||null, descriere:document.getElementById('n-descriere').value.trim()||null };
+  const { error } = id ? await sb.from('reviste').update(p).eq('id',id) : await sb.from('reviste').insert(p);
+  if (error){ document.getElementById('notif-numar').innerHTML=`<div class="notif notif-error">${error.message}</div>`; return; }
+  closeModal('modalNumar');
+  await loadNumere();
+  toast('Număr salvat!','success');
+}
+
+async function stergeNumar(id) {
+  if (!confirm('Ștergi acest număr?')) return;
+  await sb.from('reviste').delete().eq('id',id);
+  await loadNumere();
+  toast('Număr șters','info');
+}
+
+// ════════════════════════════════════════════════
+// PUBLICATE PE CATEGORII
+// ════════════════════════════════════════════════
+async function loadPublicate() {
+  const numarId = document.getElementById('f-numar-pub').value;
+  let data = allArticole.filter(a=>a.status==='publicat');
+  if (numarId) data = data.filter(a=>a.revista_id===numarId);
+  const wrap = document.getElementById('publicate-categorii');
+  if (!data.length){ wrap.innerHTML='<div style="text-align:center;padding:40px;color:#888">Niciun articol publicat.</div>'; return; }
+  const grupe = {};
+  data.forEach(a=>{ const c=a.rubrica||'Fără categorie'; if(!grupe[c]) grupe[c]=[]; grupe[c].push(a); });
+  wrap.innerHTML = Object.entries(grupe).map(([cat,arts])=>`
+    <div class="table-wrap" style="margin-bottom:14px">
+      <div style="background:#fdf5f5;padding:10px 14px;font-weight:bold;font-size:.85rem;color:#8B0000;border-bottom:1px solid #e0e0e0">
+        📂 ${cat} <span style="font-weight:normal;color:#888">(${arts.length} articole)</span>
+      </div>
+      <table><thead><tr><th>Autor</th><th>Titlu</th><th>Număr</th><th>Data</th><th>Fișier</th></tr></thead>
+      <tbody>${arts.map(a=>`<tr>
+        <td>${a.nome_autor||'—'}<div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></td>
+        <td style="font-size:.82rem">${a.titlu||'—'}</td>
+        <td style="font-size:.78rem">${a.revista_id?(allNumere.find(n=>n.id===a.revista_id)?.titlu||'—'):'—'}</td>
+        <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
+        <td>${a.fisier_url?`<a href="${a.fisier_url}" target="_blank" class="fisier-link">📄</a>`:'—'}</td>
+      </tr>`).join('')}</tbody></table>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════
+function loadDashboard() {
+  const total = allArticole.length;
+  const trimise = allArticole.filter(a=>a.status==='trimis').length;
+  const acceptate = allArticole.filter(a=>a.status==='acceptat').length;
+  const publicate = allArticole.filter(a=>a.status==='publicat').length;
+  const platite = allArticole.filter(a=>a.platit).length;
+  const neplatite = allArticole.filter(a=>!a.platit).length;
+  const numere = allNumere.length;
+
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-number">${total}</div><div class="stat-label">Total articole</div></div>
+    <div class="stat-card"><div class="stat-number" style="color:#1565c0">${trimise}</div><div class="stat-label">Noi / Netratate</div></div>
+    <div class="stat-card"><div class="stat-number" style="color:#2e7d32">${acceptate}</div><div class="stat-label">Acceptate</div></div>
+    <div class="stat-card"><div class="stat-number" style="color:#6a1b9a">${publicate}</div><div class="stat-label">Publicate</div></div>
+    <div class="stat-card"><div class="stat-number" style="color:#2e7d32">${platite*40}</div><div class="stat-label">Lei încasați</div><div class="stat-sub">${platite} plăți</div></div>
+    <div class="stat-card"><div class="stat-number" style="color:#c62828">${neplatite}</div><div class="stat-label">Plăți în așteptare</div></div>
+    <div class="stat-card"><div class="stat-number">${numere}</div><div class="stat-label">Numere revistă</div></div>`;
+
+  // Grafic ultimele 30 zile
+  const now = new Date();
+  const labels = [], counts = [];
+  for (let i=29;i>=0;i--) {
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    labels.push(d.toLocaleDateString('ro-RO',{day:'2-digit',month:'2-digit'}));
+    const dayStr = d.toISOString().slice(0,10);
+    counts.push(allArticole.filter(a=>(a.created_at||'').slice(0,10)===dayStr).length);
+  }
+  const ctx = document.getElementById('chartArticole').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx,{
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Articole trimise', data:counts, backgroundColor:'rgba(139,0,0,.6)', borderColor:'#8B0000', borderWidth:1, borderRadius:3 }] },
+    options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
   });
 
-  // ── INIT ──────────────────────────────────────────────────
-  async function init() {
-    const { data: { user } } = await sb.auth.getUser();
-    document.getElementById('loadingScreen').style.display = 'none';
-    if (!user || user.email !== ADMIN_EMAIL) {
-      document.getElementById('accessDenied').style.display = 'block';
-      return;
-    }
-    document.getElementById('adminPanel').style.display = 'block';
-    loadAll();
+  // Recent
+  const recent = allArticole.slice(0,5).map(a=>`
+    <div style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-size:.82rem;display:flex;justify-content:space-between;align-items:center">
+      <div><strong>${a.nome_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.rubrica||'—'}</div></div>
+      <div>${badge(a.status)}</div>
+    </div>`).join('');
+  document.getElementById('dash-recent').innerHTML = recent||'<div style="padding:20px;text-align:center;color:#888;font-size:.83rem">Niciun articol</div>';
+
+  // Plăți pending
+  const pending = allArticole.filter(a=>!a.platit).slice(0,5).map(a=>`
+    <div style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-size:.82rem;display:flex;justify-content:space-between;align-items:center">
+      <div><strong>${a.nome_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></div>
+      <button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','platit',true)">✓ Plătit</button>
+    </div>`).join('');
+  document.getElementById('dash-plati-pend').innerHTML = pending||'<div style="padding:20px;text-align:center;color:#888;font-size:.83rem">Toate plătite ✅</div>';
+}
+
+// ════════════════════════════════════════════════
+// CALENDAR
+// ════════════════════════════════════════════════
+function renderCalendar() {
+  const months = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
+  document.getElementById('cal-title').textContent = `${months[calMonth]} ${calYear}`;
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+  let start = first.getDay(); if(start===0) start=7; start--;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const grid = document.getElementById('cal-grid');
+  let html = '';
+  for (let i=0;i<start;i++) html+=`<div class="cal-day other-month"></div>`;
+  for (let d=1;d<=last.getDate();d++) {
+    const date = new Date(calYear,calMonth,d);
+    const ds   = date.toISOString().slice(0,10);
+    const isToday = date.getTime()===today.getTime();
+    const arts = allArticole.filter(a=>(a.created_at||'').slice(0,10)===ds);
+    const nums = allNumere.filter(n=>n.data_aparitie===ds);
+    let evts = arts.map(a=>`<div class="cal-event" title="${a.nome_autor||'Articol'}">${a.nome_autor||'Articol'}</div>`).join('');
+    evts += nums.map(n=>`<div class="cal-event ev-blue" title="${n.titlu}">📚 ${n.titlu}</div>`).join('');
+    html+=`<div class="cal-day ${isToday?'today':''}"><div class="cal-day-num">${d}</div>${evts}</div>`;
   }
+  grid.innerHTML = html;
+}
+function prevMonth(){ calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function nextMonth(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
 
-  function loadAll() {
-    loadArticole();
-    loadPlati();
-    loadNumere();
-    loadAutori();
-  }
+// ════════════════════════════════════════════════
+// AUTORI
+// ════════════════════════════════════════════════
+async function loadAutori() {
+  const { data } = await sb.from('autori').select('*').order('created_at',{ascending:false});
+  const rows = (data||[]).map(a=>`
+    <tr>
+      <td><strong>${a.nume_complet||'—'}</strong></td>
+      <td>${a.email||'—'}</td>
+      <td>${a.institutie||'—'}</td>
+      <td>${a.titlu_didactic||'—'}</td>
+      <td>${fmtDate(a.created_at)}</td>
+    </tr>`).join('');
+  document.getElementById('tabel-autori').innerHTML = rows
+    ? `<table><thead><tr><th>Nume</th><th>Email</th><th>Instituție</th><th>Funcție</th><th>Data</th></tr></thead><tbody>${rows}</tbody></table>`
+    : '<div style="text-align:center;padding:30px;color:#888">Niciun autor înregistrat</div>';
+}
 
-  // ── NAVIGARE ──────────────────────────────────────────────
-  function showSection(id) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('nav.main-nav a').forEach(a => a.classList.remove('active'));
-    document.getElementById('section-' + id).classList.add('active');
-    document.getElementById('sb-' + id).classList.add('active');
-    document.getElementById('nav-' + id).classList.add('active');
-    if (id === 'publicate') loadPublicate();
-  }
+// ════════════════════════════════════════════════
+// RAPORT
+// ════════════════════════════════════════════════
+function loadRaport() {
+  const luna = parseInt(document.getElementById('raport-luna').value);
+  const an   = parseInt(document.getElementById('raport-an').value);
+  const luni = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'];
 
-  // ── HELPERS ───────────────────────────────────────────────
-  function badge(status) {
-    const map = {
-      'trimis': 'badge-trimis', 'in_evaluare': 'badge-evaluare',
-      'acceptat': 'badge-acceptat', 'respins': 'badge-respins', 'publicat': 'badge-publicat',
-      'draft': 'badge-draft'
-    };
-    const labels = {
-      'trimis': 'Trimis', 'in_evaluare': 'În evaluare', 'acceptat': 'Acceptat',
-      'respins': 'Respins', 'publicat': 'Publicat', 'draft': 'Draft'
-    };
-    return `<span class="badge ${map[status] || ''}">${labels[status] || status}</span>`;
-  }
+  const art = allArticole.filter(a=>{
+    const d = new Date(a.created_at);
+    return d.getMonth()===luna && d.getFullYear()===an;
+  });
 
-  function fmtDate(d) {
-    if (!d) return '—';
-    return new Date(d).toLocaleDateString('ro-RO');
-  }
+  const primite   = art.length;
+  const acceptate = art.filter(a=>a.status==='acceptat'||a.status==='publicat').length;
+  const respinse  = art.filter(a=>a.status==='respins').length;
+  const platite   = art.filter(a=>a.platit).length;
+  const incasat   = platite*40;
 
-  function openModal(id) { document.getElementById(id).classList.add('open'); }
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  const peCateg = {};
+  art.forEach(a=>{ const c=a.rubrica||'Nespecificat'; if(!peCateg[c]) peCateg[c]=0; peCateg[c]++; });
 
-  // ── ARTICOLE ──────────────────────────────────────────────
-  async function loadArticole() {
-    const statusFilter  = document.getElementById('filter-status').value;
-    const rubricaFilter = document.getElementById('filter-rubrica').value;
-    const searchFilter  = document.getElementById('filter-search').value.trim().toLowerCase();
-
-    let query = sb.from('articole_revista').select('*').order('created_at', { ascending: false });
-    if (statusFilter)  query = query.eq('status', statusFilter);
-    if (rubricaFilter) query = query.eq('rubrica', rubricaFilter);
-
-    const { data, error } = await query;
-    if (error) { document.getElementById('tabel-articole').innerHTML = `<div class="loading">Eroare: ${error.message}</div>`; return; }
-
-    const filtered = searchFilter ? data.filter(a => (a.nume_autor||'').toLowerCase().includes(searchFilter) || (a.email_autor||'').toLowerCase().includes(searchFilter)) : data;
-
-    // Stats
-    document.getElementById('cnt-trimis').textContent    = data.filter(a => a.status === 'trimis').length;
-    document.getElementById('cnt-evaluare').textContent  = data.filter(a => a.status === 'in_evaluare').length;
-    document.getElementById('cnt-acceptat').textContent  = data.filter(a => a.status === 'acceptat').length;
-    document.getElementById('cnt-publicat').textContent  = data.filter(a => a.status === 'publicat').length;
-    document.getElementById('badge-articole').textContent = data.filter(a => a.status === 'trimis').length;
-
-    if (!filtered.length) {
-      document.getElementById('tabel-articole').innerHTML = '<div class="loading">Niciun articol găsit.</div>';
-      return;
-    }
-
-    const rows = filtered.map(a => `
-      <tr>
-        <td><strong>${a.nome_autor || a.titlu}</strong><br><small style="color:#888">${a.email_autor||''}</small></td>
-        <td><small>${a.rubrica||'—'}</small></td>
-        <td><small>${a.tip_fisier||'—'}</small></td>
-        <td>${badge(a.status)}</td>
-        <td><span class="badge ${a.platit ? 'badge-platit' : 'badge-nepla'}">${a.platit ? 'Plătit' : 'Neplatit'}</span></td>
-        <td><small>${fmtDate(a.created_at)}</small></td>
-        <td style="white-space:nowrap;">
-          <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">Detalii</button>
-          <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">Asignează</button>
-        </td>
-      </tr>
-    `).join('');
-
-    document.getElementById('tabel-articole').innerHTML = `
-      <table>
-        <thead><tr><th>Autor</th><th>Categorie</th><th>Tip</th><th>Status</th><th>Plată</th><th>Data</th><th>Acțiuni</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-  }
-
-  // Detalii articol
-  async function detaliiArticol(id) {
-    const { data: a } = await sb.from('articole_revista').select('*').eq('id', id).single();
-    if (!a) return;
-
-    const fisiere = (a.fisiere_links || []).map(l =>
-      `<a href="${l}" target="_blank" class="fisier-link">📄 ${l.split('/').pop()}</a>`
-    ).join('') || (a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" class="fisier-link">📄 Fișier</a>` : '—');
-
-    document.getElementById('modal-articol-content').innerHTML = `
-      <div class="detail-grid">
-        <div class="detail-item"><label>Autor</label><p>${a.nume_autor||'—'}</p></div>
-        <div class="detail-item"><label>Email</label><p>${a.email_autor||'—'}</p></div>
-        <div class="detail-item"><label>Instituție</label><p>${a.institutie||'—'}</p></div>
-        <div class="detail-item"><label>Funcție</label><p>${a.functie||'—'}</p></div>
-        <div class="detail-item"><label>Localitate</label><p>${a.localitate||'—'}, ${a.judet||'—'}</p></div>
-        <div class="detail-item"><label>Telefon</label><p>${a.telefon||'—'}</p></div>
-        <div class="detail-item"><label>Categorie</label><p>${a.rubrica||'—'}</p></div>
-        <div class="detail-item"><label>Tip material</label><p>${a.tip_fisier||'—'}</p></div>
-        <div class="detail-item"><label>Nr. articole</label><p>${a.nr_articole||1}</p></div>
-        <div class="detail-item"><label>Opțiune plată</label><p>${a.optiune_plata||'—'}</p></div>
-        <div class="detail-item"><label>Status</label><p>${badge(a.status)}</p></div>
-        <div class="detail-item"><label>Plătit</label><p><span class="badge ${a.platit ? 'badge-platit':'badge-nepla'}">${a.platit?'Da':'Nu'}</span></p></div>
-        <div class="detail-item"><label>Data trimiterii</label><p>${fmtDate(a.created_at)}</p></div>
+  document.getElementById('raport-content').innerHTML = `
+    <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px" id="raport-print">
+      <div style="text-align:center;margin-bottom:20px">
+        <h2 style="color:#8B0000;font-size:1.3rem">Raport editorial lunar</h2>
+        <p style="color:#888;font-size:.9rem">${luni[luna]} ${an} — Revista Dokimasia</p>
       </div>
-      <div class="form-group"><label>Fișiere</label><div>${fisiere}</div></div>
-      ${a.feedback_editor ? `<div class="form-group"><label>Feedback editor</label><p>${a.feedback_editor}</p></div>` : ''}
-      <div class="form-group" style="margin-top:16px;">
-        <label>Schimbă status</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
-          <button class="btn btn-sm btn-outline" onclick="schimbaStatus('${a.id}','in_evaluare')">→ În evaluare</button>
-          <button class="btn btn-sm btn-green" onclick="schimbaStatus('${a.id}','acceptat')">✓ Acceptat</button>
-          <button class="btn btn-sm btn-danger" onclick="schimbaStatus('${a.id}','respins')">✗ Respins</button>
-          <button class="btn btn-sm btn-primary" onclick="schimbaStatus('${a.id}','publicat')">★ Publicat</button>
-          ${!a.platit ? `<button class="btn btn-sm btn-green" onclick="marcheazaPlatit('${a.id}')">💳 Marchează plătit</button>` : ''}
-        </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-number">${primite}</div><div class="stat-label">Articole primite</div></div>
+        <div class="stat-card"><div class="stat-number" style="color:#2e7d32">${acceptate}</div><div class="stat-label">Acceptate/Publicate</div></div>
+        <div class="stat-card"><div class="stat-number" style="color:#c62828">${respinse}</div><div class="stat-label">Respinse</div></div>
+        <div class="stat-card"><div class="stat-number">${incasat}</div><div class="stat-label">Lei încasați</div></div>
       </div>
-    `;
-    openModal('modalArticol');
-  }
-
-  async function schimbaStatus(id, status) {
-    await sb.from('articole_revista').update({ status }).eq('id', id);
-    closeModal('modalArticol');
-    loadArticole();
-  }
-
-  async function marcheazaPlatit(id) {
-    await sb.from('articole_revista').update({ platit: true }).eq('id', id);
-    closeModal('modalArticol');
-    loadArticole();
-    loadPlati();
-  }
-
-  // ── PLĂȚI ────────────────────────────────────────────────
-  async function loadPlati() {
-    const { data } = await sb.from('articole_revista').select('*').order('created_at', { ascending: false });
-    if (!data) return;
-
-    const platite   = data.filter(a => a.platit);
-    const neplatite = data.filter(a => !a.platit);
-    const sumaEst   = platite.length * 40;
-
-    document.getElementById('cnt-platit').textContent   = platite.length;
-    document.getElementById('cnt-neplatit').textContent = neplatite.length;
-    document.getElementById('suma-totala').textContent  = sumaEst;
-    document.getElementById('badge-plati').textContent  = neplatite.length;
-
-    const rows = data.map(a => `
-      <tr>
-        <td><strong>${a.nume_autor||'—'}</strong><br><small>${a.email_autor||''}</small></td>
-        <td>${a.rubrica||'—'}</td>
-        <td>${a.optiune_plata === 'acum' ? 'Acum' : 'Mai târziu'}</td>
-        <td><span class="badge ${a.platit?'badge-platit':'badge-nepla'}">${a.platit?'Plătit':'Neplatit'}</span></td>
-        <td>${fmtDate(a.created_at)}</td>
-        <td>${!a.platit ? `<button class="btn btn-sm btn-green" onclick="marcheazaPlatit('${a.id}')">Marchează plătit</button>` : '—'}</td>
-      </tr>
-    `).join('');
-
-    document.getElementById('tabel-plati').innerHTML = `
-      <table>
-        <thead><tr><th>Autor</th><th>Categorie</th><th>Opțiune plată</th><th>Status</th><th>Data</th><th>Acțiuni</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-  }
-
-  // ── NUMERE REVISTĂ ────────────────────────────────────────
-  let numere = [];
-
-  async function loadNumere() {
-    const { data } = await sb.from('reviste').select('*').order('data_aparitie', { ascending: false });
-    numere = data || [];
-
-    if (!numere.length) {
-      document.getElementById('lista-numere').innerHTML = '<div class="loading">Niciun număr creat încă. Apasă "+ Număr nou".</div>';
-      return;
-    }
-
-    // Populează selectul din modal asignare și filtrul publicate
-    const opts = numere.map(n => `<option value="${n.id}">${n.titlu} (${n.editie})</option>`).join('');
-    document.getElementById('as-numar-select').innerHTML = '<option value="">Selectează numărul...</option>' + opts;
-    document.getElementById('filter-numar-pub').innerHTML = '<option value="">Toate numerele</option>' + opts;
-
-    const cards = numere.map(n => `
-      <div class="numar-card">
-        <div class="numar-card-header">
-          <div>
-            <div class="numar-card-title">📚 ${n.titlu}</div>
-            <div class="numar-card-meta">Ediție: ${n.editie} | Data: ${fmtDate(n.data_aparitie)} | ${badge(n.status)}</div>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button class="btn btn-sm btn-outline" onclick="editNumar('${n.id}')">✏️ Editează</button>
-            <button class="btn btn-sm btn-danger" onclick="stergeNumar('${n.id}')">🗑️ Șterge</button>
-          </div>
-        </div>
-        ${n.descriere ? `<p style="font-size:0.85rem;color:#666;margin-bottom:10px;">${n.descriere}</p>` : ''}
-        <div id="cats-${n.id}" class="numar-card-cats"><span style="font-size:0.8rem;color:#999;">Se încarcă categoriile...</span></div>
-      </div>
-    `).join('');
-
-    document.getElementById('lista-numere').innerHTML = cards;
-
-    // Încarcă categoriile pentru fiecare număr
-    for (const n of numere) loadCategoriiNumar(n.id);
-  }
-
-  async function loadCategoriiNumar(numarId) {
-    const { data } = await sb.from('articole_revista')
-      .select('rubrica')
-      .eq('revista_id', numarId)
-      .eq('status', 'publicat');
-
-    const el = document.getElementById(`cats-${numarId}`);
-    if (!el) return;
-
-    if (!data || !data.length) {
-      el.innerHTML = '<span style="font-size:0.8rem;color:#999;">Niciun articol publicat în acest număr.</span>';
-      return;
-    }
-
-    const unice = [...new Set(data.map(a => a.rubrica).filter(Boolean))];
-    el.innerHTML = unice.map(c => `<span class="cat-tag">${c}</span>`).join('');
-  }
-
-  function openModalNumar() {
-    document.getElementById('n-id').value = '';
-    document.getElementById('n-titlu').value = '';
-    document.getElementById('n-editie').value = '';
-    document.getElementById('n-data').value = '';
-    document.getElementById('n-status').value = 'draft';
-    document.getElementById('n-coperta').value = '';
-    document.getElementById('n-descriere').value = '';
-    document.getElementById('modal-numar-title').textContent = '📚 Număr nou';
-    document.getElementById('notif-numar').innerHTML = '';
-    openModal('modalNumar');
-  }
-
-  async function editNumar(id) {
-    const n = numere.find(x => x.id === id);
-    if (!n) return;
-    document.getElementById('n-id').value       = n.id;
-    document.getElementById('n-titlu').value    = n.titlu || '';
-    document.getElementById('n-editie').value   = n.editie || '';
-    document.getElementById('n-data').value     = n.data_aparitie || '';
-    document.getElementById('n-status').value   = n.status || 'draft';
-    document.getElementById('n-coperta').value  = n.coperta_url || '';
-    document.getElementById('n-descriere').value = n.descriere || '';
-    document.getElementById('modal-numar-title').textContent = '✏️ Editează număr';
-    document.getElementById('notif-numar').innerHTML = '';
-    openModal('modalNumar');
-  }
-
-  async function salveazaNumar() {
-    const id      = document.getElementById('n-id').value;
-    const titlu   = document.getElementById('n-titlu').value.trim();
-    const editie  = document.getElementById('n-editie').value.trim();
-    if (!titlu || !editie) {
-      document.getElementById('notif-numar').innerHTML = '<div class="notif notif-error">Titlul și ediția sunt obligatorii.</div>';
-      return;
-    }
-
-    const payload = {
-      titlu, editie,
-      data_aparitie: document.getElementById('n-data').value || null,
-      status:        document.getElementById('n-status').value,
-      coperta_url:   document.getElementById('n-coperta').value.trim() || null,
-      descriere:     document.getElementById('n-descriere').value.trim() || null,
-    };
-
-    let error;
-    if (id) {
-      ({ error } = await sb.from('reviste').update(payload).eq('id', id));
-    } else {
-      ({ error } = await sb.from('reviste').insert(payload));
-    }
-
-    if (error) {
-      document.getElementById('notif-numar').innerHTML = `<div class="notif notif-error">Eroare: ${error.message}</div>`;
-      return;
-    }
-
-    closeModal('modalNumar');
-    loadNumere();
-  }
-
-  async function stergeNumar(id) {
-    if (!confirm('Ești sigur că vrei să ștergi acest număr?')) return;
-    await sb.from('reviste').delete().eq('id', id);
-    loadNumere();
-  }
-
-  // ── ASIGNARE ARTICOL LA NUMĂR ─────────────────────────────
-  function openAsignare(articolId, titlu) {
-    document.getElementById('as-articol-id').value    = articolId;
-    document.getElementById('as-articol-titlu').value = titlu;
-    document.getElementById('as-feedback').value      = '';
-    document.getElementById('notif-asignare').innerHTML = '';
-    openModal('modalAsignare');
-  }
-
-  async function salveazaAsignare() {
-    const articolId = document.getElementById('as-articol-id').value;
-    const numarId   = document.getElementById('as-numar-select').value;
-    const status    = document.getElementById('as-status').value;
-    const feedback  = document.getElementById('as-feedback').value.trim();
-
-    if (!numarId) {
-      document.getElementById('notif-asignare').innerHTML = '<div class="notif notif-error">Selectează un număr.</div>';
-      return;
-    }
-
-    const { error } = await sb.from('articole_revista').update({
-      revista_id:      numarId,
-      status:          status,
-      feedback_editor: feedback || null,
-    }).eq('id', articolId);
-
-    if (error) {
-      document.getElementById('notif-asignare').innerHTML = `<div class="notif notif-error">Eroare: ${error.message}</div>`;
-      return;
-    }
-
-    closeModal('modalAsignare');
-    loadArticole();
-    loadPublicate();
-  }
-
-  // ── PUBLICATE PE CATEGORII ────────────────────────────────
-  async function loadPublicate() {
-    const numarId = document.getElementById('filter-numar-pub').value;
-    let query = sb.from('articole_revista').select('*').eq('status', 'publicat').order('rubrica');
-    if (numarId) query = query.eq('revista_id', numarId);
-
-    const { data } = await query;
-    if (!data || !data.length) {
-      document.getElementById('publicate-categorii').innerHTML = '<div class="loading">Niciun articol publicat.</div>';
-      return;
-    }
-
-    // Grupează pe categorii
-    const grupe = {};
-    data.forEach(a => {
-      const cat = a.rubrica || 'Fără categorie';
-      if (!grupe[cat]) grupe[cat] = [];
-      grupe[cat].push(a);
-    });
-
-    const html = Object.entries(grupe).map(([cat, arts]) => `
-      <div class="table-wrap" style="margin-bottom:16px;">
-        <div class="categoria-header">📂 ${cat} <span style="font-weight:normal;color:#888;">(${arts.length} articole)</span></div>
-        <table>
-          <thead><tr><th>Autor</th><th>Titlu</th><th>Număr</th><th>Data</th><th>Fișier</th></tr></thead>
-          <tbody>
-            ${arts.map(a => `
-              <tr>
-                <td>${a.nume_autor||'—'}<br><small style="color:#888">${a.email_autor||''}</small></td>
-                <td>${a.titlu||'—'}</td>
-                <td>${a.revista_id ? (numere.find(n=>n.id===a.revista_id)?.titlu||'—') : '—'}</td>
-                <td>${fmtDate(a.created_at)}</td>
-                <td>${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank" class="fisier-link">📄 Descarcă</a>` : '—'}</td>
-              </tr>
-            `).join('')}
-          </tbody>
+      <div style="margin-top:20px">
+        <h3 style="font-size:.9rem;color:#8B0000;margin-bottom:10px">Distribuție pe categorii</h3>
+        <table><thead><tr><th>Categorie</th><th>Nr. articole</th></tr></thead>
+        <tbody>${Object.entries(peCateg).map(([c,n])=>`<tr><td>${c}</td><td>${n}</td></tr>`).join('')||'<tr><td colspan="2" style="text-align:center;color:#888">Nicio dată</td></tr>'}</tbody>
         </table>
       </div>
-    `).join('');
+      <div style="margin-top:20px">
+        <h3 style="font-size:.9rem;color:#8B0000;margin-bottom:10px">Lista articole</h3>
+        <table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Data</th></tr></thead>
+        <tbody>${art.map(a=>`<tr><td>${a.nome_autor||'—'}</td><td style="font-size:.78rem">${a.rubrica||'—'}</td><td>${badge(a.status)}</td><td><span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'✓':'✗'}</span></td><td style="font-size:.75rem">${fmtDate(a.created_at)}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#888">Niciun articol</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
 
-    document.getElementById('publicate-categorii').innerHTML = html;
-  }
+function genereazaRaport() {
+  window.print();
+}
 
-  // ── AUTORI ────────────────────────────────────────────────
-  async function loadAutori() {
-    const { data } = await sb.from('autori').select('*').order('created_at', { ascending: false });
-    if (!data || !data.length) {
-      document.getElementById('tabel-autori').innerHTML = '<div class="loading">Niciun autor înregistrat.</div>';
-      return;
-    }
+// ════════════════════════════════════════════════
+// EXPORT CSV
+// ════════════════════════════════════════════════
+function exportCSV() {
+  const data = getFilteredArticole();
+  const rows = [['Autor','Email','Instituție','Categorie','Tip','Status','Plătit','Data']];
+  data.forEach(a=>rows.push([a.nome_autor||'',a.email_autor||'',a.institutie||'',a.rubrica||'',a.tip_fisier||'',a.status||'',a.platit?'Da':'Nu',fmtDate(a.created_at)]));
+  downloadCSV(rows,'articole.csv');
+}
 
-    const rows = data.map(a => `
-      <tr>
-        <td><strong>${a.nume_complet||'—'}</strong></td>
-        <td>${a.email||'—'}</td>
-        <td>${a.institutie||'—'}</td>
-        <td>${a.titlu_didactic||'—'}</td>
-        <td>${fmtDate(a.created_at)}</td>
-      </tr>
-    `).join('');
+function exportCSVPlati() {
+  const rows = [['Autor','Email','Opțiune','Plătit','Data']];
+  allArticole.forEach(a=>rows.push([a.nome_autor||'',a.email_autor||'',a.optiune_plata||'',a.platit?'Da':'Nu',fmtDate(a.created_at)]));
+  downloadCSV(rows,'plati.csv');
+}
 
-    document.getElementById('tabel-autori').innerHTML = `
-      <table>
-        <thead><tr><th>Nume</th><th>Email</th><th>Instituție</th><th>Funcție</th><th>Data</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-  }
+function downloadCSV(rows, name) {
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+}
 
-  // ── START ─────────────────────────────────────────────────
-  init();
+// ════════════════════════════════════════════════
+// CĂUTARE GLOBALĂ
+// ════════════════════════════════════════════════
+function globalSearchFn(q) {
+  const r = document.getElementById('searchResults');
+  if (!q || q.length<2){ r.classList.remove('open'); return; }
+  const ql = q.toLowerCase();
+  const hits = [];
+  allArticole.filter(a=>(a.nome_autor||'').toLowerCase().includes(ql)||(a.email_autor||'').toLowerCase().includes(ql)||(a.rubrica||'').toLowerCase().includes(ql)).slice(0,5).forEach(a=>hits.push({type:'📄 Articol',text:`${a.nome_autor||'—'} — ${a.rubrica||'—'}`,action:`detaliiArticol('${a.id}')`}));
+  allNumere.filter(n=>(n.titlu||'').toLowerCase().includes(ql)||(n.editie||'').toLowerCase().includes(ql)).slice(0,3).forEach(n=>hits.push({type:'📚 Număr',text:`${n.titlu} (${n.editie})`,action:`showSection('numere')`}));
+  if (!hits.length){ r.innerHTML='<div class="search-item" style="color:#aaa">Niciun rezultat</div>'; r.classList.add('open'); return; }
+  r.innerHTML = hits.map(h=>`<div class="search-item" onclick="${h.action};document.getElementById('globalSearch').value='';document.getElementById('searchResults').classList.remove('open')"><strong>${h.type}</strong> ${h.text}</div>`).join('');
+  r.classList.add('open');
+}
+
+// ════════════════════════════════════════════════
+// START
+// ════════════════════════════════════════════════
+init();
 </script>
 </body>
 </html>
