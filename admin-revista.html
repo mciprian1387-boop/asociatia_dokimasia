@@ -1456,20 +1456,20 @@ function renderNumere() {
   wrap.innerHTML = allNumere.map(n => {
     const arts = allArticole.filter(a=>a.revista_id===n.id);
     const cats = [...new Set(arts.map(a=>a.rubrica).filter(Boolean))];
-    return `<div class="numar-card">
+    return `<div class="numar-card" style="cursor:default">
       <div class="numar-card-header">
-        <div>
-          <div class="numar-card-title">📚 ${n.titlu}</div>
-          <div class="numar-card-meta">Ediție: ${n.editie} | Data: ${fmtDate(n.data_aparitie)} | ${badge(n.status)} | ${arts.length} articole</div>
+        <div style="cursor:pointer" onclick="window.location.href='numar-revista.html?id=${n.id}'">
+          <div class="numar-card-title">📚 Revista Dokimasia — ${n.editie}</div>
+          <div class="numar-card-meta">Data: ${fmtDate(n.data_aparitie)} | ${badge(n.status)} | ${arts.length} articole asignate</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-blue" onclick="window.location.href='numar-revista.html?id=${n.id}'">📋 Gestionează</button>
           ${n.status==='draft'?`<button class="btn btn-sm btn-green" onclick="publicaNumar('${n.id}')">🚀 Publică</button>`:''}
           <button class="btn btn-sm btn-outline" onclick="editNumar('${n.id}')">✏️ Editează</button>
           <button class="btn btn-sm btn-danger" onclick="stergeNumar('${n.id}')">🗑️</button>
         </div>
       </div>
-      ${n.descriere?`<p style="font-size:.83rem;color:#666;margin-bottom:8px">${n.descriere}</p>`:''}
-      <div style="display:flex;flex-wrap:wrap;gap:6px">${cats.map(c=>`<span class="cat-tag">${c}</span>`).join('')||'<span style="font-size:.78rem;color:#aaa">Niciun articol asignat</span>'}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${cats.map(c=>`<span class="cat-tag">${c}</span>`).join('')||'<span style="font-size:.78rem;color:#aaa">Niciun articol asignat încă</span>'}</div>
     </div>`;
   }).join('');
 }
