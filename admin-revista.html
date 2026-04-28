@@ -995,11 +995,13 @@ async function salveazaFinal() {
     const url = data.url || CDN + '/' + key;
     const { error } = await sb.from('articole_revista').update({ fisier_final_url: url }).eq('id', finalArticolId);
     if (error) throw error;
-    document.getElementById('final-url-preview').href = url;
-    document.getElementById('final-url-preview').style.display = 'inline';
-    msg.textContent = '✅ Articolul final a fost încărcat cu succes!'; msg.style.color = '#2e7d32';
     const a = allArticole.find(x => x.id === finalArticolId);
     if (a) a.fisier_final_url = url;
+    // Actualizează blocul fișier existent
+    document.getElementById('final-existent').style.display = 'block';
+    document.getElementById('final-existent-link').href = url;
+    document.getElementById('final-existent-link').textContent = '🔗 ' + url.split('/').pop().split('?')[0];
+    msg.textContent = '✅ Articolul final a fost încărcat cu succes!'; msg.style.color = '#2e7d32';
     setTimeout(() => closeModal('modalFinal'), 2000);
   } catch(e) {
     msg.textContent = 'Eroare: ' + (e.message || e); msg.style.color = '#c62828';
