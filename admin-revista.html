@@ -1352,10 +1352,10 @@ async function loadAutori() {
 }
 
 async function stergeAutor(id, nume) {
-  if (!confirm(\`Ștergi autorul "${nume}"? Articolele sale rămân în bază dar fără legătură la autor.\`)) return;
+  if (!confirm('Stergi autorul "' + nume + '"? Articolele sale raman in baza dar fara legatura la autor.')) return;
   const { error } = await sb.from('autori').delete().eq('id', id);
-  if (error) { toast('Eroare la ștergere: ' + error.message, 'error'); return; }
-  toast(\`Autorul "${nume}" a fost șters.\`, 'info');
+  if (error) { toast('Eroare la stergere: ' + error.message, 'error'); return; }
+  toast('Autorul a fost sters.', 'info');
   loadAutori();
 }
 
