@@ -600,7 +600,8 @@ const SB_URL  = 'https://jaoxhsyplnkanhqevnnr.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw';
 const ADMIN_EMAIL = 'm.ciprian1387@gmail.com';
 const EJS_SVC = 'service_4a8gp1c';
-const EJS_TPL = 'template_wg7nlez';
+const EJS_TPL = 'template_wg7nlez';       // notificări articol nou
+const EJS_TPL_AUTOR = 'template_ole4m78'; // emailuri către autori
 const EJS_PUB = 'cPvtBWK6KReX_pqhM';
 const EJS_PRV = '10BoQnIOrBEDaG_qDeDSo';
 
@@ -1033,7 +1034,7 @@ async function trimiteMail() {
   const htmlBody = buildEmailHtml(nume, paragraphs, mesajPersonalizat);
 
   try {
-    await emailjs.send(EJS_SVC, EJS_TPL, {
+    await emailjs.send(EJS_SVC, EJS_TPL_AUTOR, {
       to_email: email,
       to_name: nume,
       subject: subj,
