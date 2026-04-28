@@ -839,7 +839,7 @@ function renderArticoleTable(data, wrap) {
         <div style="display:flex;flex-wrap:wrap;gap:5px;min-width:320px">
           <button class="btn-explicit btn-explicit-outline" onclick="detaliiArticol('${a.id}')"><span>👁</span><small>Detalii</small></button>
           ${a.fisier_url
-            ? `<a href="${a.fisier_url}" target="_blank"><button class="btn-explicit btn-explicit-blue"><span>📄</span><small>Art. inițial</small></button></a>`
+            ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
             : `<button class="btn-explicit btn-explicit-gray" disabled title="Niciun fișier trimis"><span>📄</span><small>Art. inițial</small></button>`}
           <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
           <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
@@ -872,7 +872,7 @@ function renderArticoleCards(data, wrap) {
       <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap">
         <button class="btn-explicit btn-explicit-outline" onclick="detaliiArticol('${a.id}')"><span>👁</span><small>Detalii</small></button>
         ${a.fisier_url
-          ? `<a href="${a.fisier_url}" target="_blank"><button class="btn-explicit btn-explicit-blue"><span>📄</span><small>Art. inițial</small></button></a>`
+          ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
           : `<button class="btn-explicit btn-explicit-gray" disabled><span>📄</span><small>Art. inițial</small></button>`}
         <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
         <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
@@ -903,6 +903,16 @@ async function saveInlineField(id, field, val) {
   const { error } = await sb.from('articole_revista').update({[field]:val}).eq('id',id);
   if (!error) { const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; loadDashboard(); loadPlati(); }
   else toast('Eroare la salvare','error');
+}
+
+function vizualizeazaFisier(url) {
+  const ext = url.split('?')[0].split('.').pop().toLowerCase();
+  if (ext === 'pdf') {
+    window.open(url, '_blank');
+  } else {
+    // DOC/DOCX — deschide prin Google Docs Viewer
+    window.open('https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=false', '_blank');
+  }
 }
 
 // ════════════════════════════════════════════════
