@@ -808,6 +808,7 @@ function renderArticoleTable(data, wrap) {
         <button class="btn btn-sm btn-outline" onclick="openNote('${a.id}')">📝</button>
         <button class="btn btn-sm btn-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐</button>
         <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌</button>
+        <button class="btn btn-sm btn-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">🗑️</button>
       </td>
     </tr>`).join('');
   wrap.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Scor</th><th>Data</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -834,6 +835,7 @@ function renderArticoleCards(data, wrap) {
         <button class="btn btn-sm btn-outline" onclick="openNote('${a.id}')">📝 Note</button>
         <button class="btn btn-sm btn-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
         <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
+        <button class="btn btn-sm btn-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">🗑️ Șterge</button>
       </div>
     </div>`).join('');
   wrap.innerHTML = cards;
@@ -856,6 +858,23 @@ async function saveInlineField(id, field, val) {
   const { error } = await sb.from('articole_revista').update({[field]:val}).eq('id',id);
   if (!error) { const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; loadDashboard(); loadPlati(); }
   else toast('Eroare la salvare','error');
+}
+
+// ════════════════════════════════════════════════
+// ȘTERGERE ARTICOL
+// ════════════════════════════════════════════════
+async function stergeArticol(id, autor) {
+  const autor_display = autor || 'acest articol';
+  if (!confirm(`⚠️ Ești sigur că vrei să ștergi definitiv articolul lui "${autor_display}"?\n\nAceastă acțiune este ireversibilă!`)) return;
+  const { error } = await sb.from('articole_revista').delete().eq('id', id);
+  if (error) {
+    toast('Eroare la ștergere: ' + error.message, 'error');
+    return;
+  }
+  allArticole = allArticole.filter(a => a.id !== id);
+  toast(`Articolul lui "${autor_display}" a fost șters definitiv.`, 'info');
+  refreshViews();
+  loadPlati();
 }
 
 // ════════════════════════════════════════════════
@@ -896,6 +915,7 @@ async function detaliiArticol(id) {
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openNote('${a.id}')">📝 Note</button>
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
         <button class="btn btn-sm btn-primary" onclick="closeModal('modalArticol');openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
+        <button class="btn btn-sm btn-danger" onclick="closeModal('modalArticol');stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">🗑️ Șterge definitiv</button>
       </div>
     </div>`;
   openModal('modalArticol');
