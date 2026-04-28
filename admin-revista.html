@@ -921,7 +921,7 @@ async function saveInline(id, field, el) {
 
 async function saveInlineField(id, field, val) {
   const { error } = await sb.from('articole_revista').update({[field]:val}).eq('id',id);
-  if (!error) { const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; loadDashboard(); loadPlati(); }
+  if (!error) { const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; loadDashboard(); loadPlati(); refreshViews(); }
   else toast('Eroare la salvare','error');
 }
 
