@@ -600,15 +600,27 @@
     <button class="modal-close" onclick="closeModal('modalNumar')">✕</button>
     <div class="modal-title" id="modal-numar-title">📚 Număr nou</div>
     <div id="notif-numar"></div>
-    <div class="form-grid">
-      <div class="form-group"><label>Titlu *</label><input type="text" id="n-titlu" placeholder="Nr. 1/2025" /></div>
-      <div class="form-group"><label>Ediție *</label><input type="text" id="n-editie" placeholder="1/2025" /></div>
-      <div class="form-group"><label>Data apariției</label><input type="date" id="n-data" /></div>
-      <div class="form-group"><label>Status</label><select id="n-status"><option value="draft">Draft</option><option value="publicat">Publicat</option></select></div>
+    <!-- Titlu fix -->
+    <div style="text-align:center;margin-bottom:16px;padding:12px;background:#fdf5f5;border-radius:6px;border:1px solid #f0d0d0">
+      <div style="font-size:.65rem;letter-spacing:3px;text-transform:uppercase;color:#8B0000;margin-bottom:4px">Publicație</div>
+      <div style="font-size:1.1rem;font-weight:bold;color:#8B0000;letter-spacing:2px">REVISTA DOKIMASIA</div>
     </div>
-    <div class="form-group"><label>URL Copertă</label><input type="text" id="n-coperta" /></div>
-    <div class="form-group"><label>Descriere</label><textarea id="n-descriere" rows="3"></textarea></div>
+    <div class="form-grid">
+      <div class="form-group"><label>Ediție *</label><input type="text" id="n-editie" placeholder="Nr. 1/2025" /></div>
+      <div class="form-group"><label>Data apariției</label><input type="date" id="n-data" /></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Status</label><select id="n-status"><option value="draft">Draft</option><option value="publicat">Publicat</option></select></div>
+    </div>
+    <!-- Secțiuni fixe -->
+    <div style="margin-top:14px;margin-bottom:14px">
+      <div style="font-size:.72rem;font-weight:bold;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Secțiuni tematice</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-left:3px solid #8B0000;border-radius:4px;padding:8px 12px;font-size:.82rem;color:#333">I. Pedagogie, didactică și metodica predării în învățământul preuniversitar</div>
+        <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-left:3px solid #8B0000;border-radius:4px;padding:8px 12px;font-size:.82rem;color:#333">II. Management educațional, formare continuă și inovație în practica școlară</div>
+        <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-left:3px solid #8B0000;border-radius:4px;padding:8px 12px;font-size:.82rem;color:#333">III. Cercetare, proiecte educaționale și bune practici în comunitatea școlară</div>
+      </div>
+    </div>
     <input type="hidden" id="n-id" />
+    <input type="hidden" id="n-titlu" value="Revista Dokimasia" />
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-outline" onclick="closeModal('modalNumar')">Anulează</button>
       <button class="btn btn-primary" onclick="salveazaNumar()">Salvează</button>
@@ -1473,7 +1485,7 @@ async function publicaNumar(id) {
 }
 
 function openModalNumar() {
-  ['n-id','n-titlu','n-editie','n-coperta','n-descriere'].forEach(id=>document.getElementById(id).value='');
+  ['n-id','n-editie'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('n-data').value='';
   document.getElementById('n-status').value='draft';
   document.getElementById('modal-numar-title').textContent='📚 Număr nou';
@@ -1485,12 +1497,9 @@ function editNumar(id) {
   const n = allNumere.find(x=>x.id===id);
   if (!n) return;
   document.getElementById('n-id').value=n.id;
-  document.getElementById('n-titlu').value=n.titlu||'';
   document.getElementById('n-editie').value=n.editie||'';
   document.getElementById('n-data').value=n.data_aparitie||'';
   document.getElementById('n-status').value=n.status||'draft';
-  document.getElementById('n-coperta').value=n.coperta_url||'';
-  document.getElementById('n-descriere').value=n.descriere||'';
   document.getElementById('modal-numar-title').textContent='✏️ Editează număr';
   document.getElementById('notif-numar').innerHTML='';
   openModal('modalNumar');
@@ -1498,10 +1507,9 @@ function editNumar(id) {
 
 async function salveazaNumar() {
   const id     = document.getElementById('n-id').value;
-  const titlu  = document.getElementById('n-titlu').value.trim();
   const editie = document.getElementById('n-editie').value.trim();
-  if (!titlu||!editie){ document.getElementById('notif-numar').innerHTML='<div class="notif notif-error">Titlul și ediția sunt obligatorii.</div>'; return; }
-  const p = { titlu, editie, data_aparitie:document.getElementById('n-data').value||null, status:document.getElementById('n-status').value, coperta_url:document.getElementById('n-coperta').value.trim()||null, descriere:document.getElementById('n-descriere').value.trim()||null };
+  if (!editie){ document.getElementById('notif-numar').innerHTML='<div class="notif notif-error">Ediția este obligatorie.</div>'; return; }
+  const p = { titlu: 'Revista Dokimasia', editie, data_aparitie:document.getElementById('n-data').value||null, status:document.getElementById('n-status').value };
   const { error } = id ? await sb.from('reviste').update(p).eq('id',id) : await sb.from('reviste').insert(p);
   if (error){ document.getElementById('notif-numar').innerHTML=`<div class="notif notif-error">${error.message}</div>`; return; }
   closeModal('modalNumar');
