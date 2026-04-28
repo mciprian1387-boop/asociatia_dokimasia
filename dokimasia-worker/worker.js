@@ -120,9 +120,31 @@ export default {
 
       // ---- Salvează în Supabase ----
       let supabaseOk = true;
+      let autorId = null;
+
+      // Caută sau creează autor
+      try {
+        const autorResp = await fetch(`${env.SUPABASE_URL}/rest/v1/autori?email=eq.${encodeURIComponent(email)}&select=id&limit=1`, {
+          headers: { 'apikey': env.SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}` }
+        });
+        const autorData = await autorResp.json();
+        if (autorData && autorData.length > 0) {
+          autorId = autorData[0].id;
+          await fetch(`${env.SUPABASE_URL}/rest/v1/autori?id=eq.${autorId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'apikey': env.SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}` },
+            body: JSON.stringify({ nume_complet: nume, institutie, titlu_didactic: functie, email, localitate, judet, telefon })
+          });
+        } else {
+          const newAutor = await supabaseInsert(env, 'autori', { nume_complet: nume, institutie, titlu_didactic: functie, email, localitate, judet, telefon, status: 'aprobat' });
+          autorId = newAutor?.id || null;
+        }
+      } catch(e) { console.error('Autor error:', e.message); }
+
       try {
         for (let i = 0; i < nr_articole; i++) {
           await supabaseInsert(env, 'articole_revista', {
+            autor_id: autorId,
             titlu:         `Articol ${i + 1} – ${nume}`,
             rubrica:       sectiune,
             tip_acces:     'premium',
