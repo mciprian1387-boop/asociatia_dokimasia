@@ -818,7 +818,7 @@ function renderArticoleTable(data, wrap) {
   const rows = data.map(a => `
     <tr>
       <td>
-        <strong class="editable" title="Click pentru editare" contenteditable="false" onblur="saveInline('${a.id}','titlu',this)">${a.nome_autor||a.titlu||'—'}</strong>
+        <strong class="editable" title="Click pentru editare" contenteditable="false" onblur="saveInline('${a.id}','titlu',this)">${a.nume_autor||a.titlu||'—'}</strong>
         <div style="font-size:.75rem;color:#888">${a.email_autor||''}</div>
       </td>
       <td style="font-size:.78rem">${a.rubrica||'—'}</td>
@@ -841,13 +841,13 @@ function renderArticoleTable(data, wrap) {
           ${a.fisier_url
             ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
             : `<button class="btn-explicit btn-explicit-gray" disabled title="Niciun fișier trimis"><span>📄</span><small>Art. inițial</small></button>`}
-          <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
+          <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
           <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
           <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
           <button class="btn-explicit btn-explicit-outline" onclick="openNote('${a.id}')"><span>📝</span><small>Note</small></button>
           <button class="btn-explicit btn-explicit-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})"><span>⭐</span><small>Evaluare</small></button>
           <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
-          <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
+          <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
         </div>
       </td>
     </tr>`).join('');
@@ -859,7 +859,7 @@ function renderArticoleCards(data, wrap) {
     <div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:14px;margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
         <div>
-          <strong style="color:#333">${a.nome_autor||a.titlu||'—'}</strong>
+          <strong style="color:#333">${a.nume_autor||a.titlu||'—'}</strong>
           <div style="font-size:.78rem;color:#888">${a.email_autor||''} • ${a.institutie||''}</div>
           <div style="margin-top:4px">${badge(a.status)} <span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'Plătit':'Neplatit'}</span></div>
         </div>
@@ -874,13 +874,13 @@ function renderArticoleCards(data, wrap) {
         ${a.fisier_url
           ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
           : `<button class="btn-explicit btn-explicit-gray" disabled><span>📄</span><small>Art. inițial</small></button>`}
-        <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
+        <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
         <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
         <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
         <button class="btn-explicit btn-explicit-outline" onclick="openNote('${a.id}')"><span>📝</span><small>Note</small></button>
         <button class="btn-explicit btn-explicit-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})"><span>⭐</span><small>Evaluare</small></button>
         <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
-        <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
+        <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
       </div>
     </div>`).join('');
   wrap.innerHTML = cards;
@@ -980,7 +980,7 @@ async function detaliiArticol(id) {
   const fisiere = (a.fisiere_links||[]).map(l=>`<a href="${l}" target="_blank" class="fisier-link">📄 ${l.split('/').pop()}</a>`).join('') || (a.fisier_url?`<a href="${a.fisier_url}" target="_blank" class="fisier-link">📄 Fișier</a>`:'—');
   document.getElementById('modal-articol-content').innerHTML = `
     <div class="detail-grid">
-      <div class="detail-item"><label>Autor</label><p>${a.nome_autor||'—'}</p></div>
+      <div class="detail-item"><label>Autor</label><p>${a.nume_autor||'—'}</p></div>
       <div class="detail-item"><label>Email</label><p>${a.email_autor||'—'}</p></div>
       <div class="detail-item"><label>Instituție</label><p>${a.institutie||'—'}</p></div>
       <div class="detail-item"><label>Funcție</label><p>${a.functie||'—'}</p></div>
@@ -1009,7 +1009,7 @@ async function detaliiArticol(id) {
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openNote('${a.id}')">📝 Note</button>
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
         <button class="btn btn-sm btn-primary" onclick="closeModal('modalArticol');openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
-        <button class="btn btn-sm btn-danger" onclick="closeModal('modalArticol');stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">🗑️ Șterge definitiv</button>
+        <button class="btn btn-sm btn-danger" onclick="closeModal('modalArticol');stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">🗑️ Șterge definitiv</button>
       </div>
     </div>`;
   openModal('modalArticol');
@@ -1263,12 +1263,12 @@ function renderKanban() {
     const cards = arts.map(a=>`
       <div class="kanban-card" draggable="true" data-id="${a.id}" data-status="${a.status}"
         ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-        <div class="kc-autor">${a.nome_autor||a.titlu||'—'}</div>
+        <div class="kc-autor">${a.nume_autor||a.titlu||'—'}</div>
         <div class="kc-rubrica">${a.rubrica||'—'} • ${fmtDate(a.created_at)}</div>
         <div style="font-size:.72rem;margin-top:4px">${renderStarsSmall(a.scor_evaluare||0)} ${a.platit?'<span class="badge b-platit" style="font-size:.65rem">✓ Plătit</span>':''}</div>
         <div class="kc-actions">
           <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">👁</button>
-          <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">📧</button>
+          <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧</button>
         </div>
       </div>`).join('');
     return `<div class="kanban-col" data-status="${col.id}" ondragover="dragOver(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
@@ -1309,7 +1309,7 @@ function loadPlati() {
 
   const rows = allArticole.map(a=>`
     <tr>
-      <td><strong>${a.nome_autor||'—'}</strong><div style="font-size:.75rem;color:#888">${a.email_autor||''}</div></td>
+      <td><strong>${a.nume_autor||'—'}</strong><div style="font-size:.75rem;color:#888">${a.email_autor||''}</div></td>
       <td style="font-size:.78rem">${a.rubrica||'—'}</td>
       <td><span class="badge ${a.optiune_plata==='acum'||a.optiune_plata==='Plătește acum'?'b-acum':'b-tarziu'}">${a.optiune_plata||'—'}</span></td>
       <td>
@@ -1431,7 +1431,7 @@ async function loadPublicate() {
       </div>
       <table><thead><tr><th>Autor</th><th>Titlu</th><th>Număr</th><th>Data</th><th>Fișier</th></tr></thead>
       <tbody>${arts.map(a=>`<tr>
-        <td>${a.nome_autor||'—'}<div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></td>
+        <td>${a.nume_autor||'—'}<div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></td>
         <td style="font-size:.82rem">${a.titlu||'—'}</td>
         <td style="font-size:.78rem">${a.revista_id?(allNumere.find(n=>n.id===a.revista_id)?.titlu||'—'):'—'}</td>
         <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
@@ -1481,7 +1481,7 @@ function loadDashboard() {
   // Recent
   const recent = allArticole.slice(0,5).map(a=>`
     <div style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-size:.82rem;display:flex;justify-content:space-between;align-items:center">
-      <div><strong>${a.nome_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.rubrica||'—'}</div></div>
+      <div><strong>${a.nume_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.rubrica||'—'}</div></div>
       <div>${badge(a.status)}</div>
     </div>`).join('');
   document.getElementById('dash-recent').innerHTML = recent||'<div style="padding:20px;text-align:center;color:#888;font-size:.83rem">Niciun articol</div>';
@@ -1489,7 +1489,7 @@ function loadDashboard() {
   // Plăți pending
   const pending = allArticole.filter(a=>!a.platit).slice(0,5).map(a=>`
     <div style="padding:8px 14px;border-bottom:1px solid #f5f5f5;font-size:.82rem;display:flex;justify-content:space-between;align-items:center">
-      <div><strong>${a.nome_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></div>
+      <div><strong>${a.nume_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></div>
       <button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','platit',true)">✓ Plătit</button>
     </div>`).join('');
   document.getElementById('dash-plati-pend').innerHTML = pending||'<div style="padding:20px;text-align:center;color:#888;font-size:.83rem">Toate plătite ✅</div>';
@@ -1514,7 +1514,7 @@ function renderCalendar() {
     const isToday = date.getTime()===today.getTime();
     const arts = allArticole.filter(a=>(a.created_at||'').slice(0,10)===ds);
     const nums = allNumere.filter(n=>n.data_aparitie===ds);
-    let evts = arts.map(a=>`<div class="cal-event" title="${a.nome_autor||'Articol'}">${a.nome_autor||'Articol'}</div>`).join('');
+    let evts = arts.map(a=>`<div class="cal-event" title="${a.nume_autor||'Articol'}">${a.nume_autor||'Articol'}</div>`).join('');
     evts += nums.map(n=>`<div class="cal-event ev-blue" title="${n.titlu}">📚 ${n.titlu}</div>`).join('');
     html+=`<div class="cal-day ${isToday?'today':''}"><div class="cal-day-num">${d}</div>${evts}</div>`;
   }
@@ -1594,7 +1594,7 @@ function loadRaport() {
       <div style="margin-top:20px">
         <h3 style="font-size:.9rem;color:#8B0000;margin-bottom:10px">Lista articole</h3>
         <table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Data</th></tr></thead>
-        <tbody>${art.map(a=>`<tr><td>${a.nome_autor||'—'}</td><td style="font-size:.78rem">${a.rubrica||'—'}</td><td>${badge(a.status)}</td><td><span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'✓':'✗'}</span></td><td style="font-size:.75rem">${fmtDate(a.created_at)}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#888">Niciun articol</td></tr>'}</tbody>
+        <tbody>${art.map(a=>`<tr><td>${a.nume_autor||'—'}</td><td style="font-size:.78rem">${a.rubrica||'—'}</td><td>${badge(a.status)}</td><td><span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'✓':'✗'}</span></td><td style="font-size:.75rem">${fmtDate(a.created_at)}</td></tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:#888">Niciun articol</td></tr>'}</tbody>
         </table>
       </div>
     </div>`;
@@ -1610,13 +1610,13 @@ function genereazaRaport() {
 function exportCSV() {
   const data = getFilteredArticole();
   const rows = [['Autor','Email','Instituție','Categorie','Tip','Status','Plătit','Data']];
-  data.forEach(a=>rows.push([a.nome_autor||'',a.email_autor||'',a.institutie||'',a.rubrica||'',a.tip_fisier||'',a.status||'',a.platit?'Da':'Nu',fmtDate(a.created_at)]));
+  data.forEach(a=>rows.push([a.nume_autor||'',a.email_autor||'',a.institutie||'',a.rubrica||'',a.tip_fisier||'',a.status||'',a.platit?'Da':'Nu',fmtDate(a.created_at)]));
   downloadCSV(rows,'articole.csv');
 }
 
 function exportCSVPlati() {
   const rows = [['Autor','Email','Opțiune','Plătit','Data']];
-  allArticole.forEach(a=>rows.push([a.nome_autor||'',a.email_autor||'',a.optiune_plata||'',a.platit?'Da':'Nu',fmtDate(a.created_at)]));
+  allArticole.forEach(a=>rows.push([a.nume_autor||'',a.email_autor||'',a.optiune_plata||'',a.platit?'Da':'Nu',fmtDate(a.created_at)]));
   downloadCSV(rows,'plati.csv');
 }
 
@@ -1634,7 +1634,7 @@ function globalSearchFn(q) {
   if (!q || q.length<2){ r.classList.remove('open'); return; }
   const ql = q.toLowerCase();
   const hits = [];
-  allArticole.filter(a=>(a.nome_autor||'').toLowerCase().includes(ql)||(a.email_autor||'').toLowerCase().includes(ql)||(a.rubrica||'').toLowerCase().includes(ql)).slice(0,5).forEach(a=>hits.push({type:'📄 Articol',text:`${a.nome_autor||'—'} — ${a.rubrica||'—'}`,action:`detaliiArticol('${a.id}')`}));
+  allArticole.filter(a=>(a.nume_autor||'').toLowerCase().includes(ql)||(a.email_autor||'').toLowerCase().includes(ql)||(a.rubrica||'').toLowerCase().includes(ql)).slice(0,5).forEach(a=>hits.push({type:'📄 Articol',text:`${a.nume_autor||'—'} — ${a.rubrica||'—'}`,action:`detaliiArticol('${a.id}')`}));
   allNumere.filter(n=>(n.titlu||'').toLowerCase().includes(ql)||(n.editie||'').toLowerCase().includes(ql)).slice(0,3).forEach(n=>hits.push({type:'📚 Număr',text:`${n.titlu} (${n.editie})`,action:`showSection('numere')`}));
   if (!hits.length){ r.innerHTML='<div class="search-item" style="color:#aaa">Niciun rezultat</div>'; r.classList.add('open'); return; }
   r.innerHTML = hits.map(h=>`<div class="search-item" onclick="${h.action};document.getElementById('globalSearch').value='';document.getElementById('searchResults').classList.remove('open')"><strong>${h.type}</strong> ${h.text}</div>`).join('');
