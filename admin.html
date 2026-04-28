@@ -1497,8 +1497,10 @@
           <td>${a.rubrica||'—'}</td>
           <td><span style="padding:3px 8px;border-radius:20px;font-size:0.75rem;background:${bg};color:${col};">${a.status}</span></td>
           <td style="text-align:center;">${a.platit?'✓':'—'}</td>
-          <td style="display:flex;gap:6px;">
-            <button class="btn btn-sm btn-outline" onclick='editArticol(${JSON.stringify(a).replace(/'/g,"&#39;")})'>✏️</button>
+          <td style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-outline" onclick='editArticol(${JSON.stringify(a).replace(/'/g,"&#39;")})' title="Editează">✏️</button>
+            ${a.fisier_url ? `<a href="${a.fisier_url}" target="_blank"><button class="btn btn-sm" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;" title="Vizualizează articolul inițial trimis de autor">👁 Inițial</button></a>` : `<button class="btn btn-sm" style="background:#f5f5f5;color:#aaa;border:1px solid #ddd;" disabled title="Niciun fișier inițial">👁 Inițial</button>`}
+            <button class="btn btn-sm" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;" onclick="incarcaArticolFinal('${a.id}')" title="Încarcă articolul final editat">📄 Final</button>
             <button class="btn btn-sm" style="background:#fce4ec;color:#c62828;border:1px solid #f48fb1;" onclick="stergeArticol('${a.id}')">🗑</button>
           </td>
         </tr>`
@@ -1585,6 +1587,42 @@
     if(!confirm('Ștergi acest articol?')) return
     await sbAdmin.from('articole_revista').delete().eq('id',id)
     loadArticoleEditie(currentEditieId)
+  }
+
+  // ─── ARTICOL FINAL ───
+  let articolFinalId = null;
+
+  function incarcaArticolFinal(id) {
+    articolFinalId = id;
+    document.getElementById('finalUploadMsg').textContent = '';
+    document.getElementById('finalFisier').value = '';
+    document.getElementById('modalArticolFinal').style.display = 'flex';
+  }
+
+  function closeModalFinal() {
+    document.getElementById('modalArticolFinal').style.display = 'none';
+    articolFinalId = null;
+  }
+
+  async function salveazaArticolFinal() {
+    const file = document.getElementById('finalFisier').files[0];
+    const msg = document.getElementById('finalUploadMsg');
+    if (!file) { msg.textContent = 'Selectează un fișier!'; msg.style.color = '#c00'; return; }
+    msg.textContent = '⏳ Se uploadează...'; msg.style.color = '#888';
+    try {
+      const key = 'articole-finale/' + Date.now() + '_' + file.name.replace(/\s+/g,'_');
+      const res = await fetch(R2_WORKER + '/' + key, {
+        method: 'PUT',
+        headers: { 'Authorization': 'Bearer ' + R2_SECRET, 'Content-Type': file.type },
+        body: file
+      });
+      const data = await res.json();
+      const url = data.url || CDN + '/' + key;
+      const { error } = await sbAdmin.from('articole_revista').update({ fisier_final_url: url }).eq('id', articolFinalId);
+      if (error) throw new Error(error.message);
+      msg.textContent = '✓ Articolul final a fost încărcat cu succes!'; msg.style.color = 'green';
+      setTimeout(() => { closeModalFinal(); loadArticoleEditie(currentEditieId); }, 1500);
+    } catch(e) { msg.textContent = 'Eroare: ' + e.message; msg.style.color = '#c00'; }
   }
 
   // ─── AUTORI ───
@@ -1835,5 +1873,24 @@
   checkAccess()
   loadSetari()
 </script>
+<!-- MODAL: Încarcă articol final -->
+<div id="modalArticolFinal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:12px;padding:32px;width:100%;max-width:480px;position:relative;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <button onclick="closeModalFinal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#999;">✕</button>
+    <h3 style="color:#8B0000;margin-bottom:6px;">📄 Încarcă articolul final</h3>
+    <p style="font-size:0.83rem;color:#888;margin-bottom:20px;">Acesta este versiunea editată și aprobată a articolului, care va fi publicată.</p>
+    <div style="border:2px dashed #e0c0c0;border-radius:8px;padding:24px;text-align:center;background:#fdf5f5;margin-bottom:16px;">
+      <div style="font-size:2rem;margin-bottom:8px;">📁</div>
+      <p style="font-size:0.85rem;color:#555;margin-bottom:12px;">Selectează fișierul final (PDF, DOC, DOCX)</p>
+      <input type="file" id="finalFisier" accept=".pdf,.doc,.docx" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif;" />
+    </div>
+    <p id="finalUploadMsg" style="font-size:0.83rem;min-height:18px;margin-bottom:12px;"></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeModalFinal()" style="padding:9px 20px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-family:'Georgia',serif;">Anulează</button>
+      <button onclick="salveazaArticolFinal()" style="padding:9px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Georgia',serif;font-weight:bold;">📤 Încarcă</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
