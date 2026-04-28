@@ -230,6 +230,18 @@
     .view-btn{padding:5px 10px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:.8rem;border-radius:4px;transition:all .2s}
     .view-btn.active{background:#8B0000;color:#fff;border-color:#8B0000}
 
+    /* BUTOANE EXPLICITE */
+    .btn-explicit{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:'Georgia',serif;border:1px solid transparent;transition:all .2s;min-width:64px}
+    .btn-explicit span{font-size:1.1rem;line-height:1}
+    .btn-explicit small{font-size:.62rem;line-height:1;white-space:nowrap;font-weight:bold;letter-spacing:.3px}
+    .btn-explicit:disabled{opacity:.45;cursor:not-allowed}
+    .btn-explicit-outline{background:#fff;color:#555;border-color:#ddd}.btn-explicit-outline:hover:not(:disabled){background:#f5f5f5;border-color:#bbb}
+    .btn-explicit-blue{background:#e3f2fd;color:#1565c0;border-color:#90caf9}.btn-explicit-blue:hover:not(:disabled){background:#bbdefb}
+    .btn-explicit-green{background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7}.btn-explicit-green:hover:not(:disabled){background:#c8e6c9}
+    .btn-explicit-purple{background:#f3e5f5;color:#6a1b9a;border-color:#ce93d8}.btn-explicit-purple:hover:not(:disabled){background:#e1bee7}
+    .btn-explicit-danger{background:#ffebee;color:#c62828;border-color:#ef9a9a}.btn-explicit-danger:hover:not(:disabled){background:#ffcdd2}
+    .btn-explicit-gray{background:#f5f5f5;color:#aaa;border-color:#e0e0e0}
+
     @media(max-width:900px){
       .kanban-board{grid-template-columns:1fr 1fr}
       .form-grid{grid-template-columns:1fr}
@@ -592,6 +604,26 @@
   </div>
 </div>
 
+<!-- Modal: Articol final -->
+<div class="modal-overlay" id="modalFinal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalFinal')">✕</button>
+    <div class="modal-title">📤 Încarcă articolul final</div>
+    <p style="font-size:.83rem;color:#666;margin-bottom:16px">Autor: <strong id="final-autor-nume"></strong></p>
+    <div style="border:2px dashed #e0c0c0;border-radius:8px;padding:24px;text-align:center;background:#fdf5f5;margin-bottom:14px">
+      <div style="font-size:2.5rem;margin-bottom:8px">📁</div>
+      <p style="font-size:.83rem;color:#666;margin-bottom:12px">Versiunea editată și aprobată a articolului</p>
+      <input type="file" id="final-fisier-input" accept=".pdf,.doc,.docx" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif" />
+    </div>
+    <p id="final-upload-msg" style="font-size:.83rem;min-height:18px;margin-bottom:12px"></p>
+    <a id="final-url-preview" href="#" target="_blank" style="display:none;font-size:.8rem;color:#8B0000;margin-bottom:12px;display:block">🔗 Vezi fișierul încărcat</a>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-outline" onclick="closeModal('modalFinal')">Anulează</button>
+      <button class="btn btn-green" onclick="salveazaFinal()">📤 Încarcă articolul final</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════════════════
 // CONFIG
@@ -803,13 +835,20 @@ function renderArticoleTable(data, wrap) {
       </td>
       <td>${renderStarsSmall(a.scor_evaluare||0)}</td>
       <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">👁</button>
-        <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧</button>
-        <button class="btn btn-sm btn-outline" onclick="openNote('${a.id}')">📝</button>
-        <button class="btn btn-sm btn-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐</button>
-        <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌</button>
-        <button class="btn btn-sm btn-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">🗑️</button>
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;min-width:320px">
+          <button class="btn-explicit btn-explicit-outline" onclick="detaliiArticol('${a.id}')"><span>👁</span><small>Detalii</small></button>
+          ${a.fisier_url
+            ? `<a href="${a.fisier_url}" target="_blank"><button class="btn-explicit btn-explicit-blue"><span>📄</span><small>Art. inițial</small></button></a>`
+            : `<button class="btn-explicit btn-explicit-gray" disabled title="Niciun fișier trimis"><span>📄</span><small>Art. inițial</small></button>`}
+          <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
+          <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
+          <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
+          <button class="btn-explicit btn-explicit-outline" onclick="openNote('${a.id}')"><span>📝</span><small>Note</small></button>
+          <button class="btn-explicit btn-explicit-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})"><span>⭐</span><small>Evaluare</small></button>
+          <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
+          <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
+        </div>
       </td>
     </tr>`).join('');
   wrap.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Scor</th><th>Data</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -830,13 +869,18 @@ function renderArticoleCards(data, wrap) {
           ${renderStarsSmall(a.scor_evaluare||0)}
         </div>
       </div>
-      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-outline" onclick="detaliiArticol('${a.id}')">👁 Detalii</button>
-        <button class="btn btn-sm btn-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧 Email</button>
-        <button class="btn btn-sm btn-outline" onclick="openNote('${a.id}')">📝 Note</button>
-        <button class="btn btn-sm btn-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
-        <button class="btn btn-sm btn-primary" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
-        <button class="btn btn-sm btn-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')">🗑️ Șterge</button>
+      <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn-explicit btn-explicit-outline" onclick="detaliiArticol('${a.id}')"><span>👁</span><small>Detalii</small></button>
+        ${a.fisier_url
+          ? `<a href="${a.fisier_url}" target="_blank"><button class="btn-explicit btn-explicit-blue"><span>📄</span><small>Art. inițial</small></button></a>`
+          : `<button class="btn-explicit btn-explicit-gray" disabled><span>📄</span><small>Art. inițial</small></button>`}
+        <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
+        <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
+        <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
+        <button class="btn-explicit btn-explicit-outline" onclick="openNote('${a.id}')"><span>📝</span><small>Note</small></button>
+        <button class="btn-explicit btn-explicit-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})"><span>⭐</span><small>Evaluare</small></button>
+        <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
+        <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nome_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
       </div>
     </div>`).join('');
   wrap.innerHTML = cards;
@@ -859,6 +903,45 @@ async function saveInlineField(id, field, val) {
   const { error } = await sb.from('articole_revista').update({[field]:val}).eq('id',id);
   if (!error) { const a=allArticole.find(x=>x.id===id); if(a) a[field]=val; loadDashboard(); loadPlati(); }
   else toast('Eroare la salvare','error');
+}
+
+// ════════════════════════════════════════════════
+// ARTICOL FINAL
+// ════════════════════════════════════════════════
+let finalArticolId = null;
+
+function openFinal(id, autor) {
+  finalArticolId = id;
+  document.getElementById('final-autor-nume').textContent = autor || 'autor';
+  document.getElementById('final-upload-msg').textContent = '';
+  document.getElementById('final-fisier-input').value = '';
+  document.getElementById('final-url-preview').style.display = 'none';
+  document.getElementById('modalFinal').classList.add('open');
+}
+
+async function salveazaFinal() {
+  const file = document.getElementById('final-fisier-input').files[0];
+  const msg = document.getElementById('final-upload-msg');
+  if (!file) { msg.textContent = '⚠️ Selectează un fișier!'; msg.style.color = '#c62828'; return; }
+  msg.textContent = '⏳ Se uploadează...'; msg.style.color = '#888';
+  try {
+    const { data: uploadData, error: uploadError } = await sb.storage
+      .from('articole')
+      .upload('finale/' + Date.now() + '_' + file.name.replace(/\s+/g,'_'), file, { upsert: true });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = sb.storage.from('articole').getPublicUrl(uploadData.path);
+    const url = urlData.publicUrl;
+    const { error } = await sb.from('articole_revista').update({ fisier_final_url: url }).eq('id', finalArticolId);
+    if (error) throw error;
+    document.getElementById('final-url-preview').href = url;
+    document.getElementById('final-url-preview').style.display = 'inline';
+    msg.textContent = '✅ Articolul final a fost încărcat cu succes!'; msg.style.color = '#2e7d32';
+    const a = allArticole.find(x => x.id === finalArticolId);
+    if (a) a.fisier_final_url = url;
+    setTimeout(() => closeModal('modalFinal'), 2000);
+  } catch(e) {
+    msg.textContent = 'Eroare: ' + (e.message || e); msg.style.color = '#c62828';
+  }
 }
 
 // ════════════════════════════════════════════════
