@@ -620,15 +620,23 @@
 <div class="modal-overlay" id="modalFinal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('modalFinal')">✕</button>
-    <div class="modal-title">📤 Încarcă articolul final</div>
+    <div class="modal-title">📤 Articol final</div>
     <p style="font-size:.83rem;color:#666;margin-bottom:16px">Autor: <strong id="final-autor-nume"></strong></p>
+    <!-- Fișier existent -->
+    <div id="final-existent" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.78rem;color:#2e7d32;font-weight:bold;margin-bottom:8px">✅ Fișier final încărcat</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <a id="final-existent-link" href="#" target="_blank" onclick="vizualizeazaFisierFinal(event)" style="color:#1565c0;font-size:.83rem;word-break:break-all">🔗 Vezi fișierul</a>
+        <button class="btn btn-sm btn-danger" onclick="stergeFisierFinal()">🗑️ Șterge fișierul</button>
+      </div>
+    </div>
+    <!-- Upload nou -->
     <div style="border:2px dashed #e0c0c0;border-radius:8px;padding:24px;text-align:center;background:#fdf5f5;margin-bottom:14px">
       <div style="font-size:2.5rem;margin-bottom:8px">📁</div>
-      <p style="font-size:.83rem;color:#666;margin-bottom:12px">Versiunea editată și aprobată a articolului</p>
+      <p style="font-size:.83rem;color:#666;margin-bottom:12px">Încarcă versiunea editată și aprobată</p>
       <input type="file" id="final-fisier-input" accept=".pdf,.doc,.docx" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:'Georgia',serif" />
     </div>
     <p id="final-upload-msg" style="font-size:.83rem;min-height:18px;margin-bottom:12px"></p>
-    <a id="final-url-preview" href="#" target="_blank" style="display:none;font-size:.8rem;color:#8B0000;margin-bottom:12px;display:block">🔗 Vezi fișierul încărcat</a>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
       <button class="btn btn-outline" onclick="closeModal('modalFinal')">Anulează</button>
       <button class="btn btn-green" onclick="salveazaFinal()">📤 Încarcă articolul final</button>
@@ -937,8 +945,34 @@ function openFinal(id, autor) {
   document.getElementById('final-autor-nume').textContent = autor || 'autor';
   document.getElementById('final-upload-msg').textContent = '';
   document.getElementById('final-fisier-input').value = '';
-  document.getElementById('final-url-preview').style.display = 'none';
+  // Verifică dacă există deja un fișier final
+  const articol = allArticole.find(x => x.id === id);
+  const existentDiv = document.getElementById('final-existent');
+  const existentLink = document.getElementById('final-existent-link');
+  if (articol && articol.fisier_final_url) {
+    existentDiv.style.display = 'block';
+    existentLink.href = articol.fisier_final_url;
+    existentLink.textContent = '🔗 ' + articol.fisier_final_url.split('/').pop().split('?')[0];
+  } else {
+    existentDiv.style.display = 'none';
+  }
   document.getElementById('modalFinal').classList.add('open');
+}
+
+function vizualizeazaFisierFinal(e) {
+  e.preventDefault();
+  const url = document.getElementById('final-existent-link').href;
+  vizualizeazaFisier(url);
+}
+
+async function stergeFisierFinal() {
+  if (!confirm('Ștergi fișierul final? Acțiunea este ireversibilă.')) return;
+  const { error } = await sb.from('articole_revista').update({ fisier_final_url: null }).eq('id', finalArticolId);
+  if (error) { toast('Eroare la ștergere: ' + error.message, 'error'); return; }
+  const a = allArticole.find(x => x.id === finalArticolId);
+  if (a) a.fisier_final_url = null;
+  document.getElementById('final-existent').style.display = 'none';
+  toast('Fișierul final a fost șters.', 'info');
 }
 
 const R2_WORKER = 'https://r2-upload-dokimasia.m-ciprian1387.workers.dev';
@@ -1043,7 +1077,12 @@ async function restaureazaArticol(istoricId) {
 async function detaliiArticol(id) {
   const a = allArticole.find(x=>x.id===id);
   if (!a) return;
-  const fisiere = (a.fisiere_links||[]).map(l=>`<a href="${l}" target="_blank" class="fisier-link">📄 ${l.split('/').pop()}</a>`).join('') || (a.fisier_url?`<a href="${a.fisier_url}" target="_blank" class="fisier-link">📄 Fișier</a>`:'—');
+  const fisierInitial = (a.fisiere_links||[]).length
+    ? (a.fisiere_links||[]).map(l=>`<button class="btn btn-sm btn-blue" onclick="vizualizeazaFisier('${l}')">👁 ${l.split('/').pop()}</button>`).join('')
+    : (a.fisier_url ? `<button class="btn btn-sm btn-blue" onclick="vizualizeazaFisier('${a.fisier_url}')">👁 Vezi fișierul inițial</button>` : '<span style="color:#aaa;font-size:.83rem">—</span>');
+  const fisierFinal = a.fisier_final_url
+    ? `<button class="btn btn-sm btn-green" onclick="vizualizeazaFisier('${a.fisier_final_url}')">👁 Vezi fișierul final</button>`
+    : '<span style="color:#aaa;font-size:.83rem">—</span>';
   document.getElementById('modal-articol-content').innerHTML = `
     <div class="detail-grid">
       <div class="detail-item"><label>Autor</label><p>${a.nume_autor||'—'}</p></div>
@@ -1061,12 +1100,12 @@ async function detaliiArticol(id) {
       <div class="detail-item"><label>Data trimiterii</label><p>${fmtDateTime(a.created_at)}</p></div>
       <div class="detail-item"><label>Scor evaluare</label><p>${renderStarsSmall(a.scor_evaluare||0)}</p></div>
     </div>
-    <div class="form-group"><label>Fișiere</label><div>${fisiere}</div></div>
+    <div class="form-group"><label>Fișier inițial</label><div>${fisierInitial}</div></div>
+    <div class="form-group"><label>Fișier final</label><div>${fisierFinal}</div></div>
     ${a.feedback_editor?`<div class="form-group"><label>Feedback editor</label><p style="font-size:.85rem">${a.feedback_editor}</p></div>`:''}
     <div style="margin-top:14px">
       <div style="font-size:.78rem;color:#666;margin-bottom:6px;font-weight:bold">ACȚIUNI RAPIDE</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        ${!a.platit?`<button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','platit',true)">💳 Marchează plătit</button>`:''}
         <button class="btn btn-sm btn-blue" onclick="closeModal('modalArticol');openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧 Email</button>
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openNote('${a.id}')">📝 Note</button>
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
