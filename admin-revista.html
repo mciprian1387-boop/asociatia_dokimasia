@@ -805,7 +805,7 @@ function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 async function loadArticole() {
   const { data, error } = await sb.from('articole_revista').select('*').order('created_at',{ascending:false});
   if (!error) allArticole = data || [];
-  document.getElementById('badge-articole').textContent = allArticole.filter(a=>a.status==='trimis').length;
+  document.getElementById('badge-articole').textContent = allArticole.length;
   renderArticoleView();
 }
 
