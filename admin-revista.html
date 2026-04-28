@@ -1335,18 +1335,28 @@ function nextMonth(){ calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderC
 // AUTORI
 // ════════════════════════════════════════════════
 async function loadAutori() {
-  const { data } = await sb.from('autori').select('*').order('created_at',{ascending:false});
+  const { data } = await sb.from('autori').select('*').order('nume_complet',{ascending:true});
   const rows = (data||[]).map(a=>`
     <tr>
       <td><strong>${a.nume_complet||'—'}</strong></td>
       <td>${a.email||'—'}</td>
       <td>${a.institutie||'—'}</td>
       <td>${a.titlu_didactic||'—'}</td>
+      <td>${a.localitate||'—'}, ${a.judet||'—'}</td>
       <td>${fmtDate(a.created_at)}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="stergeAutor('${a.id}','${(a.nume_complet||'').replace(/'/g,"\'")}')">🗑️ Șterge</button></td>
     </tr>`).join('');
   document.getElementById('tabel-autori').innerHTML = rows
-    ? `<table><thead><tr><th>Nume</th><th>Email</th><th>Instituție</th><th>Funcție</th><th>Data</th></tr></thead><tbody>${rows}</tbody></table>`
+    ? `<table><thead><tr><th>Nume</th><th>Email</th><th>Instituție</th><th>Funcție</th><th>Localitate</th><th>Data</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table>`
     : '<div style="text-align:center;padding:30px;color:#888">Niciun autor înregistrat</div>';
+}
+
+async function stergeAutor(id, nume) {
+  if (!confirm(\`Ștergi autorul "${nume}"? Articolele sale rămân în bază dar fără legătură la autor.\`)) return;
+  const { error } = await sb.from('autori').delete().eq('id', id);
+  if (error) { toast('Eroare la ștergere: ' + error.message, 'error'); return; }
+  toast(\`Autorul "${nume}" a fost șters.\`, 'info');
+  loadAutori();
 }
 
 // ════════════════════════════════════════════════
