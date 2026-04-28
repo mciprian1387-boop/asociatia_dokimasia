@@ -929,18 +929,24 @@ function openFinal(id, autor) {
   document.getElementById('modalFinal').classList.add('open');
 }
 
+const R2_WORKER = 'https://r2-upload-dokimasia.m-ciprian1387.workers.dev';
+const R2_SECRET = 'dokimasia-r2-secret-2024';
+const CDN = 'https://cdn.dokimasia.ro';
+
 async function salveazaFinal() {
   const file = document.getElementById('final-fisier-input').files[0];
   const msg = document.getElementById('final-upload-msg');
   if (!file) { msg.textContent = '⚠️ Selectează un fișier!'; msg.style.color = '#c62828'; return; }
   msg.textContent = '⏳ Se uploadează...'; msg.style.color = '#888';
   try {
-    const { data: uploadData, error: uploadError } = await sb.storage
-      .from('articole')
-      .upload('finale/' + Date.now() + '_' + file.name.replace(/\s+/g,'_'), file, { upsert: true });
-    if (uploadError) throw uploadError;
-    const { data: urlData } = sb.storage.from('articole').getPublicUrl(uploadData.path);
-    const url = urlData.publicUrl;
+    const key = 'articole-finale/' + Date.now() + '_' + file.name.replace(/\s+/g,'_');
+    const res = await fetch(R2_WORKER + '/' + key, {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer ' + R2_SECRET, 'Content-Type': file.type },
+      body: file
+    });
+    const data = await res.json();
+    const url = data.url || CDN + '/' + key;
     const { error } = await sb.from('articole_revista').update({ fisier_final_url: url }).eq('id', finalArticolId);
     if (error) throw error;
     document.getElementById('final-url-preview').href = url;
@@ -1000,10 +1006,6 @@ async function detaliiArticol(id) {
     <div style="margin-top:14px">
       <div style="font-size:.78rem;color:#666;margin-bottom:6px;font-weight:bold">ACȚIUNI RAPIDE</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-outline" onclick="saveInlineField('${a.id}','status','in_evaluare')">→ În evaluare</button>
-        <button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','status','acceptat')">✓ Acceptat</button>
-        <button class="btn btn-sm btn-danger" onclick="saveInlineField('${a.id}','status','respins')">✗ Respins</button>
-        <button class="btn btn-sm btn-primary" onclick="saveInlineField('${a.id}','status','publicat')">★ Publicat</button>
         ${!a.platit?`<button class="btn btn-sm btn-green" onclick="saveInlineField('${a.id}','platit',true)">💳 Marchează plătit</button>`:''}
         <button class="btn btn-sm btn-blue" onclick="closeModal('modalArticol');openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧 Email</button>
         <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openNote('${a.id}')">📝 Note</button>
