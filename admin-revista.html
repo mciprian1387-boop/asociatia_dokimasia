@@ -472,7 +472,9 @@
 
     <!-- ═══════════════ ISTORIC ȘTERS ═══════════════ -->
     <div class="section" id="section-istoric">
-      <div class="page-title">🗂️ Istoric articole șterse</div>
+      <div class="page-title">🗂️ Istoric articole șterse
+        <button class="btn btn-danger btn-sm" onclick="golesteIstoric()">🗑️ Golește istoricul</button>
+      </div>
       <div class="table-wrap">
         <div class="table-header"><h3>Articole șterse</h3></div>
         <div id="tabel-istoric"></div>
@@ -1011,6 +1013,14 @@ async function loadIstoric() {
     </tr>`;
   }).join('');
   wrap.innerHTML = `<table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Data trimiterii</th><th>Șters la</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function golesteIstoric() {
+  if (!confirm('⚠️ Ștergi definitiv tot istoricul? Articolele nu vor mai putea fi restaurate.')) return;
+  const { error } = await sb.from('articole_sterse').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  if (error) { toast('Eroare: ' + error.message, 'error'); return; }
+  toast('Istoricul a fost golit.', 'info');
+  loadIstoric();
 }
 
 async function restaureazaArticol(istoricId) {
