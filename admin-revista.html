@@ -1283,29 +1283,6 @@ function buildEmailHtml(nume, paragraphs, mesajPersonalizat) {
     </td></tr>
   </table>
 
-<!-- Modal: Formatare AI -->
-<div class="modal-overlay" id="modalFormatare">
-  <div class="modal-box wide">
-    <button class="modal-close" onclick="closeModal('modalFormatare')">✕</button>
-    <div class="modal-title">✨ Articol formatat de AI</div>
-    <div id="notif-formatare"></div>
-    <div id="formatare-loading" style="text-align:center;padding:40px;display:none;">
-      <div style="font-size:2rem;margin-bottom:12px">⏳</div>
-      <div style="color:#888;font-size:.9rem">Claude formatează articolul...</div>
-    </div>
-    <div id="formatare-result" style="display:none;">
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-        <button class="btn btn-green" onclick="descarcaDocx()">📥 Descarcă .docx</button>
-        <button class="btn btn-outline" onclick="copiazaText()">📋 Copiază text</button>
-      </div>
-      <div id="formatare-preview" style="
-        border:1px solid #e0e0e0;border-radius:6px;padding:28px 36px;
-        background:#fff;font-family:Calibri,sans-serif;font-size:12pt;
-        line-height:1.15;max-height:60vh;overflow-y:auto;
-      "></div>
-    </div>
-  </div>
-</div>
 </body></html>`;
 }
 
@@ -2019,5 +1996,25 @@ function descarcaDocx() {
 // ════════════════════════════════════════════════
 init();
 </script>
+
+<!-- Modal: Formatare AI -->
+<div class="modal-overlay" id="modalFormatare">
+  <div class="modal-box wide">
+    <button class="modal-close" onclick="closeModal('modalFormatare')">✕</button>
+    <div class="modal-title">✨ Articol formatat de AI</div>
+    <div id="notif-formatare"></div>
+    <div id="formatare-loading" style="text-align:center;padding:40px;display:none;">
+      <div style="font-size:2rem;margin-bottom:12px">⏳</div>
+      <div style="color:#888;font-size:.9rem">Claude formatează articolul...</div>
+    </div>
+    <div id="formatare-result" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="btn btn-green" onclick="descarcaDocx()">📥 Descarcă .docx</button>
+        <button class="btn btn-outline" onclick="copiazaText()">📋 Copiază text</button>
+      </div>
+      <div id="formatare-preview" style="border:1px solid #e0e0e0;border-radius:6px;padding:28px 36px;background:#fff;font-family:Calibri,sans-serif;font-size:12pt;line-height:1.15;max-height:60vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
