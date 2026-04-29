@@ -238,7 +238,6 @@
     .btn-explicit-outline{background:#fff;color:#555;border-color:#ddd}.btn-explicit-outline:hover:not(:disabled){background:#f5f5f5;border-color:#bbb}
     .btn-explicit-blue{background:#e3f2fd;color:#1565c0;border-color:#90caf9}.btn-explicit-blue:hover:not(:disabled){background:#bbdefb}
     .btn-explicit-green{background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7}.btn-explicit-green:hover:not(:disabled){background:#c8e6c9}
-    .btn-explicit-purple{background:#f3e5f5;color:#6a1b9a;border-color:#ce93d8}.btn-explicit-purple:hover:not(:disabled){background:#e1bee7}
     .btn-explicit-danger{background:#ffebee;color:#c62828;border-color:#ef9a9a}.btn-explicit-danger:hover:not(:disabled){background:#ffcdd2}
     .btn-explicit-gray{background:#f5f5f5;color:#aaa;border-color:#e0e0e0}
 
@@ -877,10 +876,7 @@ function renderArticoleTable(data, wrap) {
             ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
             : `<button class="btn-explicit btn-explicit-gray" disabled title="Niciun fișier trimis"><span>📄</span><small>Art. inițial</small></button>`}
           <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
-          <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
           <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
-          <button class="btn-explicit btn-explicit-outline" onclick="openNote('${a.id}')"><span>📝</span><small>Note</small></button>
-          <button class="btn-explicit btn-explicit-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})"><span>⭐</span><small>Evaluare</small></button>
           <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
           <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
         </div>
@@ -910,10 +906,7 @@ function renderArticoleCards(data, wrap) {
           ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
           : `<button class="btn-explicit btn-explicit-gray" disabled><span>📄</span><small>Art. inițial</small></button>`}
         <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
-        <button class="btn-explicit btn-explicit-purple" onclick="saveInlineField('${a.id}','status','publicat')"><span>🌐</span><small>Publică</small></button>
         <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
-        <button class="btn-explicit btn-explicit-outline" onclick="openNote('${a.id}')"><span>📝</span><small>Note</small></button>
-        <button class="btn-explicit btn-explicit-outline" onclick="openEvaluare('${a.id}',${a.scor_evaluare||0})"><span>⭐</span><small>Evaluare</small></button>
         <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
         <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
       </div>
@@ -1094,43 +1087,147 @@ async function restaureazaArticol(istoricId) {
 async function detaliiArticol(id) {
   const a = allArticole.find(x=>x.id===id);
   if (!a) return;
+
   const fisierInitial = (a.fisiere_links||[]).length
     ? (a.fisiere_links||[]).map(l=>`<button class="btn btn-sm btn-blue" onclick="vizualizeazaFisier('${l}')">👁 ${l.split('/').pop()}</button>`).join('')
     : (a.fisier_url ? `<button class="btn btn-sm btn-blue" onclick="vizualizeazaFisier('${a.fisier_url}')">👁 Vezi fișierul inițial</button>` : '<span style="color:#aaa;font-size:.83rem">—</span>');
   const fisierFinal = a.fisier_final_url
     ? `<button class="btn btn-sm btn-green" onclick="vizualizeazaFisier('${a.fisier_final_url}')">👁 Vezi fișierul final</button>`
     : '<span style="color:#aaa;font-size:.83rem">—</span>';
+
   document.getElementById('modal-articol-content').innerHTML = `
-    <div class="detail-grid">
-      <div class="detail-item"><label>Autor</label><p>${a.nume_autor||'—'}</p></div>
-      <div class="detail-item"><label>Email</label><p>${a.email_autor||'—'}</p></div>
-      <div class="detail-item"><label>Instituție</label><p>${a.institutie||'—'}</p></div>
-      <div class="detail-item"><label>Funcție</label><p>${a.functie||'—'}</p></div>
-      <div class="detail-item"><label>Localitate</label><p>${a.localitate||'—'}, ${a.judet||'—'}</p></div>
-      <div class="detail-item"><label>Telefon</label><p>${a.telefon||'—'}</p></div>
-      <div class="detail-item"><label>Categorie</label><p>${a.rubrica||'—'}</p></div>
-      <div class="detail-item"><label>Tip material</label><p>${a.tip_fisier||'—'}</p></div>
-      <div class="detail-item"><label>Nr. articole</label><p>${a.nr_articole||1}</p></div>
-      <div class="detail-item"><label>Opțiune plată</label><p>${a.optiune_plata||'—'}</p></div>
-      <div class="detail-item"><label>Status</label><p>${badge(a.status)}</p></div>
-      <div class="detail-item"><label>Plătit</label><p><span class="badge ${a.platit?'b-platit':'b-neplatit'}">${a.platit?'Da':'Nu'}</span></p></div>
-      <div class="detail-item"><label>Data trimiterii</label><p>${fmtDateTime(a.created_at)}</p></div>
-      <div class="detail-item"><label>Scor evaluare</label><p>${renderStarsSmall(a.scor_evaluare||0)}</p></div>
-    </div>
-    <div class="form-group"><label>Fișier inițial</label><div>${fisierInitial}</div></div>
-    <div class="form-group"><label>Fișier final</label><div>${fisierFinal}</div></div>
-    ${a.feedback_editor?`<div class="form-group"><label>Feedback editor</label><p style="font-size:.85rem">${a.feedback_editor}</p></div>`:''}
-    <div style="margin-top:14px">
-      <div style="font-size:.78rem;color:#666;margin-bottom:6px;font-weight:bold">ACȚIUNI RAPIDE</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-blue" onclick="closeModal('modalArticol');openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">📧 Email</button>
-        <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openNote('${a.id}')">📝 Note</button>
-        <button class="btn btn-sm btn-outline" onclick="closeModal('modalArticol');openEvaluare('${a.id}',${a.scor_evaluare||0})">⭐ Evaluare</button>
-        <button class="btn btn-sm btn-primary" onclick="closeModal('modalArticol');openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')">📌 Asignează</button>
-        <button class="btn btn-sm btn-danger" onclick="closeModal('modalArticol');stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')">🗑️ Șterge definitiv</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div class="form-group" style="margin:0">
+        <label>Autor</label>
+        <input class="det-input" data-field="nume_autor" value="${(a.nume_autor||'').replace(/"/g,'&quot;')}" />
       </div>
+      <div class="form-group" style="margin:0">
+        <label>Email</label>
+        <input class="det-input" data-field="email_autor" value="${(a.email_autor||'').replace(/"/g,'&quot;')}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Instituție</label>
+        <input class="det-input" data-field="institutie" value="${(a.institutie||'').replace(/"/g,'&quot;')}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Funcție</label>
+        <input class="det-input" data-field="functie" value="${(a.functie||'').replace(/"/g,'&quot;')}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Localitate</label>
+        <input class="det-input" data-field="localitate" value="${(a.localitate||'').replace(/"/g,'&quot;')}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Județ</label>
+        <input class="det-input" data-field="judet" value="${(a.judet||'').replace(/"/g,'&quot;')}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Telefon</label>
+        <input class="det-input" data-field="telefon" value="${(a.telefon||'').replace(/"/g,'&quot;')}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Nr. articole</label>
+        <input class="det-input" data-field="nr_articole" type="number" min="1" value="${a.nr_articole||1}" />
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Categorie</label>
+        <select class="det-input" data-field="rubrica">
+          <option value="Pedagogie, didactică și metodica predării în învățământul preuniversitar" ${(a.rubrica||'')==='Pedagogie, didactică și metodica predării în învățământul preuniversitar'?'selected':''}>Pedagogie, didactică și metodica predării în învățământul preuniversitar</option>
+          <option value="Management educațional, formare continuă și inovație în practica școlară" ${(a.rubrica||'')==='Management educațional, formare continuă și inovație în practica școlară'?'selected':''}>Management educațional, formare continuă și inovație în practica școlară</option>
+          <option value="Cercetare, proiecte educaționale și bune practici în comunitatea școlară" ${(a.rubrica||'')==='Cercetare, proiecte educaționale și bune practici în comunitatea școlară'?'selected':''}>Cercetare, proiecte educaționale și bune practici în comunitatea școlară</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Tip material</label>
+        <select class="det-input" data-field="tip_fisier">
+          <option value="Articol științific / de cercetare" ${(a.tip_fisier||'')==='Articol științific / de cercetare'?'selected':''}>Articol științific / de cercetare</option>
+          <option value="Studiu de caz și exemple de bună practică" ${(a.tip_fisier||'')==='Studiu de caz și exemple de bună practică'?'selected':''}>Studiu de caz și exemple de bună practică</option>
+          <option value="Ghid metodic și auxiliar curricular" ${(a.tip_fisier||'')==='Ghid metodic și auxiliar curricular'?'selected':''}>Ghid metodic și auxiliar curricular</option>
+          <option value="Analiză și reflecție profesională" ${(a.tip_fisier||'')==='Analiză și reflecție profesională'?'selected':''}>Analiză și reflecție profesională</option>
+          <option value="Recenzie, interviu și alte materiale" ${(a.tip_fisier||'')==='Recenzie, interviu și alte materiale'?'selected':''}>Recenzie, interviu și alte materiale</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Status</label>
+        <select class="det-input" data-field="status">
+          <option value="trimis" ${(a.status||'')==='trimis'?'selected':''}>Trimis</option>
+          <option value="in_evaluare" ${(a.status||'')==='in_evaluare'?'selected':''}>În evaluare</option>
+          <option value="acceptat" ${(a.status||'')==='acceptat'?'selected':''}>Acceptat</option>
+          <option value="respins" ${(a.status||'')==='respins'?'selected':''}>Respins</option>
+          <option value="publicat" ${(a.status||'')==='publicat'?'selected':''}>Publicat</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Plătit</label>
+        <select class="det-input" data-field="platit">
+          <option value="false" ${!a.platit?'selected':''}>Nu</option>
+          <option value="true" ${a.platit?'selected':''}>Da</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Opțiune plată</label>
+        <select class="det-input" data-field="optiune_plata">
+          <option value="Plătește acum" ${(a.optiune_plata||'')==='Plătește acum'?'selected':''}>Plătește acum</option>
+          <option value="Plătește mai târziu" ${(a.optiune_plata||'')==='Plătește mai târziu'?'selected':''}>Plătește mai târziu</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label>Data trimiterii</label>
+        <input style="background:#f5f5f5;color:#888" value="${fmtDateTime(a.created_at)}" readonly />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Feedback editor</label>
+      <textarea class="det-input" data-field="feedback_editor" rows="3">${a.feedback_editor||''}</textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="form-group" style="margin:0;flex:1">
+        <label>Fișier inițial</label>
+        <div style="margin-top:4px">${fisierInitial}</div>
+      </div>
+      <div class="form-group" style="margin:0;flex:1">
+        <label>Fișier final</label>
+        <div style="margin-top:4px">${fisierFinal}</div>
+      </div>
+    </div>
+    <div id="det-msg" style="font-size:.83rem;min-height:18px;margin-bottom:8px"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-outline" onclick="closeModal('modalArticol')">Închide</button>
+      <button class="btn btn-primary" onclick="salveazaDetalii('${a.id}')">💾 Salvează modificările</button>
     </div>`;
+
   openModal('modalArticol');
+}
+
+async function salveazaDetalii(id) {
+  const inputs = document.querySelectorAll('#modal-articol-content .det-input');
+  const payload = {};
+  inputs.forEach(el => {
+    const field = el.dataset.field;
+    let val = el.value;
+    if (field === 'platit') val = val === 'true';
+    if (field === 'nr_articole') val = parseInt(val) || 1;
+    payload[field] = val;
+  });
+
+  const msgEl = document.getElementById('det-msg');
+  msgEl.style.color = '#888';
+  msgEl.textContent = 'Se salvează...';
+
+  const { error } = await sb.from('articole_revista').update(payload).eq('id', id);
+  if (error) {
+    msgEl.style.color = '#c62828';
+    msgEl.textContent = 'Eroare: ' + error.message;
+    return;
+  }
+
+  const a = allArticole.find(x => x.id === id);
+  if (a) Object.assign(a, payload);
+
+  msgEl.style.color = '#2e7d32';
+  msgEl.textContent = '✓ Salvat cu succes!';
+  setTimeout(() => { msgEl.textContent = ''; }, 2500);
+  renderArticoleView();
 }
 
 // ════════════════════════════════════════════════
