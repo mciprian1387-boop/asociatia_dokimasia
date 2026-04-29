@@ -706,91 +706,7 @@
           </div>
         </div>
 
-        <!-- PASUL 2: Plată -->
-        <div id="tr-step2" style="display:none;">
-          <div class="form-section">
-            <div class="form-section-title">Pasul 2 — Contribuția editorială</div>
-            <p style="font-size:0.95rem;color:#555;margin-bottom:20px;line-height:1.7;">
-              Ai selectat <strong id="tr-pach-label">1 articol</strong>. Contribuția editorială este de <strong id="tr-pach-suma">40 lei</strong>.
-            </p>
 
-            <!-- Opțiuni plată: două secțiuni -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-
-              <!-- PLĂTEȘTE ACUM -->
-              <div id="sectiune-plateste-acum" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('acum')">
-                <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
-                  <input type="radio" name="optiune-plata" id="radio-acum" style="accent-color:var(--crimson);" />
-                  <label for="radio-acum" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">💳 Plătește acum</label>
-                </div>
-                <div id="continut-plateste-acum" style="display:none;padding:16px 18px;">
-                  <!-- Tabs plată -->
-                  <div class="tr-pay-tabs">
-                    <button class="tr-pay-tab active" onclick="switchPayTab('card', this)">💳 Card bancar</button>
-                    <button class="tr-pay-tab" onclick="switchPayTab('paypal', this)">🅿 PayPal</button>
-                    <button class="tr-pay-tab" onclick="switchPayTab('iban', this)">🏦 Transfer bancar</button>
-                  </div>
-
-                  <!-- CARD STRIPE -->
-                  <div id="tr-card-wrap" style="margin-top:16px;max-width:420px;">
-                    <div id="stripe-card-element" style="border:1px solid var(--border);border-radius:3px;padding:12px 14px;background:#fff;"></div>
-                    <div id="stripe-card-error" style="color:#c0392b;font-size:0.85rem;margin-top:8px;"></div>
-                    <button onclick="platesteCard()" id="btn-card-pay"
-                      style="margin-top:14px;width:100%;background:var(--crimson);color:#fff;border:none;padding:13px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;">
-                      Plătește <span id="card-pay-suma">40</span> lei cu cardul
-                    </button>
-                    <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">🔒 Plată securizată prin Stripe. Acceptăm Visa, Mastercard.</p>
-                  </div>
-
-                  <!-- PayPal -->
-                  <div id="tr-paypal-wrap" style="display:none;margin-top:16px;max-width:300px;">
-                    <div id="tr-pp-btn"></div>
-                    <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal.</p>
-                  </div>
-
-                  <!-- IBAN -->
-                  <div id="tr-iban-wrap" style="display:none;margin-top:16px;">
-                    <div style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;">
-                      <div style="font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Date transfer bancar</div>
-                      <table style="font-size:0.95rem;border-collapse:collapse;width:100%;">
-                        <tr><td style="padding:5px 0;color:#666;width:140px;">Beneficiar</td><td style="padding:5px 0;font-weight:600;">Asociația Dokimasia</td></tr>
-                        <tr><td style="padding:5px 0;color:#666;">IBAN</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">RO00 XXXX 0000 0000 0000 0000</td></tr>
-                        <tr><td style="padding:5px 0;color:#666;">Bancă</td><td style="padding:5px 0;">—</td></tr>
-                        <tr><td style="padding:5px 0;color:#666;">Suma</td><td style="padding:5px 0;font-weight:600;" id="tr-iban-suma">40 lei</td></tr>
-                        <tr><td style="padding:5px 0;color:#666;">Referință</td><td style="padding:5px 0;">Contribuție editorială Dokimasia</td></tr>
-                      </table>
-                    </div>
-                    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
-                      <input type="checkbox" id="tr-iban-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
-                      <span style="font-size:0.92rem;color:#444;line-height:1.65;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
-                    </label>
-                    <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- PLĂTEȘTE MAI TÂRZIU -->
-              <div id="sectiune-plateste-mai-tarziu" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('tarziu')">
-                <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
-                  <input type="radio" name="optiune-plata" id="radio-tarziu" style="accent-color:var(--crimson);" />
-                  <label for="radio-tarziu" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">🕐 Plătește mai târziu</label>
-                </div>
-                <div id="continut-plateste-tarziu" style="display:none;padding:16px 18px;">
-                  <p style="font-size:0.92rem;color:#555;line-height:1.7;margin-bottom:16px;">
-                    Poți trimite articolul acum și achita contribuția editorială ulterior. Redacția va procesa materialul după confirmarea plății.
-                  </p>
-                  <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
-                    <input type="checkbox" id="tr-tarziu-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" onchange="handleTarziuConfirm(this)" />
-                    <span style="font-size:0.92rem;color:#444;line-height:1.65;">
-                      Am luat la cunoștință că articolul va fi procesat după achitarea contribuției editoriale de <strong id="tr-tarziu-suma">40 lei</strong> și confirm că voi efectua plata ulterior. <span class="req">*</span>
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- PASUL 3: Formular trimitere (vizibil după selectarea pachetului) -->
@@ -893,6 +809,92 @@
           </label>
         </div>
 
+
+        <!-- PASUL 2: Plată -->
+        <div id="tr-step2">
+          <div class="form-section">
+            <div class="form-section-title">Contribuția editorială</div>
+            <p style="font-size:0.95rem;color:#555;margin-bottom:20px;line-height:1.7;">
+              Ai selectat <strong id="tr-pach-label">1 articol</strong>. Contribuția editorială este de <strong id="tr-pach-suma">40 lei</strong>.
+            </p>
+
+            <!-- Opțiuni plată: două secțiuni -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+
+              <!-- PLĂTEȘTE ACUM -->
+              <div id="sectiune-plateste-acum" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('acum')">
+                <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
+                  <input type="radio" name="optiune-plata" id="radio-acum" style="accent-color:var(--crimson);" />
+                  <label for="radio-acum" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">💳 Plătește acum</label>
+                </div>
+                <div id="continut-plateste-acum" style="display:none;padding:16px 18px;">
+                  <!-- Tabs plată -->
+                  <div class="tr-pay-tabs">
+                    <button class="tr-pay-tab active" onclick="switchPayTab('card', this)">💳 Card bancar</button>
+                    <button class="tr-pay-tab" onclick="switchPayTab('paypal', this)">🅿 PayPal</button>
+                    <button class="tr-pay-tab" onclick="switchPayTab('iban', this)">🏦 Transfer bancar</button>
+                  </div>
+
+                  <!-- CARD STRIPE -->
+                  <div id="tr-card-wrap" style="margin-top:16px;max-width:420px;">
+                    <div id="stripe-card-element" style="border:1px solid var(--border);border-radius:3px;padding:12px 14px;background:#fff;"></div>
+                    <div id="stripe-card-error" style="color:#c0392b;font-size:0.85rem;margin-top:8px;"></div>
+                    <button onclick="platesteCard()" id="btn-card-pay"
+                      style="margin-top:14px;width:100%;background:var(--crimson);color:#fff;border:none;padding:13px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;">
+                      Plătește <span id="card-pay-suma">40</span> lei cu cardul
+                    </button>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">🔒 Plată securizată prin Stripe. Acceptăm Visa, Mastercard.</p>
+                  </div>
+
+                  <!-- PayPal -->
+                  <div id="tr-paypal-wrap" style="display:none;margin-top:16px;max-width:300px;">
+                    <div id="tr-pp-btn"></div>
+                    <p style="font-size:0.8rem;color:var(--muted);margin-top:10px;">Plata se procesează securizat prin PayPal.</p>
+                  </div>
+
+                  <!-- IBAN -->
+                  <div id="tr-iban-wrap" style="display:none;margin-top:16px;">
+                    <div style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;">
+                      <div style="font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Date transfer bancar</div>
+                      <table style="font-size:0.95rem;border-collapse:collapse;width:100%;">
+                        <tr><td style="padding:5px 0;color:#666;width:140px;">Beneficiar</td><td style="padding:5px 0;font-weight:600;">Asociația Dokimasia</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">IBAN</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">RO00 XXXX 0000 0000 0000 0000</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">Bancă</td><td style="padding:5px 0;">—</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">Suma</td><td style="padding:5px 0;font-weight:600;" id="tr-iban-suma">40 lei</td></tr>
+                        <tr><td style="padding:5px 0;color:#666;">Referință</td><td style="padding:5px 0;">Contribuție editorială Dokimasia</td></tr>
+                      </table>
+                    </div>
+                    <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
+                      <input type="checkbox" id="tr-iban-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
+                      <span style="font-size:0.92rem;color:#444;line-height:1.65;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
+                    </label>
+                    <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PLĂTEȘTE MAI TÂRZIU -->
+              <div id="sectiune-plateste-mai-tarziu" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('tarziu')">
+                <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
+                  <input type="radio" name="optiune-plata" id="radio-tarziu" style="accent-color:var(--crimson);" />
+                  <label for="radio-tarziu" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">🕐 Plătește mai târziu</label>
+                </div>
+                <div id="continut-plateste-tarziu" style="display:none;padding:16px 18px;">
+                  <p style="font-size:0.92rem;color:#555;line-height:1.7;margin-bottom:16px;">
+                    Poți trimite articolul acum și achita contribuția editorială ulterior. Redacția va procesa materialul după confirmarea plății.
+                  </p>
+                  <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
+                    <input type="checkbox" id="tr-tarziu-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" onchange="handleTarziuConfirm(this)" />
+                    <span style="font-size:0.92rem;color:#444;line-height:1.65;">
+                      Am luat la cunoștință că articolul va fi procesat după achitarea contribuției editoriale de <strong id="tr-tarziu-suma">40 lei</strong> și confirm că voi efectua plata ulterior. <span class="req">*</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
         <!-- Confirmare plată -->
         <div id="tr-plata-confirmare-wrap" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:14px 18px;margin-top:20px;align-items:center;gap:10px;">
           <span style="font-size:1.3rem;">✅</span>
@@ -1430,7 +1432,6 @@
     trPachetSelectat = 0;
     trPlataConfirmata = false;
     [1,2,3].forEach(function(i) { document.getElementById('pach-' + i).classList.remove('selected'); });
-    document.getElementById('tr-step2').style.display = 'none';
     document.getElementById('tr-pp-btn').innerHTML = '';
     document.getElementById('radio-acum').checked = false;
     document.getElementById('radio-tarziu').checked = false;
@@ -1485,10 +1486,8 @@
     document.getElementById('tr-iban-suma2').textContent = p.suma + ' lei';
     var trzSuma = document.getElementById('tr-tarziu-suma');
     if (trzSuma) trzSuma.textContent = p.suma + ' lei';
-    document.getElementById('tr-step2').style.display = 'block';
     // Render fisiere per articol
     renderArticoleFisiere(nr);
-    document.getElementById('tr-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     // Afișează formularul imediat după selectarea pachetului
     document.getElementById('trimitereForm').style.display = 'block';
     // Update suma pe butonul card
