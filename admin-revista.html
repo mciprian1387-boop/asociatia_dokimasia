@@ -241,6 +241,18 @@
     .btn-explicit-danger{background:#ffebee;color:#c62828;border-color:#ef9a9a}.btn-explicit-danger:hover:not(:disabled){background:#ffcdd2}
     .btn-explicit-gray{background:#f5f5f5;color:#aaa;border-color:#e0e0e0}
 
+
+    /* FORMATARE AI */
+    #formatare-preview .art-titlu{font-size:14pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:6px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-autor{text-align:center;font-weight:bold;margin-bottom:2px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-institutie{text-align:center;font-style:italic;color:#555;margin-bottom:14px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-abstract{background:#f9f9f9;border-left:3px solid #8B0000;padding:10px 14px;margin-bottom:10px;font-size:11pt;font-family:Calibri,sans-serif}
+    #formatare-preview .art-cuvinte-cheie{font-style:italic;color:#555;margin-bottom:16px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-sectiune{font-size:12pt;font-weight:bold;margin:16px 0 6px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-corp{text-align:justify;margin-bottom:8px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-bibliografie{margin-top:20px;border-top:1px solid #e0e0e0;padding-top:12px;font-family:Calibri,sans-serif}
+    #formatare-preview .art-ref{font-size:11pt;margin-bottom:4px;font-family:Calibri,sans-serif}
+
     @media(max-width:900px){
       .kanban-board{grid-template-columns:1fr 1fr}
       .form-grid{grid-template-columns:1fr}
@@ -872,6 +884,7 @@ function renderArticoleTable(data, wrap) {
             ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
             : `<button class="btn-explicit btn-explicit-gray" disabled title="Niciun fișier trimis"><span>📄</span><small>Art. inițial</small></button>`}
           <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
+          <button class="btn-explicit" style="background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe" onclick="formateazaArticol('${a.id}')"><span>✨</span><small>Formatează</small></button>
           <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
           <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
           <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
@@ -901,6 +914,7 @@ function renderArticoleCards(data, wrap) {
           ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
           : `<button class="btn-explicit btn-explicit-gray" disabled><span>📄</span><small>Art. inițial</small></button>`}
         <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
+        <button class="btn-explicit" style="background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe" onclick="formateazaArticol('${a.id}')"><span>✨</span><small>Formatează</small></button>
         <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
         <button class="btn-explicit btn-explicit-outline" onclick="openAsignare('${a.id}','${(a.titlu||'').replace(/'/g,"\\'")}')"><span>📌</span><small>Asignează</small></button>
         <button class="btn-explicit btn-explicit-danger" onclick="stergeArticol('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>🗑️</span><small>Șterge</small></button>
@@ -1268,6 +1282,30 @@ function buildEmailHtml(nume, paragraphs, mesajPersonalizat) {
       </table>
     </td></tr>
   </table>
+
+<!-- Modal: Formatare AI -->
+<div class="modal-overlay" id="modalFormatare">
+  <div class="modal-box wide">
+    <button class="modal-close" onclick="closeModal('modalFormatare')">✕</button>
+    <div class="modal-title">✨ Articol formatat de AI</div>
+    <div id="notif-formatare"></div>
+    <div id="formatare-loading" style="text-align:center;padding:40px;display:none;">
+      <div style="font-size:2rem;margin-bottom:12px">⏳</div>
+      <div style="color:#888;font-size:.9rem">Claude formatează articolul...</div>
+    </div>
+    <div id="formatare-result" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <button class="btn btn-green" onclick="descarcaDocx()">📥 Descarcă .docx</button>
+        <button class="btn btn-outline" onclick="copiazaText()">📋 Copiază text</button>
+      </div>
+      <div id="formatare-preview" style="
+        border:1px solid #e0e0e0;border-radius:6px;padding:28px 36px;
+        background:#fff;font-family:Calibri,sans-serif;font-size:12pt;
+        line-height:1.15;max-height:60vh;overflow-y:auto;
+      "></div>
+    </div>
+  </div>
+</div>
 </body></html>`;
 }
 
@@ -1904,6 +1942,76 @@ function globalSearchFn(q) {
   if (!hits.length){ r.innerHTML='<div class="search-item" style="color:#aaa">Niciun rezultat</div>'; r.classList.add('open'); return; }
   r.innerHTML = hits.map(h=>`<div class="search-item" onclick="${h.action};document.getElementById('globalSearch').value='';document.getElementById('searchResults').classList.remove('open')"><strong>${h.type}</strong> ${h.text}</div>`).join('');
   r.classList.add('open');
+}
+
+
+// ════════════════════════════════════════════════
+// FORMATARE AI
+// ════════════════════════════════════════════════
+const WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
+let htmlFormatat = '';
+
+async function formateazaArticol(id) {
+  const a = allArticole.find(x => x.id === id);
+  if (!a) return;
+  const fisierUrl = a.fisier_final_url || a.fisier_url;
+  if (!fisierUrl) {
+    toast('Niciun fișier disponibil pentru formatare.', 'error');
+    return;
+  }
+
+  document.getElementById('formatare-loading').style.display = 'block';
+  document.getElementById('formatare-result').style.display = 'none';
+  document.getElementById('notif-formatare').innerHTML = '';
+  openModal('modalFormatare');
+
+  try {
+    const resp = await fetch(WORKER_URL + '/formateaza', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fisier_url: fisierUrl })
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error || 'Eroare necunoscută');
+
+    htmlFormatat = data.html;
+    document.getElementById('formatare-preview').innerHTML = htmlFormatat;
+    document.getElementById('formatare-loading').style.display = 'none';
+    document.getElementById('formatare-result').style.display = 'block';
+  } catch(e) {
+    document.getElementById('formatare-loading').style.display = 'none';
+    document.getElementById('notif-formatare').innerHTML =
+      `<div class="notif notif-error">Eroare: ${e.message}</div>`;
+  }
+}
+
+function copiazaText() {
+  const el = document.getElementById('formatare-preview');
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => toast('Text copiat!', 'success'));
+}
+
+function descarcaDocx() {
+  // Generează un fișier HTML cu stiluri inline care Word poate deschide ca .doc
+  const stil = `
+    <style>
+      body { font-family: Calibri, sans-serif; font-size: 12pt; line-height: 1.15; margin: 2.5cm; }
+      .art-titlu { font-size: 14pt; font-weight: bold; text-align: center; text-transform: uppercase; margin-bottom: 6px; }
+      .art-autor { text-align: center; font-weight: bold; margin-bottom: 2px; }
+      .art-institutie { text-align: center; font-style: italic; color: #555; margin-bottom: 14px; }
+      .art-abstract { background: #f9f9f9; border-left: 3px solid #8B0000; padding: 10px 14px; margin-bottom: 10px; font-size: 11pt; }
+      .art-cuvinte-cheie { font-style: italic; color: #555; margin-bottom: 16px; }
+      .art-sectiune { font-size: 12pt; font-weight: bold; margin: 16px 0 6px; }
+      .art-corp { text-align: justify; margin-bottom: 8px; }
+      .art-bibliografie { margin-top: 20px; border-top: 1px solid #e0e0e0; padding-top: 12px; }
+      .art-ref { font-size: 11pt; margin-bottom: 4px; }
+    </style>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">${stil}</head><body>${htmlFormatat}</body></html>`;
+  const blob = new Blob([html], { type: 'application/msword' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'articol_formatat.doc';
+  a.click();
 }
 
 // ════════════════════════════════════════════════
