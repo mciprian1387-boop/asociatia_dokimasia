@@ -73,6 +73,17 @@
     .toast.info{border-left-color:#1565c0}
     @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
+    .numar-folder { margin-bottom:12px; border:1px solid #e0e0e0; border-radius:6px; overflow:hidden; }
+    .numar-folder-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#fdf5f5; cursor:pointer; user-select:none; }
+    .numar-folder-header:hover { background:#f9eaea; }
+    .numar-folder-title { font-size:.88rem; font-weight:bold; color:#8B0000; display:flex; align-items:center; gap:8px; }
+    .numar-folder-meta { font-size:.75rem; color:#888; font-weight:normal; margin-left:4px; }
+    .numar-folder-arrow { font-size:.75rem; color:#8B0000; transition:transform .2s; }
+    .numar-folder-arrow.open { transform:rotate(180deg); }
+    .numar-folder-body { display:none; }
+    .numar-folder-body.open { display:block; }
+    .numar-folder-empty { padding:14px 16px; font-size:.82rem; color:#aaa; font-style:italic; }
+
     @media(max-width:768px){
       .sectiuni{grid-template-columns:1fr}
       .filters-bar{flex-direction:column;align-items:stretch}
@@ -124,6 +135,15 @@
       <h3>📌 Articole asignate acestui număr (<span id="cnt-asignate">0</span>)</h3>
     </div>
     <div id="tabel-asignate"><div style="padding:20px;text-align:center;color:#888">Se încarcă...</div></div>
+  </div>
+
+  <!-- Toate articolele asignate, grupate pe număr -->
+  <div class="table-wrap" style="margin-bottom:20px">
+    <div class="table-header" style="cursor:pointer" onclick="toggleToateAsignate()">
+      <h3>📂 Toate articolele asignate — pe numere <span id="cnt-toate-asignate" style="font-size:.78rem;color:#888;font-weight:normal;margin-left:6px"></span></h3>
+      <span id="arrow-toate" style="color:#8B0000;font-size:.85rem;transition:transform .2s">▼</span>
+    </div>
+    <div id="toate-asignate-wrap" style="display:none;padding:0 16px 16px"></div>
   </div>
 
   <!-- Filtre pentru adăugare articole -->
@@ -364,6 +384,107 @@ async function eliminaArticol(id) {
   if (error) { toast('Eroare: ' + error.message, 'error'); return; }
   toast('Articolul a fost eliminat din număr.', 'info');
   await loadAsignate();
+}
+
+async function loadToateAsignate() {
+  const wrap = document.getElementById('toate-asignate-wrap');
+  wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-size:.85rem">Se încarcă...</div>';
+
+  // Load all issues
+  const { data: reviste } = await sb.from('reviste')
+    .select('id, titlu, editie, status, data_aparitie')
+    .order('data_aparitie', { ascending: false });
+
+  // Load all assigned articles
+  const { data: articole } = await sb.from('articole_revista')
+    .select('*')
+    .not('revista_id', 'is', null)
+    .order('created_at', { ascending: false });
+
+  if (!reviste || !articole) { wrap.innerHTML = '<div style="padding:20px;color:#c62828">Eroare la încărcare.</div>'; return; }
+
+  // Group articles by revista_id
+  const grupate = {};
+  articole.forEach(a => {
+    if (!grupate[a.revista_id]) grupate[a.revista_id] = [];
+    grupate[a.revista_id].push(a);
+  });
+
+  const totalAsignate = articole.length;
+  document.getElementById('cnt-toate-asignate').textContent = '(' + totalAsignate + ' articole în ' + Object.keys(grupate).length + ' numere)';
+
+  if (!Object.keys(grupate).length) {
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-style:italic">Niciun articol asignat la niciun număr.</div>';
+    return;
+  }
+
+  let html = '';
+  reviste.forEach(rev => {
+    const arts = grupate[rev.id] || [];
+    if (!arts.length) return;
+    const isCurrentNumar = rev.id === numarId;
+    const folderId = 'folder-' + rev.id;
+
+    const rows = arts.map(a => `
+      <tr>
+        <td><strong>${a.nume_autor||'—'}</strong><div style="font-size:.73rem;color:#888">${a.email_autor||''}</div></td>
+        <td style="font-size:.78rem">${a.rubrica||'—'}</td>
+        <td>${badge(a.status)}</td>
+        <td style="font-size:.75rem">${fmtDateTime(a.created_at)}</td>
+        <td>
+          ${a.fisier_final_url
+            ? `<a href="${a.fisier_final_url}" target="_blank"><button class="btn btn-sm btn-green">👁 Final</button></a>`
+            : `<span style="font-size:.73rem;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:10px;font-weight:bold;">⚠ Fără fișier</span>`}
+        </td>
+      </tr>`).join('');
+
+    html += `
+      <div class="numar-folder">
+        <div class="numar-folder-header" onclick="toggleFolder('${folderId}')">
+          <div class="numar-folder-title">
+            ${isCurrentNumar ? '📍' : '📚'} ${rev.editie || ''}
+            <span class="numar-folder-meta">— ${rev.titlu || ''}</span>
+            ${isCurrentNumar ? '<span style="background:#8B0000;color:#fff;font-size:.65rem;padding:1px 7px;border-radius:10px;font-weight:bold;">NUMĂRUL CURENT</span>' : ''}
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:.78rem;color:#888">${arts.length} articole</span>
+            <span class="numar-folder-arrow" id="arrow-${folderId}">▼</span>
+          </div>
+        </div>
+        <div class="numar-folder-body ${isCurrentNumar ? 'open' : ''}" id="${folderId}">
+          <table>
+            <thead><tr><th>Autor</th><th>Secțiunea</th><th>Status</th><th>Data trimiterii</th><th>Fișier final</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>`;
+
+    if (isCurrentNumar) {
+      document.getElementById('arrow-' + folderId).classList.add('open');
+    }
+  });
+
+  wrap.innerHTML = html || '<div style="padding:20px;text-align:center;color:#aaa;font-style:italic">Niciun articol asignat.</div>';
+}
+
+function toggleFolder(id) {
+  const body = document.getElementById(id);
+  const arrow = document.getElementById('arrow-' + id);
+  const isOpen = body.classList.toggle('open');
+  arrow.classList.toggle('open', isOpen);
+}
+
+let toateAsignateLoaded = false;
+function toggleToateAsignate() {
+  const wrap = document.getElementById('toate-asignate-wrap');
+  const arrow = document.getElementById('arrow-toate');
+  const isVisible = wrap.style.display !== 'none';
+  wrap.style.display = isVisible ? 'none' : 'block';
+  arrow.style.transform = isVisible ? '' : 'rotate(180deg)';
+  if (!isVisible && !toateAsignateLoaded) {
+    toateAsignateLoaded = true;
+    loadToateAsignate();
+  }
 }
 
 init();
