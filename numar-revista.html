@@ -223,7 +223,6 @@ async function loadAsignate() {
   const { data } = await sb.from('articole_revista')
     .select('*')
     .eq('revista_id', numarId)
-    .not('fisier_final_url', 'is', null)
     .order('created_at', { ascending: false });
 
   const articole = data || [];
@@ -241,14 +240,18 @@ async function loadAsignate() {
       <td>${badge(a.status)}</td>
       <td style="font-size:.75rem">${fmtDateTime(a.created_at)}</td>
       <td>
-        <a href="${a.fisier_final_url}" target="_blank"><button class="btn btn-sm btn-green">👁 Final</button></a>
+        ${a.fisier_final_url
+          ? `<a href="${a.fisier_final_url}" target="_blank"><button class="btn btn-sm btn-green">👁 Final</button></a>`
+          : `<span style="font-size:.73rem;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:10px;font-weight:bold;">⚠ Fără fișier final</span>`}
+      </td>
+      <td>
         <button class="btn btn-sm btn-danger" onclick="eliminaArticol('${a.id}')">✕ Elimină</button>
       </td>
     </tr>`).join('');
 
   document.getElementById('tabel-asignate').innerHTML = `
     <table>
-      <thead><tr><th>Autor</th><th>Secțiunea</th><th>Status</th><th>Data trimiterii</th><th>Acțiuni</th></tr></thead>
+      <thead><tr><th>Autor</th><th>Secțiunea</th><th>Status</th><th>Data trimiterii</th><th>Fișier final</th><th>Acțiuni</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
 }
@@ -262,7 +265,6 @@ async function cautaArticole() {
 
   let query = sb.from('articole_revista')
     .select('*')
-    .not('fisier_final_url', 'is', null)
     .is('revista_id', null)
     .gte('created_at', dela + 'T00:00:00')
     .lte('created_at', panala + 'T23:59:59')
@@ -299,7 +301,9 @@ function renderCautare() {
       <td>${badge(a.status)}</td>
       <td style="font-size:.75rem">${fmtDateTime(a.created_at)}</td>
       <td>
-        <a href="${a.fisier_final_url}" target="_blank"><button class="btn btn-sm btn-green">👁 Final</button></a>
+        ${a.fisier_final_url
+          ? `<a href="${a.fisier_final_url}" target="_blank"><button class="btn btn-sm btn-green">👁 Final</button></a>`
+          : `<span style="font-size:.73rem;color:#e65100;background:#fff3e0;padding:2px 8px;border-radius:10px;font-weight:bold;">⚠ Fără fișier</span>`}
       </td>
     </tr>`).join('');
 
