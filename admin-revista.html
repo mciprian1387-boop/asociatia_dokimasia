@@ -867,7 +867,6 @@ function renderArticoleTable(data, wrap) {
           <option value="false" ${!a.platit?'selected':''}>❌ Neplatit</option>
         </select>
       </td>
-      <td>${renderStarsSmall(a.scor_evaluare||0)}</td>
       <td style="font-size:.75rem">${fmtDate(a.created_at)}</td>
       <td>
         <div style="display:flex;flex-wrap:wrap;gap:5px;min-width:320px">
@@ -882,7 +881,7 @@ function renderArticoleTable(data, wrap) {
         </div>
       </td>
     </tr>`).join('');
-  wrap.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Scor</th><th>Data</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  wrap.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Autor</th><th>Categorie</th><th>Status</th><th>Plată</th><th>Data</th><th>Acțiuni</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 function renderArticoleCards(data, wrap) {
@@ -897,7 +896,6 @@ function renderArticoleCards(data, wrap) {
         <div style="text-align:right">
           <div style="font-size:.78rem;color:#888">${a.rubrica||'—'}</div>
           <div style="font-size:.75rem;color:#aaa">${fmtDate(a.created_at)}</div>
-          ${renderStarsSmall(a.scor_evaluare||0)}
         </div>
       </div>
       <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap">
