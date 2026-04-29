@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrare Numere — Revista Dokimasia</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="auth.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --crimson: #8B0000; --crimson-dark: #5a0000; --crimson-light: #b91c1c;
+      --gold: #b8963e; --gold-light: #d4af6a;
+      --ink: #1a1108; --paper: #faf8f4; --paper-dark: #f0ece4;
+      --muted: #7a7060; --border: #ddd8cc;
+      --green: #15803d; --green-bg: #f0fdf4; --green-border: #bbf7d0;
+      --red-bg: #fef2f2; --red-border: #fecaca;
+      --blue-bg: #eff6ff; --blue-border: #bfdbfe; --blue: #1d4ed8;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Source Serif 4',Georgia,serif; background:var(--paper); color:var(--ink); min-height:100vh; }
+    a { text-decoration:none; color:inherit; }
+
+    /* HEADER */
+    .adm-header {
+      background:var(--crimson);
+      background-image: repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 39px,rgba(255,255,255,0.03) 40px);
+      padding:0 40px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-bottom:3px solid var(--gold);
+      position:sticky; top:0; z-index:100;
+    }
+    .adm-header-left { display:flex; align-items:center; gap:16px; padding:14px 0; }
+    .adm-back { display:inline-flex; align-items:center; gap:6px; color:rgba(255,255,255,0.7); font-size:0.82rem; letter-spacing:0.5px; transition:color 0.2s; padding:6px 0; }
+    .adm-back:hover { color:#fff; }
+    .adm-divider { color:rgba(255,255,255,0.3); font-size:1.1rem; }
+    .adm-title { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:700; color:#fff; letter-spacing:1px; }
+    .adm-subtitle { font-size:0.75rem; color:var(--gold-light); letter-spacing:2px; text-transform:uppercase; margin-top:1px; }
+    .adm-header-right { display:flex; align-items:center; gap:12px; }
+    .btn-nou { display:inline-flex; align-items:center; gap:8px; background:var(--gold); color:#fff; padding:9px 20px; border-radius:3px; font-size:0.87rem; font-family:'Source Serif 4',serif; font-weight:600; border:none; cursor:pointer; transition:background 0.2s; letter-spacing:0.3px; }
+    .btn-nou:hover { background:var(--gold-light); }
+
+    /* GUARD */
+    #guard { display:none; position:fixed; inset:0; background:var(--paper); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+    #guard.show { display:flex; }
+    #guard p { font-size:1rem; color:var(--muted); }
+    #guard .g-icon { font-size:3rem; }
+
+    /* LAYOUT */
+    .adm-body { max-width:1280px; margin:0 auto; padding:32px 40px 60px; }
+
+    /* STATS BAR */
+    .stats-bar { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:32px; }
+    .stat-card { background:#fff; border:1px solid var(--border); border-radius:4px; padding:16px 20px; display:flex; flex-direction:column; gap:4px; position:relative; overflow:hidden; }
+    .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .stat-card.s-total::before { background:var(--crimson); }
+    .stat-card.s-pub::before { background:var(--green); }
+    .stat-card.s-draft::before { background:var(--gold); }
+    .stat-card.s-art::before { background:var(--blue); }
+    .stat-label { font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+    .stat-val { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:var(--ink); line-height:1; }
+    .stat-sub { font-size:0.75rem; color:var(--muted); margin-top:2px; }
+
+    /* FILTERS */
+    .filters-bar { display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .filter-btn { padding:7px 16px; border:1px solid var(--border); border-radius:3px; font-size:0.8rem; font-family:'Source Serif 4',serif; background:#fff; color:var(--muted); cursor:pointer; transition:all 0.2s; }
+    .filter-btn.active { background:var(--crimson); border-color:var(--crimson); color:#fff; }
+    .search-box { flex:1; min-width:200px; padding:8px 14px; border:1px solid var(--border); border-radius:3px; font-size:0.88rem; font-family:'Source Serif 4',serif; background:#fff; outline:none; }
+    .search-box:focus { border-color:var(--crimson); }
+
+    /* TABLE */
+    .tbl-wrap { background:#fff; border:1px solid var(--border); border-radius:4px; overflow:hidden; box-shadow:var(--shadow); }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:var(--paper-dark); }
+    th { padding:11px 16px; font-size:0.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-weight:600; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+    th.th-center { text-align:center; }
+    td { padding:14px 16px; font-size:0.9rem; border-bottom:1px solid var(--border); vertical-align:middle; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--paper); }
+    .td-cover { width:52px; }
+    .cover-thumb { width:38px; height:52px; object-fit:cover; border-radius:2px; border:1px solid var(--border); display:block; }
+    .cover-empty { width:38px; height:52px; background:linear-gradient(160deg,var(--crimson),var(--crimson-dark)); border-radius:2px; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.5); font-size:0.65rem; letter-spacing:1px; text-align:center; line-height:1.3; }
+    .nr-editie { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:3px; }
+    .nr-titlu { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; color:var(--ink); }
+    .nr-data { font-size:0.8rem; color:var(--muted); font-style:italic; margin-top:2px; }
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:12px; font-size:0.73rem; font-weight:600; letter-spacing:0.3px; }
+    .badge-pub { background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+    .badge-draft { background:#fefce8; color:#854d0e; border:1px solid #fef08a; }
+    .badge-ret { background:var(--red-bg); color:#b91c1c; border:1px solid var(--red-border); }
+    .td-pdf { font-size:0.8rem; }
+    .pdf-link { color:var(--crimson); display:inline-flex; align-items:center; gap:4px; }
+    .pdf-link:hover { text-decoration:underline; }
+    .art-count { display:inline-flex; align-items:center; justify-content:center; background:var(--blue-bg); border:1px solid var(--blue-border); color:var(--blue); border-radius:12px; padding:3px 10px; font-size:0.78rem; font-weight:600; min-width:32px; }
+    .td-actions { white-space:nowrap; text-align:right; }
+    .act-btn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:3px; font-size:0.78rem; font-family:'Source Serif 4',serif; border:1px solid var(--border); background:#fff; cursor:pointer; transition:all 0.15s; margin-left:4px; color:var(--ink); }
+    .act-btn:hover { border-color:var(--crimson); color:var(--crimson); background:var(--red-bg); }
+    .act-btn.btn-pub { border-color:var(--green-border); color:var(--green); background:var(--green-bg); }
+    .act-btn.btn-pub:hover { background:#dcfce7; }
+    .act-btn.btn-ret { border-color:var(--red-border); color:#b91c1c; background:var(--red-bg); }
+    .act-btn.btn-ret:hover { background:#fee2e2; }
+    .act-btn.btn-del { border-color:var(--red-border); color:#b91c1c; }
+    .act-btn.btn-del:hover { background:var(--red-bg); }
+
+    /* EMPTY */
+    .tbl-empty { text-align:center; padding:60px 20px; color:var(--muted); font-style:italic; }
+
+    /* MODAL */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto; backdrop-filter:blur(3px); }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:6px; width:100%; max-width:720px; box-shadow:0 20px 60px rgba(0,0,0,0.2); overflow:hidden; margin:auto; }
+    .modal-head { background:var(--crimson); padding:20px 28px; display:flex; align-items:center; justify-content:space-between; }
+    .modal-head h3 { font-family:'Playfair Display',serif; font-size:1.15rem; color:#fff; font-weight:700; }
+    .modal-close { background:none; border:none; color:rgba(255,255,255,0.7); font-size:1.4rem; cursor:pointer; line-height:1; padding:0 4px; transition:color 0.2s; }
+    .modal-close:hover { color:#fff; }
+    .modal-body { padding:28px; }
+    .modal-footer { padding:16px 28px; background:var(--paper-dark); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+
+    /* FORM */
+    .fld-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    .fld-row.cols3 { grid-template-columns:1fr 1fr 1fr; }
+    .fld-row.cols1 { grid-template-columns:1fr; }
+    .fld-group { display:flex; flex-direction:column; gap:6px; }
+    .fld-label { font-size:0.78rem; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); font-weight:600; }
+    .fld-label .req { color:var(--crimson); }
+    .fld-input { padding:9px 12px; border:1px solid var(--border); border-radius:3px; font-size:0.92rem; font-family:'Source Serif 4',serif; outline:none; background:#fff; color:var(--ink); transition:border-color 0.2s; }
+    .fld-input:focus { border-color:var(--crimson); }
+    .fld-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7060' fill='none' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
+    .upload-zone { border:2px dashed var(--border); border-radius:4px; padding:20px; text-align:center; cursor:pointer; transition:border-color 0.2s, background 0.2s; position:relative; background:#fafafa; }
+    .upload-zone:hover, .upload-zone.drag { border-color:var(--crimson); background:var(--red-bg); }
+    .upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .upload-icon { font-size:1.8rem; margin-bottom:6px; }
+    .upload-label { font-size:0.83rem; color:var(--muted); line-height:1.6; }
+    .upload-preview { display:none; align-items:center; gap:12px; background:var(--paper); border:1px solid var(--border); border-radius:3px; padding:10px 14px; margin-top:10px; }
+    .upload-preview.show { display:flex; }
+    .upload-preview img { width:36px; height:50px; object-fit:cover; border-radius:2px; }
+    .upload-preview-name { font-size:0.85rem; flex:1; }
+    .upload-preview-rm { background:none; border:none; cursor:pointer; color:var(--muted); font-size:1rem; }
+    .upload-preview-rm:hover { color:var(--crimson); }
+    .current-file { display:flex; align-items:center; gap:8px; background:var(--paper); border:1px solid var(--border); border-radius:3px; padding:8px 12px; margin-bottom:8px; font-size:0.83rem; color:var(--muted); }
+    .current-file a { color:var(--crimson); }
+    .section-divider { font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); font-weight:600; padding:12px 0 8px; border-top:1px solid var(--border); margin:16px 0 0; }
+
+    /* ARTICOLE in modal */
+    .art-list { display:flex; flex-direction:column; gap:8px; margin-top:8px; max-height:280px; overflow-y:auto; }
+    .art-item { display:flex; align-items:flex-start; gap:10px; background:var(--paper); border:1px solid var(--border); border-radius:3px; padding:10px 12px; }
+    .art-item-body { flex:1; min-width:0; }
+    .art-item-titlu { font-size:0.88rem; font-weight:600; color:var(--ink); }
+    .art-item-autor { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+    .art-item-rm { background:none; border:none; cursor:pointer; color:var(--muted); font-size:0.9rem; padding:2px 4px; flex-shrink:0; }
+    .art-item-rm:hover { color:#b91c1c; }
+    .art-add-row { display:flex; gap:8px; margin-top:8px; }
+    .art-add-row .fld-input { flex:1; }
+    .btn-add-art { padding:9px 14px; background:var(--paper-dark); border:1px solid var(--border); border-radius:3px; font-size:0.83rem; font-family:'Source Serif 4',serif; cursor:pointer; white-space:nowrap; transition:background 0.2s; }
+    .btn-add-art:hover { background:var(--border); }
+
+    /* BUTTONS */
+    .btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--crimson); color:#fff; padding:10px 24px; border-radius:3px; font-size:0.92rem; font-family:'Source Serif 4',serif; font-weight:600; border:none; cursor:pointer; transition:background 0.2s; }
+    .btn-primary:hover { background:var(--crimson-dark); }
+    .btn-primary:disabled { background:#bbb; cursor:not-allowed; }
+    .btn-secondary { display:inline-flex; align-items:center; gap:8px; background:#fff; color:var(--ink); padding:10px 20px; border-radius:3px; font-size:0.88rem; font-family:'Source Serif 4',serif; border:1px solid var(--border); cursor:pointer; transition:all 0.2s; }
+    .btn-secondary:hover { border-color:var(--crimson); color:var(--crimson); }
+
+    /* TOAST */
+    #toast { position:fixed; bottom:28px; right:28px; z-index:9999; display:flex; flex-direction:column; gap:8px; }
+    .toast-item { display:flex; align-items:center; gap:10px; background:#1a1108; color:#fff; padding:12px 18px; border-radius:4px; font-size:0.87rem; box-shadow:0 4px 20px rgba(0,0,0,0.2); animation:slideIn 0.25s ease; min-width:260px; }
+    .toast-item.ok { border-left:3px solid #4ade80; }
+    .toast-item.err { border-left:3px solid #f87171; }
+    .toast-item.info { border-left:3px solid var(--gold); }
+    @keyframes slideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    /* LOADER */
+    .spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--crimson); border-radius:50%; animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-row td { text-align:center; padding:48px; }
+
+    /* CONFIRM DIALOG */
+    .confirm-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:600; align-items:center; justify-content:center; }
+    .confirm-overlay.open { display:flex; }
+    .confirm-box { background:#fff; border-radius:6px; padding:28px 32px; max-width:400px; width:90%; box-shadow:0 12px 40px rgba(0,0,0,0.18); text-align:center; }
+    .confirm-icon { font-size:2.5rem; margin-bottom:12px; }
+    .confirm-msg { font-size:0.97rem; color:#444; line-height:1.7; margin-bottom:22px; }
+    .confirm-btns { display:flex; gap:10px; justify-content:center; }
+
+    /* PROGRESS BAR */
+    .upload-progress { height:4px; background:var(--border); border-radius:2px; margin-top:8px; overflow:hidden; display:none; }
+    .upload-progress-bar { height:100%; background:var(--crimson); border-radius:2px; transition:width 0.3s; width:0; }
+    .upload-progress.show { display:block; }
+
+    @media (max-width:768px) {
+      .adm-body { padding:20px; }
+      .stats-bar { grid-template-columns:1fr 1fr; }
+      .fld-row { grid-template-columns:1fr; }
+      .fld-row.cols3 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- GUARD: acces doar admin -->
+<div id="guard" class="show">
+  <div class="g-icon">🔒</div>
+  <p>Se verifică accesul...</p>
+</div>
+
+<!-- HEADER -->
+<header class="adm-header">
+  <div class="adm-header-left">
+    <a href="revista.html" class="adm-back">← Înapoi la revistă</a>
+    <span class="adm-divider">/</span>
+    <div>
+      <div class="adm-title">Numere revistă</div>
+      <div class="adm-subtitle">Panou administrare</div>
+    </div>
+  </div>
+  <div class="adm-header-right">
+    <button class="btn-nou" onclick="deschideModal()">+ Număr nou</button>
+  </div>
+</header>
+
+<!-- BODY -->
+<div class="adm-body">
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-card s-total">
+      <div class="stat-label">Total numere</div>
+      <div class="stat-val" id="stat-total">—</div>
+      <div class="stat-sub">în baza de date</div>
+    </div>
+    <div class="stat-card s-pub">
+      <div class="stat-label">Publicate</div>
+      <div class="stat-val" id="stat-pub">—</div>
+      <div class="stat-sub">vizibile pe site</div>
+    </div>
+    <div class="stat-card s-draft">
+      <div class="stat-label">Draft</div>
+      <div class="stat-val" id="stat-draft">—</div>
+      <div class="stat-sub">în pregătire</div>
+    </div>
+    <div class="stat-card s-art">
+      <div class="stat-label">Total articole</div>
+      <div class="stat-val" id="stat-art">—</div>
+      <div class="stat-sub">în toate numerele</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <button class="filter-btn active" onclick="setFilter('toate', this)">Toate</button>
+    <button class="filter-btn" onclick="setFilter('publicat', this)">Publicate</button>
+    <button class="filter-btn" onclick="setFilter('draft', this)">Draft</button>
+    <button class="filter-btn" onclick="setFilter('retras', this)">Retrase</button>
+    <input type="text" class="search-box" id="searchBox" placeholder="Caută după titlu sau ediție..." oninput="filtreaza()" />
+  </div>
+
+  <!-- TABLE -->
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="td-cover"></th>
+          <th>Număr / Titlu</th>
+          <th>Dată apariție</th>
+          <th class="th-center">Status</th>
+          <th class="th-center">Articole</th>
+          <th>PDF</th>
+          <th class="th-center">Acțiuni</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody">
+        <tr class="loading-row"><td colspan="7"><div class="spinner" style="margin:0 auto;"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /adm-body -->
+
+<!-- MODAL: Adaugă / Editează -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)inchideModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Număr nou</h3>
+      <button class="modal-close" onclick="inchideModal()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="fld-row cols3">
+        <div class="fld-group">
+          <label class="fld-label">Ediție <span class="req">*</span></label>
+          <input type="text" id="f-editie" class="fld-input" placeholder="ex. Nr. 1 / 2024" />
+        </div>
+        <div class="fld-group" style="grid-column:span 2;">
+          <label class="fld-label">Titlu număr <span class="req">*</span></label>
+          <input type="text" id="f-titlu" class="fld-input" placeholder="ex. Inovație în educație" />
+        </div>
+      </div>
+
+      <div class="fld-row">
+        <div class="fld-group">
+          <label class="fld-label">Dată apariție</label>
+          <input type="date" id="f-data" class="fld-input" />
+        </div>
+        <div class="fld-group">
+          <label class="fld-label">Status</label>
+          <select id="f-status" class="fld-input fld-select">
+            <option value="draft">Draft</option>
+            <option value="publicat">Publicat</option>
+            <option value="retras">Retras</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Copertă -->
+      <div class="section-divider">Copertă</div>
+      <div class="fld-row cols1" style="margin-top:8px;">
+        <div class="fld-group">
+          <div id="coperta-current" class="current-file" style="display:none;">
+            📷 Copertă curentă: <a id="coperta-current-link" href="#" target="_blank">vezi</a>
+            <button onclick="stergeCopertaCurenta()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#b91c1c;font-size:0.8rem;">✕ Șterge</button>
+          </div>
+          <div class="upload-zone" id="coperta-zone"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="handleDrop(event,'coperta')">
+            <input type="file" id="f-coperta" accept="image/*" onchange="previzualizeazaCoperta(this)" />
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-label">Trage imaginea aici sau <strong>apasă pentru upload</strong><br><span style="font-size:0.75rem;">JPG, PNG, WebP — max 5 MB</span></div>
+          </div>
+          <div class="upload-progress" id="coperta-progress"><div class="upload-progress-bar" id="coperta-progress-bar"></div></div>
+          <div class="upload-preview" id="coperta-preview">
+            <img id="coperta-preview-img" src="" alt="" />
+            <span class="upload-preview-name" id="coperta-preview-name"></span>
+            <button class="upload-preview-rm" onclick="stergeCopertaNou()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF -->
+      <div class="section-divider">PDF revistă</div>
+      <div class="fld-row cols1" style="margin-top:8px;">
+        <div class="fld-group">
+          <div id="pdf-current" class="current-file" style="display:none;">
+            📄 PDF curent: <a id="pdf-current-link" href="#" target="_blank">descarcă</a>
+            <button onclick="stergePdfCurent()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#b91c1c;font-size:0.8rem;">✕ Șterge</button>
+          </div>
+          <div class="upload-zone" id="pdf-zone"
+            ondragover="event.preventDefault();this.classList.add('drag')"
+            ondragleave="this.classList.remove('drag')"
+            ondrop="handleDrop(event,'pdf')">
+            <input type="file" id="f-pdf" accept=".pdf" onchange="previzualizeazaPdf(this)" />
+            <div class="upload-icon">📄</div>
+            <div class="upload-label">Trage PDF-ul aici sau <strong>apasă pentru upload</strong><br><span style="font-size:0.75rem;">Doar fișiere PDF — max 50 MB</span></div>
+          </div>
+          <div class="upload-progress" id="pdf-progress"><div class="upload-progress-bar" id="pdf-progress-bar"></div></div>
+          <div class="upload-preview" id="pdf-preview">
+            <span style="font-size:1.3rem;">📄</span>
+            <span class="upload-preview-name" id="pdf-preview-name"></span>
+            <button class="upload-preview-rm" onclick="stergePdfNou()">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Articole -->
+      <div class="section-divider">Articole incluse în număr</div>
+      <div style="margin-top:8px;">
+        <div class="art-list" id="artList"></div>
+        <div class="art-add-row">
+          <input type="text" id="art-titlu-input" class="fld-input" placeholder="Titlu articol" style="flex:2;" />
+          <input type="text" id="art-autor-input" class="fld-input" placeholder="Autor(i)" style="flex:1;" />
+          <button class="btn-add-art" onclick="adaugaArticol()">+ Adaugă</button>
+        </div>
+      </div>
+
+      <div id="modal-msg" style="margin-top:16px;font-size:0.87rem;min-height:20px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="inchideModal()">Anulează</button>
+      <button class="btn-primary" id="btnSalveaza" onclick="salveaza()">💾 Salvează</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-msg" id="confirmMsg">Ești sigur?</div>
+    <div class="confirm-btns">
+      <button class="btn-secondary" onclick="confirmCancel()">Anulează</button>
+      <button class="btn-primary btn-del" id="confirmOk" onclick="confirmDo()">Confirmă</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+  // ==========================================
+  // STATE
+  // ==========================================
+  var numere = []
+  var filteredNumere = []
+  var currentFilter = 'toate'
+  var editId = null
+  var articole = []
+  var deleteCoperta = false
+  var deletePdf = false
+  var confirmCallback = null
+
+  // ==========================================
+  // AUTH GUARD
+  // ==========================================
+  window.onUserLoaded = function(user) {
+    if (!user || user.email !== 'm.ciprian1387@gmail.com') {
+      document.getElementById('guard').innerHTML =
+        '<div class="g-icon">🚫</div>' +
+        '<p>Acces restricționat. <a href="revista.html" style="color:var(--crimson);">Înapoi la revistă</a></p>'
+      return
+    }
+    document.getElementById('guard').classList.remove('show')
+    incarcaNumere()
+  }
+
+  // ==========================================
+  // SUPABASE HELPERS
+  // ==========================================
+  async function incarcaNumere() {
+    var r = await sb.from('reviste').select('*, articole_revista(*)').order('data_aparitie', { ascending: false })
+    if (r.error) { toast('Eroare la încărcare: ' + r.error.message, 'err'); return }
+    numere = r.data || []
+    actualizeazaStats()
+    filtreaza()
+  }
+
+  function actualizeazaStats() {
+    var pub = numere.filter(function(n) { return n.status === 'publicat' }).length
+    var draft = numere.filter(function(n) { return n.status === 'draft' }).length
+    var totalArt = numere.reduce(function(acc, n) {
+      return acc + (n.articole_revista ? n.articole_revista.length : 0)
+    }, 0)
+    document.getElementById('stat-total').textContent = numere.length
+    document.getElementById('stat-pub').textContent = pub
+    document.getElementById('stat-draft').textContent = draft
+    document.getElementById('stat-art').textContent = totalArt
+  }
+
+  // ==========================================
+  // FILTER & RENDER
+  // ==========================================
+  function setFilter(val, btn) {
+    currentFilter = val
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active') })
+    btn.classList.add('active')
+    filtreaza()
+  }
+
+  function filtreaza() {
+    var q = document.getElementById('searchBox').value.toLowerCase()
+    filteredNumere = numere.filter(function(n) {
+      var matchFilter = currentFilter === 'toate' || n.status === currentFilter
+      var matchSearch = !q || (n.titlu||'').toLowerCase().includes(q) || (n.editie||'').toLowerCase().includes(q)
+      return matchFilter && matchSearch
+    })
+    renderTabela()
+  }
+
+  function renderTabela() {
+    var tbody = document.getElementById('tblBody')
+    if (filteredNumere.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="tbl-empty">Niciun număr găsit.</td></tr>'
+      return
+    }
+    tbody.innerHTML = filteredNumere.map(function(n) {
+      var d = n.data_aparitie ? new Date(n.data_aparitie).toLocaleDateString('ro-RO', { year:'numeric', month:'long' }) : '—'
+      var artCount = n.articole_revista ? n.articole_revista.length : 0
+      var badge = n.status === 'publicat'
+        ? '<span class="badge badge-pub">✓ Publicat</span>'
+        : n.status === 'draft'
+          ? '<span class="badge badge-draft">✎ Draft</span>'
+          : '<span class="badge badge-ret">✗ Retras</span>'
+      var pubBtn = n.status !== 'publicat'
+        ? '<button class="act-btn btn-pub" onclick="schimbaStatus(\'' + n.id + '\',\'publicat\')">▶ Publică</button>'
+        : '<button class="act-btn btn-ret" onclick="schimbaStatus(\'' + n.id + '\',\'retras\')">⏸ Retrage</button>'
+      return '<tr>' +
+        '<td class="td-cover">' +
+          (n.coperta_url
+            ? '<img class="cover-thumb" src="' + n.coperta_url + '" alt="copertă" />'
+            : '<div class="cover-empty">fără copertă</div>') +
+        '</td>' +
+        '<td>' +
+          '<div class="nr-editie">' + escHtml(n.editie || '') + '</div>' +
+          '<div class="nr-titlu">' + escHtml(n.titlu || '') + '</div>' +
+          '<div class="nr-data">' + d + '</div>' +
+        '</td>' +
+        '<td>' + d + '</td>' +
+        '<td class="th-center">' + badge + '</td>' +
+        '<td class="th-center"><span class="art-count">' + artCount + '</span></td>' +
+        '<td class="td-pdf">' +
+          (n.pdf_url ? '<a class="pdf-link" href="' + n.pdf_url + '" target="_blank">📄 PDF</a>' : '<span style="color:var(--muted);font-size:0.78rem;">—</span>') +
+        '</td>' +
+        '<td class="td-actions">' +
+          '<button class="act-btn" onclick="deschideModal(\'' + n.id + '\')">✎ Editează</button>' +
+          pubBtn +
+          '<button class="act-btn btn-del" onclick="confirmSterge(\'' + n.id + '\',\'' + escHtml(n.titlu||'') + '\')">✕</button>' +
+        '</td>' +
+      '</tr>'
+    }).join('')
+  }
+
+  // ==========================================
+  // MODAL
+  // ==========================================
+  function deschideModal(id) {
+    editId = id || null
+    articole = []
+    deleteCoperta = false
+    deletePdf = false
+    document.getElementById('modal-msg').textContent = ''
+    document.getElementById('modalTitle').textContent = id ? 'Editează număr' : 'Număr nou'
+    document.getElementById('btnSalveaza').disabled = false
+    document.getElementById('btnSalveaza').textContent = '💾 Salvează'
+
+    // Reset fields
+    ;['f-editie','f-titlu','f-data'].forEach(function(fid) { document.getElementById(fid).value = '' })
+    document.getElementById('f-status').value = 'draft'
+    stergeCopertaNou()
+    stergePdfNou()
+    document.getElementById('coperta-current').style.display = 'none'
+    document.getElementById('pdf-current').style.display = 'none'
+
+    if (id) {
+      var n = numere.find(function(x) { return x.id === id })
+      if (n) {
+        document.getElementById('f-editie').value = n.editie || ''
+        document.getElementById('f-titlu').value = n.titlu || ''
+        document.getElementById('f-data').value = n.data_aparitie ? n.data_aparitie.substring(0,10) : ''
+        document.getElementById('f-status').value = n.status || 'draft'
+        if (n.coperta_url) {
+          document.getElementById('coperta-current').style.display = 'flex'
+          document.getElementById('coperta-current-link').href = n.coperta_url
+        }
+        if (n.pdf_url) {
+          document.getElementById('pdf-current').style.display = 'flex'
+          document.getElementById('pdf-current-link').href = n.pdf_url
+        }
+        articole = (n.articole_revista || []).map(function(a) {
+          return { id: a.id, titlu: a.titlu, autor: a.autor, nou: false }
+        })
+      }
+    }
+
+    renderArticole()
+    document.getElementById('modalOverlay').classList.add('open')
+    document.getElementById('f-editie').focus()
+  }
+
+  function inchideModal() {
+    document.getElementById('modalOverlay').classList.remove('open')
+  }
+
+  // ==========================================
+  // ARTICOLE
+  // ==========================================
+  function renderArticole() {
+    var list = document.getElementById('artList')
+    if (articole.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--muted);font-style:italic;font-size:0.85rem;">Niciun articol adăugat încă.</div>'
+      return
+    }
+    list.innerHTML = articole.map(function(a, i) {
+      return '<div class="art-item">' +
+        '<div class="art-item-body">' +
+          '<div class="art-item-titlu">' + escHtml(a.titlu) + '</div>' +
+          '<div class="art-item-autor">' + escHtml(a.autor || '') + '</div>' +
+        '</div>' +
+        '<button class="art-item-rm" onclick="stergeArticol(' + i + ')" title="Șterge">✕</button>' +
+      '</div>'
+    }).join('')
+  }
+
+  function adaugaArticol() {
+    var titlu = document.getElementById('art-titlu-input').value.trim()
+    var autor = document.getElementById('art-autor-input').value.trim()
+    if (!titlu) { toast('Introduceți titlul articolului.', 'err'); return }
+    articole.push({ id: null, titlu: titlu, autor: autor, nou: true })
+    document.getElementById('art-titlu-input').value = ''
+    document.getElementById('art-autor-input').value = ''
+    renderArticole()
+  }
+
+  function stergeArticol(i) {
+    articole.splice(i, 1)
+    renderArticole()
+  }
+
+  // ==========================================
+  // UPLOAD PREVIEWS
+  // ==========================================
+  function previzualizeazaCoperta(input) {
+    if (!input.files[0]) return
+    var file = input.files[0]
+    if (file.size > 5 * 1024 * 1024) { toast('Imaginea depășește 5 MB.', 'err'); input.value=''; return }
+    var reader = new FileReader()
+    reader.onload = function(e) {
+      document.getElementById('coperta-preview-img').src = e.target.result
+      document.getElementById('coperta-preview-name').textContent = file.name
+      document.getElementById('coperta-preview').classList.add('show')
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function previzualizeazaPdf(input) {
+    if (!input.files[0]) return
+    var file = input.files[0]
+    if (file.size > 50 * 1024 * 1024) { toast('PDF-ul depășește 50 MB.', 'err'); input.value=''; return }
+    document.getElementById('pdf-preview-name').textContent = file.name + ' (' + fmtBytes(file.size) + ')'
+    document.getElementById('pdf-preview').classList.add('show')
+  }
+
+  function stergeCopertaNou() {
+    document.getElementById('f-coperta').value = ''
+    document.getElementById('coperta-preview').classList.remove('show')
+    document.getElementById('coperta-preview-img').src = ''
+  }
+
+  function stergePdfNou() {
+    document.getElementById('f-pdf').value = ''
+    document.getElementById('pdf-preview').classList.remove('show')
+    document.getElementById('pdf-preview-name').textContent = ''
+  }
+
+  function stergeCopertaCurenta() {
+    deleteCoperta = true
+    document.getElementById('coperta-current').style.display = 'none'
+  }
+
+  function stergePdfCurent() {
+    deletePdf = true
+    document.getElementById('pdf-current').style.display = 'none'
+  }
+
+  function handleDrop(e, tip) {
+    e.preventDefault()
+    document.getElementById(tip + '-zone').classList.remove('drag')
+    var files = e.dataTransfer.files
+    if (!files[0]) return
+    var input = document.getElementById('f-' + tip)
+    // Creează un DataTransfer pentru a seta fișierul pe input
+    try {
+      var dt = new DataTransfer()
+      dt.items.add(files[0])
+      input.files = dt.files
+    } catch(err) {}
+    if (tip === 'coperta') previzualizeazaCoperta(input)
+    else previzualizeazaPdf(input)
+  }
+
+  // ==========================================
+  // UPLOAD TO SUPABASE STORAGE
+  // ==========================================
+  async function uploadFisier(bucket, file, progressId) {
+    var ext = file.name.split('.').pop()
+    var path = Date.now() + '_' + Math.random().toString(36).substring(2,8) + '.' + ext
+    var prog = document.getElementById(progressId)
+    var bar = document.getElementById(progressId + '-bar')
+    if (prog) { prog.classList.add('show'); bar.style.width = '10%' }
+
+    // Simulate progress while uploading
+    var prog_int = setInterval(function() {
+      var w = parseFloat(bar.style.width) || 10
+      if (w < 85) bar.style.width = (w + Math.random() * 15) + '%'
+    }, 300)
+
+    var r = await sb.storage.from(bucket).upload(path, file, { upsert: false, contentType: file.type })
+    clearInterval(prog_int)
+
+    if (r.error) {
+      if (prog) prog.classList.remove('show')
+      throw new Error(r.error.message)
+    }
+    if (bar) bar.style.width = '100%'
+    setTimeout(function() { if (prog) prog.classList.remove('show') }, 600)
+
+    var pub = sb.storage.from(bucket).getPublicUrl(path)
+    return pub.data.publicUrl
+  }
+
+  // ==========================================
+  // SAVE
+  // ==========================================
+  async function salveaza() {
+    var editie = document.getElementById('f-editie').value.trim()
+    var titlu = document.getElementById('f-titlu').value.trim()
+    if (!editie || !titlu) { setModalMsg('Ediția și titlul sunt obligatorii.', 'err'); return }
+
+    var btn = document.getElementById('btnSalveaza')
+    btn.disabled = true
+    btn.textContent = '⏳ Se salvează...'
+    setModalMsg('', '')
+
+    try {
+      // Upload copertă dacă există
+      var coperta_url = null
+      var pdf_url = null
+      var copertaFile = document.getElementById('f-coperta').files[0]
+      var pdfFile = document.getElementById('f-pdf').files[0]
+
+      if (copertaFile) {
+        setModalMsg('Se încarcă coperta...', 'info')
+        coperta_url = await uploadFisier('coperte', copertaFile, 'coperta-progress')
+      }
+      if (pdfFile) {
+        setModalMsg('Se încarcă PDF-ul...', 'info')
+        pdf_url = await uploadFisier('reviste-pdf', pdfFile, 'pdf-progress')
+      }
+
+      setModalMsg('Se salvează datele...', 'info')
+
+      var payload = {
+        editie: editie,
+        titlu: titlu,
+        data_aparitie: document.getElementById('f-data').value || null,
+        status: document.getElementById('f-status').value,
+      }
+      if (coperta_url) payload.coperta_url = coperta_url
+      if (deleteCoperta) payload.coperta_url = null
+      if (pdf_url) payload.pdf_url = pdf_url
+      if (deletePdf) payload.pdf_url = null
+
+      var nrId = editId
+      if (editId) {
+        var r = await sb.from('reviste').update(payload).eq('id', editId)
+        if (r.error) throw r.error
+      } else {
+        var r = await sb.from('reviste').insert(payload).select().single()
+        if (r.error) throw r.error
+        nrId = r.data.id
+      }
+
+      // Sincronizează articole
+      if (nrId) {
+        // Șterge articolele vechi dacă edităm
+        if (editId) {
+          await sb.from('articole_revista').delete().eq('revista_id', nrId)
+        }
+        // Inserează toate articolele (noi + vechi rearanjate)
+        var artPayload = articole.map(function(a) {
+          return { revista_id: nrId, titlu: a.titlu, autor: a.autor || '' }
+        })
+        if (artPayload.length > 0) {
+          var ra = await sb.from('articole_revista').insert(artPayload)
+          if (ra.error) throw ra.error
+        }
+      }
+
+      toast(editId ? 'Numărul a fost actualizat.' : 'Număr nou creat cu succes.', 'ok')
+      inchideModal()
+      await incarcaNumere()
+    } catch(e) {
+      setModalMsg('Eroare: ' + (e.message || JSON.stringify(e)), 'err')
+      btn.disabled = false
+      btn.textContent = '💾 Salvează'
+    }
+  }
+
+  // ==========================================
+  // PUBLISH / RETRACT
+  // ==========================================
+  async function schimbaStatus(id, status) {
+    var r = await sb.from('reviste').update({ status: status }).eq('id', id)
+    if (r.error) { toast('Eroare: ' + r.error.message, 'err'); return }
+    var label = status === 'publicat' ? 'publicat' : 'retras'
+    toast('Numărul a fost ' + label + '.', 'ok')
+    await incarcaNumere()
+  }
+
+  // ==========================================
+  // DELETE
+  // ==========================================
+  function confirmSterge(id, titlu) {
+    confirmCallback = async function() {
+      var r = await sb.from('reviste').delete().eq('id', id)
+      if (r.error) { toast('Eroare la ștergere: ' + r.error.message, 'err'); return }
+      toast('Numărul "' + titlu + '" a fost șters.', 'ok')
+      await incarcaNumere()
+    }
+    document.getElementById('confirmIcon').textContent = '🗑️'
+    document.getElementById('confirmMsg').innerHTML = 'Ești sigur că vrei să ștergi numărul<br><strong>"' + escHtml(titlu) + '"</strong>?<br><span style="font-size:0.83rem;color:#b91c1c;">Această acțiune este ireversibilă.</span>'
+    document.getElementById('confirmOk').textContent = 'Șterge'
+    document.getElementById('confirmOverlay').classList.add('open')
+  }
+
+  function confirmDo() {
+    document.getElementById('confirmOverlay').classList.remove('open')
+    if (confirmCallback) confirmCallback()
+    confirmCallback = null
+  }
+
+  function confirmCancel() {
+    document.getElementById('confirmOverlay').classList.remove('open')
+    confirmCallback = null
+  }
+
+  // ==========================================
+  // UTILS
+  // ==========================================
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+  }
+
+  function fmtBytes(b) {
+    if (b < 1024) return b + ' B'
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB'
+    return (b/1048576).toFixed(1) + ' MB'
+  }
+
+  function toast(msg, type) {
+    var div = document.createElement('div')
+    div.className = 'toast-item ' + (type || 'ok')
+    div.textContent = msg
+    document.getElementById('toast').appendChild(div)
+    setTimeout(function() { div.remove() }, 4000)
+  }
+
+  function setModalMsg(msg, type) {
+    var el = document.getElementById('modal-msg')
+    el.textContent = msg
+    el.style.color = type === 'err' ? '#b91c1c' : type === 'info' ? 'var(--gold)' : 'var(--green)'
+  }
+
+  // Close confirm on ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      inchideModal()
+      document.getElementById('confirmOverlay').classList.remove('open')
+    }
+    // Enter în câmpul articol
+    if (e.key === 'Enter' && document.activeElement.id === 'art-titlu-input') {
+      adaugaArticol()
+    }
+  })
+</script>
+</body>
+</html>
