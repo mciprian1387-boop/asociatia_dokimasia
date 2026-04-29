@@ -1436,8 +1436,30 @@ function openAsignare(id, titlu) {
   document.getElementById('as-id').value = id;
   document.getElementById('as-titlu').value = a ? (a.nume_autor||titlu) : titlu;
   document.getElementById('notif-asignare').innerHTML = '';
+
+  const numarSelect = document.getElementById('as-numar');
   const opts = allNumere.map(n=>`<option value="${n.id}">${n.titlu} (${n.editie})</option>`).join('');
-  document.getElementById('as-numar').innerHTML = '<option value="">Selectează...</option>'+opts;
+
+  // Dacă articolul e deja asignat, arată numărul curent și blochează
+  if (a && a.revista_id) {
+    const numarCurent = allNumere.find(n=>n.id===a.revista_id);
+    const numeNumar = numarCurent ? `${numarCurent.titlu} (${numarCurent.editie})` : 'număr necunoscut';
+    numarSelect.innerHTML = `<option value="${a.revista_id}" selected>${numeNumar}</option>`;
+    numarSelect.disabled = true;
+    document.getElementById('notif-asignare').innerHTML = `
+      <div class="notif" style="background:#fff3e0;border:1px solid #ffcc80;color:#e65100;margin-bottom:12px;">
+        <strong>⚠ Articol deja asignat</strong> la <em>${numeNumar}</em>.<br>
+        <span style="font-size:.82rem;">Un articol poate fi asociat unui singur număr. 
+        <button class="btn btn-sm" style="margin-top:6px;background:#e65100;color:#fff;border:none" onclick="dezasigneazaArticol('${id}')">Elimină din numărul curent</button></span>
+      </div>`;
+    document.getElementById('modalAsignare').querySelector('.btn-primary').disabled = true;
+    document.getElementById('modalAsignare').querySelector('.btn-primary').style.opacity = '0.4';
+  } else {
+    numarSelect.innerHTML = '<option value="">Selectează...</option>'+opts;
+    numarSelect.disabled = false;
+    document.getElementById('modalAsignare').querySelector('.btn-primary').disabled = false;
+    document.getElementById('modalAsignare').querySelector('.btn-primary').style.opacity = '1';
+  }
 
   // Fișier: arată final dacă există, altfel inițial cu avertisment
   const wrap = document.getElementById('as-fisier-wrap');
@@ -1464,6 +1486,16 @@ function openAsignare(id, titlu) {
   }
 
   openModal('modalAsignare');
+}
+
+async function dezasigneazaArticol(id) {
+  const { error } = await sb.from('articole_revista').update({ revista_id: null }).eq('id', id);
+  if (error) { toast('Eroare: ' + error.message, 'error'); return; }
+  const a = allArticole.find(x=>x.id===id);
+  if (a) a.revista_id = null;
+  toast('Articolul a fost eliminat din număr.', 'info');
+  closeModal('modalAsignare');
+  renderArticoleView();
 }
 
 async function salveazaAsignare() {
