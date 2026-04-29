@@ -584,14 +584,11 @@
     <div id="notif-asignare"></div>
     <div class="form-group"><label>Articol</label><input type="text" id="as-titlu" readonly style="background:#f5f5f5" /></div>
     <div class="form-group"><label>Număr revistă</label><select id="as-numar"></select></div>
-    <div class="form-group"><label>Status</label>
-      <select id="as-status"><option value="acceptat">Acceptat</option><option value="publicat">Publicat</option></select>
-    </div>
-    <div class="form-group"><label>Feedback editor</label><textarea id="as-feedback" rows="3"></textarea></div>
+    <div id="as-fisier-wrap" style="margin-bottom:12px"></div>
     <input type="hidden" id="as-id" />
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
       <button class="btn btn-outline" onclick="closeModal('modalAsignare')">Anulează</button>
-      <button class="btn btn-primary" onclick="salveazaAsignare()">Salvează</button>
+      <button class="btn btn-primary" onclick="salveazaAsignare()">Asignează</button>
     </div>
   </div>
 </div>
@@ -1435,25 +1432,52 @@ async function salveazaEvaluare() {
 // ASIGNARE
 // ════════════════════════════════════════════════
 function openAsignare(id, titlu) {
+  const a = allArticole.find(x=>x.id===id);
   document.getElementById('as-id').value = id;
-  document.getElementById('as-titlu').value = titlu;
-  document.getElementById('as-feedback').value = '';
+  document.getElementById('as-titlu').value = a ? (a.nume_autor||titlu) : titlu;
   document.getElementById('notif-asignare').innerHTML = '';
   const opts = allNumere.map(n=>`<option value="${n.id}">${n.titlu} (${n.editie})</option>`).join('');
   document.getElementById('as-numar').innerHTML = '<option value="">Selectează...</option>'+opts;
+
+  // Fișier: arată final dacă există, altfel inițial cu avertisment
+  const wrap = document.getElementById('as-fisier-wrap');
+  if (a && a.fisier_final_url) {
+    wrap.innerHTML = `
+      <label style="font-size:.78rem;color:#666;font-weight:bold;display:block;margin-bottom:3px">Fișier asignat</label>
+      <div style="display:flex;align-items:center;gap:8px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:8px 12px;">
+        <span style="color:#2e7d32;font-size:.85rem;">✓ Fișier final disponibil</span>
+        <a href="${a.fisier_final_url}" target="_blank" class="btn btn-sm btn-green">👁 Vezi</a>
+      </div>`;
+  } else if (a && a.fisier_url) {
+    wrap.innerHTML = `
+      <label style="font-size:.78rem;color:#666;font-weight:bold;display:block;margin-bottom:3px">Fișier asignat</label>
+      <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:4px;padding:10px 12px;margin-bottom:6px;">
+        <div style="color:#e65100;font-size:.83rem;font-weight:bold;margin-bottom:4px;">⚠ Nu există fișier final</div>
+        <div style="font-size:.8rem;color:#555;">Se va asigna fișierul inițial trimis de autor.</div>
+      </div>
+      <a href="${a.fisier_url}" target="_blank" class="btn btn-sm btn-blue">👁 Vezi fișierul inițial</a>`;
+  } else {
+    wrap.innerHTML = `
+      <div style="background:#ffebee;border:1px solid #ef9a9a;border-radius:4px;padding:10px 12px;">
+        <div style="color:#c62828;font-size:.83rem;font-weight:bold;">⚠ Niciun fișier disponibil</div>
+      </div>`;
+  }
+
   openModal('modalAsignare');
 }
 
 async function salveazaAsignare() {
   const id      = document.getElementById('as-id').value;
   const numarId = document.getElementById('as-numar').value;
-  const status  = document.getElementById('as-status').value;
-  const fb      = document.getElementById('as-feedback').value.trim();
   if (!numarId){ document.getElementById('notif-asignare').innerHTML='<div class="notif notif-error">Selectează un număr.</div>'; return; }
-  const { error } = await sb.from('articole_revista').update({ revista_id:numarId, status, feedback_editor:fb||null }).eq('id',id);
-  if (error){ document.getElementById('notif-asignare').innerHTML=`<div class="notif notif-error">${error.message}</div>`; return; }
   const a = allArticole.find(x=>x.id===id);
-  if (a){ a.revista_id=numarId; a.status=status; a.feedback_editor=fb; }
+  // Folosește fișierul final dacă există, altfel cel inițial
+  const fisierUrl = (a && a.fisier_final_url) ? a.fisier_final_url : (a && a.fisier_url ? a.fisier_url : null);
+  const payload = { revista_id: numarId };
+  if (fisierUrl && !a.fisier_final_url) payload.fisier_final_url = fisierUrl;
+  const { error } = await sb.from('articole_revista').update(payload).eq('id',id);
+  if (error){ document.getElementById('notif-asignare').innerHTML=`<div class="notif notif-error">${error.message}</div>`; return; }
+  if (a){ a.revista_id=numarId; if (payload.fisier_final_url) a.fisier_final_url = fisierUrl; }
   toast('Articol asignat cu succes!','success');
   closeModal('modalAsignare');
   renderArticoleView();
