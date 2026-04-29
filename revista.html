@@ -793,12 +793,8 @@
         </div>
       </div>
 
-      <!-- PASUL 3: Formular trimitere (apare după plată) -->
+      <!-- PASUL 3: Formular trimitere (vizibil după selectarea pachetului) -->
       <div id="trimitereForm" style="display:none;margin-top:8px;">
-        <div style="background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:14px 18px;margin-bottom:24px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:1.3rem;">✅</span>
-          <span style="font-size:0.95rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare">Plată confirmată! Poți trimite acum articolul.</span>
-        </div>
 
         <div class="form-section">
           <div class="form-section-title">Pasul 3 — Date autor</div>
@@ -897,9 +893,16 @@
           </label>
         </div>
 
+        <!-- Confirmare plată -->
+        <div id="tr-plata-confirmare-wrap" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:14px 18px;margin-top:20px;align-items:center;gap:10px;">
+          <span style="font-size:1.3rem;">✅</span>
+          <span style="font-size:0.95rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare"></span>
+        </div>
+
         <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <button id="btnTrimite" onclick="trimitereArticol()"
-            style="display:inline-flex;align-items:center;gap:10px;background:var(--crimson);color:#fff;padding:14px 36px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:background 0.2s;">
+          <button id="btnTrimite" onclick="trimitereArticol()" disabled
+            style="display:inline-flex;align-items:center;gap:10px;background:#aaa;color:#fff;padding:14px 36px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:not-allowed;transition:background 0.2s;opacity:0.7;"
+            title="Confirmați mai întâi opțiunea de plată">
             <span>Trimite articolul</span>
             <span style="font-size:1.1rem;">→</span>
           </button>
@@ -1449,9 +1452,15 @@
     document.querySelector('input[name="exemplar"][value="Nu"]').checked = true;
     document.getElementById('trimitereMsg').textContent = '';
     var btn = document.getElementById('btnTrimite');
-    btn.disabled = false;
+    btn.disabled = true;
+    btn.style.background = '#aaa';
+    btn.style.cursor = 'not-allowed';
+    btn.style.opacity = '0.7';
     btn.innerHTML = '<span>Trimite articolul</span><span style="font-size:1.1rem;">→</span>';
-    document.getElementById('trimitereForm').style.display = 'block';
+    var wrap = document.getElementById('tr-plata-confirmare-wrap');
+    if (wrap) wrap.style.display = 'none';
+    document.getElementById('tr-plata-confirmare').textContent = '';
+    document.getElementById('trimitereForm').style.display = 'none';
     document.getElementById('trimitereSuccess').style.display = 'none';
   }
 
@@ -1480,6 +1489,8 @@
     // Render fisiere per articol
     renderArticoleFisiere(nr);
     document.getElementById('tr-step2').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Afișează formularul imediat după selectarea pachetului
+    document.getElementById('trimitereForm').style.display = 'block';
     // Update suma pe butonul card
     var cardSumaEl = document.getElementById('card-pay-suma');
     if (cardSumaEl) cardSumaEl.textContent = p.suma;
@@ -1504,8 +1515,20 @@
     // Conținut vizibil
     document.getElementById('continut-plateste-acum').style.display = optiune === 'acum' ? 'block' : 'none';
     document.getElementById('continut-plateste-tarziu').style.display = optiune === 'tarziu' ? 'block' : 'none';
-    // Dacă acum: init Stripe
+    // La schimbarea opțiunii, resetează starea de confirmare anterioară
+    trPlataConfirmata = false;
+    var wrap = document.getElementById('tr-plata-confirmare-wrap');
+    if (wrap) wrap.style.display = 'none';
+    document.getElementById('tr-plata-confirmare').textContent = '';
+    var btn = document.getElementById('btnTrimite');
+    btn.disabled = true;
+    btn.style.background = '#aaa';
+    btn.style.cursor = 'not-allowed';
+    btn.style.opacity = '0.7';
+    // Resetează checkbox "mai târziu" dacă se schimbă pe "acum"
     if (optiune === 'acum') {
+      var trzCheck = document.getElementById('tr-tarziu-confirm');
+      if (trzCheck) trzCheck.checked = false;
       setTimeout(initStripeCard, 100);
     }
   }
@@ -1563,8 +1586,14 @@
   function deblocheazaFormular(msg) {
     trPlataConfirmata = true;
     document.getElementById('tr-plata-confirmare').textContent = msg;
-    document.getElementById('trimitereForm').style.display = 'block';
-    document.getElementById('trimitereForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    var wrap = document.getElementById('tr-plata-confirmare-wrap');
+    wrap.style.display = 'flex';
+    var btn = document.getElementById('btnTrimite');
+    btn.disabled = false;
+    btn.style.background = 'var(--crimson)';
+    btn.style.cursor = 'pointer';
+    btn.style.opacity = '1';
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     restaureazaDateAutor();
   }
 
