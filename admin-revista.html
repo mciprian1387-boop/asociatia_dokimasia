@@ -884,9 +884,7 @@ function renderArticoleTable(data, wrap) {
       <td>
         <div style="display:flex;flex-wrap:wrap;gap:5px;min-width:320px">
           <button class="btn-explicit btn-explicit-outline" onclick="detaliiArticol('${a.id}')"><span>👁</span><small>Detalii</small></button>
-          ${a.fisier_url
-            ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
-            : `<button class="btn-explicit btn-explicit-gray" disabled title="Niciun fișier trimis"><span>📄</span><small>Art. inițial</small></button>`}
+          <button class="btn-explicit btn-explicit-blue" onclick="openInicial('${a.id}','${(a.nume_autor||'').replace(/'/g,"\'")}')"><span>📄</span><small>Art. inițial</small></button>
           <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
           <button class="btn-explicit" style="background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe" onclick="formateazaArticol('${a.id}')"><span>✨</span><small>Formatează</small></button>
           <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
@@ -914,9 +912,7 @@ function renderArticoleCards(data, wrap) {
       </div>
       <div style="display:flex;gap:5px;margin-top:10px;flex-wrap:wrap">
         <button class="btn-explicit btn-explicit-outline" onclick="detaliiArticol('${a.id}')"><span>👁</span><small>Detalii</small></button>
-        ${a.fisier_url
-          ? `<button class="btn-explicit btn-explicit-blue" onclick="vizualizeazaFisier('${a.fisier_url}')"><span>📄</span><small>Art. inițial</small></button>`
-          : `<button class="btn-explicit btn-explicit-gray" disabled><span>📄</span><small>Art. inițial</small></button>`}
+        <button class="btn-explicit btn-explicit-blue" onclick="openInicial('${a.id}','${(a.nume_autor||'').replace(/'/g,"\'")}')"><span>📄</span><small>Art. inițial</small></button>
         <button class="btn-explicit btn-explicit-green" onclick="openFinal('${a.id}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📤</span><small>Art. final</small></button>
         <button class="btn-explicit" style="background:#f3e8ff;color:#6b21a8;border-color:#d8b4fe" onclick="formateazaArticol('${a.id}')"><span>✨</span><small>Formatează</small></button>
         <button class="btn-explicit btn-explicit-blue" onclick="openEmail('${a.id}','${(a.email_autor||'').replace(/'/g,"\\'")}','${(a.nume_autor||'').replace(/'/g,"\\'")}')"><span>📧</span><small>Email</small></button>
@@ -2002,6 +1998,93 @@ function descarcaDocx() {
 // START
 // ════════════════════════════════════════════════
 init();
+
+// ════════════════════════════════════════════════
+// FISIER INITIAL
+// ════════════════════════════════════════════════
+let initialArticolId = null;
+
+function openInicial(id, autor) {
+  initialArticolId = id;
+  document.getElementById('initial-autor-nume').textContent = autor;
+  document.getElementById('initial-upload-msg').textContent = '';
+  document.getElementById('initial-fisier-input').value = '';
+
+  const a = allArticole.find(x => x.id === id);
+  const url = a && (a.fisiere_links && a.fisiere_links.length ? a.fisiere_links[0] : a.fisier_url);
+
+  if (url) {
+    document.getElementById('initial-existent').style.display = 'block';
+    document.getElementById('initial-lipsa').style.display = 'none';
+    document.getElementById('initial-existent-link').href = url;
+    document.getElementById('initial-existent-link').textContent = '🔗 ' + url.split('/').pop();
+  } else {
+    document.getElementById('initial-existent').style.display = 'none';
+    document.getElementById('initial-lipsa').style.display = 'block';
+  }
+
+  openModal('modalInicial');
+}
+
+async function stergeFisierInitial() {
+  if (!confirm('Ești sigur că vrei să ștergi fișierul inițial?')) return;
+  const { error } = await sb.from('articole_revista').update({ fisier_url: null, fisiere_links: [] }).eq('id', initialArticolId);
+  if (error) { document.getElementById('initial-upload-msg').textContent = 'Eroare: ' + error.message; return; }
+  const a = allArticole.find(x => x.id === initialArticolId);
+  if (a) { a.fisier_url = null; a.fisiere_links = []; }
+  document.getElementById('initial-existent').style.display = 'none';
+  document.getElementById('initial-lipsa').style.display = 'block';
+  toast('Fișierul inițial a fost șters.', 'info');
+  renderArticoleView();
+}
+
+async function salveazaInitial() {
+  const file = document.getElementById('initial-fisier-input').files[0];
+  if (!file) { document.getElementById('initial-upload-msg').textContent = 'Selectează un fișier.'; return; }
+
+  const msg = document.getElementById('initial-upload-msg');
+  msg.style.color = '#888';
+  msg.textContent = 'Se încarcă...';
+
+  try {
+    const a = allArticole.find(x => x.id === initialArticolId);
+    const autor = (a && a.nume_autor || '').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,30);
+    const timestamp = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+    const ext = file.name.split('.').pop();
+    const key = `articole/${timestamp}_${autor}_art1.${ext}`;
+
+    const fd = new FormData();
+    fd.append('fisiere', file);
+    fd.append('_replace_key', key);
+    fd.append('_articol_id', initialArticolId);
+
+    // Upload direct la Worker
+    const workerUrl = 'https://dokimasia-articole.m-ciprian1387.workers.dev/upload-initial';
+    const resp = await fetch(workerUrl, { method: 'POST', body: fd });
+    const data = await resp.json();
+
+    if (!data.success) throw new Error(data.error || 'Eroare upload');
+
+    const newUrl = data.url;
+    const { error } = await sb.from('articole_revista').update({ fisier_url: newUrl, fisiere_links: [newUrl] }).eq('id', initialArticolId);
+    if (error) throw error;
+
+    if (a) { a.fisier_url = newUrl; a.fisiere_links = [newUrl]; }
+    document.getElementById('initial-existent').style.display = 'block';
+    document.getElementById('initial-lipsa').style.display = 'none';
+    document.getElementById('initial-existent-link').href = newUrl;
+    document.getElementById('initial-existent-link').textContent = '🔗 ' + newUrl.split('/').pop();
+    document.getElementById('initial-fisier-input').value = '';
+    msg.style.color = '#2e7d32';
+    msg.textContent = '✓ Fișier salvat cu succes!';
+    toast('Fișierul inițial a fost înlocuit.', 'success');
+    renderArticoleView();
+  } catch(e) {
+    msg.style.color = '#c62828';
+    msg.textContent = 'Eroare: ' + e.message;
+  }
+}
+
 </script>
 
 <!-- Modal: Formatare AI -->
@@ -2020,6 +2103,41 @@ init();
         <button class="btn btn-outline" onclick="copiazaText()">📋 Copiază text</button>
       </div>
       <div id="formatare-preview" style="border:1px solid #e0e0e0;border-radius:6px;padding:28px 36px;background:#fff;font-family:Calibri,sans-serif;font-size:12pt;line-height:1.15;max-height:60vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Fisier Initial -->
+<div class="modal-overlay" id="modalInicial">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modalInicial')">✕</button>
+    <div class="modal-title">📄 Fișier inițial</div>
+    <p style="font-size:.83rem;color:#666;margin-bottom:16px">Autor: <strong id="initial-autor-nume"></strong></p>
+
+    <!-- Fișier existent -->
+    <div id="initial-existent" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.78rem;color:#2e7d32;font-weight:bold;margin-bottom:8px">✅ Fișier inițial încărcat</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <a id="initial-existent-link" href="#" target="_blank" style="color:#1565c0;font-size:.83rem;word-break:break-all">🔗 Vezi fișierul</a>
+        <button class="btn btn-sm btn-danger" onclick="stergeFisierInitial()">🗑️ Șterge</button>
+      </div>
+    </div>
+
+    <!-- Niciun fisier -->
+    <div id="initial-lipsa" style="display:none;background:#fff3e0;border:1px solid #ffcc80;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div style="font-size:.83rem;color:#e65100;">⚠ Niciun fișier inițial încărcat.</div>
+    </div>
+
+    <!-- Upload nou -->
+    <div style="border:2px dashed #c0d0e0;border-radius:8px;padding:20px;text-align:center;background:#f5f8fd;margin-bottom:14px">
+      <div style="font-size:2rem;margin-bottom:6px">📁</div>
+      <p style="font-size:.83rem;color:#666;margin-bottom:10px">Înlocuiește fișierul inițial (PDF sau Word)</p>
+      <input type="file" id="initial-fisier-input" accept=".pdf,.doc,.docx" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-family:inherit" />
+    </div>
+    <p id="initial-upload-msg" style="font-size:.83rem;min-height:18px;margin-bottom:12px;color:#c62828"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-outline" onclick="closeModal('modalInicial')">Închide</button>
+      <button class="btn btn-primary" onclick="salveazaInitial()">💾 Salvează fișierul</button>
     </div>
   </div>
 </div>
