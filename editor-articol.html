@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Editor Articol — Revista Dokimasia</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <script src="auth.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet"/>
 <style>
@@ -409,6 +410,7 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
     <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid rgba(255,255,255,0.15);flex-shrink:0;">
       <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">...</span></div>
       <button onclick="document.getElementById('modalIndicatii').classList.add('open')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.2);padding:5px 10px;border-radius:4px;font-size:0.73rem;font-family:'Georgia',serif;cursor:pointer;">💡 Indicații</button>
+      <button onclick="deschideModalImportWord()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Încarcă un fișier Word și AI îl importă automat în editor, secțiune cu secțiune.">⬆ Word</button>
       <button onclick="previzualizeaza()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Deschide articolul formatat ca publicație într-un tab nou. Poți printa sau salva ca PDF.">👁 Preview</button>
       <button onclick="deschideModalAI()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Instrumente AI pentru întregul articol: generare abstract, cuvinte-cheie, corectare diacritice.">✨ AI</button>
       <button onclick="exportPDF()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Exportă articolul ca fișier PDF gata de tipărire.">⬇ PDF</button>
@@ -696,6 +698,67 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
         <div class="ins-opt" onclick="insEq()"><div class="ins-icon">📐</div><div class="ins-lbl">Ecuație</div></div>
         <div class="ins-opt" onclick="insCitare()"><div class="ins-icon">❝</div><div class="ins-lbl">Citare</div></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL IMPORT WORD -->
+<div class="modal-ov" id="modalImportWord">
+  <div class="modal-box" style="max-width:540px;">
+    <div class="modal-head">
+      <h3>⬆ Încarcă Word pentru formatare</h3>
+      <button class="modal-x" onclick="inchideModalImportWord()">×</button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;">
+
+      <!-- Pas 1: upload -->
+      <div id="importWordPas1">
+        <div style="background:#f0f7ff;border:1px solid #b8d4f0;border-radius:5px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;line-height:1.6;color:#1a3a5c;">
+          <div style="font-weight:700;margin-bottom:5px;">Cum funcționează:</div>
+          <div>1. Încarci fișierul Word (.docx sau .doc)</div>
+          <div>2. AI citește conținutul și îl distribuie automat pe secțiunile articolului</div>
+          <div>3. Verifici și ajustezi — totul rămâne editabil</div>
+          <div style="margin-top:6px;color:#c0392b;font-size:0.78rem;">⚠ Conținutul existent din editor va fi înlocuit.</div>
+        </div>
+
+        <div id="importDropZone" style="border:2px dashed var(--border);border-radius:6px;padding:32px;text-align:center;cursor:pointer;transition:all 0.2s;"
+          onclick="document.getElementById('importWordInput').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--crimson)';this.style.background='#fff5f5';"
+          ondragleave="this.style.borderColor='var(--border)';this.style.background='';"
+          ondrop="handleImportDrop(event)">
+          <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+          <div style="font-size:0.88rem;color:var(--ink);font-weight:600;">Trage fișierul Word aici</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">sau click pentru a selecta</div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:6px;">.docx, .doc — max 10 MB</div>
+        </div>
+        <input type="file" id="importWordInput" accept=".docx,.doc" style="display:none" onchange="handleImportFile(this)"/>
+
+        <div id="importWordFileName" style="display:none;margin-top:10px;padding:8px 12px;background:var(--paper-dark);border-radius:4px;font-size:0.82rem;display:flex;align-items:center;gap:8px;">
+          <span>📄</span><span id="importWordName"></span>
+          <span style="margin-left:auto;color:var(--gold);font-weight:600;">✓ Fișier selectat</span>
+        </div>
+
+        <div style="margin-top:14px;">
+          <label style="display:block;font-size:0.78rem;font-weight:600;color:var(--muted);margin-bottom:4px;">Tipul articolului din fișier:</label>
+          <select id="importWordTip" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:4px;font-family:'Source Serif 4',serif;font-size:0.85rem;">
+            <option value="practic">🎓 Practici educaționale și inovare didactică</option>
+            <option value="cercetare">🔬 Cercetare și analiză în educație</option>
+            <option value="dezvoltare">🌱 Dezvoltare educațională și profesională</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Pas 2: procesare -->
+      <div id="importWordPas2" style="display:none;text-align:center;padding:24px;">
+        <div style="font-size:2rem;margin-bottom:12px;animation:spin 1s linear infinite;display:inline-block;">⏳</div>
+        <div style="font-weight:600;color:var(--ink);margin-bottom:6px;">AI procesează fișierul...</div>
+        <div id="importWordStatus" style="font-size:0.82rem;color:var(--muted);">Se citește conținutul...</div>
+      </div>
+
+    </div>
+    <div class="modal-foot" id="importWordFoot">
+      <button class="btn-cancel" onclick="inchideModalImportWord()">Anulează</button>
+      <button class="btn-ok" id="btnImportWord" onclick="ruleazaImportWord()" disabled style="opacity:0.5;">⬆ Importă și formatează</button>
     </div>
   </div>
 </div>
@@ -2225,8 +2288,212 @@ async function ruleazaAI(){
 }
 
 // ══════════════════════════════════════════════════════════
-// PREVIZUALIZARE — tab nou
+// IMPORT WORD
 // ══════════════════════════════════════════════════════════
+let importWordFileData = null;
+
+function deschideModalImportWord(){
+  document.getElementById('modalImportWord').classList.add('open');
+  document.getElementById('importWordPas1').style.display='block';
+  document.getElementById('importWordPas2').style.display='none';
+  document.getElementById('importWordFoot').style.display='flex';
+  document.getElementById('importWordFileName').style.display='none';
+  document.getElementById('importWordInput').value='';
+  document.getElementById('btnImportWord').disabled=true;
+  document.getElementById('btnImportWord').style.opacity='0.5';
+  importWordFileData=null;
+}
+function inchideModalImportWord(){
+  document.getElementById('modalImportWord').classList.remove('open');
+}
+
+function handleImportDrop(e){
+  e.preventDefault();
+  const dropZone=document.getElementById('importDropZone');
+  dropZone.style.borderColor='var(--border)';
+  dropZone.style.background='';
+  const file=e.dataTransfer.files[0];
+  if(file) procesaFisierImport(file);
+}
+function handleImportFile(inp){
+  if(inp.files[0]) procesaFisierImport(inp.files[0]);
+}
+
+function procesaFisierImport(file){
+  if(!file.name.match(/\.(doc|docx)$/i)){
+    toast('Selectați un fișier Word (.doc sau .docx).','err');
+    return;
+  }
+  if(file.size>10*1024*1024){
+    toast('Fișierul este prea mare (max 10 MB).','err');
+    return;
+  }
+  // Citește fișierul ca base64
+  const reader=new FileReader();
+  reader.onload=e=>{
+    importWordFileData=e.target.result; // base64
+    document.getElementById('importWordName').textContent=file.name;
+    document.getElementById('importWordFileName').style.display='flex';
+    document.getElementById('btnImportWord').disabled=false;
+    document.getElementById('btnImportWord').style.opacity='1';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function ruleazaImportWord(){
+  if(!importWordFileData){toast('Selectați mai întâi un fișier.','err');return;}
+
+  const tip=document.getElementById('importWordTip').value;
+
+  // Arată procesarea
+  document.getElementById('importWordPas1').style.display='none';
+  document.getElementById('importWordPas2').style.display='block';
+  document.getElementById('importWordFoot').style.display='none';
+
+  const setStatus=msg=>{ document.getElementById('importWordStatus').textContent=msg; };
+
+  try{
+    setStatus('Se extrage textul din fișier...');
+
+    // Extrage textul din Word via mammoth (disponibil în browser)
+    // Folosim mammoth.js din CDN dacă e disponibil, altfel trimitem la AI cu base64
+    let textBrut='';
+
+    if(typeof mammoth !== 'undefined'){
+      // mammoth.js disponibil — extrage text direct în browser
+      const base64=importWordFileData.split(',')[1];
+      const binary=atob(base64);
+      const bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+      const result=await mammoth.extractRawText({arrayBuffer:bytes.buffer});
+      textBrut=result.value;
+    } else {
+      // Fallback — trimitem textul brut la AI pentru procesare
+      textBrut='[Fișier Word — conținut neparsabil fără mammoth.js]';
+    }
+
+    if(!textBrut.trim()){
+      throw new Error('Nu s-a putut extrage text din fișier. Verificați că fișierul nu este protejat.');
+    }
+
+    setStatus('AI analizează și distribuie conținutul pe secțiuni...');
+
+    // Structura secțiunilor pentru tipul ales
+    const structura={
+      practic:['Titlu','Subtitlu','Autori','Abstract (română)','Abstract (engleză)','Cuvinte-cheie','Introducere și context','Descrierea demersului didactic','Rezultate și observații','Concluzii și recomandări','Bibliografie'],
+      cercetare:['Titlu','Subtitlu','Autori','Abstract (română)','Abstract (engleză)','Cuvinte-cheie','Introducere și fundamentare teoretică','Metodologie','Rezultate și analiză','Concluzii și implicații','Bibliografie'],
+      dezvoltare:['Titlu','Subtitlu','Autori','Abstract (română)','Abstract (engleză)','Cuvinte-cheie','Introducere și context','Descrierea intervenției / proiectului','Rezultate și observații','Concluzii și implicații','Bibliografie'],
+    }[tip];
+
+    const promptAI=`Ești un asistent editorial specializat în articole academice educaționale românești. Primești textul brut al unui articol Word și trebuie să îl distribui pe secțiunile standard ale revistei Dokimasia.
+
+Secțiunile sunt: ${structura.join(' | ')}
+
+Returnează un JSON valid cu exact aceste chei (în română, fără diacritice în chei):
+{
+  "titlu": "...",
+  "subtitlu": "...",
+  "autori": "Prenume NUME (unul per linie dacă sunt mai mulți)",
+  "abstract_ro": "...",
+  "abstract_en": "...",
+  "cuvinte_cheie": "cuv1, cuv2, cuv3",
+  "s_intro": "...",
+  "s_sectiune2": "...",
+  "s_rezultate": "...",
+  "s_concluzii": "...",
+  "biblio": "ref1\nref2\nref3"
+}
+
+Unde s_sectiune2 este:
+- "s_demers" pentru practici educationale
+- "s_metodologie" pentru cercetare
+- "s_interventie" pentru dezvoltare
+
+Dacă o secțiune nu există în text, pune string gol "".
+Păstrează diacriticele românești corecte (ă â î ș ț).
+Returnează DOAR JSON-ul, fără explicații.
+
+Text articol:
+${textBrut.slice(0,6000)}`;
+
+    const rezultatAI=await callAI(promptAI, 2000);
+
+    setStatus('Se populează editorul...');
+
+    // Parsează JSON
+    let parsed;
+    try{
+      const clean=rezultatAI.replace(/```json|```/g,'').trim();
+      parsed=JSON.parse(clean);
+    }catch(e){
+      throw new Error('AI nu a putut structura conținutul. Încearcă din nou sau copiază manual.');
+    }
+
+    // Dacă nu există articol activ, creează unul nou
+    if(!tipSelectat || tipSelectat!==tip){
+      tipSelectat=tip;
+      buildSectiuni();
+    }
+    if(!articleId){
+      await autosave();
+    }
+
+    // Populează cache-ul și editorul
+    _stateCache.titlu=parsed.titlu||'';
+    _stateCache.subtitlu=parsed.subtitlu||'';
+    _stateCache.cuvinte=parsed.cuvinte_cheie||'';
+    _stateCache.abRo=parsed.abstract_ro?`<p>${parsed.abstract_ro}</p>`:'';
+    _stateCache.abEn=parsed.abstract_en?`<p>${parsed.abstract_en}</p>`:'';
+
+    // Autori
+    if(parsed.autori){
+      const linii=parsed.autori.split('\n').filter(Boolean);
+      autori=linii.map((l,i)=>{
+        const parts=l.trim().split(/\s+/);
+        const numeP=parts.pop()||'';
+        const prenumeP=parts.join(' ');
+        return {id:i+1,prenume:formatPrenume(prenumeP),nume:formatNume(numeP),institutie:'',email:''};
+      });
+      if(!autori.length) autori=[{id:1,prenume:'',nume:'',institutie:'',email:''}];
+      _stateCache.autori=autori;
+    }
+
+    // Bibliografie
+    if(parsed.biblio){
+      const refs=parsed.biblio.split('\n').filter(r=>r.trim());
+      biblio=refs.length?refs:[''];
+      _stateCache.biblio=biblio;
+    }
+
+    // Secțiuni rich text
+    const mapSec={
+      practic:{s_intro:'s_intro',s_demers:'s_demers',s_rezultate:'s_rezultate',s_concluzii:'s_concluzii'},
+      cercetare:{s_intro:'s_intro',s_metodologie:'s_metodologie',s_rezultate:'s_rezultate',s_concluzii:'s_concluzii'},
+      dezvoltare:{s_intro:'s_intro',s_interventie:'s_interventie',s_rezultate:'s_rezultate',s_concluzii:'s_concluzii'},
+    }[tip];
+
+    Object.entries(mapSec).forEach(([cheieAI,cheieDB])=>{
+      if(parsed[cheieAI]) _stateCache['r_'+cheieDB]=`<p>${parsed[cheieAI].replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')}</p>`;
+    });
+
+    // Randează editorul
+    updateTipBar();
+    renderSidebar();
+    showWelcomeEditor(false);
+    activaSec('titlu');
+
+    // Salvează
+    await autosave();
+
+    inchideModalImportWord();
+    toast('✓ Fișier importat și distribuit pe secțiuni!','ok');
+
+  }catch(e){
+    console.error('[Import Word]',e);
+    toast('Eroare import: '+e.message,'err');
+    deschideModalImportWord();
+  }
+}
 function previzualizeaza(){
   if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
   const html=buildPreview();
