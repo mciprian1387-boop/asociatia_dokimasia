@@ -250,6 +250,22 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 .sb-item.dragging{opacity:0.3;}
 .sb-item.drag-over{border-top:2px solid var(--crimson);}
 
+/* Secțiuni șterse — gri în sidebar */
+.sb-item.deleted{opacity:0.45;background:var(--paper-dark)!important;color:var(--muted)!important;border:1px dashed var(--border)!important;cursor:default;}
+.sb-item.deleted .si-label{text-decoration:line-through;font-style:italic;}
+.sb-restore-btn{font-size:0.62rem;padding:1px 6px;background:#fff;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--muted);font-family:'Source Serif 4',serif;flex-shrink:0;}
+.sb-restore-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* Avertisment export */
+.export-warn{padding:14px 18px;background:#fff3cd;border:1px solid #ffc107;border-radius:5px;font-size:0.84rem;line-height:1.6;color:#664d03;}
+.export-warn-title{font-weight:700;font-size:0.9rem;margin-bottom:8px;color:#664d03;}
+.export-warn ul{margin-left:16px;}
+.export-warn li{margin-bottom:3px;}
+.export-warn-btns{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;}
+.btn-warn-export{background:var(--gold);color:#fff;border:none;padding:7px 16px;border-radius:3px;font-size:0.82rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;}
+.btn-warn-cancel{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 14px;border-radius:3px;font-size:0.82rem;font-family:'Source Serif 4',serif;cursor:pointer;}
+.btn-warn-cancel:hover{border-color:var(--crimson);color:var(--crimson);}
+
 /* Editare inline nume secțiuni */
 .si-label-wrap{flex:1;display:flex;align-items:center;gap:4px;min-width:0;}
 .si-label{font-weight:500;font-size:0.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
@@ -506,6 +522,29 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   </aside>
 </div>
 
+<!-- MODAL AVERTISMENT EXPORT -->
+<div class="modal-ov" id="modalExportWarn">
+  <div class="modal-box" style="max-width:460px;">
+    <div class="modal-head" style="background:#b8963e;">
+      <h3>⚠ Articol incomplet</h3>
+      <button class="modal-x" onclick="document.getElementById('modalExportWarn').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body" style="padding:16px 20px;">
+      <div class="export-warn">
+        <div class="export-warn-title">Următoarele secțiuni obligatorii lipsesc sau sunt incomplete:</div>
+        <ul id="exportWarnList"></ul>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-top:12px;line-height:1.5;">Poți exporta articolul acum, dar aceste secțiuni vor apărea goale în documentul final. Recomandăm completarea lor înainte de export.</p>
+    </div>
+    <div class="modal-foot" style="justify-content:space-between;">
+      <button class="btn-warn-cancel" onclick="document.getElementById('modalExportWarn').classList.remove('open')">✕ Anulează</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-warn-export" id="btnExportOricum" onclick="">⬇ Exportă oricum</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL INDICAȚII EDITARE -->
 <div class="modal-ov" id="modalIndicatii">
   <div class="modal-box" style="max-width:520px;">
@@ -668,6 +707,7 @@ let autori=[{id:1,prenume:'',nume:'',institutie:'',email:''}];
 let biblio=[''];
 let secContor=0;
 let sectiuni=[];
+let sectiuniSterse=[]; // secțiuni șterse — rămân în sidebar ca gri
 let secActiva=null;
 let activeEd=null;
 let articleId=null;
@@ -912,6 +952,7 @@ async function incarcaArticol(id){
     if(!confirm('Deschideți alt articol?')) return;
   }
   articleId=id;
+  sectiuniSterse=[];
   const d=art.data||{};
   tipSelectat=art.tip||'practic';
   autori=(d.autori||[{id:1,prenume:'',nume:'',institutie:'',email:''}]).map(a=>{
@@ -979,8 +1020,8 @@ function articolNou(){
     if(!confirm('Începeți un articol nou? Articolul curent este salvat automat.'))return;
   }
   articleId=null; tipSelectat=null;
-  autori=[{id:1,nume:'',institutie:'',email:''}];
-  biblio=['']; secContor=0; sectiuni=[]; secActiva=null;
+  autori=[{id:1,prenume:'',nume:'',institutie:'',email:''}];
+  biblio=['']; secContor=0; sectiuni=[]; sectiuniSterse=[]; secActiva=null; _stateCache={};
   updateTipBar(); setBadge('','Nesalvat'); renderIstoric();
   deschideModalTip();
 }
@@ -1073,6 +1114,17 @@ function renderSidebar(){
   let html=fix.map(s=>sbItem(s,false)).join('');
   html+=`<div class="sb-divider">Secțiuni articol <span style="font-weight:400;text-transform:none;letter-spacing:0;">(trage ⠿ pentru a reordona)</span></div>`;
   html+=mob.map(s=>sbItem(s,s.tip!=='fix')).join('');
+  // Secțiuni șterse — gri cu buton Restaurează
+  if(sectiuniSterse.length){
+    html+=`<div class="sb-divider" style="color:#bbb;border-color:#eee;">Secțiuni șterse</div>`;
+    html+=sectiuniSterse.map(s=>`
+      <div class="sb-item deleted" title="Secțiune ștearsă — apasă Restaurează pentru a o recupera">
+        <span style="width:12px"></span>
+        <span class="si-icon" style="opacity:0.5;">${s.icon||'📄'}</span>
+        <span class="si-label-wrap"><span class="si-label">${s.label}</span></span>
+        <button class="sb-restore-btn" onclick="restaureazaSec('${s.id}')">↩ Restaurează</button>
+      </div>`).join('');
+  }
   document.getElementById('sbList').innerHTML=html;
   const b=document.getElementById('btnAddSec'); if(b) b.style.display='flex';
   updateProg();
@@ -1307,21 +1359,31 @@ function secPanelAutori(){
 
 function secPanelAbstract(){
   return `<div class="sec-panel">
-    ${_panelHead('📄','Abstract',false)}
+    ${_panelHead('📄','Abstract',true)}
     <div class="sec-panel-body">
-      <p class="sec-hint">Recomandat: 150–200 cuvinte. Generați automat pe baza secțiunilor completate sau scrieți manual.</p>
-      <div class="ab-actions" style="margin-bottom:10px;">
+      <div style="background:linear-gradient(135deg,#f0f7ff,#e8f4fd);border:1px solid #b8d4f0;border-radius:5px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;line-height:1.6;color:#1a3a5c;">
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:6px;color:#1565c0;">📋 Ce este abstractul și cum îl completezi</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div>📌 Abstractul este un <strong>rezumat al întregului articol</strong> — 150–200 de cuvinte, în română și în engleză.</div>
+          <div>✍ Trebuie să cuprindă: <strong>scopul</strong>, <strong>metodologia</strong>, <strong>rezultatele</strong> și <strong>concluziile</strong>.</div>
+          <div>🤖 Dacă ai completat celelalte secțiuni, apasă <strong>„✨ AI — Generează"</strong> — abstractul se scrie automat.</div>
+          <div>🌐 Dacă ai abstractul în română, apasă <strong>„🌐 AI — Traduce"</strong> pentru versiunea în engleză.</div>
+          <div style="color:#c0392b;font-weight:600;">⚠ Abstractul este <u>obligatoriu</u> pentru export. Fără el nu poți finaliza articolul.</div>
+        </div>
+      </div>
+      <div class="ab-actions" style="margin-bottom:12px;">
         <button class="btn-ai-gen" onclick="genAbstract()">✨ AI — Generează abstract (RO)</button>
         <button class="btn-ai-tr" onclick="tradAbstract()">🌐 AI — Traduce în engleză</button>
       </div>
-      <div class="fld"><label class="fld-label">Abstract (română)</label>
+      <div class="fld">
+        <label class="fld-label">Abstract (română) <span class="req">*</span></label>
         ${tb('abstract')}
-        <div class="rich-ed" id="rich-abstract" contenteditable="true" data-ph="Scrieți sau generați abstractul în română..." oninput="onChange()"></div>
+        <div class="rich-ed" id="rich-abstract" contenteditable="true" data-ph="Scrieți sau generați abstractul în română (150–200 cuvinte)..." oninput="onChange()"></div>
         <div class="fld-count" id="abCnt">0 cuvinte</div>
       </div>
       <div class="ab-en-head">Abstract (English)</div>
       <div class="fld">${tb('abstract-en')}
-        <div class="rich-ed" id="rich-abstract-en" contenteditable="true" data-ph="English abstract..." oninput="onChange()"></div>
+        <div class="rich-ed" id="rich-abstract-en" contenteditable="true" data-ph="English abstract (150–200 words)..." oninput="onChange()"></div>
       </div>
     </div>
   </div>`;
@@ -1331,9 +1393,19 @@ function secPanelCuvinte(){
   return `<div class="sec-panel">
     ${_panelHead('🔑','Cuvinte-cheie',false)}
     <div class="sec-panel-body">
-      <p class="sec-hint">5-7 cuvinte cheie separate prin virgulă.</p>
-      <div class="fld"><label class="fld-label">Cuvinte-cheie</label>
-        <input type="text" class="fld-input" id="f-cuvinte" placeholder="ex: educație, didactică, inovare, formare, curriculum" oninput="onChange()"/>
+      <div style="background:linear-gradient(135deg,#f8f4ff,#f0ecf8);border:1px solid #d8c8f0;border-radius:5px;padding:10px 14px;margin-bottom:12px;font-size:0.82rem;line-height:1.6;color:#3a1a5c;">
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:#6a1b9a;">🔑 Cum completezi cuvintele-cheie</div>
+        <div>Introdu <strong>5–7 cuvinte sau sintagme</strong> reprezentative, separate prin <strong>virgulă</strong>.</div>
+        <div>Sau apasă <strong>„⚡ AI — Extrage"</strong> pentru a le genera automat din conținutul articolului.</div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <button class="btn-ai-gen" style="font-size:0.74rem;padding:5px 12px;" onclick="aiExtrageCuvinte()">⚡ AI — Extrage cuvinte-cheie din articol</button>
+      </div>
+      <div class="fld">
+        <label class="fld-label">Cuvinte-cheie</label>
+        <input type="text" class="fld-input" id="f-cuvinte"
+          placeholder="ex: educație incluzivă, metode active, evaluare formativă, formare continuă"
+          oninput="onChange()"/>
         <div class="fld-count" id="kwCnt">0 cuvinte-cheie</div>
       </div>
     </div>
@@ -1552,11 +1624,31 @@ function adaugaSecLibera(){
   renderSidebar();activaSec(id);onChange();
 }
 function delSec(id){
-  if(!confirm('Ștergem secțiunea?'))return;
-  sectiuni=sectiuni.filter(s=>s.id!==id);
-  const el=document.getElementById('sec-'+id);if(el)el.remove();
-  renderSidebar();onChange();
+  const s=sectiuni.find(x=>x.id===id);
+  if(!s) return;
+  sectiuniSterse.push({...s, continut: _stateCache['r_'+id]||''});
+  sectiuni=sectiuni.filter(x=>x.id!==id);
+  if(secActiva===id){
+    secActiva=null;
+    showWelcomeEditor(true);
+    const p=document.getElementById('secPanel');if(p)p.style.display='none';
+  }
+  _stateCache['r_'+id]='';
+  renderSidebar(); onChange();
+  toast('Secțiune ștearsă. O poți restaura din sidebar.','info');
 }
+
+function restaureazaSec(id){
+  const s=sectiuniSterse.find(x=>x.id===id);
+  if(!s) return;
+  sectiuniSterse=sectiuniSterse.filter(x=>x.id!==id);
+  const biIdx=sectiuni.findIndex(x=>x.id==='biblio');
+  sectiuni.splice(biIdx,0,{id:s.id,label:s.label,icon:s.icon,required:s.required||false,tip:s.tip,hint:s.hint});
+  if(s.continut) _stateCache['r_'+s.id]=s.continut;
+  renderSidebar(); onChange();
+  toast('Secțiune restaurată!','ok');
+}
+
 function renum(id){ starteazaEditNume(id); }
 
 // CHANGE
@@ -1634,7 +1726,24 @@ function aiBtnLoading(id, loading){
   btn.classList.toggle('loading',loading);
 }
 
-// AI DIACRITICE — per secțiune
+// AI extrage cuvinte-cheie
+async function aiExtrageCuvinte(){
+  const ctx=getCtx();
+  const titlu=_stateCache.titlu||'';
+  if(!ctx&&!titlu){toast('Completați mai întâi conținutul articolului.','err');return;}
+  const btn=document.querySelector('[onclick="aiExtrageCuvinte()"]');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Se extrag...';}
+  try{
+    const result=await callAI(
+      `Extrage 5-7 cuvinte-cheie relevante din acest articol academic românesc. Titlu: "${titlu}"\n\nConținut:\n${ctx.slice(0,1500)}\n\nReturnează DOAR cuvintele-cheie separate prin virgulă, fără explicații, fără numerotare, fără ghilimele.`,
+      150
+    );
+    const fc=document.getElementById('f-cuvinte');
+    if(fc){ fc.value=result.trim(); _stateCache.cuvinte=fc.value; onChange(); }
+    toast('Cuvinte-cheie extrase!','ok');
+  }catch(e){toast('Eroare AI: '+e.message,'err');}
+  if(btn){btn.disabled=false;btn.textContent='⚡ AI — Extrage cuvinte-cheie din articol';}
+}
 async function aiDiacritice(secId){
   const el=document.getElementById('rich-'+secId);
   if(!el){toast('Secțiunea nu are editor text.','err');return;}
@@ -1876,17 +1985,55 @@ function buildDoc(forPrint){
   const ps=forPrint?`@page{size:A4;margin:2.5cm;}@media print{body{margin:0;}}`:'' ;
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${ps}body{font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.5;margin:2.5cm;}p{text-indent:2em;text-align:justify;margin-bottom:4pt;}h1,h2{font-family:'Times New Roman',serif;}</style></head><body>${body}</body></html>`;
 }
+// Verifică completarea pentru export
+function verificaCompletare(){
+  const lipsa=[];
+  const d=colDate();
+  if(!d.titlu.trim()) lipsa.push('Titlu articol');
+  if(!autori.some(a=>(a.prenume||'').trim()||(a.nume||'').trim())) lipsa.push('Autori');
+  const abText=(d.abRo||'').replace(/<[^>]+>/g,'').trim();
+  if(!abText) lipsa.push('Abstract (română)');
+  sectiuni.filter(s=>s.required&&!FIX_IDS.includes(s.id)).forEach(s=>{
+    const txt=(_stateCache['r_'+s.id]||'').replace(/<[^>]+>/g,'').trim();
+    if(!txt) lipsa.push(s.label);
+  });
+  return lipsa;
+}
+
+function deschideExportWarn(lipsa, callbackExport){
+  const list=document.getElementById('exportWarnList');
+  list.innerHTML=lipsa.map(l=>`<li>${l}</li>`).join('');
+  document.getElementById('btnExportOricum').onclick=()=>{
+    document.getElementById('modalExportWarn').classList.remove('open');
+    callbackExport();
+  };
+  document.getElementById('modalExportWarn').classList.add('open');
+}
+
 function exportDOCX(){
   if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
-  const blob=new Blob([buildDoc(false)],{type:'application/msword'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download=(slugify(gv('f-titlu'))||'articol')+'.doc';a.click();
-  toast('Word descărcat!','ok');
+  const lipsa=verificaCompletare();
+  const doExport=()=>{
+    const blob=new Blob([buildDoc(false)],{type:'application/msword'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=(slugify(_stateCache.titlu||'articol'))+'.doc';a.click();
+    toast('Word descărcat!','ok');
+  };
+  if(lipsa.length) deschideExportWarn(lipsa, doExport);
+  else doExport();
 }
+
 function exportPDF(){
   if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
-  const w=window.open('','_blank');w.document.write(buildDoc(true));w.document.close();
-  setTimeout(()=>w.print(),600);toast('Salvați ca PDF din fereastra de printare.','info');
+  const lipsa=verificaCompletare();
+  const doExport=()=>{
+    const w=window.open('','_blank');
+    w.document.write(buildDoc(true));w.document.close();
+    setTimeout(()=>w.print(),600);
+    toast('Salvați ca PDF din fereastra de printare.','info');
+  };
+  if(lipsa.length) deschideExportWarn(lipsa, doExport);
+  else doExport();
 }
 
 // UTILS
