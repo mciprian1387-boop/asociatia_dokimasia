@@ -134,39 +134,30 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 .tip-card-btn:hover{background:var(--crimson-dark);}
 
 /* EDITOR */
-.editor-area{overflow-y:auto;background:var(--paper);}
-.editor-inner{max-width:820px;margin:0 auto;padding:20px 28px 60px;}
-.editor-placeholder{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px;color:var(--muted);}
-.editor-placeholder h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);}
-.editor-placeholder p{font-size:0.88rem;text-align:center;max-width:300px;line-height:1.6;}
+.editor-area{overflow-y:auto;background:var(--paper);display:flex;flex-direction:column;}
+.editor-inner{max-width:820px;margin:0 auto;padding:20px 28px 60px;width:100%;}
 
-/* ACCORDION secțiuni */
-.sec-wrap{margin-bottom:6px;border:1px solid var(--border);border-radius:5px;overflow:hidden;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
-.sec-wrap.open{box-shadow:0 2px 12px rgba(0,0,0,0.08);}
-.sec-header{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none;transition:background 0.15s;background:#fff;}
-.sec-header:hover{background:var(--paper);}
-.sec-wrap.open .sec-header{background:var(--paper-dark);border-bottom:1px solid var(--border);}
-.sec-header-icon{font-size:1rem;flex-shrink:0;}
-.sec-header-title{flex:1;font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;color:var(--ink);}
-.sec-wrap.open .sec-header-title{color:var(--crimson);}
-.sec-header-req{color:var(--crimson);font-size:0.72rem;margin-left:2px;}
-.sec-header-dot{width:7px;height:7px;border-radius:50%;background:#ddd;flex-shrink:0;}
-.sec-header-dot.ok{background:#66bb6a;}
-.sec-header-dot.warn{background:#ffa726;}
-.sec-header-arrow{font-size:0.65rem;color:var(--muted);transition:transform 0.2s;flex-shrink:0;}
-.sec-wrap.open .sec-header-arrow{transform:rotate(180deg);}
-.sec-header-btns{display:flex;gap:4px;opacity:0;transition:opacity 0.15s;}
-.sec-header:hover .sec-header-btns{opacity:1;}
-.sec-hbtn{background:none;border:1px solid var(--border);border-radius:3px;padding:2px 6px;font-size:0.64rem;cursor:pointer;color:var(--muted);font-family:'Source Serif 4',serif;}
-.sec-hbtn:hover{border-color:var(--crimson);color:var(--crimson);}
-.sec-hbtn.del:hover{border-color:#e53935;color:#e53935;}
+/* PLACEHOLDER prima deschidere */
+.editor-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 24px;text-align:center;}
+.editor-welcome-icon{font-size:3rem;margin-bottom:16px;}
+.editor-welcome h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--crimson);margin-bottom:10px;}
+.editor-welcome p{font-size:0.9rem;color:var(--muted);line-height:1.7;max-width:340px;margin-bottom:6px;}
+.editor-welcome .welcome-hint{font-size:1.1rem;font-weight:700;color:var(--ink);background:var(--paper-dark);border:2px dashed var(--border);border-radius:6px;padding:12px 24px;margin-top:16px;display:inline-block;}
 
-.sec-body{display:none;padding:14px 16px 16px;}
-.sec-wrap.open .sec-body{display:block;}
-.sec-hint{font-size:0.8rem;color:var(--muted);font-style:italic;line-height:1.55;margin-bottom:10px;border-left:2px solid var(--gold);padding-left:8px;}
+/* SECȚIUNEA ACTIVĂ — o singură secțiune în editor */
+.sec-panel{background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 2px 16px rgba(0,0,0,0.07);overflow:hidden;margin:16px 20px;}
+.sec-panel-head{background:linear-gradient(135deg,var(--crimson),#6a0000);padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.sec-panel-icon{font-size:1.1rem;}
+.sec-panel-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#fff;flex:1;}
+.sec-panel-req{color:var(--gold-light);font-size:0.75rem;}
+.sec-panel-body{padding:18px 20px 22px;}
+.sec-hint{font-size:0.8rem;color:var(--muted);font-style:italic;line-height:1.55;margin-bottom:12px;border-left:2px solid var(--gold);padding-left:8px;}
+
+/* Ascunde vechile accordion wraps */
+.sec-wrap{display:none !important;}
 
 /* AI toolbar per secțiune */
-.sec-ai-bar{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap;padding:7px 10px;background:linear-gradient(135deg,#f8f4ff,#f0ecf8);border:1px solid #e0d8f0;border-radius:4px;}
+.sec-ai-bar{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap;padding:7px 10px;background:linear-gradient(135deg,#f8f4ff,#f0ecf8);border:1px solid #e0d8f0;border-radius:4px;}
 .sec-ai-bar-label{font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:#6a1b9a;align-self:center;margin-right:4px;white-space:nowrap;}
 .ai-sec-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #c4a8e0;border-radius:3px;font-size:0.72rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;background:#fff;color:#6a1b9a;white-space:nowrap;}
 .ai-sec-btn:hover{background:#6a1b9a;color:#fff;border-color:#6a1b9a;}
@@ -410,57 +401,18 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   </aside>
 
   <!-- EDITOR — zona centrală -->
-  <main class="editor-area">
-    <div id="editorInner">
-      <!-- PLACEHOLDER cu cele 3 tipuri ca și carduri -->
-      <div id="tipCardsPlaceholder" style="overflow-y:auto;height:100%;display:flex;flex-direction:column;">
-        <div style="padding:28px 24px 8px;text-align:center;">
-          <div style="font-size:2rem;margin-bottom:8px;">📝</div>
-          <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--crimson);margin-bottom:6px;">Editor articol — Revista Dokimasia</h3>
-          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Alegeți tipul lucrării pentru a configura editorul și a începe redactarea.</p>
-        </div>
-        <div class="tip-cards">
-          <div class="tip-card" onclick="schimbaTip('practic')">
-            <div class="tip-card-header">
-              <div class="tip-card-icon">🎓</div>
-              <div>
-                <div class="tip-card-title">Practici educaționale și inovare didactică</div>
-                <div class="tip-card-sub">Demersuri didactice, metode active, resurse educaționale</div>
-              </div>
-            </div>
-            <div class="tip-card-body">
-              <div class="tip-card-desc">Planuri de lecție, scenarii didactice, exemple de bună practică, instrumente de evaluare, activități remediale și materiale metodice.</div>
-              <button class="tip-card-btn">✏ Redactează →</button>
-            </div>
-          </div>
-          <div class="tip-card" onclick="schimbaTip('cercetare')">
-            <div class="tip-card-header">
-              <div class="tip-card-icon">🔬</div>
-              <div>
-                <div class="tip-card-title">Cercetare și analiză în educație</div>
-                <div class="tip-card-sub">Studii, cercetări, analize de politici educaționale</div>
-              </div>
-            </div>
-            <div class="tip-card-body">
-              <div class="tip-card-desc">Articole de specialitate, studii de caz, sinteze tematice, analize instituționale, articole de tip review și cercetări educaționale.</div>
-              <button class="tip-card-btn">✏ Redactează →</button>
-            </div>
-          </div>
-          <div class="tip-card" onclick="schimbaTip('dezvoltare')">
-            <div class="tip-card-header">
-              <div class="tip-card-icon">🌱</div>
-              <div>
-                <div class="tip-card-title">Dezvoltare educațională și profesională</div>
-                <div class="tip-card-sub">Proiecte, Erasmus+, formare continuă, reflecție profesională</div>
-              </div>
-            </div>
-            <div class="tip-card-body">
-              <div class="tip-card-desc">Prezentări de proiecte educaționale, materiale Erasmus+, eseuri profesionale, interviuri, recenzii și rapoarte de activitate.</div>
-              <button class="tip-card-btn">✏ Redactează →</button>
-            </div>
-          </div>
-        </div>
+  <main class="editor-area" id="editorArea">
+    <div id="editorInner" style="flex:1;display:flex;flex-direction:column;">
+      <!-- Welcome placeholder — vizibil la prima deschidere -->
+      <div id="editorWelcome" class="editor-welcome">
+        <div class="editor-welcome-icon">📝</div>
+        <h2>Editor articol — Revista Dokimasia</h2>
+        <p>Bun venit! Istoricul tău de articole apare în dreapta.</p>
+        <p>Pentru a începe un articol nou, apasă butonul de mai jos.</p>
+        <div class="welcome-hint">→ Apasă <strong>+ Articol nou</strong> pentru a crea un articol</div>
       </div>
+      <!-- Panoul secțiunii active — completat dinamic -->
+      <div id="secPanel" style="display:none;flex:1;overflow-y:auto;"></div>
     </div>
   </main>
 
@@ -478,6 +430,27 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
       <button onclick="autosave()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;background:none;border:1px solid var(--border);border-radius:4px;font-size:0.78rem;font-family:'Source Serif 4',serif;color:var(--muted);cursor:pointer;margin-top:5px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">💾 Salvează acum</button>
     </div>
   </aside>
+</div>
+
+<!-- MODAL TIP ARTICOL NOU -->
+<div class="modal-ov" id="modalTip">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-head"><h3>📝 Articol nou — alegeți tipul</h3><button class="modal-x" onclick="inchideModalTip()">×</button></div>
+    <div class="modal-body" style="padding:12px 16px;">
+      <div onclick="selecteazaTip('practic')" class="modal-opt" style="margin-bottom:8px;">
+        <div style="font-size:1.4rem;flex-shrink:0;">🎓</div>
+        <div><div class="mo-title">Practici educaționale și inovare didactică</div><div class="mo-desc">Planuri de lecție, scenarii didactice, metode active, exemple de bună practică.</div></div>
+      </div>
+      <div onclick="selecteazaTip('cercetare')" class="modal-opt" style="margin-bottom:8px;">
+        <div style="font-size:1.4rem;flex-shrink:0;">🔬</div>
+        <div><div class="mo-title">Cercetare și analiză în educație</div><div class="mo-desc">Articole de specialitate, studii de caz, sinteze tematice, cercetări educaționale.</div></div>
+      </div>
+      <div onclick="selecteazaTip('dezvoltare')" class="modal-opt">
+        <div style="font-size:1.4rem;flex-shrink:0;">🌱</div>
+        <div><div class="mo-title">Dezvoltare educațională și profesională</div><div class="mo-desc">Proiecte Erasmus+, eseuri profesionale, interviuri, recenzii, rapoarte.</div></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL AI -->
@@ -620,14 +593,11 @@ function initEditor(user) {
   setBadge('', 'Nesalvat');
   incarcaIstoric();
 
-  // ?tip= din URL
+  // ?tip= din URL — fără toast
   const tipParam = new URLSearchParams(window.location.search).get('tip');
   if (tipParam && TIPURI[tipParam]) {
-    setTimeout(() => {
-      tipSelectat = tipParam;
-      buildSectiuni(); renderAll(); activaSec('titlu'); updateTipBar();
-      toast('Editor: ' + TIPURI[tipParam].label, 'ok');
-    }, 300);
+    // Nu face nimic automat — userul trebuie să apese + Articol nou
+    // Dacă vrea să creeze direct, poate apăsa din tipbar
   }
 }
 
@@ -723,14 +693,27 @@ function toggleIstoric(){
   arrow.classList.toggle('open');
 }
 
+// State cache pentru datele din panelul curent
+let _stateCache = {};
+
 function colDate(){
-  const d={tip:tipSelectat,autori,biblio};
-  d.titlu=gv('f-titlu'); d.subtitlu=gv('f-subtitlu'); d.cuvinte=gv('f-cuvinte');
-  d.abRo=gi('rich-abstract'); d.abEn=gi('rich-abstract-en');
-  d.sectiuniLibere=sectiuni.filter(s=>s.tip==='liber').map(s=>({id:s.id,label:s.label,icon:s.icon,hint:s.hint,continut:gi('rich-'+s.id)}));
+  // Citește din DOM dacă există, altfel din cache
+  const d={tip:tipSelectat, autori, biblio};
+  d.titlu = (document.getElementById('f-titlu')||{}).value || _stateCache.titlu || '';
+  d.subtitlu = (document.getElementById('f-subtitlu')||{}).value || _stateCache.subtitlu || '';
+  d.cuvinte = (document.getElementById('f-cuvinte')||{}).value || _stateCache.cuvinte || '';
+  d.abRo = (document.getElementById('rich-abstract')||{}).innerHTML || _stateCache.abRo || '';
+  d.abEn = (document.getElementById('rich-abstract-en')||{}).innerHTML || _stateCache.abEn || '';
+  d.sectiuniLibere=sectiuni.filter(s=>s.tip==='liber').map(s=>({
+    id:s.id, label:s.label, icon:s.icon, hint:s.hint,
+    continut:(document.getElementById('rich-'+s.id)||{}).innerHTML || _stateCache['r_'+s.id] || ''
+  }));
   sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
-    d['r_'+s.id]=gi('rich-'+s.id);
+    const el=document.getElementById('rich-'+s.id);
+    d['r_'+s.id] = el ? el.innerHTML : (_stateCache['r_'+s.id]||'');
   });
+  // Actualizează cache
+  Object.assign(_stateCache, d);
   return d;
 }
 function gv(id){const e=document.getElementById(id);return e?e.value:'';}
@@ -775,34 +758,43 @@ function renderIstoric(){
 
 async function incarcaArticol(id){
   const art=istoricArticole.find(a=>a.id===id);
-  if(!art)return;
-  if(articleId&&articleId!==id){
-    if(!confirm('Doriți să deschideți alt articol? Modificările nesalvate se vor pierde.'))return;
+  if(!art) return;
+  if(articleId && articleId!==id){
+    if(!confirm('Deschideți alt articol?')) return;
   }
   articleId=id;
   const d=art.data||{};
   tipSelectat=art.tip||'practic';
   autori=d.autori||[{id:1,nume:'',institutie:'',email:''}];
   biblio=d.biblio||[''];
-  // Ascunde cardurile
-  const cards=document.getElementById('tipCardsPlaceholder');
-  if(cards) cards.style.display='none';
+  autorContor=Math.max(...autori.map(a=>a.id||0),1)+1;
+
+  // Reconstruieste sectiunile inclusiv cele libere salvate
   buildSectiuni();
-  renderAll();
-  // Restore field values
-  setTimeout(()=>{
-    setFld('f-titlu',d.titlu||'');
-    setFld('f-subtitlu',d.subtitlu||'');
-    setFld('f-cuvinte',d.cuvinte||'');
-    setRich('rich-abstract',d.abRo||'');
-    setRich('rich-abstract-en',d.abEn||'');
-    sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
-      setRich('rich-'+s.id,d['r_'+s.id]||'');
+  if(d.sectiuniLibere && d.sectiuniLibere.length){
+    const biIdx=sectiuni.findIndex(s=>s.id==='biblio');
+    d.sectiuniLibere.forEach(sl=>{
+      if(!sectiuni.find(s=>s.id===sl.id)){
+        sectiuni.splice(biIdx,0,{...sl,tip:'liber'});
+      }
     });
-    onChange();
-  },100);
-  activaSec('titlu');
+  }
+
+  // Populează cache-ul cu datele articolului pentru persistență între panel-uri
+  _stateCache = {
+    titlu: d.titlu||'', subtitlu: d.subtitlu||'',
+    cuvinte: d.cuvinte||'', abRo: d.abRo||'', abEn: d.abEn||''
+  };
+  sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
+    if(d['r_'+s.id]) _stateCache['r_'+s.id]=d['r_'+s.id];
+  });
+
   updateTipBar();
+  renderSidebar();
+  showWelcomeEditor(false);
+  activaSec('titlu');
+
+  renderAutori(); renderBiblio();
   renderIstoric();
   toast('Articol deschis!','ok');
 }
@@ -820,62 +812,72 @@ function setRich(id,val){const e=document.getElementById(id);if(e&&val){e.innerH
 
 function articolNou(){
   if(articleId){
-    if(!confirm('Începeți un articol nou? Salvați mai întâi articolul curent dacă doriți.'))return;
+    if(!confirm('Începeți un articol nou? Articolul curent este salvat automat.'))return;
   }
-  articleId=null;tipSelectat=null;
+  articleId=null; tipSelectat=null;
   autori=[{id:1,nume:'',institutie:'',email:''}];
-  biblio=[''];secContor=0;sectiuni=[];
-  resetEditor();
-  updateTipBar();
-  setBadge('','Nesalvat');
-  renderIstoric();
-  toast('Editor resetat. Selectați tipul lucrării.','info');
+  biblio=['']; secContor=0; sectiuni=[]; secActiva=null;
+  updateTipBar(); setBadge('','Nesalvat'); renderIstoric();
+  deschideModalTip();
+}
+
+function deschideModalTip(){
+  document.getElementById('modalTip').classList.add('open');
+}
+function inchideModalTip(){
+  document.getElementById('modalTip').classList.remove('open');
+  // Dacă nu s-a ales nimic și nu există articol activ, arată welcome
+  if(!tipSelectat) showWelcomeEditor(true);
+}
+function selecteazaTip(tip){
+  inchideModalTip();
+  tipSelectat=tip;
+  buildSectiuni();
+  // Salvează imediat articolul nou în Supabase
+  autosave().then(()=>{
+    updateTipBar();
+    showWelcomeEditor(false);
+    renderSidebar();
+    activaSec('titlu');
+  });
+}
+
+function showWelcomeEditor(show){
+  const w=document.getElementById('editorWelcome');
+  const p=document.getElementById('secPanel');
+  if(w) w.style.display=show?'flex':'none';
+  if(p) p.style.display=show?'none':'block';
 }
 
 function resetEditor(){
-  // Reafișează cardurile de tip
-  const cards=document.getElementById('tipCardsPlaceholder');
-  if(cards) cards.style.display='flex';
-  // Șterge editorul dacă există
-  const edDiv=document.getElementById('editorContent');
-  if(edDiv) edDiv.remove();
-  document.getElementById('sbList').innerHTML='<div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării.</div>';
+  showWelcomeEditor(true);
+  document.getElementById('sbList').innerHTML='<div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Niciun articol selectat.</div>';
   const btnAdd=document.getElementById('btnAddSec');
   if(btnAdd) btnAdd.style.display='none';
   document.getElementById('progFill').style.width='0%';
   document.getElementById('progPct').textContent='0%';
   document.getElementById('progWarn').textContent='';
+  updateTipBar();
 }
 
 // ══════════════════════════════════════════════════════════
 // TIP BAR
 // ══════════════════════════════════════════════════════════
 function schimbaTip(tip){
-  if(tipSelectat===tip){
-    // dacă tipul e deja selectat și editorul e activ, nu face nimic
-    const cards=document.getElementById('tipCardsPlaceholder');
-    if(cards&&cards.style.display==='none') return;
-  }
-  if(tipSelectat&&articleId&&tipSelectat!==tip){
-    if(!confirm('Schimbați tipul lucrării? Secțiunile specifice tipului curent vor fi înlocuite.'))return;
+  if(!articleId){ deschideModalTip(); return; }
+  if(tipSelectat===tip) return;
+  if(tipSelectat && tipSelectat!==tip){
+    if(!confirm('Schimbați tipul lucrării? Secțiunile vor fi înlocuite.'))return;
   }
   tipSelectat=tip;
-  // Ascunde cardurile, arată editorul propriu-zis
-  const cards=document.getElementById('tipCardsPlaceholder');
-  if(cards) cards.style.display='none';
-  buildSectiuni();
-  renderAll();
-  activaSec('titlu');
-  updateTipBar();
-  onChange();
+  buildSectiuni(); renderSidebar();
+  showWelcomeEditor(false); activaSec('titlu');
+  updateTipBar(); onChange();
 }
 
 function updateTipBar(){
   document.querySelectorAll('.tip-tab').forEach(t=>t.classList.remove('active'));
-  if(tipSelectat){
-    const tab=document.getElementById('tab-'+tipSelectat);
-    if(tab)tab.classList.add('active');
-  }
+  if(tipSelectat){ const tab=document.getElementById('tab-'+tipSelectat); if(tab)tab.classList.add('active'); }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -895,9 +897,9 @@ function buildSectiuni(){
 }
 
 // ══════════════════════════════════════════════════════════
-// RENDER ALL
+// RENDER ALL — renderEditor nu mai face nimic (panel e în activaSec)
 // ══════════════════════════════════════════════════════════
-function renderAll(){ renderSidebar(); renderEditor(); const b=document.getElementById('btnAddSec');if(b)b.style.display='flex'; }
+function renderAll(){ renderSidebar(); const b=document.getElementById('btnAddSec');if(b)b.style.display='flex'; }
 
 // SIDEBAR
 function renderSidebar(){
@@ -908,6 +910,7 @@ function renderSidebar(){
   html+=`<div class="sb-divider">Secțiuni articol</div>`;
   html+=mob.map(s=>sbItem(s,s.tip!=='fix')).join('');
   document.getElementById('sbList').innerHTML=html;
+  const b=document.getElementById('btnAddSec'); if(b) b.style.display='flex';
   updateProg();
   initDrag();
 }
@@ -939,41 +942,69 @@ function updateProg(){
   document.getElementById('progWarn').textContent=lipsa.length?'⚠ '+lipsa.join(', '):'';
 }
 
-function toggleSec(id){
-  const wrap=document.getElementById('sec-'+id);
-  if(!wrap)return;
-  const isOpen=wrap.classList.contains('open');
-  // Închide toate
-  document.querySelectorAll('.sec-wrap.open').forEach(w=>w.classList.remove('open'));
-  // Dacă nu era deschis, deschide-l
-  if(!isOpen){
-    wrap.classList.add('open');
-    secActiva=id;
-    // Scroll smooth la secțiune
-    wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
-  } else {
-    secActiva=null;
-  }
+// Activare secțiune — afișează panelul unic în centru
+function activaSec(id){
+  if(!tipSelectat || !sectiuni.length) return;
+  const s=sectiuni.find(x=>x.id===id);
+  if(!s) return;
+  secActiva=id;
+
   // Actualizează sidebar
   document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active'));
-  if(secActiva){
-    const sb=document.getElementById('sb-'+secActiva);
-    if(sb)sb.classList.add('active');
-  }
+  const sb=document.getElementById('sb-'+id); if(sb) sb.classList.add('active');
+
+  // Salvează datele din panelul anterior înainte de a schimba
+  _salvezDinPanel();
+
+  // Renderează noul panel
+  const panel=document.getElementById('secPanel');
+  if(!panel) return;
+  showWelcomeEditor(false);
+
+  if(id==='titlu') panel.innerHTML=secPanelTitlu();
+  else if(id==='autori') panel.innerHTML=secPanelAutori();
+  else if(id==='abstract') panel.innerHTML=secPanelAbstract();
+  else if(id==='cuvinte') panel.innerHTML=secPanelCuvinte();
+  else if(id==='biblio') panel.innerHTML=secPanelBiblio();
+  else panel.innerHTML=secPanelRich(s);
+
+  initEditors();
+
+  // Populează cu datele salvate
+  _restaurezInPanel(id, s);
 }
 
-function activaSec(id){
-  // Deschide secțiunea accordion
-  const wrap=document.getElementById('sec-'+id);
-  if(!wrap)return;
-  document.querySelectorAll('.sec-wrap.open').forEach(w=>w.classList.remove('open'));
-  wrap.classList.add('open');
-  secActiva=id;
-  document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active'));
-  const sb=document.getElementById('sb-'+id);
-  if(sb)sb.classList.add('active');
-  setTimeout(()=>wrap.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+// Salvează din panelul curent în state (înainte de schimbare)
+function _salvezDinPanel(){
+  if(!secActiva) return;
+  const ft=document.getElementById('f-titlu'); if(ft) { /* onChange se ocupă deja */ }
 }
+
+// Restaurează datele în panelul nou deschis
+function _restaurezInPanel(id, s){
+  const d=colDate();
+  setTimeout(()=>{
+    if(id==='titlu'){
+      setFld('f-titlu', d.titlu||'');
+      setFld('f-subtitlu', d.subtitlu||'');
+    } else if(id==='cuvinte'){
+      setFld('f-cuvinte', d.cuvinte||'');
+    } else if(id==='abstract'){
+      setRich('rich-abstract', d.abRo||'');
+      setRich('rich-abstract-en', d.abEn||'');
+    } else if(id==='autori'){
+      renderAutori();
+    } else if(id==='biblio'){
+      renderBiblio();
+    } else {
+      setRich('rich-'+id, d['r_'+id]||'');
+    }
+    updAbCnt(); updKwCnt(); updateProg();
+  }, 30);
+}
+
+// toggleSec nu mai e folosit dar îl păstrăm pentru compatibilitate
+function toggleSec(id){ activaSec(id); }
 
 // DRAG
 let dragId=null;
@@ -1005,60 +1036,33 @@ function initDrag(){
   });
 }
 
-// ══════════════════════════════════════════════════════════
-// EDITOR
-// ══════════════════════════════════════════════════════════
-function renderEditor(){
-  // Ascunde placeholder-ul cu carduri și inserează editorul
-  const cards=document.getElementById('tipCardsPlaceholder');
-  if(cards) cards.style.display='none';
-  const inner=document.getElementById('editorInner');
-  // Creează sau actualizează div-ul editorului propriu-zis
-  let edDiv=document.getElementById('editorContent');
-  if(!edDiv){
-    edDiv=document.createElement('div');
-    edDiv.id='editorContent';
-    edDiv.className='editor-inner';
-    inner.appendChild(edDiv);
-  }
-  edDiv.innerHTML=sectiuni.map(s=>renderSec(s)).join('');
-  renderAutori();renderBiblio();initEditors();
-}
-function renderSec(s){
-  if(s.id==='titlu')return secTitlu();
-  if(s.id==='autori')return secAutoriHTML();
-  if(s.id==='abstract')return secAbstract();
-  if(s.id==='cuvinte')return secCuvinte();
-  if(s.id==='biblio')return secBiblio();
-  return secRich(s);
-}
+// renderEditor nu mai e necesar — folosim activaSec cu panel
+function renderEditor(){ if(secActiva) activaSec(secActiva); }
+
+function renderSec(s){ return ''; } // compatibilitate — nu mai e folosit
 
 // Toolbar word processor
 function tb(id){
   return `<div class="word-tb"><div class="tb-grp"><select class="tb-sel" onchange="execF('fontName',this.value)"><option value="Times New Roman">Times New Roman</option><option value="Calibri">Calibri</option><option value="Arial">Arial</option></select><select class="tb-sel" style="width:42px" onchange="execF('fontSize',this.value)"><option value="3">12</option><option value="4">14</option><option value="5">18</option><option value="2">10</option></select></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('bold')"><b>B</b></button><button class="tb-btn" onclick="execF('italic')"><i>I</i></button><button class="tb-btn" onclick="execF('underline')"><u>U</u></button><button class="tb-btn" onclick="execF('strikeThrough')"><s>S</s></button><input type="color" class="tb-color" title="Culoare" onchange="execF('foreColor',this.value)"/></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('justifyLeft')">⬅</button><button class="tb-btn" onclick="execF('justifyCenter')">☰</button><button class="tb-btn" onclick="execF('justifyRight')">➡</button><button class="tb-btn" onclick="execF('justifyFull')">≡</button></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('insertUnorderedList')">• List</button><button class="tb-btn" onclick="execF('insertOrderedList')">1.</button><button class="tb-btn" onclick="execF('indent')">→</button><button class="tb-btn" onclick="execF('outdent')">←</button></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="deschideIns()" title="Inserează">⊞</button></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('undo')">↩</button><button class="tb-btn" onclick="execF('redo')">↪</button></div></div>`;
 }
 
-// Bara AI per secțiune
 function aiBar(secId, label){
   return `<div class="sec-ai-bar">
     <span class="sec-ai-bar-label">✨ AI</span>
-    <button class="ai-sec-btn" id="ai-diac-${secId}" onclick="aiDiacritice('${secId}')" title="Corectează diacriticele românești">ă â î ș ț Diacritice</button>
-    <button class="ai-sec-btn" id="ai-imb-${secId}" onclick="aiImbunatatire('${secId}')" title="Îmbunătățește stilul și claritatea textului">✍ Îmbunătățire</button>
-    <button class="ai-sec-btn" id="ai-gen-${secId}" onclick="aiGenerare('${secId}','${label}')" title="Generează conținut pentru această secțiune">⚡ Generează</button>
+    <button class="ai-sec-btn" id="ai-diac-${secId}" onclick="aiDiacritice('${secId}')">ă â î ș ț Diacritice</button>
+    <button class="ai-sec-btn" id="ai-imb-${secId}" onclick="aiImbunatatire('${secId}')">✍ Îmbunătățire</button>
+    <button class="ai-sec-btn" id="ai-gen-${secId}" onclick="aiGenerare('${secId}','${label}')">⚡ Generează</button>
   </div>`;
 }
 
-// Secțiunea TITLU — accordion
-function secTitlu(){
-  const open = secActiva==='titlu';
-  return `<div class="sec-wrap${open?' open':''}" id="sec-titlu">
-    <div class="sec-header" onclick="toggleSec('titlu')">
-      <span class="sec-header-icon">📌</span>
-      <span class="sec-header-title">Titlu<span class="sec-header-req"> *</span></span>
-      <span class="sec-header-dot${isFilled('titlu')?' ok':' warn'}" id="dot-titlu"></span>
-      <span class="sec-header-arrow">▼</span>
-    </div>
-    <div class="sec-body">
+function _panelHead(icon, title, req){
+  return `<div class="sec-panel-head"><span class="sec-panel-icon">${icon}</span><span class="sec-panel-title">${title}${req?`<span class="sec-panel-req"> *</span>`:''}</span></div>`;
+}
+
+function secPanelTitlu(){
+  return `<div class="sec-panel">
+    ${_panelHead('📌','Titlu',true)}
+    <div class="sec-panel-body">
       <p class="sec-hint">Titlul trebuie să fie concis și reprezentativ. Evitați titlurile vagi sau prea lungi.</p>
       <div class="fld"><label class="fld-label">Titlul articolului <span class="req">*</span></label>
         <input type="text" class="fld-input" id="f-titlu" placeholder="Introduceți titlul articolului..." oninput="onChange()"/>
@@ -1070,17 +1074,10 @@ function secTitlu(){
   </div>`;
 }
 
-// Secțiunea AUTORI — accordion
-function secAutoriHTML(){
-  const open = secActiva==='autori';
-  return `<div class="sec-wrap${open?' open':''}" id="sec-autori">
-    <div class="sec-header" onclick="toggleSec('autori')">
-      <span class="sec-header-icon">👤</span>
-      <span class="sec-header-title">Autori<span class="sec-header-req"> *</span></span>
-      <span class="sec-header-dot${isFilled('autori')?' ok':' warn'}" id="dot-autori"></span>
-      <span class="sec-header-arrow">▼</span>
-    </div>
-    <div class="sec-body">
+function secPanelAutori(){
+  return `<div class="sec-panel">
+    ${_panelHead('👤','Autori',true)}
+    <div class="sec-panel-body">
       <p class="sec-hint">Format: <strong>Prenume NUME</strong>. Ex: <strong>Andrei Ionuț POPESCU</strong>. Instituția și emailul apar ca notă de subsol.</p>
       <div id="autoriList"></div>
       <button class="btn-add-autor" onclick="addAutor()">+ Adaugă autor</button>
@@ -1088,17 +1085,10 @@ function secAutoriHTML(){
   </div>`;
 }
 
-// Secțiunea ABSTRACT — accordion
-function secAbstract(){
-  const open = secActiva==='abstract';
-  return `<div class="sec-wrap${open?' open':''}" id="sec-abstract">
-    <div class="sec-header" onclick="toggleSec('abstract')">
-      <span class="sec-header-icon">📄</span>
-      <span class="sec-header-title">Abstract</span>
-      <span class="sec-header-dot${isFilled('abstract')?' ok':''}" id="dot-abstract"></span>
-      <span class="sec-header-arrow">▼</span>
-    </div>
-    <div class="sec-body">
+function secPanelAbstract(){
+  return `<div class="sec-panel">
+    ${_panelHead('📄','Abstract',false)}
+    <div class="sec-panel-body">
       <p class="sec-hint">Recomandat: 150–200 cuvinte. Generați automat pe baza secțiunilor completate sau scrieți manual.</p>
       <div class="ab-actions" style="margin-bottom:10px;">
         <button class="btn-ai-gen" onclick="genAbstract()">✨ AI — Generează abstract (RO)</button>
@@ -1117,17 +1107,10 @@ function secAbstract(){
   </div>`;
 }
 
-// Secțiunea CUVINTE — accordion
-function secCuvinte(){
-  const open = secActiva==='cuvinte';
-  return `<div class="sec-wrap${open?' open':''}" id="sec-cuvinte">
-    <div class="sec-header" onclick="toggleSec('cuvinte')">
-      <span class="sec-header-icon">🔑</span>
-      <span class="sec-header-title">Cuvinte-cheie</span>
-      <span class="sec-header-dot${isFilled('cuvinte')?' ok':''}" id="dot-cuvinte"></span>
-      <span class="sec-header-arrow">▼</span>
-    </div>
-    <div class="sec-body">
+function secPanelCuvinte(){
+  return `<div class="sec-panel">
+    ${_panelHead('🔑','Cuvinte-cheie',false)}
+    <div class="sec-panel-body">
       <p class="sec-hint">5-7 cuvinte cheie separate prin virgulă.</p>
       <div class="fld"><label class="fld-label">Cuvinte-cheie</label>
         <input type="text" class="fld-input" id="f-cuvinte" placeholder="ex: educație, didactică, inovare, formare, curriculum" oninput="onChange()"/>
@@ -1137,17 +1120,10 @@ function secCuvinte(){
   </div>`;
 }
 
-// Secțiunea BIBLIO — accordion
-function secBiblio(){
-  const open = secActiva==='biblio';
-  return `<div class="sec-wrap${open?' open':''}" id="sec-biblio">
-    <div class="sec-header" onclick="toggleSec('biblio')">
-      <span class="sec-header-icon">📚</span>
-      <span class="sec-header-title">Bibliografie</span>
-      <span class="sec-header-dot${isFilled('biblio')?' ok':''}" id="dot-biblio"></span>
-      <span class="sec-header-arrow">▼</span>
-    </div>
-    <div class="sec-body">
+function secPanelBiblio(){
+  return `<div class="sec-panel">
+    ${_panelHead('📚','Bibliografie',false)}
+    <div class="sec-panel-body">
       <p class="sec-hint">Format APA, ordonate alfabetic. Ex: Ionescu, M. (2020). Titlul lucrării. Editura.</p>
       <div id="biblioList"></div>
       <button class="btn-add-bib" onclick="addBib()">+ Adaugă referință</button>
@@ -1155,31 +1131,27 @@ function secBiblio(){
   </div>`;
 }
 
-// Secțiuni rich text (tipuri + libere) — accordion cu AI bar
-function secRich(s){
-  const open = secActiva===s.id;
+function secPanelRich(s){
   const canDel = s.tip==='liber';
-  const filled = isFilled(s.id);
-  return `<div class="sec-wrap${open?' open':''}" id="sec-${s.id}">
-    <div class="sec-header" onclick="toggleSec('${s.id}')">
-      <span class="sec-header-icon">${s.icon||'📄'}</span>
-      <span class="sec-header-title">${s.label}${s.required?'<span class="sec-header-req"> *</span>':''}</span>
-      ${canDel?`<span class="sec-header-btns">
-        <button class="sec-hbtn" onclick="event.stopPropagation();renum('${s.id}')">✎</button>
-        <button class="sec-hbtn del" onclick="event.stopPropagation();delSec('${s.id}')">✕</button>
-      </span>`:''}
-      <span class="sec-header-dot${filled?' ok':s.required?' warn':''}" id="dot-${s.id}"></span>
-      <span class="sec-header-arrow">▼</span>
-    </div>
-    <div class="sec-body">
+  return `<div class="sec-panel">
+    ${_panelHead(s.icon||'📄', s.label+(canDel?` <button class="sec-hbtn" onclick="renum('${s.id}')" style="margin-left:8px;">✎</button><button class="sec-hbtn del" onclick="delSec('${s.id}')">✕</button>`:''), s.required)}
+    <div class="sec-panel-body">
       <p class="sec-hint">${s.hint||'Scrieți conținutul acestei secțiuni.'}</p>
       ${aiBar(s.id, s.label)}
       <div class="fld">${tb(s.id)}
-        <div class="rich-ed" id="rich-${s.id}" contenteditable="true" data-ph="${(s.hint||s.label+'...').split('.')[0]}..." oninput="onChange()"></div>
+        <div class="rich-ed" id="rich-${s.id}" contenteditable="true" data-ph="${(s.hint||s.label).split('.')[0]}..." oninput="onChange()"></div>
       </div>
     </div>
   </div>`;
 }
+
+// Vechile funcții secTitlu etc. nu mai sunt apelate — compatibilitate
+function secTitlu(){return '';}
+function secAutoriHTML(){return '';}
+function secAbstract(){return '';}
+function secCuvinte(){return '';}
+function secBiblio(){return '';}
+function secRich(s){return '';}
 
 function execF(cmd,val){document.execCommand(cmd,false,val||null);onChange();}
 
