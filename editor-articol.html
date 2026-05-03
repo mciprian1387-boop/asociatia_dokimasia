@@ -250,6 +250,25 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 .sb-item.dragging{opacity:0.3;}
 .sb-item.drag-over{border-top:2px solid var(--crimson);}
 
+/* Editare inline nume secțiuni */
+.si-label-wrap{flex:1;display:flex;align-items:center;gap:4px;min-width:0;}
+.si-label{font-weight:500;font-size:0.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
+.si-label-input{flex:1;font-size:0.77rem;font-family:'Source Serif 4',serif;font-weight:600;border:1px solid var(--crimson);border-radius:2px;padding:1px 5px;color:var(--crimson);outline:none;background:#fff;min-width:0;}
+.si-edit-hint{font-size:0.56rem;color:#ccc;white-space:nowrap;display:none;flex-shrink:0;}
+.sb-item:hover .si-edit-hint{display:inline;}
+
+/* Tooltipuri */
+[data-tip]{position:relative;}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1108ee;color:#fff;font-size:0.68rem;padding:5px 9px;border-radius:4px;z-index:9999;pointer-events:none;line-height:1.4;max-width:200px;white-space:normal;text-align:center;font-family:'Source Serif 4',serif;}
+[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1108ee;z-index:9999;pointer-events:none;}
+
+/* Ghid contextual */
+.sb-ghid{padding:10px 12px;background:linear-gradient(135deg,#fffbf0,#fdf5e0);border-top:2px solid var(--gold);font-size:0.72rem;color:#7a6030;line-height:1.6;flex-shrink:0;}
+.sb-ghid-title{font-weight:700;font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+.sb-ghid ul{margin-left:14px;}
+.sb-ghid li{margin-bottom:2px;}
+.sb-ghid-tip{display:flex;align-items:flex-start;gap:5px;margin-top:6px;font-size:0.68rem;background:rgba(184,150,62,0.12);border-radius:3px;padding:5px 7px;color:#5a4010;line-height:1.5;}
+
 /* TOAST */
 #toast-w{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:5px;}
 .toast{display:flex;align-items:center;gap:6px;background:#1a1108;color:#fff;padding:8px 13px;border-radius:3px;font-size:0.78rem;box-shadow:0 3px 14px rgba(0,0,0,0.2);animation:slideUp 0.2s ease;}
@@ -373,10 +392,10 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
     <!-- Butoane editor în dreapta tip-bar -->
     <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid rgba(255,255,255,0.15);flex-shrink:0;">
       <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">...</span></div>
-      <button onclick="previzualizeaza()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" title="Previzualizare articol în tab nou">👁 Preview</button>
-      <button onclick="deschideModalAI()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">✨ AI</button>
-      <button onclick="exportPDF()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">⬇ PDF</button>
-      <button onclick="exportDOCX()" style="background:#fff;color:#8B0000;border:none;padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">⬇ Word</button>
+      <button onclick="previzualizeaza()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Deschide articolul formatat ca publicație într-un tab nou. Poți printa sau salva ca PDF.">👁 Preview</button>
+      <button onclick="deschideModalAI()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Instrumente AI pentru întregul articol: generare abstract, cuvinte-cheie, corectare diacritice.">✨ AI</button>
+      <button onclick="exportPDF()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Exportă articolul ca fișier PDF gata de tipărire.">⬇ PDF</button>
+      <button onclick="exportDOCX()" style="background:#fff;color:#8B0000;border:none;padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Exportă articolul ca fișier Word (.doc) editabil.">⬇ Word</button>
     </div>
   </div>
 </div>
@@ -393,10 +412,26 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
       <div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării pentru a vedea structura.</div>
     </div>
     <div class="ss-foot">
-      <button class="btn-add-s" onclick="adaugaSecLibera()" id="btnAddSec" style="display:none;">+ Adaugă secțiune</button>
+      <button class="btn-add-s" onclick="adaugaSecLibera()" id="btnAddSec" style="display:none;"
+        data-tip="Adaugă o secțiune suplimentară liberă la finalul articolului">
+        + Adaugă secțiune liberă
+      </button>
       <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-      <div class="prog-txt"><span>Completare</span><span id="progPct">0%</span></div>
+      <div class="prog-txt"><span>Completare articol</span><span id="progPct">0%</span></div>
       <div class="prog-warn" id="progWarn"></div>
+    </div>
+    <!-- Ghid contextual -->
+    <div class="sb-ghid" id="sbGhid" style="display:none;">
+      <div class="sb-ghid-title">💡 Cum funcționează</div>
+      <ul>
+        <li><strong>Click</strong> pe o secțiune → o deschide</li>
+        <li><strong>Dublu-click</strong> pe nume → îl editezi</li>
+        <li><strong>Trage (⠿)</strong> secțiunile să le reordonezi</li>
+        <li>Punctul <span style="color:#66bb6a;">●</span> = completat, <span style="color:#ffa726;">●</span> = necesar</li>
+      </ul>
+      <div class="sb-ghid-tip">
+        💾 Conținutul se salvează automat la fiecare tastă.
+      </div>
     </div>
   </aside>
 
@@ -407,9 +442,41 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
       <div id="editorWelcome" class="editor-welcome">
         <div class="editor-welcome-icon">📝</div>
         <h2>Editor articol — Revista Dokimasia</h2>
-        <p>Bun venit! Istoricul tău de articole apare în dreapta.</p>
-        <p>Pentru a începe un articol nou, apasă butonul de mai jos.</p>
-        <div class="welcome-hint">→ Apasă <strong>+ Articol nou</strong> pentru a crea un articol</div>
+        <p style="font-size:0.95rem;color:var(--ink);font-weight:600;margin-bottom:4px;">Bun venit!</p>
+        <p>Selectați un articol din istoricul din dreapta sau creați unul nou.</p>
+
+        <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:18px 22px;margin-top:18px;text-align:left;max-width:420px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+          <div style="font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:12px;">Cum funcționează editorul</div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:0.84rem;color:var(--ink);line-height:1.5;">
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:1.1rem;flex-shrink:0;">📂</span>
+              <div><strong>Istoricul meu</strong> (dreapta) — toate articolele tale salvate. Apasă <em>Deschide</em> pentru a continua un articol.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:1.1rem;flex-shrink:0;">📋</span>
+              <div><strong>Structura articolului</strong> (stânga) — lista secțiunilor. <strong>Click</strong> pe o secțiune pentru a o deschide și edita.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:1.1rem;flex-shrink:0;">✏️</span>
+              <div><strong>Dublu-click</strong> pe numele unei secțiuni din stânga pentru a-l redenumi.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:1.1rem;flex-shrink:0;">⠿</span>
+              <div><strong>Trage</strong> secțiunile din stânga pentru a le reordona în articol.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:1.1rem;flex-shrink:0;">✨</span>
+              <div><strong>AI</strong> — fiecare secțiune are butoane AI pentru diacritice, îmbunătățire stil și generare conținut.</div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:1.1rem;flex-shrink:0;">💾</span>
+              <div><strong>Salvare automată</strong> — conținutul se salvează în Supabase la fiecare tastă. Poți reveni oricând.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="welcome-hint" style="margin-top:20px;">→ Apasă <strong>+ Articol nou</strong> în dreapta pentru a începe</div>
       </div>
       <!-- Panoul secțiunii active — completat dinamic -->
       <div id="secPanel" style="display:none;flex:1;overflow-y:auto;"></div>
@@ -927,17 +994,76 @@ function renderSidebar(){
   const fix=sectiuni.filter(s=>FIX_IDS.includes(s.id));
   const mob=sectiuni.filter(s=>!FIX_IDS.includes(s.id));
   let html=fix.map(s=>sbItem(s,false)).join('');
-  html+=`<div class="sb-divider">Secțiuni articol</div>`;
+  html+=`<div class="sb-divider">Secțiuni articol <span style="font-weight:400;text-transform:none;letter-spacing:0;">(trage ⠿ pentru a reordona)</span></div>`;
   html+=mob.map(s=>sbItem(s,s.tip!=='fix')).join('');
   document.getElementById('sbList').innerHTML=html;
   const b=document.getElementById('btnAddSec'); if(b) b.style.display='flex';
+  // Arată ghidul
+  const ghid=document.getElementById('sbGhid'); if(ghid) ghid.style.display='block';
   updateProg();
   initDrag();
 }
 
 function sbItem(s,drag){
   const f=isFilled(s.id);
-  return `<div class="sb-item ${s.id===secActiva?'active':''}" id="sb-${s.id}" onclick="activaSec('${s.id}')" ${drag?`draggable="true" data-id="${s.id}"`:''}>${drag?`<span class="si-drag">⠿</span>`:'<span style="width:12px"></span>'}<span class="si-icon">${s.icon||'📄'}</span><span class="si-label">${s.label}${s.required?'<span class="si-req"> *</span>':''}</span><span class="si-dot ${f?'ok':s.required?'warn':''}"></span><span class="si-acts">${s.tip==='liber'?`<button class="si-btn" onclick="event.stopPropagation();renum('${s.id}')" title="Redenumește">✎</button><button class="si-btn del" onclick="event.stopPropagation();delSec('${s.id}')" title="Șterge">✕</button>`:''}</span></div>`;
+  const canEdit=s.tip!=='fix'; // secțiunile fixe (titlu, autori etc.) nu se redenumesc
+  const canDel=s.tip==='liber';
+  const dragAttr=drag?`draggable="true" data-id="${s.id}"`:'';
+  const dragHandle=drag?`<span class="si-drag" data-tip="Trage pentru a reordona">⠿</span>`:'<span style="width:12px"></span>';
+  const editHint=canEdit?`<span class="si-edit-hint" title="Dublu-click pentru a edita numele">✎</span>`:'';
+  const acts=canDel?`<span class="si-acts">
+    <button class="si-btn del" onclick="event.stopPropagation();delSec('${s.id}')" data-tip="Șterge această secțiune suplimentară">✕</button>
+  </span>`:'';
+  const dblClick=canEdit?`ondblclick="event.stopPropagation();starteazaEditNume('${s.id}')"`:'' ;
+  return `<div class="sb-item ${s.id===secActiva?'active':''}" id="sb-${s.id}"
+    onclick="activaSec('${s.id}')" ${dragAttr} ${dblClick}
+    data-tip="${canEdit?'Click pentru a deschide · Dublu-click pentru a edita numele':'Click pentru a deschide această secțiune'}">
+    ${dragHandle}
+    <span class="si-icon">${s.icon||'📄'}</span>
+    <span class="si-label-wrap">
+      <span class="si-label" id="sil-${s.id}">${s.label}${s.required?'<span class="si-req"> *</span>':''}</span>
+      ${editHint}
+    </span>
+    <span class="si-dot ${f?'ok':s.required?'warn':''}" data-tip="${f?'Secțiune completată':'Secțiune necompletată'}"></span>
+    ${acts}
+  </div>`;
+}
+
+// Editare inline nume secțiune — dublu-click
+function starteazaEditNume(id){
+  const s=sectiuni.find(x=>x.id===id);
+  if(!s||s.tip==='fix') return;
+  const labelEl=document.getElementById('sil-'+id);
+  if(!labelEl) return;
+  const wrap=labelEl.parentElement;
+  const oldLabel=s.label;
+  // Înlocuiește label cu input
+  wrap.innerHTML=`<input class="si-label-input" id="inp-${id}" value="${escVal(oldLabel)}"
+    onclick="event.stopPropagation()"
+    onkeydown="if(event.key==='Enter'){event.preventDefault();terminaEditNume('${id}');}if(event.key==='Escape'){anuleazaEditNume('${id}','${escVal(oldLabel)}');}"
+    onblur="terminaEditNume('${id}')"
+    maxlength="60" autocomplete="off"/>`;
+  const inp=document.getElementById('inp-'+id);
+  if(inp){inp.focus();inp.select();}
+}
+
+function terminaEditNume(id){
+  const inp=document.getElementById('inp-'+id);
+  if(!inp) return;
+  const nouNume=inp.value.trim();
+  const s=sectiuni.find(x=>x.id===id);
+  if(s && nouNume) s.label=nouNume;
+  renderSidebar();
+  // Dacă secțiunea e activă, actualizează titlul în panel
+  if(secActiva===id){
+    const head=document.querySelector('.sec-panel-title');
+    if(head && s) head.childNodes[0].textContent=s.label;
+  }
+  onChange();
+}
+
+function anuleazaEditNume(id, vechi){
+  renderSidebar();
 }
 
 function isFilled(id){
@@ -1293,15 +1419,7 @@ function delSec(id){
   const el=document.getElementById('sec-'+id);if(el)el.remove();
   renderSidebar();onChange();
 }
-function renum(id){
-  const s=sectiuni.find(x=>x.id===id);if(!s)return;
-  const nv=prompt('Noul nume:',s.label);
-  if(!nv||!nv.trim())return;
-  s.label=nv.trim();
-  const sec=document.getElementById('sec-'+id);
-  if(sec){const h=sec.querySelector('h2');if(h)h.innerHTML=(s.icon||'📄')+' '+s.label;}
-  renderSidebar();onChange();
-}
+function renum(id){ starteazaEditNume(id); }
 
 // CHANGE
 function onChange(){updAbCnt();updKwCnt();updateProg();renderSidebar();schedAS();}
