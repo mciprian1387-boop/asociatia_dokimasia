@@ -568,59 +568,91 @@ let autorContor=2;
 let istoricArticole=[];
 
 // ══════════════════════════════════════════════════════════
-// AUTH — via auth.js
+// AUTH — citeşte sesiunea direct din window.sb (auth.js)
+// Nu depinde de onUserLoaded care nu e apelat de auth.js
 // ══════════════════════════════════════════════════════════
-window.onUserLoaded = function(user) {
+
+function initEditor(user) {
   if (!user) {
+    // Neautentificat — guard vizibil, rest ascuns
     document.getElementById('authGuard').classList.remove('hidden');
+    document.getElementById('siteHeader').classList.add('site-hidden');
+    document.getElementById('appBody').classList.add('site-hidden');
     return;
   }
+
   currentUser = user;
+  sbClient = window.sb;
 
-  // Inițializează client Supabase
-  sbClient = window.sb || (typeof supabase !== 'undefined' ? supabase.createClient(SB_URL, SB_ANON) : null);
+  console.log('[Editor] User:', user.email);
+  console.log('[Editor] sbClient:', sbClient ? 'OK' : 'NULL');
 
-  console.log('[Auth] User autentificat:', user.email);
-  console.log('[Auth] sbClient:', sbClient ? 'OK' : 'NULL — verifică auth.js');
-
-  // Test rapid de conectivitate
-  if(sbClient){
-    sbClient.from('articole_draft').select('id').limit(1).then(({data,error})=>{
-      if(error){
-        console.error('[Supabase] Eroare conectivitate:', error.message, error.code);
-        setBadge('err', '⚠ Supabase: '+error.message.slice(0,30));
-      } else {
-        console.log('[Supabase] Conexiune OK. Draft-uri găsite:', data?.length||0);
-      }
-    });
-  }
-
-  // Ascunde guard, arată app
+  // Ascunde guard, arată tot
   document.getElementById('authGuard').classList.add('hidden');
   document.getElementById('siteHeader').classList.remove('site-hidden');
   document.getElementById('appBody').classList.remove('site-hidden');
 
-  // UI
-  document.getElementById('shUser').textContent = user.email.split('@')[0];
-  document.getElementById('accountLabel').textContent = user.email.split('@')[0];
-  document.getElementById('loggedOut').style.display = 'none';
-  document.getElementById('loggedIn').style.display = 'block';
+  // UI header/sidebar
+  const displayName = (user.user_metadata?.full_name || user.user_metadata?.name || user.email).split(/[ @]/)[0];
+  const shUser = document.getElementById('shUser');
+  const accLabel = document.getElementById('accountLabel');
+  if (shUser) shUser.textContent = displayName;
+  if (accLabel) accLabel.textContent = displayName;
+  const loggedOut = document.getElementById('loggedOut');
+  const loggedIn = document.getElementById('loggedIn');
+  if (loggedOut) loggedOut.style.display = 'none';
+  if (loggedIn) loggedIn.style.display = 'block';
+  if (user.email === 'm.ciprian1387@gmail.com') {
+    const adminBtn = document.getElementById('adminBtn');
+    if (adminBtn) adminBtn.style.display = 'block';
+  }
+
   setBadge('', 'Nesalvat');
 
-  incarcaIstoric();
+  // Test conectivitate Supabase
+  sbClient.from('articole_draft').select('id').limit(1).then(({data, error}) => {
+    if (error) {
+      console.error('[Supabase] Eroare:', error.message, '| Cod:', error.code);
+      setBadge('err', '⚠ ' + (error.message||'Eroare DB').slice(0, 35));
+    } else {
+      console.log('[Supabase] OK — draft-uri user:', data?.length || 0);
+      incarcaIstoric();
+    }
+  });
 
+  // Dacă vine cu ?tip= din revista.html
   const tipParam = new URLSearchParams(window.location.search).get('tip');
   if (tipParam && TIPURI[tipParam]) {
     setTimeout(() => {
       tipSelectat = tipParam;
-      buildSectiuni();
-      renderAll();
-      activaSec('titlu');
-      updateTipBar();
+      buildSectiuni(); renderAll(); activaSec('titlu'); updateTipBar();
       toast('Editor configurat: ' + TIPURI[tipParam].label, 'ok');
-    }, 300);
+    }, 400);
   }
-};
+}
+
+// Pornire: aşteaptă auth.js să creeze window.sb, apoi citeşte sesiunea
+function startEditor() {
+  if (!window.sb) {
+    // auth.js nu a terminat încă — mai aşteaptă
+    setTimeout(startEditor, 100);
+    return;
+  }
+  window.sb.auth.getUser().then(({ data: { user } }) => {
+    initEditor(user || null);
+  });
+
+  // Ascultă schimbările de sesiune (login/logout în timp real)
+  window.sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') initEditor(session?.user || null);
+    if (event === 'SIGNED_OUT') initEditor(null);
+  });
+}
+
+// Compatibilitate cu auth.js care poate apela onUserLoaded
+window.onUserLoaded = function(user) { initEditor(user); };
+
+document.addEventListener('DOMContentLoaded', startEditor);
 
 // ══════════════════════════════════════════════════════════
 // SUPABASE AUTOSAVE — robust cu diagnostic
