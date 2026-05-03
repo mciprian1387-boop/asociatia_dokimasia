@@ -253,6 +253,7 @@ textarea.field-input{resize:vertical;min-height:120px;}
         <span id="progressPct">0%</span>
       </div>
       <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div id="progress-warn" style="font-size:0.72rem;margin-top:6px;min-height:14px;line-height:1.4;"></div>
     </div>
   </aside>
 
@@ -329,23 +330,62 @@ textarea.field-input{resize:vertical;min-height:120px;}
 
 <script>
 // ══════════════════════════════════════════
-// STATE
+// CONFIG TIPURI
 // ══════════════════════════════════════════
 const WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
 
-const sectiuniFixe = [
-  { id:'titlu',     icon:'📌', label:'Titlu',           required:true,  tip:'fix' },
-  { id:'autori',    icon:'👤', label:'Autori',          required:true,  tip:'fix' },
-  { id:'abstract',  icon:'📄', label:'Abstract',        required:false, tip:'fix' },
-  { id:'cuvinte',   icon:'🔑', label:'Cuvinte-cheie',   required:false, tip:'fix' },
-  { id:'intro',     icon:'🔹', label:'Introducere',     required:false, tip:'fix' },
-  { id:'corp',      icon:'📝', label:'Conținut',        required:false, tip:'fix' },
-  { id:'concluzii', icon:'✅', label:'Concluzii',       required:false, tip:'fix' },
-  { id:'biblio',    icon:'📚', label:'Bibliografie',    required:false, tip:'fix' },
+const TIPURI = {
+  practic: {
+    label: 'Practici educaționale și inovare didactică',
+    icon: '🎓',
+    culoare: '#1565c0',
+    sectiuni: [
+      { id:'intro',    icon:'🔹', label:'Introducere și context',         required:true,  hint:'Prezentați contextul educațional în care se desfășoară activitatea, nevoia identificată și scopul demersului didactic.' },
+      { id:'demers',   icon:'📋', label:'Descrierea demersului didactic', required:true,  hint:'Descrieți în detaliu activitatea didactică: etape, metode utilizate, resurse, mod de organizare a clasei și desfășurarea efectivă.' },
+      { id:'rezultate',icon:'📊', label:'Rezultate și observații',        required:true,  hint:'Prezentați rezultatele obținute, reacțiile elevilor, aspectele pozitive și dificultățile întâmpinate.' },
+      { id:'concluzii',icon:'✅', label:'Concluzii și recomandări',       required:true,  hint:'Sintetizați concluziile și formulați recomandări pentru cadre didactice interesate de o abordare similară.' },
+    ]
+  },
+  cercetare: {
+    label: 'Cercetare și analiză în educație',
+    icon: '🔬',
+    culoare: '#1b5e20',
+    sectiuni: [
+      { id:'intro',      icon:'🔹', label:'Introducere și fundamentare teoretică', required:true,  hint:'Prezentați contextul teoretic al cercetării, literatura de specialitate relevantă, problema de cercetare și ipotezele.' },
+      { id:'metodologie',icon:'⚙️', label:'Metodologie',                           required:true,  hint:'Descrieți designul cercetării, participanții, instrumentele de colectare a datelor și procedura de analiză.' },
+      { id:'rezultate',  icon:'📊', label:'Rezultate și analiză',                  required:true,  hint:'Prezentați datele colectate, rezultatele analizei și interpretarea acestora în raport cu ipotezele formulate.' },
+      { id:'concluzii',  icon:'✅', label:'Concluzii și implicații',               required:true,  hint:'Sintetizați concluziile cercetării, limitele studiului și implicațiile practice sau teoretice pentru domeniu.' },
+    ]
+  },
+  dezvoltare: {
+    label: 'Dezvoltare educațională și profesională',
+    icon: '🌱',
+    culoare: '#4a148c',
+    sectiuni: [
+      { id:'intro',      icon:'🔹', label:'Introducere și context',                        required:true,  hint:'Prezentați contextul instituțional sau profesional, necesitatea intervenției și obiectivele urmărite.' },
+      { id:'interventie',icon:'🏗️', label:'Descrierea intervenției / proiectului',         required:true,  hint:'Descrieți în detaliu proiectul, programul sau intervenția: etape, parteneri, activități, resurse utilizate.' },
+      { id:'rezultate',  icon:'📊', label:'Rezultate și observații',                       required:true,  hint:'Prezentați rezultatele obținute, impactul asupra beneficiarilor și aspectele relevante observate în implementare.' },
+      { id:'concluzii',  icon:'✅', label:'Concluzii și implicații',                       required:true,  hint:'Sintetizați concluziile, lecțiile învățate și recomandările pentru proiecte sau intervenții similare.' },
+    ]
+  }
+};
+
+const SECTIUNI_COMUNE_INAINTE = [
+  { id:'titlu',   icon:'📌', label:'Titlu',         required:true,  tip:'fix' },
+  { id:'autori',  icon:'👤', label:'Autori',        required:true,  tip:'fix' },
+  { id:'abstract',icon:'📄', label:'Abstract',      required:false, tip:'fix' },
+  { id:'cuvinte', icon:'🔑', label:'Cuvinte-cheie', required:false, tip:'fix' },
+];
+const SECTIUNI_COMUNE_DUPA = [
+  { id:'biblio',  icon:'📚', label:'Bibliografie',  required:false, tip:'fix' },
 ];
 
-let sectiuniLibere = []; // { id, label }
-let sectiuneActiva = 'titlu';
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let tipSelectat = null; // 'practic' | 'cercetare' | 'dezvoltare'
+let sectiuniLibere = [];
+let sectiuneActiva = 'selectare-tip';
 let autori = [{ nume:'', institutie:'', email:'' }];
 let biblio = [''];
 let sectiuniLibereContor = 0;
@@ -354,9 +394,47 @@ let sectiuniLibereContor = 0;
 // INIT
 // ══════════════════════════════════════════
 function init() {
+  renderEditorTip();
   renderSidebar();
+  activareSectiune('selectare-tip');
+}
+
+// ══════════════════════════════════════════
+// SELECTARE TIP
+// ══════════════════════════════════════════
+function selectTip(tip) {
+  tipSelectat = tip;
+  const t = TIPURI[tip];
+  // Update card-uri vizual
+  document.querySelectorAll('.tip-card').forEach(el => el.classList.remove('active'));
+  const card = document.getElementById('tip-card-' + tip);
+  if (card) card.classList.add('active');
+  document.getElementById('btn-confirma-tip').disabled = false;
+  document.getElementById('tip-selectat-label').textContent = t.label;
+  document.getElementById('tip-selectat-label').style.display = 'block';
+}
+
+function confirmaTip() {
+  if (!tipSelectat) return;
+  // Rebuild editor sections
   renderEditorSections();
+  renderSidebar();
   activareSectiune('titlu');
+  toast('Structura articolului a fost configurată pentru: ' + TIPURI[tipSelectat].label, 'ok');
+}
+
+// ══════════════════════════════════════════
+// GET SECTIUNI CURENTE
+// ══════════════════════════════════════════
+function getSectiuniCurente() {
+  if (!tipSelectat) return [];
+  const tipSect = TIPURI[tipSelectat].sectiuni.map(s => ({...s, tip:'fix'}));
+  return [
+    ...SECTIUNI_COMUNE_INAINTE,
+    ...tipSect,
+    ...SECTIUNI_COMUNE_DUPA,
+    ...sectiuniLibere,
+  ];
 }
 
 // ══════════════════════════════════════════
@@ -364,14 +442,34 @@ function init() {
 // ══════════════════════════════════════════
 function renderSidebar() {
   const list = document.getElementById('sectionList');
-  const toate = [...sectiuniFixe, ...sectiuniLibere];
-  list.innerHTML = toate.map(s => `
-    <div class="section-item ${s.id === sectiuneActiva ? 'active' : ''}" onclick="activareSectiune('${s.id}')" id="nav-${s.id}">
-      <span class="si-icon">${s.icon || '📄'}</span>
-      <span class="si-label">${s.label}</span>
-      <span class="si-status ${isFilled(s.id) ? 'filled' : ''}" title="${isFilled(s.id) ? 'Completat' : 'Gol'}"></span>
-      ${s.tip === 'liber' ? `<button class="si-del" onclick="event.stopPropagation();stergeSectiuLibera('${s.id}')" title="Șterge">✕</button>` : ''}
-    </div>`).join('');
+  
+  // Tipul lucrării mereu primul
+  let html = `
+    <div class="section-item ${sectiuneActiva === 'selectare-tip' ? 'active' : ''} ${tipSelectat ? 'tip-done' : 'tip-pending'}"
+      onclick="activareSectiune('selectare-tip')" id="nav-selectare-tip" style="border-left:3px solid var(--gold);">
+      <span class="si-icon">📂</span>
+      <span class="si-label" style="font-weight:700;">Tipul lucrării</span>
+      <span class="si-status ${tipSelectat ? 'filled' : ''}" title="${tipSelectat ? TIPURI[tipSelectat].label : 'Neselectat'}"></span>
+    </div>`;
+
+  if (tipSelectat) {
+    const t = TIPURI[tipSelectat];
+    html += `<div style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 16px 4px;border-top:1px solid var(--border);margin-top:4px;">${t.icon} ${t.label.split(' ').slice(0,2).join(' ')}...</div>`;
+    
+    const toate = getSectiuniCurente();
+    html += toate.map(s => {
+      const filled = isFilled(s.id);
+      const isReq = s.required;
+      return `<div class="section-item ${s.id === sectiuneActiva ? 'active' : ''}" onclick="activareSectiune('${s.id}')" id="nav-${s.id}">
+        <span class="si-icon">${s.icon || '📄'}</span>
+        <span class="si-label">${s.label}${isReq ? ' <span style="color:var(--crimson);font-size:0.7rem;">*</span>' : ''}</span>
+        <span class="si-status ${filled ? 'filled' : ''}" title="${filled ? 'Completat' : isReq ? 'Obligatoriu' : 'Gol'}"></span>
+        ${s.tip === 'liber' ? `<button class="si-del" onclick="event.stopPropagation();stergeSectiuLibera('${s.id}')" title="Șterge">✕</button>` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  list.innerHTML = html;
   updateProgress();
 }
 
@@ -379,19 +477,33 @@ function isFilled(id) {
   if (id === 'autori') return autori.some(a => a.nume.trim());
   if (id === 'biblio') return biblio.some(b => b.trim());
   const el = document.getElementById('field-' + id);
-  if (!el) {
-    const re = document.getElementById('rich-' + id);
-    return re ? re.innerText.trim().length > 0 : false;
-  }
-  return el.value.trim().length > 0;
+  if (el) return el.value.trim().length > 0;
+  const re = document.getElementById('rich-' + id);
+  return re ? re.innerText.trim().length > 0 : false;
 }
 
 function updateProgress() {
-  const toate = [...sectiuniFixe, ...sectiuniLibere];
-  const completate = toate.filter(s => isFilled(s.id)).length;
-  const pct = Math.round((completate / toate.length) * 100);
+  if (!tipSelectat) {
+    document.getElementById('progressPct').textContent = '0%';
+    document.getElementById('progressFill').style.width = '0%';
+    return;
+  }
+  const toate = getSectiuniCurente();
+  const obligatorii = toate.filter(s => s.required);
+  const completateOblig = obligatorii.filter(s => isFilled(s.id)).length;
+  const completateTot = toate.filter(s => isFilled(s.id)).length;
+  const pct = Math.round((completateTot / toate.length) * 100);
+  const pctOblig = Math.round((completateOblig / obligatorii.length) * 100);
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressFill').style.background = pctOblig < 100 ? 'var(--crimson)' : 'var(--gold)';
+  // Avertizare secțiuni obligatorii
+  const warn = document.getElementById('progress-warn');
+  if (warn) {
+    const lipsa = obligatorii.filter(s => !isFilled(s.id)).map(s => s.label);
+    warn.textContent = lipsa.length ? '⚠ Lipsesc: ' + lipsa.join(', ') : '';
+    warn.style.color = lipsa.length ? 'var(--crimson)' : '#4caf50';
+  }
 }
 
 function activareSectiune(id) {
@@ -406,36 +518,112 @@ function activareSectiune(id) {
 }
 
 // ══════════════════════════════════════════
-// EDITOR SECTIONS
+// RENDER EDITOR
 // ══════════════════════════════════════════
+function renderEditorTip() {
+  const area = document.getElementById('editorArea');
+  area.innerHTML = `
+    <div class="editor-section active" id="sec-selectare-tip">
+      <div class="section-header">
+        <h2>📂 Tipul lucrării</h2>
+        <div class="section-header-line"></div>
+        <p class="section-hint">Selectați tipul lucrării pentru a configura structura editorului. Această alegere determină secțiunile disponibile și ghidurile de redactare.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
+        ${Object.entries(TIPURI).map(([key, t]) => `
+          <div class="tip-card" id="tip-card-${key}" onclick="selectTip('${key}')"
+            style="border:2px solid var(--border);border-radius:8px;padding:20px;cursor:pointer;transition:all 0.2s;text-align:center;">
+            <div style="font-size:2rem;margin-bottom:10px;">${t.icon}</div>
+            <div style="font-weight:700;color:var(--ink);font-size:0.95rem;margin-bottom:8px;font-family:'Playfair Display',serif;">${t.label}</div>
+            <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">
+              ${t.sectiuni.map(s => '• ' + s.label).join('<br>')}
+            </div>
+          </div>`).join('')}
+      </div>
+      <div id="tip-selectat-label" style="display:none;font-size:0.88rem;color:var(--gold);font-weight:600;margin-bottom:16px;padding:10px 14px;background:var(--paper-dark);border-radius:4px;border-left:3px solid var(--gold);">—</div>
+      <button id="btn-confirma-tip" onclick="confirmaTip()" disabled
+        style="background:var(--crimson);color:#fff;padding:12px 28px;border:none;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;opacity:0.5;transition:opacity 0.2s;"
+        onmouseover="if(!this.disabled)this.style.background='var(--crimson-dark)'"
+        onmouseout="this.style.background='var(--crimson)'">
+        Confirmă și continuă →
+      </button>
+    </div>`;
+
+  // CSS pentru tip-card active
+  if (!document.getElementById('tip-card-style')) {
+    const style = document.createElement('style');
+    style.id = 'tip-card-style';
+    style.textContent = `
+      .tip-card:hover { border-color: var(--crimson) !important; background: var(--paper); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+      .tip-card.active { border-color: var(--crimson) !important; background: #fff8f8; box-shadow: 0 4px 16px rgba(139,0,0,0.12); }
+      .tip-card.active div:first-child { filter: drop-shadow(0 0 4px rgba(139,0,0,0.3)); }
+      #btn-confirma-tip:not([disabled]) { opacity: 1 !important; }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
 function renderEditorSections() {
   const area = document.getElementById('editorArea');
-  area.innerHTML = sectiuniFixe.map(s => renderSectiune(s)).join('') +
-    sectiuniLibere.map(s => renderSectiuneLibera(s)).join('');
-  // Re-attach events
+  const t = TIPURI[tipSelectat];
+
+  // Rebuild all sections
+  let html = `<div class="editor-section" id="sec-selectare-tip">
+    <div class="section-header">
+      <h2>📂 Tipul lucrării</h2>
+      <div class="section-header-line"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
+      ${Object.entries(TIPURI).map(([key, tip]) => `
+        <div class="tip-card ${tipSelectat===key?'active':''}" id="tip-card-${key}" onclick="selectTip('${key}')"
+          style="border:2px solid var(--border);border-radius:8px;padding:20px;cursor:pointer;transition:all 0.2s;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:10px;">${tip.icon}</div>
+          <div style="font-weight:700;color:var(--ink);font-size:0.95rem;margin-bottom:8px;font-family:'Playfair Display',serif;">${tip.label}</div>
+          <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">${tip.sectiuni.map(s=>'• '+s.label).join('<br>')}</div>
+        </div>`).join('')}
+    </div>
+    <button id="btn-confirma-tip" onclick="confirmaTip()"
+      style="background:var(--crimson);color:#fff;padding:12px 28px;border:none;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">
+      Schimbă tipul →
+    </button>
+  </div>`;
+
+  // Secțiuni comune înainte
+  SECTIUNI_COMUNE_INAINTE.forEach(s => { html += renderSectiuneHtml(s); });
+
+  // Secțiunile specifice tipului
+  t.sectiuni.forEach((s, idx) => {
+    html += renderSectiuneHtml({...s, tip:'fix', nrSectiune: idx+1});
+  });
+
+  // Secțiuni comune după
+  SECTIUNI_COMUNE_DUPA.forEach(s => { html += renderSectiuneHtml(s); });
+
+  // Secțiuni libere
+  sectiuniLibere.forEach(s => { html += renderSectiuneLibera(s); });
+
+  area.innerHTML = html;
   attachRichEditors();
   renderAutori();
   renderBiblio();
 }
 
-function renderSectiune(s) {
+function renderSectiuneHtml(s) {
   const hints = {
-    titlu: 'Titlul trebuie să fie concis, clar și reprezentativ pentru conținut.',
-    autori: 'Adăugați toți autorii contribuției.',
-    abstract: 'Rezumați conținutul articolului în 150-200 de cuvinte.',
-    cuvinte: 'Introduceți 5-7 cuvinte cheie separate prin virgulă.',
-    intro: 'Prezentați contextul general, problema de cercetare și obiectivele studiului.',
-    corp: 'Conținutul principal al articolului, structurat în subsecțiuni dacă este necesar.',
-    concluzii: 'Sintetizați rezultatele și contribuțiile principale ale lucrării.',
-    biblio: 'Listați sursele utilizate în format APA, ordonate alfabetic.',
+    titlu: 'Titlul trebuie să fie concis, clar și reprezentativ pentru conținut. Evitați titlurile prea lungi sau prea vagi.',
+    autori: 'Adăugați toți autorii contribuției cu datele de contact și afilierea instituțională.',
+    abstract: 'Rezumați conținutul articolului în 150-200 de cuvinte: contextul, metodologia, rezultatele și concluzia.',
+    cuvinte: 'Introduceți 5-7 cuvinte cheie separate prin virgulă, relevante pentru conținutul articolului.',
+    biblio: 'Listați sursele utilizate în format APA, ordonate alfabetic. Ex: Ionescu, M. (2020). Titlul lucrării. Editura.',
   };
+  const hint = s.hint || hints[s.id] || 'Completați conținutul acestei secțiuni.';
 
   if (s.id === 'autori') return `
     <div class="editor-section" id="sec-autori">
       <div class="section-header">
         <h2>${s.icon} ${s.label}</h2>
         <div class="section-header-line"></div>
-        <p class="section-hint">${hints.autori}</p>
+        <p class="section-hint">${hint}</p>
       </div>
       <div id="autoriList"></div>
       <button class="btn-add-author" onclick="adaugaAutor()">+ Adaugă autor</button>
@@ -446,7 +634,7 @@ function renderSectiune(s) {
       <div class="section-header">
         <h2>${s.icon} ${s.label}</h2>
         <div class="section-header-line"></div>
-        <p class="section-hint">${hints.biblio}</p>
+        <p class="section-hint">${hint}</p>
       </div>
       <div id="biblioList"></div>
       <button class="btn-add-bib" onclick="adaugaBibRef()">+ Adaugă referință</button>
@@ -457,7 +645,7 @@ function renderSectiune(s) {
       <div class="section-header">
         <h2>${s.icon} ${s.label} <span style="color:var(--crimson);font-size:0.8rem;">*</span></h2>
         <div class="section-header-line"></div>
-        <p class="section-hint">${hints.titlu}</p>
+        <p class="section-hint">${hint}</p>
       </div>
       <div class="field-group">
         <label class="field-label">Titlul articolului <span class="req">*</span></label>
@@ -474,7 +662,7 @@ function renderSectiune(s) {
       <div class="section-header">
         <h2>${s.icon} ${s.label}</h2>
         <div class="section-header-line"></div>
-        <p class="section-hint">${hints.cuvinte}</p>
+        <p class="section-hint">${hint}</p>
       </div>
       <div class="field-group">
         <label class="field-label">Cuvinte-cheie</label>
@@ -483,34 +671,33 @@ function renderSectiune(s) {
       </div>
     </div>`;
 
-  // Rich text sections
-  const richIds = ['abstract','intro','corp','concluzii'];
-  if (richIds.includes(s.id)) return `
+  // Secțiune rich text (toate celelalte)
+  const nrLabel = s.nrSectiune ? `${s.nrSectiune}. ` : '';
+  const tipLabel = tipSelectat ? `<span style="font-size:0.68rem;letter-spacing:1px;background:var(--paper-dark);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--muted);margin-left:8px;vertical-align:middle;">${TIPURI[tipSelectat].icon} ${TIPURI[tipSelectat].label.split(' ').slice(0,2).join(' ')}</span>` : '';
+  return `
     <div class="editor-section" id="sec-${s.id}">
       <div class="section-header">
-        <h2>${s.icon} ${s.label}</h2>
+        <h2>${s.icon} ${nrLabel}${s.label}${s.required ? ' <span style="color:var(--crimson);font-size:0.8rem;">*</span>' : ''} ${s.nrSectiune ? tipLabel : ''}</h2>
         <div class="section-header-line"></div>
-        <p class="section-hint">${hints[s.id]}</p>
+        <p class="section-hint">${hint}</p>
       </div>
       <div class="field-group">
         <div class="rich-toolbar">
-          <button onclick="fmt('bold')" title="Bold"><b>B</b></button>
-          <button onclick="fmt('italic')" title="Italic"><i>I</i></button>
-          <button onclick="fmt('underline')" title="Subliniat"><u>U</u></button>
+          <button onclick="fmt('bold')"><b>B</b></button>
+          <button onclick="fmt('italic')"><i>I</i></button>
+          <button onclick="fmt('underline')"><u>U</u></button>
           <div class="tb-sep"></div>
-          <button onclick="fmt('insertUnorderedList')" title="Listă">• Listă</button>
-          <button onclick="fmt('insertOrderedList')" title="Listă numerotată">1. Listă</button>
+          <button onclick="fmt('insertUnorderedList')">• Listă</button>
+          <button onclick="fmt('insertOrderedList')">1. Listă</button>
           <div class="tb-sep"></div>
-          <button onclick="fmt('justifyFull')" title="Justify">≡</button>
+          <button onclick="fmt('justifyFull')">≡</button>
         </div>
         <div class="rich-editor" id="rich-${s.id}" contenteditable="true"
-          data-placeholder="Scrieți conținutul secțiunii ${s.label.toLowerCase()} aici..."
+          data-placeholder="${hint.split('.')[0]}..."
           oninput="onRichChange()" onblur="onRichChange()"></div>
         ${s.id === 'abstract' ? '<div class="field-count" id="abstract-count">0 cuvinte</div>' : ''}
       </div>
     </div>`;
-
-  return '';
 }
 
 function renderSectiuneLibera(s) {
@@ -603,14 +790,19 @@ function updateBib(i, val) { biblio[i] = val; onFieldChange(); }
 // SECȚIUNI LIBERE
 // ══════════════════════════════════════════
 function adaugaSectiuLibera() {
+  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
   sectiuniLibereContor++;
   const id = 'liber_' + sectiuniLibereContor;
-  const label = 'Secțiunea ' + sectiuniLibereContor;
+  const label = 'Secțiunea suplimentară ' + sectiuniLibereContor;
   sectiuniLibere.push({ id, icon:'📄', label, tip:'liber' });
   const area = document.getElementById('editorArea');
+  // Insert before biblio section
+  const biblioSec = document.getElementById('sec-biblio');
   const div = document.createElement('div');
   div.innerHTML = renderSectiuneLibera({ id, label });
-  area.appendChild(div.firstElementChild);
+  const newEl = div.firstElementChild;
+  if (biblioSec) area.insertBefore(newEl, biblioSec);
+  else area.appendChild(newEl);
   const re = document.getElementById('rich-' + id);
   if (re) { re.dataset.empty = 'true'; re.addEventListener('input', function(){ this.dataset.empty = this.innerText.trim()===''?'true':'false'; }); }
   renderSidebar();
@@ -646,7 +838,6 @@ function fmt(cmd) { document.execCommand(cmd, false, null); }
 function onFieldChange() {
   updatePreview();
   renderSidebar();
-  // Cuvinte-cheie counter
   const kw = document.getElementById('field-cuvinte');
   const kwCount = document.getElementById('kw-count');
   if (kw && kwCount) {
@@ -658,7 +849,6 @@ function onFieldChange() {
 function onRichChange() {
   updatePreview();
   renderSidebar();
-  // Abstract word count
   const ab = document.getElementById('rich-abstract');
   const abCount = document.getElementById('abstract-count');
   if (ab && abCount) {
@@ -673,31 +863,37 @@ function onRichChange() {
 // ══════════════════════════════════════════
 function updatePreview() {
   const preview = document.getElementById('previewPage');
+  if (!tipSelectat) {
+    preview.innerHTML = '<div class="preview-empty">Selectați tipul lucrării pentru a începe.</div>';
+    return;
+  }
   const titlu = (document.getElementById('field-titlu')||{}).value || '';
   const subtitlu = (document.getElementById('field-subtitlu')||{}).value || '';
   const autoriStr = autori.filter(a=>a.nume).map(a=>`${a.nume}${a.institutie?' ('+a.institutie+')':''}`).join(', ');
-  const institutii = autori.filter(a=>a.institutie).map(a=>a.institutie).join(' | ');
   const abstract = (document.getElementById('rich-abstract')||{}).innerHTML || '';
   const cuvinte = (document.getElementById('field-cuvinte')||{}).value || '';
-  const intro = (document.getElementById('rich-intro')||{}).innerHTML || '';
-  const corp = (document.getElementById('rich-corp')||{}).innerHTML || '';
-  const concluzii = (document.getElementById('rich-concluzii')||{}).innerHTML || '';
   const biblioFilled = biblio.filter(Boolean);
+  const t = TIPURI[tipSelectat];
 
   if (!titlu && !autoriStr) {
-    preview.innerHTML = '<div class="preview-empty">Completați câmpurile din stânga pentru a vedea previzualizarea.</div>';
+    preview.innerHTML = '<div class="preview-empty">Completați câmpurile pentru a vedea previzualizarea.</div>';
     return;
   }
 
   let html = '';
-  if (titlu) html += `<div class="pv-titlu">${titlu}${subtitlu ? '<br><span style="font-size:10pt;font-weight:normal;text-transform:none;font-style:italic;">' + subtitlu + '</span>' : ''}</div>`;
+  if (titlu) html += `<div class="pv-titlu">${titlu}${subtitlu?'<br><span style="font-size:10pt;font-weight:normal;text-transform:none;font-style:italic;">'+subtitlu+'</span>':''}</div>`;
   if (autoriStr) html += `<div class="pv-autor">${autoriStr}</div>`;
   if (abstract && abstract.replace(/<[^>]+>/g,'').trim()) html += `<div class="pv-abstract"><strong>Abstract:</strong> ${abstract}</div>`;
   if (cuvinte) html += `<p class="pv-kw"><strong>Cuvinte-cheie:</strong> ${cuvinte}</p>`;
-  if (intro && intro.replace(/<[^>]+>/g,'').trim()) html += `<div class="pv-sectiune">1. Introducere</div><div class="pv-corp">${intro}</div>`;
-  if (corp && corp.replace(/<[^>]+>/g,'').trim()) html += `<div class="pv-sectiune">Conținut</div><div class="pv-corp">${corp}</div>`;
 
-  // Sectiuni libere
+  let nr = 1;
+  t.sectiuni.forEach(s => {
+    const re = document.getElementById('rich-' + s.id);
+    if (re && re.innerText.trim()) {
+      html += `<div class="pv-sectiune">${nr++}. ${s.label}</div><div class="pv-corp">${re.innerHTML}</div>`;
+    }
+  });
+
   sectiuniLibere.forEach(s => {
     const re = document.getElementById('rich-' + s.id);
     if (re && re.innerText.trim()) {
@@ -705,7 +901,6 @@ function updatePreview() {
     }
   });
 
-  if (concluzii && concluzii.replace(/<[^>]+>/g,'').trim()) html += `<div class="pv-sectiune">Concluzii</div><div class="pv-corp">${concluzii}</div>`;
   if (biblioFilled.length) html += `<div class="pv-sectiune">Bibliografie</div>` + biblioFilled.map((b,i)=>`<div class="pv-bib">${i+1}. ${b}</div>`).join('');
 
   preview.innerHTML = html || '<div class="preview-empty">Completați câmpurile...</div>';
@@ -715,6 +910,7 @@ function updatePreview() {
 // AI
 // ══════════════════════════════════════════
 function deschideAI() {
+  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
   document.getElementById('aiOverlay').classList.add('open');
   document.getElementById('aiSpinner').style.display = 'none';
   document.getElementById('aiFooter').style.display = 'flex';
@@ -726,100 +922,54 @@ async function ruleazaAI() {
   const opt = document.querySelector('input[name="ai-opt"]:checked').value;
   document.getElementById('aiSpinner').style.display = 'block';
   document.getElementById('aiFooter').style.display = 'none';
-
-  // Construiește contextul
   const titlu = (document.getElementById('field-titlu')||{}).value || '';
-  const corpText = (document.getElementById('rich-corp')||{}).innerText || '';
-  const introText = (document.getElementById('rich-intro')||{}).innerText || '';
-  const concluziiText = (document.getElementById('rich-concluzii')||{}).innerText || '';
-  const context = [titlu, introText, corpText, concluziiText].filter(Boolean).join('\n\n');
-
-  const prompturi = {
-    abstract: `Bazat pe textul următor, generează un abstract academic de 150-200 cuvinte în limba română, cu diacritice corecte. Returnează DOAR textul abstractului, fără titlu sau etichetă:\n\n${context}`,
-    keywords: `Bazat pe textul următor, extrage 5-7 cuvinte-cheie relevante în limba română, separate prin virgulă. Returnează DOAR cuvintele-cheie:\n\n${context}`,
-    intro: `Bazat pe titlul și conținutul următor, generează o secțiune de Introducere de 150-250 cuvinte în limba română, cu diacritice corecte. Include: context general, problema de cercetare, scopul și obiectivele. Returnează DOAR textul introducerii:\n\nTitlu: ${titlu}\n\n${corpText}`,
-    concluzii: `Bazat pe conținutul următor, generează o secțiune de Concluzii de 100-200 cuvinte în limba română, cu diacritice corecte. Sintetizează rezultatele și contribuțiile principale. Returnează DOAR textul concluziilor:\n\n${context}`,
-    diacritice: `Corectează diacriticele românești (ă, â, î, ș, ț) și greșelile gramaticale evidente din textul următor. Returnează DOAR textul corectat:\n\n${context}`,
-  };
-
+  const t = TIPURI[tipSelectat];
+  const sectiuniText = t.sectiuni.map(s => {
+    const re = document.getElementById('rich-' + s.id);
+    return re ? re.innerText.trim() : '';
+  }).filter(Boolean).join('\n\n');
+  const context = [titlu, sectiuniText].filter(Boolean).join('\n\n');
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch(WORKER_URL + '/ai-editor', {
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key': '__CLAUDE_KEY__',
-        'anthropic-version':'2023-06-01'
-      },
-      body: JSON.stringify({
-        model:'claude-opus-4-7',
-        max_tokens:1000,
-        messages:[{ role:'user', content: prompturi[opt] }]
-      })
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ opt, context, titlu, tipLucrare: t.label })
     });
-
-    // Fallback la Worker dacă cheia nu e setată direct
-    if (!resp.ok) throw new Error('direct');
     const data = await resp.json();
-    const rezultat = data.content[0].text.trim();
-    aplicaRezultatAI(opt, rezultat);
+    if (!data.success) throw new Error(data.error);
+    aplicaRezultatAI(opt, data.text);
   } catch(e) {
-    // Folosește Worker-ul ca proxy
-    try {
-      const resp2 = await fetch(WORKER_URL + '/ai-editor', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ opt, context, titlu })
-      });
-      const data2 = await resp2.json();
-      if (!data2.success) throw new Error(data2.error);
-      aplicaRezultatAI(opt, data2.text);
-    } catch(e2) {
-      toast('Eroare AI: ' + e2.message, 'err');
-    }
+    toast('Eroare AI: ' + e.message, 'err');
   }
-
   document.getElementById('aiSpinner').style.display = 'none';
   document.getElementById('aiFooter').style.display = 'flex';
   inchideAI();
 }
 
 function aplicaRezultatAI(opt, text) {
-  if (opt === 'abstract') {
-    const el = document.getElementById('rich-abstract');
-    if (el) { el.innerHTML = text; el.dataset.empty = 'false'; }
-    activareSectiune('abstract');
-    toast('Abstract generat!', 'ok');
-  } else if (opt === 'keywords') {
-    const el = document.getElementById('field-cuvinte');
-    if (el) el.value = text;
-    activareSectiune('cuvinte');
-    toast('Cuvinte-cheie extrase!', 'ok');
-  } else if (opt === 'intro') {
-    const el = document.getElementById('rich-intro');
-    if (el) { el.innerHTML = text; el.dataset.empty = 'false'; }
-    activareSectiune('intro');
-    toast('Introducere generată!', 'ok');
-  } else if (opt === 'concluzii') {
-    const el = document.getElementById('rich-concluzii');
-    if (el) { el.innerHTML = text; el.dataset.empty = 'false'; }
-    activareSectiune('concluzii');
-    toast('Concluzii generate!', 'ok');
-  } else if (opt === 'diacritice') {
-    // Aplică la toate câmpurile rich
-    ['abstract','intro','corp','concluzii'].forEach(id => {
+  const setRich = (id, val) => {
+    const el = document.getElementById('rich-' + id);
+    if (el) { el.innerHTML = val; el.dataset.empty = 'false'; }
+  };
+  if (opt === 'abstract') { setRich('abstract', text); activareSectiune('abstract'); toast('Abstract generat!', 'ok'); }
+  else if (opt === 'keywords') { const el = document.getElementById('field-cuvinte'); if (el) el.value = text; activareSectiune('cuvinte'); toast('Cuvinte-cheie extrase!', 'ok'); }
+  else if (opt === 'intro') { setRich('intro', text); activareSectiune('intro'); toast('Introducere generată!', 'ok'); }
+  else if (opt === 'concluzii') { setRich('concluzii', text); activareSectiune('concluzii'); toast('Concluzii generate!', 'ok'); }
+  else if (opt === 'diacritice') {
+    ['abstract','intro','corp','concluzii','metodologie','demers','interventie','rezultate'].forEach(id => {
       const el = document.getElementById('rich-' + id);
       if (el && el.innerText.trim()) el.innerHTML = text;
     });
     toast('Diacritice corectate!', 'ok');
   }
-  onRichChange();
-  onFieldChange();
+  onRichChange(); onFieldChange();
 }
 
 // ══════════════════════════════════════════
-// EXPORT DOCX
+// EXPORT
 // ══════════════════════════════════════════
 function exportDOCX() {
+  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
   const html = buildDocumentHTML();
   const blob = new Blob([html], { type:'application/msword' });
   const a = document.createElement('a');
@@ -830,10 +980,8 @@ function exportDOCX() {
   toast('Fișier Word descărcat!', 'ok');
 }
 
-// ══════════════════════════════════════════
-// EXPORT PDF
-// ══════════════════════════════════════════
 function exportPDF() {
+  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
   const html = buildDocumentHTML(true);
   const w = window.open('', '_blank');
   w.document.write(html);
@@ -851,10 +999,8 @@ function buildDocumentHTML(forPDF = false) {
   const emailStr = autori.filter(a=>a.email).map(a=>a.email).join(', ');
   const abstract = (document.getElementById('rich-abstract')||{}).innerHTML || '';
   const cuvinte = (document.getElementById('field-cuvinte')||{}).value || '';
-  const intro = (document.getElementById('rich-intro')||{}).innerHTML || '';
-  const corp = (document.getElementById('rich-corp')||{}).innerHTML || '';
-  const concluzii = (document.getElementById('rich-concluzii')||{}).innerHTML || '';
   const biblioFilled = biblio.filter(Boolean);
+  const t = TIPURI[tipSelectat];
 
   let body = '';
   if (titlu) body += `<h1 style="font-size:14pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:6pt;">${titlu}</h1>`;
@@ -862,60 +1008,44 @@ function buildDocumentHTML(forPDF = false) {
   if (autoriStr) body += `<p style="text-align:center;font-weight:bold;margin-bottom:2pt;">${autoriStr}</p>`;
   if (institutiiStr) body += `<p style="text-align:center;font-style:italic;color:#555;margin-bottom:2pt;">${institutiiStr}</p>`;
   if (emailStr) body += `<p style="text-align:center;font-size:10pt;color:#555;margin-bottom:12pt;">${emailStr}</p>`;
-
   if (abstract && abstract.replace(/<[^>]+>/g,'').trim())
     body += `<div style="border-left:3px solid #8B0000;padding:8pt 12pt;background:#fafafa;margin-bottom:10pt;"><strong>Abstract:</strong> ${abstract}</div>`;
   if (cuvinte)
     body += `<p style="font-style:italic;margin-bottom:16pt;"><strong>Cuvinte-cheie:</strong> ${cuvinte}</p>`;
 
-  let sectNr = 1;
-  if (intro && intro.replace(/<[^>]+>/g,'').trim()) {
-    body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${sectNr++}. Introducere</h2><div style="text-align:justify;margin-bottom:10pt;">${intro}</div>`;
-  }
-  if (corp && corp.replace(/<[^>]+>/g,'').trim()) {
-    body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${sectNr++}. Conținut</h2><div style="text-align:justify;margin-bottom:10pt;">${corp}</div>`;
-  }
-  sectiuniLibere.forEach(s => {
+  let nr = 1;
+  t.sectiuni.forEach(s => {
     const re = document.getElementById('rich-' + s.id);
     if (re && re.innerText.trim()) {
-      body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${sectNr++}. ${s.label}</h2><div style="text-align:justify;margin-bottom:10pt;">${re.innerHTML}</div>`;
+      body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${nr++}. ${s.label}</h2><div style="text-align:justify;margin-bottom:10pt;">${re.innerHTML}</div>`;
     }
   });
-  if (concluzii && concluzii.replace(/<[^>]+>/g,'').trim()) {
-    body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${sectNr++}. Concluzii</h2><div style="text-align:justify;margin-bottom:10pt;">${concluzii}</div>`;
-  }
+
+  sectiuniLibere.forEach(s => {
+    const re = document.getElementById('rich-' + s.id);
+    if (re && re.innerText.trim())
+      body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${nr++}. ${s.label}</h2><div style="text-align:justify;margin-bottom:10pt;">${re.innerHTML}</div>`;
+  });
+
   if (biblioFilled.length) {
     body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">Bibliografie</h2>`;
     body += biblioFilled.map((b,i)=>`<p style="font-size:11pt;margin-bottom:4pt;">${i+1}. ${b}</p>`).join('');
   }
 
-  const printStyle = forPDF ? `
-    @page { size:A4; margin:2.5cm; }
-    @media print { body { margin:0; } }` : '';
-
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
-  <style>
-    ${printStyle}
-    body { font-family:Times New Roman,Times,serif; font-size:12pt; line-height:1.5; margin:2.5cm; }
-    h1,h2,h3 { font-family:Times New Roman,Times,serif; }
-    p { margin-bottom:6pt; text-align:justify; }
-  </style></head><body>${body}</body></html>`;
+  const printStyle = forPDF ? `@page{size:A4;margin:2.5cm;}@media print{body{margin:0;}}` : '';
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${printStyle}body{font-family:Times New Roman,Times,serif;font-size:12pt;line-height:1.5;margin:2.5cm;}h1,h2,h3{font-family:Times New Roman,Times,serif;}p{margin-bottom:6pt;text-align:justify;}</style></head><body>${body}</body></html>`;
 }
 
 // ══════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════
-function slugify(str) {
-  return str.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,40) || 'articol';
-}
-
+function slugify(str) { return str.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,40)||'articol'; }
 function toast(msg, type='ok') {
   const wrap = document.getElementById('toast-wrap');
   const el = document.createElement('div');
-  el.className = 'toast ' + type;
-  el.textContent = msg;
+  el.className = 'toast '+type; el.textContent = msg;
   wrap.appendChild(el);
-  setTimeout(() => el.remove(), 4000);
+  setTimeout(()=>el.remove(), 4000);
 }
 
 // Start
