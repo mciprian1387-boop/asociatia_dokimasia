@@ -693,27 +693,41 @@ function toggleIstoric(){
   arrow.classList.toggle('open');
 }
 
-// State cache pentru datele din panelul curent
+// State cache — sursa de adevăr între schimbările de panel
 let _stateCache = {};
 
 function colDate(){
-  // Citește din DOM dacă există, altfel din cache
-  const d={tip:tipSelectat, autori:[...autori], biblio:[...biblio]};
-  d.titlu = (document.getElementById('f-titlu')||{}).value || _stateCache.titlu || '';
-  d.subtitlu = (document.getElementById('f-subtitlu')||{}).value || _stateCache.subtitlu || '';
-  d.cuvinte = (document.getElementById('f-cuvinte')||{}).value || _stateCache.cuvinte || '';
-  d.abRo = (document.getElementById('rich-abstract')||{}).innerHTML || _stateCache.abRo || '';
-  d.abEn = (document.getElementById('rich-abstract-en')||{}).innerHTML || _stateCache.abEn || '';
-  d.sectiuniLibere=sectiuni.filter(s=>s.tip==='liber').map(s=>({
-    id:s.id, label:s.label, icon:s.icon, hint:s.hint,
-    continut:(document.getElementById('rich-'+s.id)||{}).innerHTML || _stateCache['r_'+s.id] || ''
-  }));
+  // Actualizează cache-ul cu ce e vizibil în DOM acum
+  const ft=document.getElementById('f-titlu'); if(ft) _stateCache.titlu=ft.value;
+  const fs=document.getElementById('f-subtitlu'); if(fs) _stateCache.subtitlu=fs.value;
+  const fc=document.getElementById('f-cuvinte'); if(fc) _stateCache.cuvinte=fc.value;
+  const ra=document.getElementById('rich-abstract'); if(ra) _stateCache.abRo=ra.innerHTML;
+  const re=document.getElementById('rich-abstract-en'); if(re) _stateCache.abEn=re.innerHTML;
   sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
     const el=document.getElementById('rich-'+s.id);
-    d['r_'+s.id] = el ? el.innerHTML : (_stateCache['r_'+s.id]||'');
+    if(el) _stateCache['r_'+s.id]=el.innerHTML;
   });
-  // Actualizează cache
-  Object.assign(_stateCache, d);
+  _stateCache.autori=autori;
+  _stateCache.biblio=biblio;
+
+  // Construiește obiectul de salvat din cache (complet)
+  const d={
+    tip: tipSelectat,
+    autori: [...autori],
+    biblio: [...biblio],
+    titlu: _stateCache.titlu||'',
+    subtitlu: _stateCache.subtitlu||'',
+    cuvinte: _stateCache.cuvinte||'',
+    abRo: _stateCache.abRo||'',
+    abEn: _stateCache.abEn||'',
+    sectiuniLibere: sectiuni.filter(s=>s.tip==='liber').map(s=>({
+      id:s.id, label:s.label, icon:s.icon, hint:s.hint,
+      continut: _stateCache['r_'+s.id]||''
+    }))
+  };
+  sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
+    d['r_'+s.id]=_stateCache['r_'+s.id]||'';
+  });
   return d;
 }
 function gv(id){const e=document.getElementById(id);return e?e.value:'';}
@@ -780,14 +794,19 @@ async function incarcaArticol(id){
     });
   }
 
-  // Populează cache-ul cu datele articolului pentru persistență între panel-uri
+  // Populează cache-ul COMPLET cu datele din Supabase — sursa de adevăr la refresh
   _stateCache = {
-    titlu: d.titlu||'', subtitlu: d.subtitlu||'',
-    cuvinte: d.cuvinte||'', abRo: d.abRo||'', abEn: d.abEn||'',
-    autori: autori, biblio: biblio
+    titlu: d.titlu||'',
+    subtitlu: d.subtitlu||'',
+    cuvinte: d.cuvinte||'',
+    abRo: d.abRo||'',
+    abEn: d.abEn||'',
+    autori: autori,
+    biblio: biblio
   };
+  // Toate secțiunile rich text
   sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
-    if(d['r_'+s.id]) _stateCache['r_'+s.id]=d['r_'+s.id];
+    _stateCache['r_'+s.id] = d['r_'+s.id]||'';
   });
 
   updateTipBar();
@@ -981,24 +1000,23 @@ function _salvezDinPanel(){
   const ft=document.getElementById('f-titlu'); if(ft) { /* onChange se ocupă deja */ }
 }
 
-// Restaurează datele în panelul nou deschis
+// Restaurează datele în panelul nou deschis — citește direct din _stateCache (populat din Supabase)
 function _restaurezInPanel(id, s){
-  const d=colDate();
   setTimeout(()=>{
     if(id==='titlu'){
-      setFld('f-titlu', d.titlu||'');
-      setFld('f-subtitlu', d.subtitlu||'');
+      setFld('f-titlu', _stateCache.titlu||'');
+      setFld('f-subtitlu', _stateCache.subtitlu||'');
     } else if(id==='cuvinte'){
-      setFld('f-cuvinte', d.cuvinte||'');
+      setFld('f-cuvinte', _stateCache.cuvinte||'');
     } else if(id==='abstract'){
-      setRich('rich-abstract', d.abRo||'');
-      setRich('rich-abstract-en', d.abEn||'');
+      setRich('rich-abstract', _stateCache.abRo||'');
+      setRich('rich-abstract-en', _stateCache.abEn||'');
     } else if(id==='autori'){
       renderAutori();
     } else if(id==='biblio'){
       renderBiblio();
     } else {
-      setRich('rich-'+id, d['r_'+id]||'');
+      setRich('rich-'+id, _stateCache['r_'+id]||'');
     }
     updAbCnt(); updKwCnt(); updateProg();
   }, 30);
