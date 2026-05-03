@@ -392,6 +392,7 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
     <!-- Butoane editor în dreapta tip-bar -->
     <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid rgba(255,255,255,0.15);flex-shrink:0;">
       <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">...</span></div>
+      <button onclick="document.getElementById('modalIndicatii').classList.add('open')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.2);padding:5px 10px;border-radius:4px;font-size:0.73rem;font-family:'Georgia',serif;cursor:pointer;">💡 Indicații</button>
       <button onclick="previzualizeaza()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Deschide articolul formatat ca publicație într-un tab nou. Poți printa sau salva ca PDF.">👁 Preview</button>
       <button onclick="deschideModalAI()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Instrumente AI pentru întregul articol: generare abstract, cuvinte-cheie, corectare diacritice.">✨ AI</button>
       <button onclick="exportPDF()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Exportă articolul ca fișier PDF gata de tipărire.">⬇ PDF</button>
@@ -419,19 +420,6 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
       <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
       <div class="prog-txt"><span>Completare articol</span><span id="progPct">0%</span></div>
       <div class="prog-warn" id="progWarn"></div>
-    </div>
-    <!-- Ghid contextual -->
-    <div class="sb-ghid" id="sbGhid" style="display:none;">
-      <div class="sb-ghid-title">💡 Cum funcționează</div>
-      <ul>
-        <li><strong>Click</strong> pe o secțiune → o deschide</li>
-        <li><strong>Dublu-click</strong> pe nume → îl editezi</li>
-        <li><strong>Trage (⠿)</strong> secțiunile să le reordonezi</li>
-        <li>Punctul <span style="color:#66bb6a;">●</span> = completat, <span style="color:#ffa726;">●</span> = necesar</li>
-      </ul>
-      <div class="sb-ghid-tip">
-        💾 Conținutul se salvează automat la fiecare tastă.
-      </div>
     </div>
   </aside>
 
@@ -497,6 +485,33 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
       <button onclick="autosave()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;background:none;border:1px solid var(--border);border-radius:4px;font-size:0.78rem;font-family:'Source Serif 4',serif;color:var(--muted);cursor:pointer;margin-top:5px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">💾 Salvează acum</button>
     </div>
   </aside>
+</div>
+
+<!-- MODAL INDICAȚII EDITARE -->
+<div class="modal-ov" id="modalIndicatii">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-head">
+      <h3>💡 Indicații editare</h3>
+      <button class="modal-x" onclick="document.getElementById('modalIndicatii').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;padding:20px 24px;">
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:1.3rem;flex-shrink:0;">✏️</span>
+        <div style="font-size:0.88rem;line-height:1.6;color:var(--ink);">
+          <strong>Dublu-click pe numele unei secțiuni</strong> din stânga pentru a o redenumi.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:1.3rem;flex-shrink:0;">💾</span>
+        <div style="font-size:0.88rem;line-height:1.6;color:var(--ink);">
+          <strong>Salvare automată</strong> — conținutul se salvează în baza de date la fiecare tastă. Poți reveni oricând.
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ok" onclick="document.getElementById('modalIndicatii').classList.remove('open')">Am înțeles</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL TIP ARTICOL NOU -->
@@ -998,8 +1013,6 @@ function renderSidebar(){
   html+=mob.map(s=>sbItem(s,s.tip!=='fix')).join('');
   document.getElementById('sbList').innerHTML=html;
   const b=document.getElementById('btnAddSec'); if(b) b.style.display='flex';
-  // Arată ghidul
-  const ghid=document.getElementById('sbGhid'); if(ghid) ghid.style.display='block';
   updateProg();
   initDrag();
 }
