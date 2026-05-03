@@ -59,7 +59,7 @@
     .revista-hero-subtitle { font-size:0.93rem; color:rgba(255,255,255,0.85); font-style:italic; margin-bottom:12px; line-height:1.55; text-align:center; }
     .revista-hero-desc { font-size:0.84rem; color:rgba(255,255,255,0.7); line-height:1.75; text-align:justify; }
     .hero-ornament { color:var(--gold-light); font-size:0.9rem; margin:10px 0 0; letter-spacing:8px; opacity:0.6; }
-    .hero-nav-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:16px; }
+    .hero-nav-buttons { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:16px; }
     .hero-nav-btn { background:#fff; border:2px solid #fff; color:var(--crimson); padding:9px 10px; border-radius:3px; font-size:0.76rem; font-family:'Source Serif 4',serif; font-weight:700; letter-spacing:0.5px; cursor:pointer; transition:background 0.2s, color 0.2s, border-color 0.2s; white-space:nowrap; text-align:center; width:100%; }
     .hero-nav-btn:hover { background:var(--gold); border-color:var(--gold); color:#fff; }
     /* Hero cards */
@@ -384,17 +384,11 @@
   </nav>
   <div class="revista-subnav">
     <button class="hero-nav-btn" onclick="showTab('despre')">Despre revistă</button>
-    <button class="hero-nav-btn" onclick="showTab('domenii')">Domenii și secțiuni</button>
+    <button class="hero-nav-btn" onclick="showTab('domenii')">Arii tematice</button>
     <button class="hero-nav-btn" onclick="showTab('ghid')">Ghid pentru autori</button>
-    <button class="hero-nav-btn" onclick="showTab('procedura')">Procedura de trimitere</button>
-    <button class="hero-nav-btn" onclick="showTab('adeverinte')">Adeverințe și documente</button>
-    <button class="hero-nav-btn" onclick="showTab('contributie')">Contribuție editorială</button>
-    <button class="hero-nav-btn" onclick="showTab('trimitere')">Trimitere articol</button>
-    <button class="hero-nav-btn" onclick="showTab('faq')">Întrebări frecvente</button>
-    <button class="hero-nav-btn" onclick="showTab('etica')">Politică editorială</button>
-    <button class="hero-nav-btn" onclick="showTab('documente')">Documente</button>
+    <button class="hero-nav-btn" onclick="showTab('trimitere')">Trimite un articol</button>
     <button class="hero-nav-btn" onclick="showTab('colegiu')">Colegiul editorial</button>
-    <button class="hero-nav-btn" onclick="showTab('arhiva')">Arhivă reviste</button>
+    <button class="hero-nav-btn" onclick="showTab('arhiva')">Arhivă</button>
   </div>
 </header>
 
@@ -443,7 +437,7 @@
     <div style="text-align:center;">
       <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
       <h1>Revista Dokimasia</h1>
-      <p class="revista-hero-subtitle">Educație, formare și implicare civică</p>
+      <p class="revista-hero-subtitle">Inovație și perspective în educație</p>
     </div>
     <!-- Card dreapta: Publică -->
     <div class="hero-card" onclick="showTab('trimitere')" style="cursor:pointer;">
@@ -465,82 +459,90 @@
     <!-- DESPRE -->
     <div class="info-panel active" id="panel-despre">
       <h2>Despre revistă</h2>
-      <p>Revista Dokimasia „Educație, formare și implicare civică" este o publicație dedicată promovării articolelor, studiilor, analizelor, exemplelor de bună practică și materialelor aplicate din toate domeniile educației și din ariile conexe acesteia. Revista își propune să ofere un spațiu deschis pentru idei relevante, perspective actuale și contribuții valoroase care susțin dezvoltarea educației, formarea continuă și consolidarea implicării civice în școală și în comunitate.</p>
-      <p>Publicația se adresează tuturor celor interesați de educație, cu accent pe persoanele care activează în acest domeniu: cadre didactice, directori, consilieri școlari, cercetători, formatori, inspectori, experți, studenți, reprezentanți ai organizațiilor educaționale și ai societății civile, precum și altor profesioniști care contribuie la dezvoltarea mediului educațional. Revista acceptă contribuții din partea oricărui autor interesat, în măsura în care materialele transmise respectă standardele editoriale și au relevanță pentru tematica publicației.</p>
-      <p>Revista Dokimasia are un profil mixt, dar cu accent aplicat, urmărind valorificarea materialelor care pot aduce un sprijin real în activitatea educațională. Sunt încurajate atât contribuțiile cu fundament teoretic, cât și cele orientate spre practică, pornind de la experiențe concrete, intervenții educaționale, proiecte, cercetări, analize de caz, reflecții profesionale și modele de bună practică.</p>
-      <p>Revista apare de patru ori pe an și este disponibilă în format online, cu posibilitatea realizării unei versiuni tipărite, la cerere. Materialele publicate trebuie să fie originale și sunt analizate din perspectivă editorială, în vederea asigurării calității, coerenței și relevanței conținutului publicat.</p>
-      <p>Un element distinctiv al revistei îl reprezintă expertiza evaluatorilor, diversitatea temelor abordate și preocuparea constantă pentru calitatea produsului final. Totodată, revista urmărește să ofere autorilor nu doar un spațiu de publicare, ci și un cadru de valorizare profesională, prin documente relevante, precum adeverințe și diplome, utile în anumite etape ale mobilității personalului didactic și ale evoluției în carieră.</p>
-      <p>Editată sub egida Asociației Dokimasia, revista susține dialogul profesional, schimbul de experiență și construirea unei comunități active în jurul educației, formării și implicării civice, contribuind la promovarea unui mediu educațional modern, responsabil, colaborativ și orientat spre progres.</p>
+      <div style="font-size:1rem;line-height:1.85;">
+        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Revista Dokimasia – Inovație și perspective în educație este o publicație educațională interdisciplinară dedicată promovării ideilor, studiilor și practicilor relevante din domeniul educației și din ariile conexe acesteia. Revista își propune să ofere un cadru deschis pentru valorificarea contribuțiilor care susțin dezvoltarea profesională, inovarea didactică și adaptarea educației la cerințele actuale.</p>
+
+        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Profilul revistei</p>
+        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Revista are un profil mixt, integrând atât articole cu fundament teoretic și științific, cât și contribuții cu caracter aplicativ. Prin această abordare, publicația facilitează dialogul între cercetare și practică, încurajând materiale care oferă soluții concrete și perspective relevante pentru activitatea educațională.</p>
+
+        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Public țintă</p>
+        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Publicația se adresează cadrelor didactice din toate nivelurile de învățământ, personalului de conducere, consilierilor școlari, cercetătorilor, formatorilor, studenților și tuturor celor interesați de domeniul educației și de dezvoltarea acestuia.</p>
+
+        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Tipuri de contribuții</p>
+        <p style="text-align:justify;text-indent:2em;margin-bottom:0.5em;">Revista publică o gamă variată de materiale, inclusiv:</p>
+        <ul style="margin-left:3em;margin-bottom:0.5em;line-height:2;">
+          <li>articole de specialitate</li>
+          <li>studii și cercetări educaționale</li>
+          <li>analize și reflecții profesionale</li>
+          <li>exemple de bună practică</li>
+          <li>proiecte educaționale</li>
+          <li>recenzii și interviuri etc.</li>
+        </ul>
+        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Materialele pot avea caracter teoretic sau aplicativ, fiind încurajate contribuțiile care valorifică experiențe concrete și rezultate relevante.</p>
+
+        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Criterii editoriale</p>
+        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Materialele transmise sunt analizate din perspectivă editorială, în vederea asigurării calității, coerenței și relevanței conținutului publicat. Revista urmărește să ofere autorilor un cadru de valorizare profesională și să contribuie la dezvoltarea unei comunități educaționale active.</p>
+
+        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Periodicitate</p>
+        <p style="text-align:justify;text-indent:2em;margin-bottom:0;">Revista apare de patru ori pe an și este disponibilă în format online, cu posibilitatea realizării unei versiuni tipărite, la cerere. Materialele publicate trebuie să fie originale și să respecte standardele editoriale ale publicației.</p>
+      </div>
     </div>
 
     <!-- DOMENII -->
     <div class="info-panel" id="panel-domenii">
-      <h2>Domenii și secțiuni tematice</h2>
-      <p>Revista Dokimasia are un profil interdisciplinar și aplicat, fiind deschisă contribuțiilor din toate domeniile educației și din ariile conexe acesteia. Revista încurajează publicarea materialelor care aduc valoare teoretică, practică și metodologică, precum și a celor care susțin dezvoltarea profesională, inovarea didactică și implicarea civică.</p>
-      <p>Articolele pot fi încadrate, orientativ, în următoarele secțiuni tematice:</p>
-      <div class="domenii-grid">
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 1</div>
-          <div class="d-titlu">Didactică și practici de predare</div>
-          <div class="d-desc">Metode de predare, strategii didactice, proiectarea activităților de învățare, adaptarea demersului educațional și exemple de bună practică aplicate la clasă.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 2</div>
-          <div class="d-titlu">Evaluare și progres școlar</div>
-          <div class="d-desc">Evaluarea rezultatelor școlare, instrumente și metode de evaluare, feedback educațional, monitorizarea progresului și intervențiile pentru îmbunătățirea performanței.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 3</div>
-          <div class="d-titlu">Literație, competențe de bază și învățare remedială</div>
-          <div class="d-desc">Dezvoltarea competențelor de literație, recuperarea pierderilor în învățare, consolidarea competențelor de bază și activitățile remediale desfășurate în mediul școlar.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 4</div>
-          <div class="d-titlu">Educație incluzivă și sprijin educațional</div>
-          <div class="d-desc">Incluziune, echitate, acces la educație, adaptarea activităților la diversitatea elevilor, sprijinul acordat grupurilor vulnerabile și prevenirea excluziunii școlare.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 5</div>
-          <div class="d-titlu">Consiliere, orientare și dezvoltare personală</div>
-          <div class="d-desc">Consiliere școlară, orientare educațională și profesională, dezvoltare socio-emoțională, motivație, autocunoaștere și sprijin pentru traseul educațional al elevilor.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 6</div>
-          <div class="d-titlu">Management educațional și leadership</div>
-          <div class="d-desc">Conducerea organizațiilor școlare, managementul proiectelor educaționale, cultura organizațională, leadershipul școlar și dezvoltarea instituțională.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 7</div>
-          <div class="d-titlu">Digitalizare și inovare în educație</div>
-          <div class="d-desc">Utilizarea tehnologiei în procesul de predare–învățare–evaluare, resurse digitale, platforme educaționale, competențe digitale și integrarea tehnologiei în educație.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 8</div>
-          <div class="d-titlu">Formare continuă și dezvoltare profesională</div>
-          <div class="d-desc">Formarea inițială și continuă a cadrelor didactice, mentoratul, coachingul, comunitățile de învățare profesională și dezvoltarea competențelor profesiei didactice.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 9</div>
-          <div class="d-titlu">Proiecte educaționale și parteneriate</div>
-          <div class="d-desc">Proiecte implementate în școli sau în alte contexte educaționale, parteneriate dintre școală, familie și comunitate, colaborarea cu ONG-uri și alte instituții relevante.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 10</div>
-          <div class="d-titlu">Educație civică și implicare în comunitate</div>
-          <div class="d-desc">Participarea activă, responsabilitatea civică, voluntariatul, cultura democratică, drepturile și valorile europene, implicarea elevilor și profesorilor în viața comunității.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 11</div>
-          <div class="d-titlu">Cercetare și perspective interdisciplinare</div>
-          <div class="d-desc">Studii, cercetări, analize, reflecții și contribuții interdisciplinare legate de educație, formare, politici educaționale sau domeniile conexe.</div>
-        </div>
-        <div class="domeniu-card">
-          <div class="d-nr">Secțiunea 12</div>
-          <div class="d-titlu">Recenzii, interviuri și resurse educaționale</div>
-          <div class="d-desc">Recenzii de carte, prezentări de resurse utile pentru profesori și elevi, interviuri cu specialiști și materiale cu caracter informativ sau inspirațional.</div>
-        </div>
+      <h2>Arii tematice</h2>
+      <div style="font-size:1rem;line-height:1.85;">
+
+        <p style="font-weight:bold;color:var(--crimson);margin-bottom:0.3em;">Practici educaționale și inovare didactică</p>
+        <p style="font-style:italic;text-align:justify;margin-bottom:0.6em;">Include contribuții cu caracter aplicativ, centrate pe activitatea didactică și pe intervențiile educaționale realizate în mediul școlar.</p>
+        <p style="margin-bottom:0.3em;">Exemple de contribuții:</p>
+        <ul style="margin-left:2em;margin-bottom:1.4em;line-height:2;">
+          <li>articole și materiale metodice</li>
+          <li>planuri de lecție și scenarii didactice</li>
+          <li>auxiliare curriculare și suporturi educaționale</li>
+          <li>fișe de lucru, instrumente de evaluare și resurse educaționale</li>
+          <li>activități remediale și de sprijin</li>
+          <li>utilizarea tehnologiei și a resurselor digitale în educație</li>
+          <li>exemple de bună practică și intervenții didactice</li>
+          <li>comunicări scurte și note de practică</li>
+          <li>alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
+        </ul>
+
+        <p style="font-weight:bold;color:var(--crimson);margin-bottom:0.3em;">Cercetare și analiză în educație</p>
+        <p style="font-style:italic;text-align:justify;margin-bottom:0.6em;">Include contribuții cu caracter științific, teoretic sau analitic, care abordează fenomenul educațional din perspective diverse.</p>
+        <p style="margin-bottom:0.3em;">Exemple de contribuții:</p>
+        <ul style="margin-left:2em;margin-bottom:1.4em;line-height:2;">
+          <li>studii și cercetări educaționale</li>
+          <li>articole de specialitate</li>
+          <li>analize și reflecții asupra practicilor educaționale</li>
+          <li>sinteze tematice și articole de tip „review"</li>
+          <li>lucrări interdisciplinare</li>
+          <li>evaluarea impactului intervențiilor educaționale</li>
+          <li>studii de caz educaționale</li>
+          <li>recenzii de lucrări și resurse educaționale</li>
+          <li>interviuri și contribuții de specialitate</li>
+          <li>alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
+        </ul>
+
+        <p style="font-weight:bold;color:var(--crimson);margin-bottom:0.3em;">Dezvoltare educațională și profesională</p>
+        <p style="font-style:italic;text-align:justify;margin-bottom:0.6em;">Include contribuții privind evoluția sistemului educațional și dezvoltarea profesională a cadrelor didactice, precum și implicarea instituțiilor educaționale în comunitate.</p>
+        <p style="margin-bottom:0.3em;">Exemple de contribuții:</p>
+        <ul style="margin-left:2em;margin-bottom:1.4em;line-height:2;">
+          <li>articole de reflecție profesională</li>
+          <li>studii de caz și analize instituționale</li>
+          <li>management educațional și leadership</li>
+          <li>politici educaționale și dezvoltare instituțională</li>
+          <li>educație incluzivă și echitate</li>
+          <li>consiliere școlară și dezvoltare personală</li>
+          <li>activități de formare și dezvoltare profesională</li>
+          <li>proiecte educaționale și parteneriate</li>
+          <li>proiecte Erasmus+, proiecte cu finanțare externă și materiale privind implementarea, promovarea și diseminarea rezultatelor acestora</li>
+          <li>ghiduri, resurse și materiale dezvoltate în cadrul proiectelor educaționale</li>
+          <li>alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
+        </ul>
+
+        <p style="font-style:italic;color:var(--muted);font-size:0.95rem;text-align:justify;border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">Ariile tematice și exemplele de contribuții au caracter orientativ. Revista încurajează transmiterea unor materiale diverse și relevante pentru activitatea didactică, cercetare și dezvoltare profesională, care pot fi valorificate în parcursul profesional al autorilor.</p>
       </div>
-      <p style="margin-top:20px;font-style:italic;font-size:0.86rem;color:var(--muted);">Redacția își rezervă dreptul de a încadra materialele primite în secțiunea tematică pe care o consideră cea mai potrivită, în funcție de conținutul și specificul acestora.</p>
     </div>
 
     <!-- GHID -->
@@ -563,125 +565,6 @@
     </div>
 
     <!-- PROCEDURA -->
-    <div class="info-panel" id="panel-procedura">
-      <h2>Procedura de trimitere și evaluare a articolului</h2>
-      <p>Pentru publicarea unui material în Revista Dokimasia, autorii trebuie să parcurgă câteva etape simple și clare, de la transmiterea articolului până la decizia editorială finală.</p>
-      <ol>
-        <li><strong>Transmiterea articolului</strong><br>Autorul trimite materialul spre publicare prin formularul disponibil pe site sau la adresa de e-mail indicată de redacție. Articolul trebuie transmis în format editabil și trebuie să respecte cerințele prevăzute în secțiunea Ghid pentru autori.</li>
-        <li><strong>Verificarea administrativă și editorială inițială</strong><br>După primirea materialului, redacția verifică dacă articolul respectă cerințele minime de redactare, dacă se încadrează în tematica revistei și dacă sunt transmise toate informațiile necesare despre autor. În această etapă pot fi solicitate completări sau corecturi preliminare.</li>
-        <li><strong>Evaluarea materialului</strong><br>Materialele care îndeplinesc condițiile editoriale intră în procesul de evaluare. Evaluarea urmărește relevanța temei, claritatea redactării, coerența textului, corectitudinea informațiilor, calitatea argumentării și utilitatea practică sau științifică a contribuției.</li>
-        <li><strong>Comunicarea rezultatului</strong><br>După analiză, autorul primește unul dintre următoarele răspunsuri: acceptat pentru publicare, acceptat cu modificări sau respins. În cazul în care sunt necesare revizuiri, autorul va primi observațiile redacției și va transmite forma revizuită în termenul indicat.</li>
-        <li><strong>Forma finală pentru publicare</strong><br>După aprobarea finală, articolul intră în etapa de editare și pregătire pentru publicare. Redacția poate face intervenții de formă, stil și tehnoredactare, fără a modifica sensul și conținutul de fond al materialului.</li>
-        <li><strong>Publicarea</strong><br>Articolul este inclus în unul dintre numerele revistei, în funcție de calendarul editorial, de tematica numărului și de finalizarea etapelor de evaluare și editare.</li>
-        <li><strong>Eliberarea documentelor aferente</strong><br>După publicarea articolului, autorului i se pot elibera, în condițiile stabilite de redacție, documente justificative precum adeverință de publicare, certificat sau diplomă, după caz.</li>
-        <li><strong>Dreptul redacției</strong><br>Redacția își rezervă dreptul de a selecta materialele pentru publicare, de a solicita modificări și de a stabili încadrarea acestora în secțiunile tematice ale revistei.</li>
-      </ol>
-    </div>
-
-    <!-- ADEVERINTE -->
-    <div class="info-panel" id="panel-adeverinte">
-      <h2>Adeverințe și documente de publicare</h2>
-      <p>Revista Dokimasia poate elibera, în condițiile stabilite de redacție, documente care atestă parcursul editorial al materialelor transmise spre publicare. Aceste documente au rolul de a confirma, după caz, primirea articolului, acceptarea acestuia, publicarea în revistă sau participarea autorului la activitățile editoriale asociate.</p>
-      <h3>1. Tipuri de documente care pot fi eliberate</h3>
-      <p>În funcție de situație, redacția poate emite:</p>
-      <ul>
-        <li>Adeverință de publicare articol/studiu în revistă cu ISSN</li>
-        <li>Certificat de publicare articol/studiu</li>
-        <li>Adeverință de autor/coautor</li>
-        <li>Adeverință/Certificat de publicare ghid metodic / auxiliar curricular / suport educațional</li>
-        <li>Orice alt document, la cerere, care se încadrează în categoria documentelor relevante pentru gradația de merit, pentru etapele de mobilitate ale personalului didactic ori pentru evoluția în carieră, în măsura în care poate fi emis în mod justificat, pe baza activităților și materialelor publicate în cadrul revistei</li>
-      </ul>
-      <h3>2. Condiții de eliberare</h3>
-      <p>Documentele se eliberează în funcție de etapa în care se află materialul transmis și de decizia editorială. Adeverința de publicare sau certificatul de publicare se emit numai pentru articolele care au parcurs procesul de evaluare și au fost publicate efectiv în revistă. Adeverințele de primire sau de acceptare pot fi emise anterior, dacă acest lucru este prevăzut de politica editorială a revistei.</p>
-      <h3>3. Informații care pot apărea în documente</h3>
-      <p>Documentele eliberate de redacție pot cuprinde, după caz, titlul articolului, numele autorului sau al autorilor, denumirea revistei, numărul și ediția în care apare materialul, data publicării, precum și alte mențiuni relevante privind statutul articolului.</p>
-      <h3>4. Utilitatea documentelor</h3>
-      <p>Adeverințele și celelalte documente emise de revistă pot fi utile autorilor pentru completarea portofoliului profesional, pentru diferite etape de mobilitate, pentru activități de dezvoltare profesională, pentru evidențierea contribuțiilor publicistice și, după caz, pentru susținerea evoluției în carieră.</p>
-      <h3>5. Modalitatea de solicitare</h3>
-      <p>Solicitarea documentelor se face prin formularul dedicat de pe site sau la adresa de e-mail a redacției, cu menționarea clară a numelui autorului, a titlului articolului și a documentului solicitat.</p>
-      <h3>6. Formatul documentelor</h3>
-      <p>Documentele pot fi transmise în format electronic, semnate și ștampilate, după caz, iar la cerere pot fi emise și în format tipărit, în condițiile stabilite de redacție.</p>
-      <h3>7. Termen de eliberare</h3>
-      <p>Documentele se eliberează într-un termen rezonabil de la momentul solicitării sau de la finalizarea etapei editoriale relevante, în funcție de tipul documentului solicitat.</p>
-      <h3>8. Verificare și validitate</h3>
-      <p>Redacția își poate rezerva dreptul de a introduce elemente de siguranță și verificare a autenticității documentelor emise, inclusiv număr de înregistrare, serie, cod unic sau cod QR.</p>
-    </div>
-
-    <!-- CONTRIBUTIE -->
-    <div class="info-panel" id="panel-contributie">
-      <h2>Contribuție editorială și beneficii</h2>
-      <p>Pentru publicarea materialelor în Revista Dokimasia, se percepe o contribuție editorială fixă. Contribuția editorială se achită înainte de publicare, prin PayPal sau transfer bancar, iar pentru sumele încasate se emite document justificativ de plată. Această contribuție susține activitatea editorială, procesul de pregătire a materialelor pentru publicare, calitatea produsului final, emiterea documentelor aferente, precum și obiectivele și activitățile desfășurate de Asociația Dokimasia în domeniul educației, formării și implicării civice.</p>
-
-      <div class="tarife-grid">
-        <div class="tarif-card" id="tc-1">
-          <div class="t-titlu">1 articol</div>
-          <div class="t-pret" id="disp-1">40</div>
-          <div class="t-unit">lei</div>
-          <div class="t-adjust">
-            <button class="t-adj-btn" onclick="adjustAmount(1,10)">＋ 10 lei</button>
-            <button class="t-adj-btn" onclick="adjustAmount(1,50)">＋ 50 lei</button>
-            <button class="t-adj-btn reset" onclick="resetAmount(1,40)">Reset</button>
-          </div>
-          <div id="pp-btn-1" class="pp-btn-wrap"></div>
-        </div>
-        <div class="tarif-card featured" id="tc-2">
-          <div class="t-titlu">2 articole</div>
-          <div class="t-pret" id="disp-2">70</div>
-          <div class="t-unit">lei</div>
-          <div class="t-adjust">
-            <button class="t-adj-btn" onclick="adjustAmount(2,10)">＋ 10 lei</button>
-            <button class="t-adj-btn" onclick="adjustAmount(2,50)">＋ 50 lei</button>
-            <button class="t-adj-btn reset" onclick="resetAmount(2,70)">Reset</button>
-          </div>
-          <div id="pp-btn-2" class="pp-btn-wrap"></div>
-        </div>
-        <div class="tarif-card" id="tc-3">
-          <div class="t-titlu">3 articole</div>
-          <div class="t-pret" id="disp-3">100</div>
-          <div class="t-unit">lei</div>
-          <div class="t-adjust">
-            <button class="t-adj-btn" onclick="adjustAmount(3,10)">＋ 10 lei</button>
-            <button class="t-adj-btn" onclick="adjustAmount(3,50)">＋ 50 lei</button>
-            <button class="t-adj-btn reset" onclick="resetAmount(3,100)">Reset</button>
-          </div>
-          <div id="pp-btn-3" class="pp-btn-wrap"></div>
-        </div>
-        <div class="tarif-card" id="tc-4">
-          <div class="t-titlu">Extras tipărit + poștă</div>
-          <div class="t-pret" id="disp-4">25</div>
-          <div class="t-unit">lei suplimentar</div>
-          <div class="t-adjust">
-            <button class="t-adj-btn" onclick="adjustAmount(4,10)">＋ 10 lei</button>
-            <button class="t-adj-btn reset" onclick="resetAmount(4,25)">Reset</button>
-          </div>
-          <div id="pp-btn-4" class="pp-btn-wrap"></div>
-        </div>
-        <div class="tarif-card" id="tc-5">
-          <div class="t-titlu">Revistă tipărită</div>
-          <div class="t-pret" id="disp-5">50</div>
-          <div class="t-unit">lei / exemplar</div>
-          <div class="t-adjust">
-            <button class="t-adj-btn" onclick="adjustAmount(5,50)">＋ 1 exemplar</button>
-            <button class="t-adj-btn reset" onclick="resetAmount(5,50)">Reset</button>
-          </div>
-          <div id="pp-btn-5" class="pp-btn-wrap"></div>
-        </div>
-      </div>
-
-      <h3>Ce include contribuția editorială</h3>
-      <p>În schimbul contribuției editoriale, autorul beneficiază de publicarea online a materialului, de PDF-ul revistei și de documentele incluse în pachetul editorial. Acestea pot cuprinde, după caz:</p>
-      <ul>
-        <li>Adeverință de publicare articol/studiu în revistă cu ISSN</li>
-        <li>Certificat de publicare articol/studiu</li>
-        <li>Adeverință de autor/coautor</li>
-        <li>Diplomă</li>
-        <li>Adeverință/Certificat de publicare ghid metodic / auxiliar curricular / suport educațional (după tipul materialului publicat)</li>
-        <li>Alte documente relevante, la cerere, în condițiile revistei</li>
-      </ul>
-      <p>Materialele transmise spre publicare sunt pregătite pentru apariție cu sprijinul colectivului de redacție, iar autorii pot aduce modificările necesare sub îndrumarea acestuia, astfel încât forma finală să corespundă cerințelor editoriale ale revistei.</p>
-    </div>
-
-    <!-- TRIMITERE -->
     <div class="info-panel" id="panel-trimitere">
       <h2>Trimite un articol</h2>
       <p>Pentru publicarea în Revista Dokimasia este necesară achitarea contribuției editoriale. Ai flexibilitatea de a plăti acum — formularul se activează imediat — sau de a trimite materialul mai întâi și de a achita ulterior, bifând opțiunea „Plătește mai târziu".</p>
@@ -923,60 +806,6 @@
     </div>
 
         <!-- FAQ -->
-    <div class="info-panel" id="panel-faq">
-      <h2>Întrebări frecvente</h2>
-      <div class="faq-list" id="faqList"></div>
-    </div>
-
-    <!-- ETICA -->
-    <div class="info-panel" id="panel-etica">
-      <h2>Politica editorială și etică</h2>
-      <p>Revista Dokimasia promovează publicarea unor materiale originale, relevante și redactate cu responsabilitate profesională. Revista urmărește menținerea unor standarde ridicate de calitate editorială, corectitudine academică și respect față de autori, evaluatori și cititori.</p>
-      <p>Materialele transmise spre publicare trebuie să aparțină autorilor declarați și să respecte normele de redactare, de citare și de utilizare a surselor. Nu sunt acceptate materiale plagiate, preluări neasumate, texte generate sau prelucrate în mod necorespunzător, informații false ori formulări care încalcă normele de etică profesională și academică.</p>
-      <p>Autorii au responsabilitatea de a transmite lucrări originale, de a indica în mod corect sursele utilizate și de a se asigura că materialul trimis nu încalcă drepturile de autor ale altor persoane. În cazul articolelor redactate în coautorat, toți autorii trebuie să își asume conținutul materialului și transmiterea acestuia spre evaluare și publicare.</p>
-      <p>Redacția analizează materialele primite din punct de vedere editorial și își rezervă dreptul de a solicita corecturi, completări sau reformulări atunci când acest lucru este necesar pentru claritate, coerență, acuratețe sau încadrare în standardele publicației. Redacția își rezervă, de asemenea, dreptul de a respinge materialele care nu corespund profilului revistei sau care nu respectă cerințele editoriale și etice.</p>
-      <p>Evaluatorii și colaboratorii editoriali au obligația de a analiza materialele cu obiectivitate, confidențialitate și bună-credință, fără a utiliza în interes propriu informațiile din lucrările primite spre evaluare. Orice posibil conflict de interese trebuie evitat sau declarat.</p>
-      <p>Revista susține dialogul profesional, diversitatea de idei și libertatea de exprimare academică, în limitele respectului față de adevăr, responsabilitate publică și bune practici editoriale. Opiniile exprimate în articole aparțin autorilor și nu reprezintă în mod necesar poziția redacției sau a instituției editoare.</p>
-      <p>În situația în care, după publicare, sunt identificate erori semnificative, abateri de la normele de etică sau probleme privind originalitatea textului, redacția poate decide corectarea, retragerea sau marcarea corespunzătoare a materialului publicat.</p>
-    </div>
-
-    <!-- DOCUMENTE -->
-    <div class="info-panel" id="panel-documente">
-      <h2>Documente</h2>
-      <div class="doc-group">
-        <div class="doc-group-title">Documente pentru autori</div>
-        <div class="doc-list">
-          <a href="doc-model-articol.html" class="doc-item"><span class="doc-icon">📄</span>Model de articol</a>
-          <a href="doc-template-tehnoredactare.html" class="doc-item"><span class="doc-icon">📄</span>Template de tehnoredactare</a>
-          <a href="doc-formular-trimitere.html" class="doc-item"><span class="doc-icon">📄</span>Formular de trimitere a articolului</a>
-          <a href="doc-declaratie-originalitate.html" class="doc-item"><span class="doc-icon">📄</span>Declarație de originalitate</a>
-          <a href="doc-acord-publicare.html" class="doc-item"><span class="doc-icon">📄</span>Acord privind publicarea materialului</a>
-          <a href="doc-contract-editorial.html" class="doc-item"><span class="doc-icon">📄</span>Contract editorial / contract de publicare</a>
-          <a href="doc-declaratie-contributie.html" class="doc-item"><span class="doc-icon">📄</span>Declarație privind contribuția autorului/coautorilor</a>
-          <a href="doc-formular-autor.html" class="doc-item"><span class="doc-icon">📄</span>Formular cu datele autorului</a>
-          <a href="doc-cerere-adeverinte.html" class="doc-item"><span class="doc-icon">📄</span>Cerere pentru emiterea adeverințelor și certificatelor</a>
-          <a href="doc-cerere-tiparit.html" class="doc-item"><span class="doc-icon">📄</span>Cerere pentru exemplar tipărit / extras din volum</a>
-          <a href="doc-acord-gdpr.html" class="doc-item"><span class="doc-icon">📄</span>Acord privind prelucrarea datelor cu caracter personal</a>
-        </div>
-      </div>
-      <div class="doc-group">
-        <div class="doc-group-title">Documente editoriale și administrative</div>
-        <div class="doc-list">
-          <a href="doc-regulament-editorial.html" class="doc-item"><span class="doc-icon">📋</span>Regulament editorial</a>
-          <a href="doc-politica-etica.html" class="doc-item"><span class="doc-icon">📋</span>Politica editorială și de etică</a>
-          <a href="doc-model-adeverinta-publicare.html" class="doc-item"><span class="doc-icon">📋</span>Model de adeverință de publicare</a>
-          <a href="doc-model-certificat-publicare.html" class="doc-item"><span class="doc-icon">📋</span>Model de certificat de publicare</a>
-          <a href="doc-model-adeverinta-autor.html" class="doc-item"><span class="doc-icon">📋</span>Model de adeverință de autor/coautor</a>
-          <a href="doc-model-diploma.html" class="doc-item"><span class="doc-icon">📋</span>Model de diplomă</a>
-          <a href="doc-model-factura.html" class="doc-item"><span class="doc-icon">📋</span>Model de factură / document justificativ de plată</a>
-          <a href="doc-contract-parteneriat.html" class="doc-item"><span class="doc-icon">📋</span>Contract de parteneriat cu instituții sau organizații</a>
-          <a href="doc-invitatie-referenti.html" class="doc-item"><span class="doc-icon">📋</span>Model de invitație / acord de colaborare pentru referenți științifici</a>
-        </div>
-      </div>
-      <p style="font-style:italic;font-size:0.84rem;color:var(--muted);">Pentru a solicita oricare dintre documentele de mai sus, ne puteți contacta prin formularul de pe site sau prin e-mail.</p>
-    </div>
-
-    <!-- COLEGIU -->
     <div class="info-panel" id="panel-colegiu">
       <h2>Colegiul editorial și științific</h2>
       <p>Revista Dokimasia este realizată de un colectiv de redacție dedicat calității editoriale și promovării excelenței în educație.</p>
