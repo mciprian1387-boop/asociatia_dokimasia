@@ -475,6 +475,7 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
     </div>
     <div class="si-foot">
       <button class="btn-new-art" onclick="articolNou()">+ Articol nou</button>
+      <button onclick="autosave()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;background:none;border:1px solid var(--border);border-radius:4px;font-size:0.78rem;font-family:'Source Serif 4',serif;color:var(--muted);cursor:pointer;margin-top:5px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">💾 Salvează acum</button>
     </div>
   </aside>
 </div>
@@ -561,7 +562,7 @@ let secContor=0;
 let sectiuni=[];
 let secActiva=null;
 let activeEd=null;
-let autosaveTimer=null;
+let saveInProgress=false;
 let articleId=null;
 let autorContor=2;
 let istoricArticole=[];
@@ -571,26 +572,43 @@ let istoricArticole=[];
 // ══════════════════════════════════════════════════════════
 window.onUserLoaded = function(user) {
   if (!user) {
-    // Nu e autentificat — guard vizibil
     document.getElementById('authGuard').classList.remove('hidden');
     return;
   }
   currentUser = user;
-  // Inițializează Supabase cu același client din auth.js (window.sb)
-  sbClient = window.sb || supabase.createClient(SB_URL, SB_ANON);
+
+  // Inițializează client Supabase
+  sbClient = window.sb || (typeof supabase !== 'undefined' ? supabase.createClient(SB_URL, SB_ANON) : null);
+
+  console.log('[Auth] User autentificat:', user.email);
+  console.log('[Auth] sbClient:', sbClient ? 'OK' : 'NULL — verifică auth.js');
+
+  // Test rapid de conectivitate
+  if(sbClient){
+    sbClient.from('articole_draft').select('id').limit(1).then(({data,error})=>{
+      if(error){
+        console.error('[Supabase] Eroare conectivitate:', error.message, error.code);
+        setBadge('err', '⚠ Supabase: '+error.message.slice(0,30));
+      } else {
+        console.log('[Supabase] Conexiune OK. Draft-uri găsite:', data?.length||0);
+      }
+    });
+  }
+
   // Ascunde guard, arată app
   document.getElementById('authGuard').classList.add('hidden');
   document.getElementById('siteHeader').classList.remove('site-hidden');
   document.getElementById('appBody').classList.remove('site-hidden');
-  // Setează user în sidebar și în header
+
+  // UI
   document.getElementById('shUser').textContent = user.email.split('@')[0];
   document.getElementById('accountLabel').textContent = user.email.split('@')[0];
   document.getElementById('loggedOut').style.display = 'none';
   document.getElementById('loggedIn').style.display = 'block';
   setBadge('', 'Nesalvat');
-  // Încarcă istoricul
+
   incarcaIstoric();
-  // Presetează tipul dacă vine din revista.html cu ?tip=
+
   const tipParam = new URLSearchParams(window.location.search).get('tip');
   if (tipParam && TIPURI[tipParam]) {
     setTimeout(() => {
@@ -605,34 +623,73 @@ window.onUserLoaded = function(user) {
 };
 
 // ══════════════════════════════════════════════════════════
-// SUPABASE AUTOSAVE
+// SUPABASE AUTOSAVE — robust cu diagnostic
 // ══════════════════════════════════════════════════════════
 function setBadge(cls, txt){
   const b=document.getElementById('autosaveBadge');
   const t=document.getElementById('autosaveText');
-  b.className='autosave '+cls; t.textContent=txt;
+  if(b) b.className='autosave '+cls;
+  if(t) t.textContent=txt;
 }
+
+let saveInProgress=false;
 
 async function autosave(){
-  if(!sbClient||!tipSelectat||!currentUser)return;
+  // Verifică prerechizituri
+  if(saveInProgress){ schedAS(); return; } // reprogramează dacă e în curs
+  if(!tipSelectat){ setBadge('','Nesalvat'); return; }
+  if(!currentUser){ console.warn('[Autosave] currentUser null'); setBadge('err','Neautentificat'); return; }
+
+  // Asigură-ne că avem client Supabase
+  if(!sbClient){
+    sbClient = window.sb || (typeof supabase!=='undefined' ? supabase.createClient(SB_URL, SB_ANON) : null);
+  }
+  if(!sbClient){ console.error('[Autosave] sbClient null'); setBadge('err','Eroare client'); return; }
+
+  saveInProgress=true;
   setBadge('saving','Se salvează...');
   const data=colDate();
+
   try{
     if(articleId){
-      await sbClient.from('articole_draft').update({data,tip:tipSelectat,updated_at:new Date().toISOString()}).eq('id',articleId);
+      // UPDATE articol existent
+      const {error}=await sbClient
+        .from('articole_draft')
+        .update({data, tip:tipSelectat, updated_at:new Date().toISOString()})
+        .eq('id', articleId)
+        .eq('user_id', currentUser.id); // securitate extra
+      if(error) throw error;
     } else {
-      const r=await sbClient.from('articole_draft').insert({
-        user_id:currentUser.id, data, tip:tipSelectat
-      }).select().single();
-      if(r.data){ articleId=r.data.id; incarcaIstoric(); }
+      // INSERT articol nou
+      const {data:row, error}=await sbClient
+        .from('articole_draft')
+        .insert({user_id:currentUser.id, data, tip:tipSelectat})
+        .select('id')
+        .single();
+      if(error) throw error;
+      if(row?.id){
+        articleId=row.id;
+        console.log('[Autosave] Articol nou creat, id='+articleId);
+        incarcaIstoric();
+      }
     }
-    setBadge('saved','Salvat '+new Date().toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'}));
+    const ora=new Date().toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'});
+    setBadge('saved','✓ Salvat '+ora);
     renderIstoric();
-  }catch(e){ setBadge('err','Eroare salvare'); console.error(e); }
+  } catch(e){
+    console.error('[Autosave] Eroare:', e);
+    setBadge('err','⚠ Eroare: '+(e.message||e.code||JSON.stringify(e)).slice(0,40));
+  } finally {
+    saveInProgress=false;
+  }
 }
 
-// Salvare în timp real — debounce 300ms
-function schedAS(){ clearTimeout(autosaveTimer); autosaveTimer=setTimeout(autosave,300); }
+// Debounce 800ms — suficient de rapid dar nu agresiv
+let autosaveTimer=null;
+function schedAS(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(autosave, 800);
+}
 
 function toggleIstoric(){
   const body=document.getElementById('shList');
