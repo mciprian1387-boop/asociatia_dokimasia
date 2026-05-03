@@ -421,6 +421,18 @@ window.onUserLoaded = function(user) {
   setBadge('', 'Nesalvat');
   // Încarcă istoricul
   incarcaIstoric();
+  // Presetează tipul dacă vine din revista.html cu ?tip=
+  const tipParam = new URLSearchParams(window.location.search).get('tip');
+  if (tipParam && TIPURI[tipParam]) {
+    setTimeout(() => {
+      tipSelectat = tipParam;
+      buildSectiuni();
+      renderAll();
+      activaSec('titlu');
+      updateTipBar();
+      toast('Editor configurat: ' + TIPURI[tipParam].label, 'ok');
+    }, 300);
+  }
 };
 
 // ══════════════════════════════════════════════════════════
