@@ -23,33 +23,18 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 .guard-btn{display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:11px 28px;border-radius:4px;font-size:0.92rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:background 0.2s;}
 .guard-btn:hover{background:var(--crimson-dark);}
 
-/* HEADER */
-.app-header{background:var(--crimson);background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 39px,rgba(255,255,255,0.03) 40px);border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;}
-.header-top{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:50px;}
-.app-logo{font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
-.app-logo span{color:var(--gold-light);}
-.header-mid{display:flex;align-items:center;gap:8px;}
-.autosave{font-size:0.68rem;display:flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.65);}
-.autosave.saved{color:#81c784;}
-.autosave.saving{color:var(--gold-light);}
-.autosave.err{color:#ef9a9a;}
-.header-right{display:flex;align-items:center;gap:6px;}
-.hbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:3px;font-size:0.77rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;}
-.hbtn-gold{background:var(--gold);color:#fff;}
-.hbtn-gold:hover{background:var(--gold-light);}
-.hbtn-white{background:#fff;color:var(--crimson);}
-.hbtn-white:hover{background:var(--paper-dark);}
-.hbtn-ghost{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);}
-.hbtn-ghost:hover{background:rgba(255,255,255,0.22);}
-.hbtn-new{background:var(--gold);color:#fff;}
-.hbtn-new:hover{background:var(--gold-light);}
+/* HEADER editor — doar autosave badge, fără a suprascrie .header-top */
+.autosave{font-size:0.68rem;display:flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;background:rgba(139,0,0,0.07);color:#8B0000;}
+.autosave.saved{color:#2e7d32;}
+.autosave.saving{color:var(--gold);}
+.autosave.err{color:#c62828;}
 
 /* TIP BAR */
-.tip-bar{display:flex;align-items:stretch;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.1);}
-.tip-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;cursor:pointer;font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);letter-spacing:0.3px;border-right:1px solid rgba(255,255,255,0.08);transition:all 0.2s;font-family:'Source Serif 4',serif;text-align:center;}
+.tip-bar{display:flex;align-items:stretch;background:#8B0000;border-top:1px solid rgba(255,255,255,0.1);}
+.tip-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;cursor:pointer;font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:0.3px;border-right:1px solid rgba(255,255,255,0.15);transition:all 0.2s;font-family:'Source Serif 4',serif;text-align:center;}
 .tip-tab:last-child{border-right:none;}
-.tip-tab:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);}
-.tip-tab.active{background:rgba(255,255,255,0.15);color:#fff;border-bottom:2px solid var(--gold);}
+.tip-tab:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.tip-tab.active{background:rgba(255,255,255,0.18);color:#fff;border-bottom:3px solid var(--gold);}
 .tip-tab .tt-icon{font-size:1rem;flex-shrink:0;}
 .tip-tab .tt-label{line-height:1.3;}
 
@@ -224,27 +209,29 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 @keyframes slideUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
 /* HEADER PRINCIPAL DOKIMASIA */
-    .header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; }
-    .header-logo img { height: 80px; width: auto; display: block; }
-    .header-center { text-align: center; }
-    .header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
-    .header-motto { display: block; font-size: clamp(0.65rem, 1.5vw, 0.95rem); color: #8B0000; font-weight: normal; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
-    .header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
-    .social-icons { display: flex; align-items: center; gap: 10px; }
-    .social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
-    .social-icons a:hover { opacity: 0.7; }
-    .social-icons svg { width: 26px; height: 26px; }
-    .btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
-    .btn-account:hover { background: #6a0000; }
-    .account-wrapper { position: relative; }
-    .account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 200; padding: 8px 0; }
-    .account-dropdown.open { display: block; }
-    .account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
-    .account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
-    nav.main-nav { background: #8B0000; display: flex; width: 100%; }
-    nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
-    nav.main-nav a:last-child { border-right: none; }
-    nav.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); }
+.header-top { display: grid !important; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; height: auto !important; }
+.header-logo img { height: 80px; width: auto; display: block; }
+.header-center { text-align: center; text-decoration: none; }
+.header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
+.header-motto { display: block; font-size: clamp(0.65rem, 1.5vw, 0.95rem); color: #8B0000; font-weight: normal; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+.header-right { display: flex !important; align-items: center; gap: 12px; justify-content: flex-end; }
+.social-icons { display: flex; align-items: center; gap: 10px; }
+.social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
+.social-icons a:hover { opacity: 0.7; }
+.social-icons svg { width: 26px; height: 26px; }
+.btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
+.btn-account:hover { background: #6a0000; }
+.account-wrapper { position: relative; }
+.account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 300; padding: 8px 0; }
+.account-dropdown.open { display: block; }
+.account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
+.account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
+nav.main-nav { background: #8B0000; display: flex; width: 100%; }
+nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); text-decoration: none; }
+nav.main-nav a:last-child { border-right: none; }
+nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; }
+.hamburger span { display: block; width: 26px; height: 3px; background: #8B0000; border-radius: 2px; }
 
 /* FIX: modals din auth.js să apară corect deasupra editorului */
 .modal-overlay { z-index: 10000 !important; }
