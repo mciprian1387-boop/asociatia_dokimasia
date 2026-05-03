@@ -664,7 +664,7 @@ const FIX_IDS=['titlu','autori','abstract','cuvinte'];
 let sbClient=null;
 let currentUser=null;
 let tipSelectat=null;
-let autori=[{id:1,nume:'',institutie:'',email:''}];
+let autori=[{id:1,prenume:'',nume:'',institutie:'',email:''}];
 let biblio=[''];
 let secContor=0;
 let sectiuni=[];
@@ -914,7 +914,16 @@ async function incarcaArticol(id){
   articleId=id;
   const d=art.data||{};
   tipSelectat=art.tip||'practic';
-  autori=d.autori||[{id:1,nume:'',institutie:'',email:''}];
+  autori=(d.autori||[{id:1,prenume:'',nume:'',institutie:'',email:''}]).map(a=>{
+    // Migrare date vechi: dacă are câmpul 'nume' compus (ex: "Andrei POPESCU"), îl desparte
+    if(a.prenume===undefined){
+      const parts=(a.nume||'').trim().split(/\s+/);
+      const numePart=parts.pop()||'';
+      const prenumePart=parts.join(' ');
+      return {id:a.id||1, prenume:prenumePart, nume:numePart, institutie:a.institutie||'', email:a.email||''};
+    }
+    return a;
+  });
   biblio=d.biblio||[''];
   autorContor=Math.max(...autori.map(a=>a.id||0),1)+1;
 
@@ -1133,7 +1142,7 @@ function anuleazaEditNume(id, vechi){
 }
 
 function isFilled(id){
-  if(id==='autori')return autori.some(a=>a.nume.trim());
+  if(id==='autori')return autori.some(a=>(a.prenume||'').trim()||(a.nume||'').trim());
   if(id==='biblio')return biblio.some(b=>b.trim());
   if(id==='titlu')return (document.getElementById('f-titlu')||{value:''}).value.trim().length>0;
   if(id==='cuvinte')return (document.getElementById('f-cuvinte')||{value:''}).value.trim().length>0;
@@ -1376,21 +1385,42 @@ function initEditors(){
 }
 
 // AUTORI
+// ── Formatare automată prenume și nume ──────────────────────
+// Prenume: "andrei-viorel" / "Andrei - Viorel" → "Andrei Viorel" (Title Case, fără cratimă)
+function formatPrenume(v){
+  return v
+    .replace(/\s*-\s*/g,' ')   // orice variantă de cratimă → spațiu
+    .replace(/\s+/g,' ')        // spații multiple → unul
+    .trim()
+    .split(' ')
+    .map(p=>p.charAt(0).toUpperCase()+p.slice(1).toLowerCase())
+    .join(' ');
+}
+// Nume: "popescu" / "Popescu" → "POPESCU" (majuscule)
+function formatNume(v){
+  return v.trim().toUpperCase();
+}
+// Afișare completă în articol: "Andrei Viorel POPESCU"
+function numeComplet(a){
+  const p=a.prenume?formatPrenume(a.prenume):'';
+  const n=a.nume?formatNume(a.nume):'';
+  return [p,n].filter(Boolean).join(' ') || '(autor necompletat)';
+}
+
 function renderAutori(){
   const l=document.getElementById('autoriList');if(!l)return;
 
-  // Autori care au cel puțin instituție sau email → primesc notă de subsol
-  const cuSubsol=autori.filter(a=>a.institutie.trim()||a.email.trim());
+  const cuSubsol=autori.filter(a=>(a.institutie||'').trim()||(a.email||'').trim());
 
   l.innerHTML=`
-    <!-- Preview academic: cum apare în articol -->
+    <!-- Preview academic -->
     <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:4px;padding:10px 14px;margin-bottom:14px;">
       <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:8px;">Previzualizare — cum apare în articol</div>
       <div style="font-family:'Times New Roman',serif;font-size:11pt;text-align:center;margin-bottom:${cuSubsol.length?'10px':'0'};">
-        ${autori.map((a,i)=>{
+        ${autori.map((a)=>{
           const idx=cuSubsol.findIndex(x=>x.id===a.id);
           const sup=idx>=0?`<sup style="color:var(--crimson);font-size:0.65em;">${idx+1}</sup>`:'';
-          return `<strong>${escVal(a.nume)||'(autor necompletat)'}</strong>${sup}`;
+          return `<strong>${escVal(numeComplet(a))}</strong>${sup}`;
         }).join('<span style="color:var(--muted);"> ,  </span>')}
       </div>
       ${cuSubsol.length?`
@@ -1398,7 +1428,7 @@ function renderAutori(){
           ${cuSubsol.map((a,i)=>`
             <div style="font-family:'Times New Roman',serif;font-size:9.5pt;color:#444;line-height:1.5;">
               <sup style="color:var(--crimson);font-weight:700;">${i+1}</sup>
-              ${escVal(a.institutie)||''}${a.email?`${a.institutie?' — ':''}${escVal(a.email)}`:''}
+              ${escVal(a.institutie||'')}${a.email?`${a.institutie?' — ':''}${escVal(a.email)}`:''}
             </div>`).join('')}
         </div>`:''}
     </div>
@@ -1410,23 +1440,41 @@ function renderAutori(){
       return `<div class="autor-row" id="ar-${a.id}">
         <div class="autor-nr">${i+1}</div>
         <div style="flex:1;">
-          <input type="text" class="fld-input" value="${esc(a.nume)}" placeholder="Andrei Ionuț POPESCU"
-            oninput="updAutor(${a.id},'nume',this.value)"
-            style="font-weight:600;margin-bottom:7px;"/>
+          <!-- Prenume + Nume pe același rând -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
+            <div>
+              <div class="autor-meta-lbl">Prenume</div>
+              <input type="text" class="fld-input" value="${esc(a.prenume||'')}"
+                placeholder="ex: Andrei Viorel"
+                oninput="updAutor(${a.id},'prenume',this.value)"
+                onblur="updAutorFormat(${a.id},'prenume')"/>
+              <div class="autor-fn">→ apare ca: <em id="prev-p-${a.id}">${a.prenume?formatPrenume(a.prenume):'Andrei Viorel'}</em></div>
+            </div>
+            <div>
+              <div class="autor-meta-lbl">Nume <span style="font-size:0.6rem;color:var(--muted);font-weight:400;">(se scrie automat cu majuscule)</span></div>
+              <input type="text" class="fld-input" value="${esc(a.nume||'')}"
+                placeholder="ex: Popescu"
+                oninput="updAutor(${a.id},'nume',this.value)"
+                onblur="updAutorFormat(${a.id},'nume')"
+                style="font-weight:600;text-transform:uppercase;"/>
+              <div class="autor-fn">→ apare ca: <em id="prev-n-${a.id}">${a.nume?formatNume(a.nume):'POPESCU'}</em></div>
+            </div>
+          </div>
+          <!-- Instituție + Email -->
           <div class="autor-meta">
             <div>
               <div class="autor-meta-lbl">Instituție${supLabel}</div>
-              <input type="text" class="fld-input" value="${esc(a.institutie)}"
+              <input type="text" class="fld-input" value="${esc(a.institutie||'')}"
                 placeholder="Școala Gimnazială Nr. 1, Iași"
                 oninput="updAutor(${a.id},'institutie',this.value)"/>
-              <div class="autor-fn">↳ apare în nota de subsol ${idx>=0?idx+1:''}</div>
+              <div class="autor-fn">↳ notă de subsol ${idx>=0?idx+1:''}</div>
             </div>
             <div>
               <div class="autor-meta-lbl">Email${supLabel}</div>
-              <input type="email" class="fld-input" value="${esc(a.email)}"
-                placeholder="email@institutie.ro"
+              <input type="email" class="fld-input" value="${esc(a.email||'')}"
+                placeholder="email@gmail.com"
                 oninput="updAutor(${a.id},'email',this.value)"/>
-              <div class="autor-fn">↳ apare în nota de subsol ${idx>=0?idx+1:''}</div>
+              <div class="autor-fn">↳ notă de subsol ${idx>=0?idx+1:''}</div>
             </div>
           </div>
         </div>
@@ -1435,8 +1483,9 @@ function renderAutori(){
     }).join('')}
   `;
 }
+
 function addAutor(){
-  autori.push({id:autorContor++,nume:'',institutie:'',email:''});
+  autori.push({id:autorContor++,prenume:'',nume:'',institutie:'',email:''});
   _stateCache.autori=autori;
   renderAutori(); onChange();
 }
@@ -1448,8 +1497,31 @@ function rmAutor(id){
 }
 function updAutor(id,f,v){
   const a=autori.find(x=>x.id===id);
-  if(a){ a[f]=v; _stateCache.autori=autori; }
+  if(!a) return;
+  a[f]=v;
+  _stateCache.autori=autori;
+  // Actualizează preview live
+  if(f==='prenume'){
+    const el=document.getElementById('prev-p-'+id);
+    if(el) el.textContent=v.trim()?formatPrenume(v):'Andrei Viorel';
+  }
+  if(f==='nume'){
+    const el=document.getElementById('prev-n-'+id);
+    if(el) el.textContent=v.trim()?formatNume(v):'POPESCU';
+    // Majuscule live în câmp
+    const inp=document.querySelector(`#ar-${id} input[oninput*="'nume'"]`);
+    if(inp) inp.style.textTransform='uppercase';
+  }
   onChange();
+}
+// La blur — formatează și salvează valoarea curată
+function updAutorFormat(id,f){
+  const a=autori.find(x=>x.id===id);
+  if(!a) return;
+  if(f==='prenume' && a.prenume) a.prenume=formatPrenume(a.prenume);
+  if(f==='nume' && a.nume) a.nume=formatNume(a.nume);
+  _stateCache.autori=autori;
+  renderAutori(); onChange();
 }
 
 // BIBLIO
@@ -1714,7 +1786,7 @@ function previzualizeaza(){
 function buildPreview(){
   const titlu=gv('f-titlu');const sub=gv('f-subtitlu');const kw=gv('f-cuvinte');
   const abRo=gi('rich-abstract');const abEn=gi('rich-abstract-en');
-  const autoriNm=autori.filter(a=>a.nume).map(a=>`<strong>${escVal(a.nume)}</strong>`).join(', ');
+  const autoriNm=autori.filter(a=>a.prenume||a.nume).map(a=>`<strong>${escVal(numeComplet(a))}</strong>`).join(', ');
   const inst=autori.filter(a=>a.institutie||a.email);
   const bf=biblio.filter(Boolean);
   const tipLabel=TIPURI[tipSelectat]?.label||'';
@@ -1784,7 +1856,7 @@ ${body}
 function buildDoc(forPrint){
   const titlu=gv('f-titlu');const sub=gv('f-subtitlu');const kw=gv('f-cuvinte');
   const abRo=gi('rich-abstract');const abEn=gi('rich-abstract-en');
-  const autoriNm=autori.filter(a=>a.nume).map(a=>a.nume).join(', ');
+  const autoriNm=autori.filter(a=>a.prenume||a.nume).map(a=>numeComplet(a)).join(', ');
   const inst=autori.filter(a=>a.institutie||a.email);
   const bf=biblio.filter(Boolean);
   let body='';
