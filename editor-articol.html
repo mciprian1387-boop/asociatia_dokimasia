@@ -54,7 +54,8 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 .tip-tab .tt-label{line-height:1.3;}
 
 /* LAYOUT */
-.app-body{display:grid;grid-template-columns:240px 1fr 276px;height:calc(100vh - 210px);}
+.app-body{display:grid;grid-template-columns:240px 1fr 276px;height:calc(100vh - var(--header-h, 200px));}
+/* Calculăm înălțimea headerului dinamic via JS; fallback static */
 
 /* SIDEBAR STÂNGA — Istoric */
 .sidebar-hist{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
@@ -243,8 +244,7 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
     nav.main-nav { background: #8B0000; display: flex; width: 100%; }
     nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); }
     nav.main-nav a:last-child { border-right: none; }
-
-av.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); }
+    nav.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); }
 
 /* FIX: modals din auth.js să apară corect deasupra editorului */
 .modal-overlay { z-index: 10000 !important; }
@@ -272,12 +272,14 @@ av.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); 
       .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
    
   
-/* AUTH VISIBILITY — header sempre in DOM per sticky funzionamento */
+/* AUTH VISIBILITY */
 .site-hidden { visibility:hidden; pointer-events:none; }
 .site-hidden * { pointer-events:none; }
 #siteHeader { position:sticky; top:0; z-index:200; }
 header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07); background:#fff; }
 .app-body.site-hidden { visibility:hidden; }
+/* Headerul Dokimasia rămâne mereu vizibil, indiferent de starea auth */
+#siteHeader { visibility:visible !important; pointer-events:auto !important; }
 </style>
 </head>
 <body>
@@ -293,7 +295,7 @@ header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07);
 </div>
 
 <!-- HEADER -->
-<div id="siteHeader" class="site-hidden">
+<div id="siteHeader">
   <!-- HEADER PRINCIPAL -->
   <header>
   <div class="header-top">
@@ -1039,6 +1041,19 @@ if (typeof openContactModal === 'undefined') {
     window.open('https://dokimasia.ro/contact.html', '_blank');
   };
 }
+
+// Calculează și actualizează înălțimea headerului pentru layout corect
+function updateHeaderHeight() {
+  const h = document.getElementById('siteHeader');
+  if (h) {
+    const ht = h.offsetHeight;
+    document.documentElement.style.setProperty('--header-h', ht + 'px');
+  }
+}
+window.addEventListener('load', updateHeaderHeight);
+window.addEventListener('resize', updateHeaderHeight);
+// Rulează și imediat după DOM ready
+document.addEventListener('DOMContentLoaded', updateHeaderHeight);
 function toggleAccount(){
   document.getElementById('accountDropdown').classList.toggle('open');
 }
