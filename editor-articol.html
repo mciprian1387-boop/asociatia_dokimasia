@@ -54,7 +54,7 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 .tip-tab .tt-label{line-height:1.3;}
 
 /* LAYOUT */
-.app-body{display:grid;grid-template-columns:240px 1fr 276px;height:calc(100vh - 195px);}
+.app-body{display:grid;grid-template-columns:240px 1fr 276px;height:calc(100vh - 210px);}
 
 /* SIDEBAR STÂNGA — Istoric */
 .sidebar-hist{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
@@ -271,7 +271,14 @@ av.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); 
       .mob-nav.open { display: flex; }
       .mob-nav a { color: #fff; text-align: center; padding: 14px; font-size: 0.9rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.2); }
    
-  </style>
+  
+/* AUTH VISIBILITY — header sempre in DOM per sticky funzionamento */
+.site-hidden { visibility:hidden; pointer-events:none; }
+.site-hidden * { pointer-events:none; }
+#siteHeader { position:sticky; top:0; z-index:200; }
+header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07); background:#fff; }
+.app-body.site-hidden { visibility:hidden; }
+</style>
 </head>
 <body>
 
@@ -286,7 +293,7 @@ av.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); 
 </div>
 
 <!-- HEADER -->
-<div id="appHeader" style="display:none;">
+<div id="siteHeader" class="site-hidden">
   <!-- HEADER PRINCIPAL -->
   <header>
   <div class="header-top">
@@ -363,7 +370,7 @@ av.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); 
 </div>
 
 <!-- BODY -->
-<div class="app-body" id="appBody" style="display:none;">
+<div class="app-body" id="appBody" class="site-hidden">
 
   <!-- SIDEBAR STÂNGA — Istoric -->
   <aside class="sidebar-hist">
@@ -508,8 +515,8 @@ window.onUserLoaded = function(user) {
   sbClient = window.sb || supabase.createClient(SB_URL, SB_ANON);
   // Ascunde guard, arată app
   document.getElementById('authGuard').classList.add('hidden');
-  document.getElementById('appHeader').style.display = 'block';
-  document.getElementById('appBody').style.display = 'grid';
+  document.getElementById('siteHeader').classList.remove('site-hidden');
+  document.getElementById('appBody').classList.remove('site-hidden');
   // Setează user în sidebar și în header
   document.getElementById('shUser').textContent = user.email.split('@')[0];
   document.getElementById('accountLabel').textContent = user.email.split('@')[0];
