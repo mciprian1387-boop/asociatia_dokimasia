@@ -698,7 +698,7 @@ let _stateCache = {};
 
 function colDate(){
   // Citește din DOM dacă există, altfel din cache
-  const d={tip:tipSelectat, autori, biblio};
+  const d={tip:tipSelectat, autori:[...autori], biblio:[...biblio]};
   d.titlu = (document.getElementById('f-titlu')||{}).value || _stateCache.titlu || '';
   d.subtitlu = (document.getElementById('f-subtitlu')||{}).value || _stateCache.subtitlu || '';
   d.cuvinte = (document.getElementById('f-cuvinte')||{}).value || _stateCache.cuvinte || '';
@@ -783,7 +783,8 @@ async function incarcaArticol(id){
   // Populează cache-ul cu datele articolului pentru persistență între panel-uri
   _stateCache = {
     titlu: d.titlu||'', subtitlu: d.subtitlu||'',
-    cuvinte: d.cuvinte||'', abRo: d.abRo||'', abEn: d.abEn||''
+    cuvinte: d.cuvinte||'', abRo: d.abRo||'', abEn: d.abEn||'',
+    autori: autori, biblio: biblio
   };
   sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
     if(d['r_'+s.id]) _stateCache['r_'+s.id]=d['r_'+s.id];
@@ -1167,11 +1168,79 @@ function initEditors(){
 // AUTORI
 function renderAutori(){
   const l=document.getElementById('autoriList');if(!l)return;
-  l.innerHTML=autori.map((a,i)=>`<div class="autor-row" id="ar-${a.id}"><div class="autor-nr">${i+1}</div><div><input type="text" class="fld-input" value="${esc(a.nume)}" placeholder="Andrei Ionuț POPESCU" oninput="updAutor(${a.id},'nume',this.value)"/><div class="autor-meta"><div><div class="autor-meta-lbl">Instituție</div><input type="text" class="fld-input" value="${esc(a.institutie)}" placeholder="Școala Gimnazială Nr. 1, Iași" oninput="updAutor(${a.id},'institutie',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div><div><div class="autor-meta-lbl">Email</div><input type="email" class="fld-input" value="${esc(a.email)}" placeholder="email@institutie.ro" oninput="updAutor(${a.id},'email',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div></div></div>${autori.length>1?`<button class="btn-rm-autor" onclick="rmAutor(${a.id})">✕</button>`:''}</div>`).join('');
+
+  // Autori care au cel puțin instituție sau email → primesc notă de subsol
+  const cuSubsol=autori.filter(a=>a.institutie.trim()||a.email.trim());
+
+  l.innerHTML=`
+    <!-- Preview academic: cum apare în articol -->
+    <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:4px;padding:10px 14px;margin-bottom:14px;">
+      <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:8px;">Previzualizare — cum apare în articol</div>
+      <div style="font-family:'Times New Roman',serif;font-size:11pt;text-align:center;margin-bottom:${cuSubsol.length?'10px':'0'};">
+        ${autori.map((a,i)=>{
+          const idx=cuSubsol.findIndex(x=>x.id===a.id);
+          const sup=idx>=0?`<sup style="color:var(--crimson);font-size:0.65em;">${idx+1}</sup>`:'';
+          return `<strong>${escVal(a.nume)||'(autor necompletat)'}</strong>${sup}`;
+        }).join('<span style="color:var(--muted);"> ,  </span>')}
+      </div>
+      ${cuSubsol.length?`
+        <div style="border-top:1px solid var(--border);padding-top:6px;margin-top:4px;">
+          ${cuSubsol.map((a,i)=>`
+            <div style="font-family:'Times New Roman',serif;font-size:9.5pt;color:#444;line-height:1.5;">
+              <sup style="color:var(--crimson);font-weight:700;">${i+1}</sup>
+              ${escVal(a.institutie)||''}${a.email?`${a.institutie?' — ':''}${escVal(a.email)}`:''}
+            </div>`).join('')}
+        </div>`:''}
+    </div>
+
+    <!-- Formularele de editare -->
+    ${autori.map((a,i)=>{
+      const idx=cuSubsol.findIndex(x=>x.id===a.id);
+      const supLabel=idx>=0?` <sup style="color:var(--crimson);">${idx+1}</sup>`:'';
+      return `<div class="autor-row" id="ar-${a.id}">
+        <div class="autor-nr">${i+1}</div>
+        <div style="flex:1;">
+          <input type="text" class="fld-input" value="${esc(a.nume)}" placeholder="Andrei Ionuț POPESCU"
+            oninput="updAutor(${a.id},'nume',this.value)"
+            style="font-weight:600;margin-bottom:7px;"/>
+          <div class="autor-meta">
+            <div>
+              <div class="autor-meta-lbl">Instituție${supLabel}</div>
+              <input type="text" class="fld-input" value="${esc(a.institutie)}"
+                placeholder="Școala Gimnazială Nr. 1, Iași"
+                oninput="updAutor(${a.id},'institutie',this.value)"/>
+              <div class="autor-fn">↳ apare în nota de subsol ${idx>=0?idx+1:''}</div>
+            </div>
+            <div>
+              <div class="autor-meta-lbl">Email${supLabel}</div>
+              <input type="email" class="fld-input" value="${esc(a.email)}"
+                placeholder="email@institutie.ro"
+                oninput="updAutor(${a.id},'email',this.value)"/>
+              <div class="autor-fn">↳ apare în nota de subsol ${idx>=0?idx+1:''}</div>
+            </div>
+          </div>
+        </div>
+        ${autori.length>1?`<button class="btn-rm-autor" onclick="rmAutor(${a.id})">✕</button>`:''}
+      </div>`;
+    }).join('')}
+  `;
 }
-function addAutor(){autori.push({id:autorContor++,nume:'',institutie:'',email:''});renderAutori();onChange();}
-function rmAutor(id){if(autori.length<=1)return;autori=autori.filter(a=>a.id!==id);renderAutori();onChange();}
-function updAutor(id,f,v){const a=autori.find(x=>x.id===id);if(a)a[f]=v;onChange();}
+function addAutor(){
+  autori.push({id:autorContor++,nume:'',institutie:'',email:''});
+  _stateCache.autori=autori;
+  renderAutori(); onChange();
+}
+function rmAutor(id){
+  if(autori.length<=1)return;
+  autori=autori.filter(a=>a.id!==id);
+  _stateCache.autori=autori;
+  renderAutori(); autosave();
+}
+function updAutor(id,f,v){
+  const a=autori.find(x=>x.id===id);
+  if(a){ a[f]=v; _stateCache.autori=autori; }
+  onChange();
+}
 
 // BIBLIO
 function renderBiblio(){
