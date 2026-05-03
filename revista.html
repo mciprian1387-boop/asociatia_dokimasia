@@ -1906,6 +1906,11 @@
     }
   }
 
+
+  // Deschide automat login dacă vine cu ?login=1
+  if (new URLSearchParams(window.location.search).get('login') === '1') {
+    setTimeout(() => { if (typeof openModal === 'function') openModal('login'); }, 600);
+  }
 </script>
 </body>
 </html>
