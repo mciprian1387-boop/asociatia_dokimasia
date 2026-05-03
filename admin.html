@@ -247,6 +247,12 @@
         <span class="sidebar-badge" id="msgBadge" style="background:#c00;">0</span>
       </div>
 
+      <div class="sidebar-item" onclick="showSection('redactie')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Redacție
+        <span class="sidebar-badge" id="redactieBadge" style="background:#b8963e;display:none;">0</span>
+      </div>
+
       <div class="sidebar-item" onclick="showSection('utilizatori')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Utilizatori
@@ -300,6 +306,41 @@
 
     <!-- CONTENT -->
     <div class="admin-content">
+
+      <!-- REDACȚIE -->
+      <div class="section" id="sec-redactie">
+        <div class="page-title">✏️ Redacție — Articole</div>
+
+        <!-- Filtre + Acțiuni -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;">
+          <button class="btn btn-red btn-sm" id="rfTot" onclick="filtreazaRedactie('toate')">Toate</button>
+          <button class="btn btn-outline btn-sm" id="rfDraft" onclick="filtreazaRedactie('draft')">📝 Draft</button>
+          <button class="btn btn-outline btn-sm" id="rfAst" onclick="filtreazaRedactie('in_asteptare')">⏳ În așteptare</button>
+          <button class="btn btn-outline btn-sm" id="rfEdit" onclick="filtreazaRedactie('editat')">✅ Editat</button>
+          <button class="btn btn-outline btn-sm" id="rfPub" onclick="filtreazaRedactie('publicat')">🟢 Publicat</button>
+          <div style="flex:1;"></div>
+          <button class="btn btn-outline btn-sm" onclick="loadRedactie()">↻ Actualizează</button>
+          <button class="btn btn-red btn-sm" onclick="deschideModalArticolNou()">+ Articol nou (redacție)</button>
+        </div>
+
+        <!-- Gestionare Editori -->
+        <div class="table-wrap" style="margin-bottom:16px;">
+          <div class="table-header">
+            <h3>👥 Editori autorizați</h3>
+            <button class="btn btn-outline btn-sm" onclick="deschideModalAdaugaEditor()">+ Adaugă editor</button>
+          </div>
+          <div id="editoriList"><div class="loading">Se încarcă...</div></div>
+        </div>
+
+        <!-- Lista articole -->
+        <div class="table-wrap">
+          <div class="table-header">
+            <h3 id="redactieTitluLista">Toate articolele</h3>
+            <span id="redactieCount" style="font-size:0.82rem;color:#888;"></span>
+          </div>
+          <div id="redactieList"><div class="loading">Se încarcă...</div></div>
+        </div>
+      </div>
 
       <!-- DASHBOARD -->
       <div class="section active" id="sec-dashboard">
@@ -1378,6 +1419,7 @@
     const sec = document.getElementById('sec-' + name)
     if(sec) sec.classList.add('active')
     event.currentTarget.classList.add('active')
+    if (name === 'redactie') loadRedactie()
     if (name === 'mesaje') loadMesaje()
     if (name === 'utilizatori') loadUtilizatori()
     if (name === 'noutati') loadNoutati()
@@ -1870,6 +1912,268 @@
     })
   }
 
+  // ══════════════════════════════════════════════════════════
+  // REDACȚIE
+  // ══════════════════════════════════════════════════════════
+  let redactieArticole = []
+  let redactieFiltru = 'toate'
+  let editori = []
+
+  const STATUS_LABEL = {
+    draft: { label: '📝 Draft', color: '#888' },
+    in_asteptare: { label: '⏳ În așteptare', color: '#e65100' },
+    editat: { label: '✅ Editat', color: '#2e7d32' },
+    publicat: { label: '🟢 Publicat', color: '#1565c0' }
+  }
+  const SURSA_LABEL = {
+    editor: 'Editor web',
+    import_word: '📄 Word',
+    import_pdf: '📄 PDF',
+    mail: '📧 Mail'
+  }
+
+  async function loadRedactie() {
+    document.getElementById('redactieList').innerHTML = '<div class="loading">Se încarcă...</div>'
+    try {
+      const { data, error } = await sbAdmin.from('view_redactie')
+        .select('*')
+        .order('updated_at', { ascending: false })
+      if (error) throw error
+      redactieArticole = data || []
+      renderRedactie()
+      // Badge în sidebar
+      const inAst = redactieArticole.filter(a => a.status === 'in_asteptare').length
+      const badge = document.getElementById('redactieBadge')
+      if (badge) { badge.style.display = inAst ? 'inline' : 'none'; badge.textContent = inAst }
+    } catch(e) {
+      document.getElementById('redactieList').innerHTML = `<div style="padding:16px;color:#c00;">Eroare: ${e.message}</div>`
+    }
+    await loadEditori()
+  }
+
+  function filtreazaRedactie(filtru) {
+    redactieFiltru = filtru
+    document.querySelectorAll('[id^="rf"]').forEach(b => b.className = 'btn btn-outline btn-sm')
+    const map = { toate:'rfTot', draft:'rfDraft', in_asteptare:'rfAst', editat:'rfEdit', publicat:'rfPub' }
+    const btn = document.getElementById(map[filtru])
+    if (btn) btn.className = 'btn btn-red btn-sm'
+    renderRedactie()
+  }
+
+  function renderRedactie() {
+    const lista = redactieFiltru === 'toate'
+      ? redactieArticole
+      : redactieArticole.filter(a => a.status === redactieFiltru)
+
+    document.getElementById('redactieCount').textContent = `${lista.length} articole`
+    const titluMap = { toate:'Toate articolele', draft:'Drafturi', in_asteptare:'În așteptare editare', editat:'Editate — gata de publicare', publicat:'Publicate' }
+    document.getElementById('redactieTitluLista').textContent = titluMap[redactieFiltru] || 'Articole'
+
+    if (!lista.length) {
+      document.getElementById('redactieList').innerHTML = '<div style="padding:24px;text-align:center;color:#888;font-style:italic;">Niciun articol în această categorie.</div>'
+      return
+    }
+
+    document.getElementById('redactieList').innerHTML = `
+      <table>
+        <thead><tr>
+          <th style="width:35%">Titlu</th>
+          <th>Tip</th>
+          <th>Status</th>
+          <th>Autor</th>
+          <th>Editor</th>
+          <th>Sursă</th>
+          <th>Actualizat</th>
+          <th>Acțiuni</th>
+        </tr></thead>
+        <tbody>
+          ${lista.map(a => {
+            const st = STATUS_LABEL[a.status] || { label: a.status, color: '#888' }
+            const data = new Date(a.updated_at).toLocaleDateString('ro-RO', { day:'numeric', month:'short', year:'2-digit' })
+            const tipIcon = { practic:'🎓', cercetare:'🔬', dezvoltare:'🌱' }[a.tip] || '📄'
+            const autorAfisat = a.autor_extern || a.autor_email?.split('@')[0] || '—'
+            const editorAfisat = a.editor_email?.split('@')[0] || '<span style="color:#bbb;font-style:italic;">nealoctat</span>'
+            return `<tr>
+              <td style="font-weight:600;max-width:200px;">
+                <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${a.titlu || ''}">${a.titlu || '<em style="color:#bbb">Fără titlu</em>'}</div>
+                ${a.note_redactie ? `<div style="font-size:0.72rem;color:#888;margin-top:2px;">📝 ${a.note_redactie.slice(0,50)}...</div>` : ''}
+              </td>
+              <td>${tipIcon} ${a.tip || '—'}</td>
+              <td><span style="color:${st.color};font-weight:600;font-size:0.82rem;">${st.label}</span></td>
+              <td style="font-size:0.82rem;">${autorAfisat}</td>
+              <td style="font-size:0.82rem;">${editorAfisat}</td>
+              <td style="font-size:0.78rem;color:#888;">${SURSA_LABEL[a.sursa] || a.sursa || '—'}</td>
+              <td style="font-size:0.78rem;color:#888;white-space:nowrap;">${data}</td>
+              <td>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                  <button class="btn btn-outline btn-sm" onclick="deschideModalGestiune('${a.id}')" title="Gestionează">⚙</button>
+                  <button class="btn btn-outline btn-sm" onclick="window.open('editor-articol.html?id=${a.id}','_blank')" title="Deschide în editor">✏</button>
+                  ${a.status !== 'publicat' ? `<button class="btn btn-red btn-sm" onclick="schimbaStatus('${a.id}','publicat')" title="Marchează publicat">🟢</button>` : ''}
+                </div>
+              </td>
+            </tr>`
+          }).join('')}
+        </tbody>
+      </table>`
+  }
+
+  // Schimbă statusul unui articol
+  async function schimbaStatus(id, newStatus) {
+    const { error } = await sbAdmin.from('articole_draft').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id)
+    if (error) { alert('Eroare: ' + error.message); return }
+    await loadRedactie()
+    showToast('Status actualizat: ' + STATUS_LABEL[newStatus]?.label)
+  }
+
+  // ─── Editori ────────────────────────────────────────────
+  async function loadEditori() {
+    const { data, error } = await sbAdmin.from('user_roles').select('user_id, rol, acordat_la')
+    if (error) { document.getElementById('editoriList').innerHTML = `<div style="padding:12px;color:#c00;">${error.message}</div>`; return }
+    editori = data || []
+    // Obține emailurile
+    const { data: users } = await sbAdmin.from('users_view').select('id, email, full_name')
+    const userMap = {}
+    ;(users||[]).forEach(u => userMap[u.id] = u)
+
+    if (!editori.length) {
+      document.getElementById('editoriList').innerHTML = '<div style="padding:12px;color:#888;font-style:italic;">Niciun editor autorizat.</div>'
+      return
+    }
+    document.getElementById('editoriList').innerHTML = `
+      <table>
+        <thead><tr><th>Utilizator</th><th>Rol</th><th>Acordat la</th><th>Acțiuni</th></tr></thead>
+        <tbody>
+          ${editori.map(e => {
+            const u = userMap[e.user_id] || {}
+            const data = new Date(e.acordat_la).toLocaleDateString('ro-RO')
+            const rolBadge = e.rol === 'admin' ? '🔴 Admin' : e.rol === 'editor' ? '🟡 Editor' : '⚪ Autor'
+            return `<tr>
+              <td>${u.email || e.user_id}</td>
+              <td><strong>${rolBadge}</strong></td>
+              <td style="font-size:0.82rem;color:#888;">${data}</td>
+              <td>
+                ${e.rol !== 'admin' ? `
+                  <button class="btn btn-outline btn-sm" onclick="schimbaRol('${e.user_id}','${e.rol === 'editor' ? 'autor' : 'editor'}')">
+                    ${e.rol === 'editor' ? '↓ Retrage editor' : '↑ Acordă editor'}
+                  </button>` : '<span style="color:#888;font-size:0.8rem;">Super-admin</span>'}
+              </td>
+            </tr>`
+          }).join('')}
+        </tbody>
+      </table>`
+  }
+
+  async function schimbaRol(userId, newRol) {
+    const { error } = await sbAdmin.from('user_roles').upsert({ user_id: userId, rol: newRol, acordat_la: new Date().toISOString() })
+    if (error) { alert('Eroare: ' + error.message); return }
+    await loadEditori()
+    showToast('Rol actualizat!')
+  }
+
+  // ─── Modal adaugă editor ────────────────────────────────
+  function deschideModalAdaugaEditor() {
+    document.getElementById('modalAdaugaEditor').style.display = 'flex'
+    document.getElementById('editorEmail').value = ''
+    document.getElementById('editorRol').value = 'editor'
+  }
+  function inchideModalAdaugaEditor() {
+    document.getElementById('modalAdaugaEditor').style.display = 'none'
+  }
+  async function salveazaEditor() {
+    const email = document.getElementById('editorEmail').value.trim()
+    const rol = document.getElementById('editorRol').value
+    if (!email) { alert('Introduceți emailul.'); return }
+    // Găsește user_id după email
+    const { data: users } = await sbAdmin.from('users_view').select('id').eq('email', email)
+    if (!users?.length) { alert('Utilizatorul nu există în baza de date. Trebuie să fie înregistrat mai întâi.'); return }
+    const userId = users[0].id
+    await schimbaRol(userId, rol)
+    inchideModalAdaugaEditor()
+  }
+
+  // ─── Modal gestiune articol ─────────────────────────────
+  let gestiuneArticolId = null
+  function deschideModalGestiune(id) {
+    gestiuneArticolId = id
+    const a = redactieArticole.find(x => x.id === id)
+    if (!a) return
+    document.getElementById('modalGestiune').style.display = 'flex'
+    document.getElementById('gArtTitlu').textContent = a.titlu || 'Fără titlu'
+    document.getElementById('gStatus').value = a.status
+    document.getElementById('gEditorId').value = a.editor_id || ''
+    document.getElementById('gAutorExtern').value = a.autor_extern || ''
+    document.getElementById('gNote').value = a.note_redactie || ''
+    // Populează selectul cu editori
+    const { data: users } = sbAdmin.from('users_view').select('id, email') // sync fallback
+    renderGEditori(a.editor_id)
+  }
+  async function renderGEditori(currentEditorId) {
+    const { data: users } = await sbAdmin.from('users_view').select('id, email')
+    const { data: roles } = await sbAdmin.from('user_roles').select('user_id').in('rol',['editor','admin'])
+    const editorIds = new Set((roles||[]).map(r => r.user_id))
+    const editorUsers = (users||[]).filter(u => editorIds.has(u.id))
+    const sel = document.getElementById('gEditorId')
+    sel.innerHTML = '<option value="">— Nealoctat —</option>' + editorUsers.map(u =>
+      `<option value="${u.id}" ${u.id === currentEditorId ? 'selected' : ''}>${u.email}</option>`
+    ).join('')
+  }
+  async function salveazaGestiune() {
+    const status = document.getElementById('gStatus').value
+    const editorId = document.getElementById('gEditorId').value || null
+    const autorExtern = document.getElementById('gAutorExtern').value.trim()
+    const note = document.getElementById('gNote').value.trim()
+    const { error } = await sbAdmin.from('articole_draft').update({
+      status, editor_id: editorId, autor_extern: autorExtern || null,
+      note_redactie: note || null, updated_at: new Date().toISOString()
+    }).eq('id', gestiuneArticolId)
+    if (error) { alert('Eroare: ' + error.message); return }
+    document.getElementById('modalGestiune').style.display = 'none'
+    await loadRedactie()
+    showToast('Articol actualizat!')
+  }
+  function inchideModalGestiune() {
+    document.getElementById('modalGestiune').style.display = 'none'
+  }
+
+  // ─── Modal articol nou din redacție ─────────────────────
+  function deschideModalArticolNou() {
+    document.getElementById('modalArticolNouRed').style.display = 'flex'
+    document.getElementById('anrAutor').value = ''
+    document.getElementById('anrTip').value = 'practic'
+    document.getElementById('anrNote').value = ''
+    document.getElementById('anrSursa').value = 'mail'
+  }
+  function inchideModalArticolNouRed() {
+    document.getElementById('modalArticolNouRed').style.display = 'none'
+  }
+  async function creeazaArticolRedactie() {
+    const autorExtern = document.getElementById('anrAutor').value.trim()
+    const tip = document.getElementById('anrTip').value
+    const note = document.getElementById('anrNote').value.trim()
+    const sursa = document.getElementById('anrSursa').value
+    const { data: me } = await sb.auth.getUser()
+    const userId = me?.user?.id
+    if (!userId) { alert('Eroare autentificare.'); return }
+    const { data, error } = await sbAdmin.from('articole_draft').insert({
+      user_id: userId, tip, status: 'in_asteptare', sursa,
+      autor_extern: autorExtern || null, note_redactie: note || null,
+      data: { titlu: '', autori: [], biblio: [] }
+    }).select('id').single()
+    if (error) { alert('Eroare: ' + error.message); return }
+    inchideModalArticolNouRed()
+    await loadRedactie()
+    showToast('Articol creat! Deschide-l în editor pentru a-l completa.')
+    if (data?.id) window.open('editor-articol.html?id=' + data.id, '_blank')
+  }
+
+  function showToast(msg) {
+    const t = document.createElement('div')
+    t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1a1108;color:#fff;padding:10px 18px;border-radius:4px;font-size:0.84rem;z-index:9999;box-shadow:0 3px 12px rgba(0,0,0,0.2);'
+    t.textContent = msg
+    document.body.appendChild(t)
+    setTimeout(() => t.remove(), 3500)
+  }
+
   checkAccess()
   loadSetari()
 </script>
@@ -1888,6 +2192,103 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button onclick="closeModalFinal()" style="padding:9px 20px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-family:'Georgia',serif;">Anulează</button>
       <button onclick="salveazaArticolFinal()" style="padding:9px 20px;background:#2e7d32;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Georgia',serif;font-weight:bold;">📤 Încarcă</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Adaugă Editor -->
+<div id="modalAdaugaEditor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:10px;padding:28px;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <h3 style="margin-bottom:16px;color:#333;">+ Adaugă editor</h3>
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Email utilizator</label>
+      <input id="editorEmail" type="email" placeholder="email@gmail.com" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:5px;font-size:0.88rem;"/>
+      <div style="font-size:0.74rem;color:#888;margin-top:4px;">Utilizatorul trebuie să fie deja înregistrat pe dokimasia.ro</div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Rol</label>
+      <select id="editorRol" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:5px;font-size:0.88rem;">
+        <option value="editor">🟡 Editor — poate edita orice articol</option>
+        <option value="admin">🔴 Admin — acces complet</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="inchideModalAdaugaEditor()" style="padding:8px 16px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;">Anulează</button>
+      <button onclick="salveazaEditor()" style="padding:8px 18px;background:#8B0000;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:600;">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Gestiune articol -->
+<div id="modalGestiune" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:10px;padding:28px;width:100%;max-width:500px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <h3 style="margin-bottom:4px;color:#333;">⚙ Gestiune articol</h3>
+    <div id="gArtTitlu" style="font-size:0.85rem;color:#888;margin-bottom:16px;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Status</label>
+        <select id="gStatus" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;">
+          <option value="draft">📝 Draft</option>
+          <option value="in_asteptare">⏳ În așteptare</option>
+          <option value="editat">✅ Editat</option>
+          <option value="publicat">🟢 Publicat</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Alocă editor</label>
+        <select id="gEditorId" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;">
+          <option value="">— Nealoctat —</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Autor extern (trimis pe mail)</label>
+      <input id="gAutorExtern" type="text" placeholder="Numele autorului care a trimis articolul" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;"/>
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Note redacție (interne)</label>
+      <textarea id="gNote" rows="3" placeholder="Observații, instrucțiuni pentru editor..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="inchideModalGestiune()" style="padding:8px 16px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;">Anulează</button>
+      <button onclick="salveazaGestiune()" style="padding:8px 18px;background:#8B0000;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:600;">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Articol nou din redacție -->
+<div id="modalArticolNouRed" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#fff;border-radius:10px;padding:28px;width:100%;max-width:460px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <h3 style="margin-bottom:16px;color:#333;">+ Articol nou (redacție)</h3>
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Autor extern <span style="font-weight:400;color:#888;">(trimis pe mail)</span></label>
+      <input id="anrAutor" type="text" placeholder="ex: Andrei Popescu, profesor la Liceul X" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div>
+        <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Tipul articolului</label>
+        <select id="anrTip" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;">
+          <option value="practic">🎓 Practici educaționale</option>
+          <option value="cercetare">🔬 Cercetare</option>
+          <option value="dezvoltare">🌱 Dezvoltare</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Sursa</label>
+        <select id="anrSursa" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;">
+          <option value="mail">📧 Trimis pe mail</option>
+          <option value="import_word">📄 Import Word</option>
+          <option value="import_pdf">📄 Import PDF</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:0.82rem;font-weight:600;margin-bottom:4px;color:#555;">Note inițiale</label>
+      <textarea id="anrNote" rows="2" placeholder="Observații, termenul de predare, instrucțiuni..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:0.85rem;resize:vertical;"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="inchideModalArticolNouRed()" style="padding:8px 16px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;">Anulează</button>
+      <button onclick="creeazaArticolRedactie()" style="padding:8px 18px;background:#8B0000;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:600;">Creează și deschide în editor →</button>
     </div>
   </div>
 </div>
