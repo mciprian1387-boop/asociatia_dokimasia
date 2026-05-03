@@ -64,16 +64,13 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 .tip-tab .tt-icon{font-size:1rem;flex-shrink:0;}
 .tip-tab .tt-label{line-height:1.3;}
 
-/* LAYOUT — sidebar stânga + editor centru */
-.app-body{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - var(--header-h,200px));}
+/* LAYOUT — 3 coloane: structura | editor | istoric */
+.app-body{display:grid;grid-template-columns:260px 1fr 280px;height:calc(100vh - var(--header-h,200px));}
 
-/* SIDEBAR STÂNGA UNIFICAT */
-.sidebar-main{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-
-/* Zona structura articolului */
-.sm-struct{display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
-.sm-struct-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.sm-struct-title{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
+/* ── SIDEBAR STÂNGA — Structura articolului ── */
+.sidebar-struct{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.ss-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ss-head-title{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
 .ss-list{flex:1;overflow-y:auto;padding:4px 6px;}
 .sb-item{display:flex;align-items:center;gap:5px;padding:7px 8px;border-radius:3px;cursor:pointer;font-size:0.79rem;color:#555;transition:all 0.15s;border:1px solid transparent;margin-bottom:1px;user-select:none;}
 .sb-item:hover{background:var(--paper);color:var(--crimson);}
@@ -91,44 +88,50 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 .si-btn:hover{color:var(--crimson);}
 .si-btn.del:hover{color:#e53935;}
 .sb-divider{font-size:0.57rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:7px 8px 3px;border-top:1px solid var(--border);margin-top:2px;}
-
-/* Progres */
-.sm-prog{padding:8px 12px;border-top:1px solid var(--border);flex-shrink:0;}
+.ss-foot{padding:8px 10px;border-top:1px solid var(--border);flex-shrink:0;}
+.btn-add-s{display:flex;align-items:center;gap:5px;width:100%;padding:7px 10px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.76rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;margin-bottom:6px;}
+.btn-add-s:hover{border-color:var(--crimson);color:var(--crimson);}
 .prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:4px;}
 .prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.4s;}
 .prog-txt{font-size:0.64rem;color:var(--muted);display:flex;justify-content:space-between;}
 .prog-warn{font-size:0.63rem;color:var(--crimson);margin-top:3px;line-height:1.4;}
-.btn-add-s{display:flex;align-items:center;gap:5px;width:100%;padding:7px 10px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.76rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;margin-bottom:6px;}
-.btn-add-s:hover{border-color:var(--crimson);color:var(--crimson);}
 
-/* Istoric colapsabil */
-.sm-istoric{border-top:2px solid var(--border);flex-shrink:0;}
-.sm-ist-toggle{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;cursor:pointer;background:var(--paper-dark);user-select:none;}
-.sm-ist-toggle:hover{background:var(--paper);}
-.sm-ist-label{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
-.sm-ist-arrow{font-size:0.7rem;color:var(--muted);transition:transform 0.2s;}
-.sm-ist-arrow.open{transform:rotate(180deg);}
-.sm-ist-body{display:none;max-height:260px;overflow-y:auto;}
-.sm-ist-body.open{display:block;}
-.hist-item{padding:8px 10px;border-bottom:1px solid var(--paper-dark);cursor:pointer;transition:background 0.12s;}
+/* ── SIDEBAR DREAPTA — Istoricul meu ── */
+.sidebar-istoric{background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.si-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.si-head-title{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
+.si-user{font-size:0.72rem;color:var(--crimson);font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.si-list{flex:1;overflow-y:auto;}
+.hist-item{padding:10px 12px;border-bottom:1px solid var(--paper-dark);cursor:pointer;transition:background 0.12s;}
 .hist-item:hover{background:var(--paper);}
-.hist-item.active{background:#fff3f3;}
-.hi-tip{font-size:0.58rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:2px;}
+.hist-item.active{background:#fff3f3;border-left:3px solid var(--crimson);}
+.hi-tip{font-size:0.58rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:3px;}
 .hi-tip.practic{color:#1565c0;}
 .hi-tip.cercetare{color:#2e7d32;}
 .hi-tip.dezvoltare{color:#6a1b9a;}
-.hi-titlu{font-size:0.8rem;font-weight:600;color:var(--ink);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.hi-data{font-size:0.65rem;color:var(--muted);margin-top:1px;}
-.hi-actions{display:flex;gap:4px;margin-top:4px;}
+.hi-titlu{font-size:0.82rem;font-weight:600;color:var(--ink);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hi-data{font-size:0.65rem;color:var(--muted);margin-top:2px;}
+.hi-actions{display:flex;gap:4px;margin-top:5px;}
 .hi-btn{background:none;border:1px solid var(--border);border-radius:2px;padding:2px 7px;font-size:0.66rem;cursor:pointer;color:var(--muted);transition:all 0.15s;font-family:'Source Serif 4',serif;}
 .hi-btn:hover{border-color:var(--crimson);color:var(--crimson);}
 .hi-btn.del:hover{border-color:#e53935;color:#e53935;}
-.sh-empty{padding:16px 12px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;}
-
-/* Footer sidebar */
-.sm-foot{padding:8px 10px;border-top:1px solid var(--border);flex-shrink:0;}
+.sh-empty{padding:20px 12px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;line-height:1.6;}
+.si-foot{padding:8px 10px;border-top:1px solid var(--border);flex-shrink:0;}
 .btn-new-art{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:var(--crimson);color:#fff;border:none;border-radius:4px;font-size:0.8rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;}
 .btn-new-art:hover{background:var(--crimson-dark);}
+
+/* ── CARDURI TIPURI — placeholder editor ── */
+.tip-cards{display:grid;grid-template-columns:1fr;gap:16px;padding:24px;max-width:680px;margin:0 auto;width:100%;}
+.tip-card{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:pointer;transition:box-shadow 0.2s,transform 0.15s;}
+.tip-card:hover{box-shadow:0 6px 24px rgba(139,0,0,0.13);transform:translateY(-2px);}
+.tip-card-header{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--crimson) 0%,#6a0000 100%);padding:14px 20px;}
+.tip-card-icon{width:38px;height:38px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.tip-card-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#fff;line-height:1.3;}
+.tip-card-sub{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:2px;font-style:italic;}
+.tip-card-body{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.tip-card-desc{font-size:0.85rem;color:#555;line-height:1.6;flex:1;}
+.tip-card-btn{display:inline-flex;align-items:center;gap:6px;background:var(--crimson);color:#fff;padding:8px 16px;border-radius:4px;font-size:0.8rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;white-space:nowrap;transition:background 0.2s;flex-shrink:0;}
+.tip-card-btn:hover{background:var(--crimson-dark);}
 
 /* EDITOR */
 .editor-area{overflow-y:auto;background:var(--paper);}
@@ -368,57 +371,90 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 <!-- BODY -->
 <div class="app-body" id="appBody" class="site-hidden">
 
-  <!-- SIDEBAR STÂNGA UNIFICAT -->
-  <aside class="sidebar-main">
-
-    <!-- Structura articolului -->
-    <div class="sm-struct">
-      <div class="sm-struct-head">
-        <span class="sm-struct-title">Structura articolului</span>
-        <span id="shUser" style="font-size:0.72rem;color:var(--crimson);font-weight:600;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span>
-      </div>
-      <div class="ss-list" id="sbList">
-        <div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării pentru a vedea structura.</div>
-      </div>
+  <!-- SIDEBAR STÂNGA — Structura articolului -->
+  <aside class="sidebar-struct">
+    <div class="ss-head">
+      <span class="ss-head-title">Structura articolului</span>
     </div>
-
-    <!-- Progres + Adaugă secțiune -->
-    <div class="sm-prog">
+    <div class="ss-list" id="sbList">
+      <div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării pentru a vedea structura.</div>
+    </div>
+    <div class="ss-foot">
       <button class="btn-add-s" onclick="adaugaSecLibera()" id="btnAddSec" style="display:none;">+ Adaugă secțiune</button>
       <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
       <div class="prog-txt"><span>Completare</span><span id="progPct">0%</span></div>
       <div class="prog-warn" id="progWarn"></div>
     </div>
-
-    <!-- Istoric articole — colapsabil -->
-    <div class="sm-istoric">
-      <div class="sm-ist-toggle" onclick="toggleIstoric()">
-        <span class="sm-ist-label">📂 Istoricul meu</span>
-        <span class="sm-ist-arrow" id="istArrow">▲</span>
-      </div>
-      <div class="sm-ist-body" id="shList">
-        <div class="sh-empty">Se încarcă...</div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="sm-foot">
-      <button class="btn-new-art" onclick="articolNou()">+ Articol nou</button>
-    </div>
   </aside>
 
-  <!-- EDITOR -->
+  <!-- EDITOR — zona centrală -->
   <main class="editor-area">
     <div id="editorInner">
-      <div class="editor-placeholder" style="height:100%;display:flex;">
-        <div style="text-align:center;padding:60px 20px;">
-          <div style="font-size:3rem;margin-bottom:16px;">📝</div>
-          <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">Selectați tipul lucrării</h3>
-          <p style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Alegeți una dintre cele trei arii tematice din bara de sus pentru a configura editorul și a începe redactarea.</p>
+      <!-- PLACEHOLDER cu cele 3 tipuri ca și carduri -->
+      <div id="tipCardsPlaceholder" style="overflow-y:auto;height:100%;display:flex;flex-direction:column;">
+        <div style="padding:28px 24px 8px;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:8px;">📝</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--crimson);margin-bottom:6px;">Editor articol — Revista Dokimasia</h3>
+          <p style="font-size:0.88rem;color:var(--muted);line-height:1.6;">Alegeți tipul lucrării pentru a configura editorul și a începe redactarea.</p>
+        </div>
+        <div class="tip-cards">
+          <div class="tip-card" onclick="schimbaTip('practic')">
+            <div class="tip-card-header">
+              <div class="tip-card-icon">🎓</div>
+              <div>
+                <div class="tip-card-title">Practici educaționale și inovare didactică</div>
+                <div class="tip-card-sub">Demersuri didactice, metode active, resurse educaționale</div>
+              </div>
+            </div>
+            <div class="tip-card-body">
+              <div class="tip-card-desc">Planuri de lecție, scenarii didactice, exemple de bună practică, instrumente de evaluare, activități remediale și materiale metodice.</div>
+              <button class="tip-card-btn">✏ Redactează →</button>
+            </div>
+          </div>
+          <div class="tip-card" onclick="schimbaTip('cercetare')">
+            <div class="tip-card-header">
+              <div class="tip-card-icon">🔬</div>
+              <div>
+                <div class="tip-card-title">Cercetare și analiză în educație</div>
+                <div class="tip-card-sub">Studii, cercetări, analize de politici educaționale</div>
+              </div>
+            </div>
+            <div class="tip-card-body">
+              <div class="tip-card-desc">Articole de specialitate, studii de caz, sinteze tematice, analize instituționale, articole de tip review și cercetări educaționale.</div>
+              <button class="tip-card-btn">✏ Redactează →</button>
+            </div>
+          </div>
+          <div class="tip-card" onclick="schimbaTip('dezvoltare')">
+            <div class="tip-card-header">
+              <div class="tip-card-icon">🌱</div>
+              <div>
+                <div class="tip-card-title">Dezvoltare educațională și profesională</div>
+                <div class="tip-card-sub">Proiecte, Erasmus+, formare continuă, reflecție profesională</div>
+              </div>
+            </div>
+            <div class="tip-card-body">
+              <div class="tip-card-desc">Prezentări de proiecte educaționale, materiale Erasmus+, eseuri profesionale, interviuri, recenzii și rapoarte de activitate.</div>
+              <button class="tip-card-btn">✏ Redactează →</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </main>
+
+  <!-- SIDEBAR DREAPTA — Istoricul meu (legat de utilizator Supabase) -->
+  <aside class="sidebar-istoric">
+    <div class="si-head">
+      <span class="si-head-title">📂 Istoricul meu</span>
+      <span id="shUser" class="si-user">—</span>
+    </div>
+    <div class="si-list" id="shList">
+      <div class="sh-empty">Se încarcă...</div>
+    </div>
+    <div class="si-foot">
+      <button class="btn-new-art" onclick="articolNou()">+ Articol nou</button>
+    </div>
+  </aside>
 </div>
 
 <!-- MODAL AI -->
@@ -613,7 +649,7 @@ function renderIstoric(){
   const list=document.getElementById('shList');
   if(!list)return;
   if(!istoricArticole.length){
-    list.innerHTML='<div class="sh-empty">Niciun articol salvat încă.<br>Apăsați "+ Articol nou".</div>';
+    list.innerHTML='<div class="sh-empty">Niciun articol salvat încă.<br>Apăsați <strong>+ Articol nou</strong> sau alegeți un tip de lucrare.</div>';
     return;
   }
   list.innerHTML=istoricArticole.map(art=>{
@@ -621,15 +657,13 @@ function renderIstoric(){
     const titlu=d.titlu||'Articol fără titlu';
     const data=new Date(art.updated_at).toLocaleDateString('ro-RO',{day:'numeric',month:'short',year:'2-digit'});
     const t=art.tip||'practic';
-    return `<div class="hist-item ${art.id===articleId?'active':''}" id="hi-${art.id}" style="padding:8px 12px;">
-      <div class="hi-tip ${t}">${TIPURI[t]?TIPURI[t].icon+' '+t.charAt(0).toUpperCase()+t.slice(1):'—'}</div>
+    return `<div class="hist-item ${art.id===articleId?'active':''}" id="hi-${art.id}">
+      <div class="hi-tip ${t}">${TIPURI[t]?TIPURI[t].icon+' '+TIPURI[t].label.split(' ').slice(0,2).join(' '):'—'}</div>
       <div class="hi-titlu" title="${escVal(titlu)}">${escVal(titlu)}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
-        <div class="hi-data">${data}</div>
-        <div class="hi-actions" style="opacity:1;">
-          <button class="hi-btn" onclick="incarcaArticol('${art.id}')">Deschide</button>
-          <button class="hi-btn del" onclick="stergeArticol('${art.id}')">✕</button>
-        </div>
+      <div class="hi-data">Salvat: ${data}</div>
+      <div class="hi-actions">
+        <button class="hi-btn" onclick="incarcaArticol('${art.id}')">Deschide</button>
+        <button class="hi-btn del" onclick="stergeArticol('${art.id}')">✕ Șterge</button>
       </div>
     </div>`;
   }).join('');
@@ -646,6 +680,9 @@ async function incarcaArticol(id){
   tipSelectat=art.tip||'practic';
   autori=d.autori||[{id:1,nume:'',institutie:'',email:''}];
   biblio=d.biblio||[''];
+  // Ascunde cardurile
+  const cards=document.getElementById('tipCardsPlaceholder');
+  if(cards) cards.style.display='none';
   buildSectiuni();
   renderAll();
   // Restore field values
@@ -692,10 +729,15 @@ function articolNou(){
 }
 
 function resetEditor(){
-  document.getElementById('editorInner').innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;padding:60px 20px;"><div style="font-size:3rem;margin-bottom:16px;">📝</div><h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">Selectați tipul lucrării</h3><p style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Alegeți una dintre cele trei arii tematice din bara de sus.</p></div></div>`;
+  // Reafișează cardurile de tip
+  const cards=document.getElementById('tipCardsPlaceholder');
+  if(cards) cards.style.display='flex';
+  // Șterge editorul dacă există
+  const edDiv=document.getElementById('editorContent');
+  if(edDiv) edDiv.remove();
   document.getElementById('sbList').innerHTML='<div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării.</div>';
   const btnAdd=document.getElementById('btnAddSec');
-  if(btnAdd)btnAdd.style.display='none';
+  if(btnAdd) btnAdd.style.display='none';
   document.getElementById('progFill').style.width='0%';
   document.getElementById('progPct').textContent='0%';
   document.getElementById('progWarn').textContent='';
@@ -705,11 +747,18 @@ function resetEditor(){
 // TIP BAR
 // ══════════════════════════════════════════════════════════
 function schimbaTip(tip){
-  if(tipSelectat===tip)return;
-  if(tipSelectat&&articleId){
+  if(tipSelectat===tip){
+    // dacă tipul e deja selectat și editorul e activ, nu face nimic
+    const cards=document.getElementById('tipCardsPlaceholder');
+    if(cards&&cards.style.display==='none') return;
+  }
+  if(tipSelectat&&articleId&&tipSelectat!==tip){
     if(!confirm('Schimbați tipul lucrării? Secțiunile specifice tipului curent vor fi înlocuite.'))return;
   }
   tipSelectat=tip;
+  // Ascunde cardurile, arată editorul propriu-zis
+  const cards=document.getElementById('tipCardsPlaceholder');
+  if(cards) cards.style.display='none';
   buildSectiuni();
   renderAll();
   activaSec('titlu');
@@ -744,7 +793,7 @@ function buildSectiuni(){
 // ══════════════════════════════════════════════════════════
 // RENDER ALL
 // ══════════════════════════════════════════════════════════
-function renderAll(){ renderSidebar(); renderEditor(); document.getElementById('btnAddSec').style.display='flex'; }
+function renderAll(){ renderSidebar(); renderEditor(); const b=document.getElementById('btnAddSec');if(b)b.style.display='flex'; }
 
 // SIDEBAR
 function renderSidebar(){
@@ -816,7 +865,7 @@ function initDrag(){
       const rest=mob.filter(s=>s.id!=='biblio');
       sectiuni=[...fix,...rest,bib];
       renderSidebar();
-      const inner=document.getElementById('editorInner');
+      const inner=document.getElementById('editorContent')||document.getElementById('editorInner');
       const bdom=document.getElementById('sec-biblio');
       rest.forEach(s=>{const el=document.getElementById('sec-'+s.id);if(el&&bdom)inner.insertBefore(el,bdom);});
       schedAS();
@@ -828,7 +877,19 @@ function initDrag(){
 // EDITOR
 // ══════════════════════════════════════════════════════════
 function renderEditor(){
-  document.getElementById('editorInner').innerHTML=sectiuni.map(s=>renderSec(s)).join('');
+  // Ascunde placeholder-ul cu carduri și inserează editorul
+  const cards=document.getElementById('tipCardsPlaceholder');
+  if(cards) cards.style.display='none';
+  const inner=document.getElementById('editorInner');
+  // Creează sau actualizează div-ul editorului propriu-zis
+  let edDiv=document.getElementById('editorContent');
+  if(!edDiv){
+    edDiv=document.createElement('div');
+    edDiv.id='editorContent';
+    edDiv.className='editor-inner';
+    inner.appendChild(edDiv);
+  }
+  edDiv.innerHTML=sectiuni.map(s=>renderSec(s)).join('');
   renderAutori();renderBiblio();initEditors();
 }
 function renderSec(s){
@@ -888,10 +949,11 @@ function adaugaSecLibera(){
   const s={id,label,icon:'📄',required:false,tip:'liber',hint:'Scrieți conținutul acestei secțiuni suplimentare.'};
   const biIdx=sectiuni.findIndex(x=>x.id==='biblio');
   sectiuni.splice(biIdx,0,s);
+  const container=document.getElementById('editorContent')||document.getElementById('editorInner');
   const biDom=document.getElementById('sec-biblio');
   const div=document.createElement('div');
   div.innerHTML=secRich(s);
-  document.getElementById('editorInner').insertBefore(div.firstElementChild,biDom);
+  container.insertBefore(div.firstElementChild,biDom);
   const re=document.getElementById('rich-'+id);
   if(re)re.addEventListener('focus',()=>{activeEd=re;});
   renderSidebar();activaSec(id);onChange();
@@ -1090,7 +1152,7 @@ document.querySelectorAll('.modal-ov').forEach(ov=>{
 
 // Salvare în timp real la orice tastă în zona editorului
 document.addEventListener('input', e=>{
-  if(e.target.closest('.editor-area')||e.target.closest('.sidebar-main')){
+  if(e.target.closest('.editor-area')){
     schedAS();
   }
 });
@@ -1103,14 +1165,6 @@ document.addEventListener('paste', e=>{
   if(e.target.classList.contains('rich-ed')){
     setTimeout(schedAS, 50);
   }
-});
-
-// Deschide istoricul la start
-document.addEventListener('DOMContentLoaded', ()=>{
-  const body=document.getElementById('shList');
-  const arrow=document.getElementById('istArrow');
-  if(body){ body.classList.add('open'); }
-  if(arrow){ arrow.classList.add('open'); }
 });
 </script>
 </body>
