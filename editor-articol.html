@@ -5,195 +5,218 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Editor Articol — Revista Dokimasia</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet"/>
 <style>
 :root{--crimson:#8B0000;--crimson-dark:#5a0000;--gold:#b8963e;--gold-light:#d4af6a;--ink:#1a1108;--paper:#faf8f4;--paper-dark:#f0ece4;--muted:#7a7060;--border:#ddd8cc;--shadow:0 2px 16px rgba(0,0,0,0.08);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);min-height:100vh;}
 
-.app-header{background:var(--crimson);background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 39px,rgba(255,255,255,0.03) 40px);padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:200;height:54px;}
-.app-logo{font-family:'Playfair Display',serif;font-size:0.92rem;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+/* AUTH GUARD */
+#authGuard{display:flex;position:fixed;inset:0;background:var(--paper);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+#authGuard.hidden{display:none;}
+.guard-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:40px 48px;text-align:center;max-width:400px;box-shadow:var(--shadow);}
+.guard-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--crimson);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
+.guard-logo span{color:var(--gold);}
+.guard-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--ink);margin-bottom:8px;}
+.guard-sub{font-size:0.88rem;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+.guard-btn{display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:11px 28px;border-radius:4px;font-size:0.92rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:background 0.2s;}
+.guard-btn:hover{background:var(--crimson-dark);}
+
+/* HEADER */
+.app-header{background:var(--crimson);background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 39px,rgba(255,255,255,0.03) 40px);border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;}
+.header-top{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:50px;}
+.app-logo{font-family:'Playfair Display',serif;font-size:0.9rem;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
 .app-logo span{color:var(--gold-light);}
-.header-mid{display:flex;align-items:center;gap:10px;}
-.autosave{font-size:0.7rem;display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:10px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);}
+.header-mid{display:flex;align-items:center;gap:8px;}
+.autosave{font-size:0.68rem;display:flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.65);}
 .autosave.saved{color:#81c784;}
 .autosave.saving{color:var(--gold-light);}
 .autosave.err{color:#ef9a9a;}
 .header-right{display:flex;align-items:center;gap:6px;}
-.hbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;}
+.hbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:3px;font-size:0.77rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;}
 .hbtn-gold{background:var(--gold);color:#fff;}
 .hbtn-gold:hover{background:var(--gold-light);}
 .hbtn-white{background:#fff;color:var(--crimson);}
 .hbtn-white:hover{background:var(--paper-dark);}
 .hbtn-ghost{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);}
 .hbtn-ghost:hover{background:rgba(255,255,255,0.22);}
+.hbtn-new{background:var(--gold);color:#fff;}
+.hbtn-new:hover{background:var(--gold-light);}
 
-.app-body{display:grid;grid-template-columns:250px 1fr 280px;height:calc(100vh - 54px);}
+/* TIP BAR */
+.tip-bar{display:flex;align-items:stretch;background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.1);}
+.tip-tab{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;cursor:pointer;font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);letter-spacing:0.3px;border-right:1px solid rgba(255,255,255,0.08);transition:all 0.2s;font-family:'Source Serif 4',serif;text-align:center;}
+.tip-tab:last-child{border-right:none;}
+.tip-tab:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.9);}
+.tip-tab.active{background:rgba(255,255,255,0.15);color:#fff;border-bottom:2px solid var(--gold);}
+.tip-tab .tt-icon{font-size:1rem;flex-shrink:0;}
+.tip-tab .tt-label{line-height:1.3;}
 
-/* SIDEBAR */
-.sidebar-l{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.sb-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
-.sb-list{flex:1;overflow-y:auto;padding:4px 6px;}
-.sb-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:3px;cursor:pointer;font-size:0.81rem;color:#555;transition:all 0.15s;border:1px solid transparent;margin-bottom:1px;user-select:none;}
+/* LAYOUT */
+.app-body{display:grid;grid-template-columns:240px 1fr 276px;height:calc(100vh - 88px);}
+
+/* SIDEBAR STÂNGA — Istoric */
+.sidebar-hist{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sh-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sh-title{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
+.sh-user{font-size:0.72rem;color:var(--crimson);font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sh-list{flex:1;overflow-y:auto;padding:4px 6px;}
+.hist-item{padding:9px 10px;border-radius:4px;cursor:pointer;border:1px solid transparent;margin-bottom:3px;transition:all 0.15s;}
+.hist-item:hover{background:var(--paper);border-color:var(--border);}
+.hist-item.active{background:var(--paper-dark);border-color:var(--border);}
+.hi-tip{font-size:0.6rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:3px;}
+.hi-tip.practic{color:#1565c0;}
+.hi-tip.cercetare{color:#2e7d32;}
+.hi-tip.dezvoltare{color:#6a1b9a;}
+.hi-titlu{font-size:0.82rem;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hi-data{font-size:0.68rem;color:var(--muted);}
+.hi-actions{display:flex;gap:4px;margin-top:5px;opacity:0;transition:opacity 0.15s;}
+.hist-item:hover .hi-actions{opacity:1;}
+.hi-btn{background:none;border:1px solid var(--border);border-radius:2px;padding:2px 7px;font-size:0.68rem;cursor:pointer;color:var(--muted);transition:all 0.15s;font-family:'Source Serif 4',serif;}
+.hi-btn:hover{border-color:var(--crimson);color:var(--crimson);}
+.hi-btn.del:hover{border-color:#e53935;color:#e53935;}
+.sh-empty{padding:20px 12px;text-align:center;color:var(--muted);font-size:0.8rem;font-style:italic;}
+.sh-foot{padding:8px 10px;border-top:1px solid var(--border);}
+.btn-new-art{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:var(--crimson);color:#fff;border:none;border-radius:4px;font-size:0.8rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:background 0.2s;}
+.btn-new-art:hover{background:var(--crimson-dark);}
+
+/* SIDEBAR DREAPTA — structură + progres */
+.sidebar-sec{background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.ss-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
+.ss-list{flex:1;overflow-y:auto;padding:4px 6px;}
+.sb-item{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:3px;cursor:pointer;font-size:0.79rem;color:#555;transition:all 0.15s;border:1px solid transparent;margin-bottom:1px;user-select:none;}
 .sb-item:hover{background:var(--paper);color:var(--crimson);}
 .sb-item.active{background:var(--paper-dark);color:var(--crimson);border-color:var(--border);}
-.si-drag{cursor:grab;color:#ccc;font-size:0.7rem;flex-shrink:0;}
-.si-icon{font-size:0.85rem;flex-shrink:0;}
-.si-label{flex:1;font-weight:500;font-size:0.8rem;}
-.si-req{color:var(--crimson);font-size:0.65rem;}
+.si-drag{cursor:grab;color:#ccc;font-size:0.68rem;flex-shrink:0;}
+.si-icon{font-size:0.82rem;flex-shrink:0;}
+.si-label{flex:1;font-weight:500;font-size:0.77rem;}
+.si-req{color:var(--crimson);font-size:0.62rem;}
 .si-dot{width:6px;height:6px;border-radius:50%;background:#ddd;flex-shrink:0;}
 .si-dot.ok{background:#66bb6a;}
 .si-dot.warn{background:#ffa726;}
 .si-acts{display:flex;gap:1px;opacity:0;transition:opacity 0.15s;}
 .sb-item:hover .si-acts{opacity:1;}
-.si-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.68rem;padding:2px 3px;border-radius:2px;}
+.si-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.65rem;padding:1px 3px;border-radius:2px;}
 .si-btn:hover{color:var(--crimson);}
 .si-btn.del:hover{color:#e53935;}
-.sb-divider{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:8px 8px 3px;border-top:1px solid var(--border);margin-top:3px;}
-.sb-foot{padding:8px 10px;border-top:1px solid var(--border);}
-.btn-add-s{display:flex;align-items:center;gap:6px;width:100%;padding:7px 10px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;margin-bottom:6px;}
+.sb-divider{font-size:0.57rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:7px 8px 3px;border-top:1px solid var(--border);margin-top:2px;}
+.ss-foot{padding:8px 10px;border-top:1px solid var(--border);}
+.btn-add-s{display:flex;align-items:center;gap:5px;width:100%;padding:7px 10px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.76rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;margin-bottom:6px;}
 .btn-add-s:hover{border-color:var(--crimson);color:var(--crimson);}
 .prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:3px;}
 .prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.4s;}
-.prog-txt{font-size:0.65rem;color:var(--muted);display:flex;justify-content:space-between;}
-.prog-warn{font-size:0.65rem;color:var(--crimson);margin-top:2px;line-height:1.4;}
+.prog-txt{font-size:0.64rem;color:var(--muted);display:flex;justify-content:space-between;}
+.prog-warn{font-size:0.63rem;color:var(--crimson);margin-top:2px;line-height:1.4;}
 
 /* EDITOR */
 .editor-area{overflow-y:auto;background:var(--paper);}
-.editor-inner{max-width:800px;margin:0 auto;padding:28px 36px 60px;}
+.editor-inner{max-width:790px;margin:0 auto;padding:26px 34px 60px;}
+.editor-placeholder{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:16px;color:var(--muted);}
+.editor-placeholder h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);}
+.editor-placeholder p{font-size:0.88rem;text-align:center;max-width:300px;line-height:1.6;}
 
-.sec-wrap{position:relative;margin-bottom:24px;padding-top:4px;}
+.sec-wrap{position:relative;margin-bottom:22px;padding-top:4px;scroll-margin-top:20px;}
 .sec-ctrl{position:absolute;top:4px;right:0;display:flex;gap:3px;opacity:0;transition:opacity 0.2s;z-index:10;}
 .sec-wrap:hover .sec-ctrl{opacity:1;}
-.sec-ctrl-btn{background:#fff;border:1px solid var(--border);border-radius:3px;padding:3px 8px;font-size:0.7rem;cursor:pointer;color:var(--muted);transition:all 0.15s;}
+.sec-ctrl-btn{background:#fff;border:1px solid var(--border);border-radius:3px;padding:3px 7px;font-size:0.68rem;cursor:pointer;color:var(--muted);transition:all 0.15s;}
 .sec-ctrl-btn:hover{border-color:var(--crimson);color:var(--crimson);}
 .sec-ctrl-btn.del:hover{border-color:#e53935;color:#e53935;}
 
-.sec-h{margin-bottom:14px;}
-.sec-h h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--crimson);}
-.sec-line{height:2px;background:linear-gradient(to right,var(--gold),transparent);margin:5px 0 7px;}
-.sec-hint{font-size:0.82rem;color:var(--muted);font-style:italic;line-height:1.55;}
+.sec-h{margin-bottom:12px;}
+.sec-h h2{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--crimson);}
+.sec-line{height:2px;background:linear-gradient(to right,var(--gold),transparent);margin:5px 0 6px;}
+.sec-hint{font-size:0.8rem;color:var(--muted);font-style:italic;line-height:1.55;}
 
-.fld{margin-bottom:16px;}
-.fld-label{display:block;font-size:0.66rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px;}
+.fld{margin-bottom:15px;}
+.fld-label{display:block;font-size:0.65rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px;}
 .req{color:var(--crimson);}
-.fld-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:3px;font-family:'Source Serif 4',serif;font-size:0.93rem;color:var(--ink);background:#fff;outline:none;transition:border-color 0.2s;line-height:1.6;}
+.fld-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:3px;font-family:'Source Serif 4',serif;font-size:0.92rem;color:var(--ink);background:#fff;outline:none;transition:border-color 0.2s;line-height:1.6;}
 .fld-input:focus{border-color:var(--crimson);box-shadow:0 0 0 2px rgba(139,0,0,0.06);}
-.fld-hint{font-size:0.72rem;color:var(--muted);margin-top:3px;font-style:italic;}
-.fld-count{font-size:0.7rem;color:var(--muted);text-align:right;margin-top:2px;}
+.fld-count{font-size:0.68rem;color:var(--muted);text-align:right;margin-top:2px;}
 
 /* WORD TOOLBAR */
 .word-tb{display:flex;flex-wrap:wrap;gap:1px;padding:3px 6px;background:#f0f0f0;border:1px solid var(--border);border-bottom:none;border-radius:3px 3px 0 0;align-items:center;}
 .tb-grp{display:flex;gap:1px;align-items:center;}
-.tb-sep{width:1px;height:18px;background:var(--border);margin:0 3px;}
-.tb-btn{display:inline-flex;align-items:center;justify-content:center;padding:2px 5px;border:1px solid transparent;border-radius:2px;background:none;cursor:pointer;font-size:0.78rem;color:#333;transition:all 0.12s;min-width:24px;height:24px;}
-.tb-btn:hover{background:#e0e0e0;border-color:#ccc;}
-.tb-sel{padding:1px 5px;border:1px solid var(--border);border-radius:2px;font-size:0.74rem;background:#fff;height:24px;cursor:pointer;outline:none;}
-.tb-color{width:24px;height:24px;border:1px solid var(--border);border-radius:2px;cursor:pointer;padding:0;}
+.tb-sep{width:1px;height:17px;background:var(--border);margin:0 3px;}
+.tb-btn{display:inline-flex;align-items:center;justify-content:center;padding:2px 5px;border:1px solid transparent;border-radius:2px;background:none;cursor:pointer;font-size:0.76rem;color:#333;transition:all 0.12s;min-width:23px;height:23px;}
+.tb-btn:hover{background:#ddd;border-color:#ccc;}
+.tb-sel{padding:1px 4px;border:1px solid var(--border);border-radius:2px;font-size:0.72rem;background:#fff;height:23px;cursor:pointer;outline:none;}
+.tb-color{width:23px;height:23px;border:1px solid var(--border);border-radius:2px;cursor:pointer;padding:0;}
 
-/* RICH EDITOR */
-.rich-ed{width:100%;min-height:180px;padding:12px 14px;border:1px solid var(--border);border-radius:0 0 3px 3px;font-family:'Times New Roman',Times,serif;font-size:12pt;color:var(--ink);background:#fff;outline:none;line-height:1.8;caret-color:var(--crimson);}
+.rich-ed{width:100%;min-height:160px;padding:11px 13px;border:1px solid var(--border);border-radius:0 0 3px 3px;font-family:'Times New Roman',Times,serif;font-size:12pt;color:var(--ink);background:#fff;outline:none;line-height:1.85;caret-color:var(--crimson);}
 .rich-ed:focus{border-color:var(--crimson);}
 .rich-ed p{text-indent:2em;text-align:justify;margin-bottom:0.3em;}
 .rich-ed[data-ph]:empty:before{content:attr(data-ph);color:#bbb;font-style:italic;font-size:11pt;pointer-events:none;}
 .rich-ed img{max-width:100%;border-radius:2px;margin:6px 0;display:block;}
 .rich-ed table{border-collapse:collapse;width:100%;margin:8px 0;}
 .rich-ed td,.rich-ed th{border:1px solid #ccc;padding:5px 8px;}
-.rich-ed blockquote{border-left:3px solid var(--gold);margin:8px 0;padding:6px 14px;font-style:italic;color:#555;background:#faf8f4;}
-.rich-ed hr{border:none;border-top:1px solid #ccc;margin:10px 0;}
+.rich-ed blockquote{border-left:3px solid var(--gold);margin:8px 0;padding:6px 12px;font-style:italic;color:#555;background:#faf8f4;}
 
 /* AUTORI */
-.autor-row{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;margin-bottom:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:3px;position:relative;}
-.autor-nr{width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:2px;}
-.autor-fields{display:flex;flex-direction:column;gap:8px;}
-.autor-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.autor-meta-lbl{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:2px;}
-.autor-fn{font-size:0.68rem;color:var(--muted);font-style:italic;margin-top:1px;}
-.btn-rm-autor{position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;color:#ccc;font-size:0.8rem;padding:2px;transition:color 0.15s;}
+.autor-row{display:grid;grid-template-columns:26px 1fr;gap:9px;align-items:start;margin-bottom:10px;padding:11px;background:#fff;border:1px solid var(--border);border-radius:3px;position:relative;}
+.autor-nr{width:26px;height:26px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:2px;}
+.autor-meta{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px;}
+.autor-meta-lbl{font-size:0.63rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:2px;}
+.autor-fn{font-size:0.66rem;color:var(--muted);font-style:italic;margin-top:1px;}
+.btn-rm-autor{position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;color:#ccc;font-size:0.78rem;}
 .btn-rm-autor:hover{color:#e53935;}
-.btn-add-autor{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
+.btn-add-autor{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.76rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
 .btn-add-autor:hover{border-color:var(--gold);color:var(--gold);}
 
 /* ABSTRACT */
-.ab-info{background:var(--paper-dark);border-left:3px solid var(--gold);padding:9px 13px;border-radius:0 3px 3px 0;margin-bottom:10px;font-size:0.8rem;color:var(--muted);line-height:1.55;}
-.ab-actions{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
-.btn-ai-gen{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:linear-gradient(135deg,#6a0080,#4a0060);color:#fff;border:none;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.ab-info{background:var(--paper-dark);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 3px 3px 0;margin-bottom:9px;font-size:0.78rem;color:var(--muted);line-height:1.55;}
+.ab-actions{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
+.btn-ai-gen{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:linear-gradient(135deg,#6a0080,#4a0060);color:#fff;border:none;border-radius:3px;font-size:0.76rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .btn-ai-gen:hover{background:linear-gradient(135deg,#7b1fa2,#5b006e);}
-.btn-ai-tr{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:linear-gradient(135deg,#01579b,#003c6e);color:#fff;border:none;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-ai-tr{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;background:linear-gradient(135deg,#01579b,#003c6e);color:#fff;border:none;border-radius:3px;font-size:0.76rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .btn-ai-tr:hover{background:linear-gradient(135deg,#0277bd,#004d8e);}
-.ab-en-head{font-size:0.66rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#01579b;margin:16px 0 8px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.ab-en-head::after{content:'EN';background:#01579b;color:#fff;padding:1px 5px;border-radius:2px;font-size:0.58rem;}
+.ab-en-head{font-size:0.64rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#01579b;margin:14px 0 7px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.ab-en-head::after{content:'EN';background:#01579b;color:#fff;padding:1px 5px;border-radius:2px;font-size:0.56rem;}
 
 /* BIBLIO */
-.bib-row{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;}
-.bib-nr{width:20px;height:20px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;margin-top:9px;}
-.btn-rm-bib{background:none;border:none;cursor:pointer;color:#ccc;font-size:0.78rem;padding:0 3px;margin-top:9px;}
+.bib-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:6px;}
+.bib-nr{width:19px;height:19px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;flex-shrink:0;margin-top:8px;}
+.btn-rm-bib{background:none;border:none;cursor:pointer;color:#ccc;font-size:0.76rem;padding:0 3px;margin-top:8px;}
 .btn-rm-bib:hover{color:#e53935;}
-.btn-add-bib{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
+.btn-add-bib{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.76rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
 .btn-add-bib:hover{border-color:var(--gold);color:var(--gold);}
-
-/* PREVIEW */
-.sidebar-r{background:var(--paper-dark);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
-.prev-head{padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
-.prev-body{flex:1;overflow-y:auto;padding:12px;}
-.prev-page{background:#fff;border:1px solid var(--border);border-radius:2px;padding:18px 16px;box-shadow:var(--shadow);font-family:'Times New Roman',Times,serif;font-size:10pt;line-height:1.5;min-height:200px;}
-.pv-titlu{font-size:12pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:3px;}
-.pv-sub{font-size:10.5pt;font-style:italic;text-align:center;margin-bottom:3px;}
-.pv-autori{text-align:center;font-size:10pt;margin-bottom:2px;}
-.pv-ab-lbl{font-weight:bold;font-size:9.5pt;margin-top:10px;margin-bottom:1px;}
-.pv-ab{text-align:justify;font-size:9.5pt;margin-bottom:6px;}
-.pv-kw{font-style:italic;font-size:9pt;margin-bottom:10px;}
-.pv-sec{font-weight:bold;font-size:10.5pt;margin:10px 0 2px;}
-.pv-corp{text-align:justify;font-size:10pt;text-indent:1.2em;margin-bottom:4px;}
-.pv-bib{font-size:9pt;margin-bottom:2px;}
-.pv-fn{font-size:8pt;color:#666;border-top:1px solid #ddd;padding-top:5px;margin-top:10px;}
-.prev-empty{text-align:center;padding:24px 8px;color:#bbb;font-style:italic;font-size:0.78rem;}
 
 /* MODALS */
 .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
 .modal-ov.open{display:flex;}
-.modal-box{background:#fff;border-radius:5px;width:90%;max-width:520px;box-shadow:0 16px 48px rgba(0,0,0,0.2);overflow:hidden;}
-.modal-head{background:var(--crimson);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
-.modal-head h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;font-weight:700;}
+.modal-box{background:#fff;border-radius:5px;width:90%;max-width:500px;box-shadow:0 16px 48px rgba(0,0,0,0.2);overflow:hidden;}
+.modal-head{background:var(--crimson);padding:15px 20px;display:flex;align-items:center;justify-content:space-between;}
+.modal-head h3{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;font-weight:700;}
 .modal-x{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.2rem;cursor:pointer;}
 .modal-x:hover{color:#fff;}
-.modal-body{padding:20px;}
-.modal-foot{padding:12px 20px;background:var(--paper-dark);border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
-.modal-opt{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all 0.2s;margin-bottom:7px;}
+.modal-body{padding:18px 20px;}
+.modal-foot{padding:11px 20px;background:var(--paper-dark);border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:7px;}
+.modal-opt{display:flex;align-items:flex-start;gap:8px;padding:9px;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all 0.2s;margin-bottom:6px;}
 .modal-opt:hover{border-color:var(--crimson);background:var(--paper);}
 .modal-opt input{margin-top:3px;accent-color:var(--crimson);}
-.mo-title{font-weight:600;font-size:0.85rem;}
-.mo-desc{font-size:0.74rem;color:var(--muted);margin-top:1px;}
-.btn-ok{background:var(--crimson);color:#fff;padding:8px 20px;border:none;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;}
+.mo-title{font-weight:600;font-size:0.84rem;}
+.mo-desc{font-size:0.73rem;color:var(--muted);margin-top:1px;}
+.btn-ok{background:var(--crimson);color:#fff;padding:7px 18px;border:none;border-radius:3px;font-size:0.83rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;}
 .btn-ok:hover{background:var(--crimson-dark);}
-.btn-cancel{background:none;color:var(--muted);padding:8px 14px;border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;cursor:pointer;}
-.ai-spin{text-align:center;padding:20px;display:none;}
-.ai-spin-icon{font-size:1.8rem;animation:spin 1s linear infinite;display:block;margin-bottom:6px;}
+.btn-cancel{background:none;color:var(--muted);padding:7px 13px;border:1px solid var(--border);border-radius:3px;font-size:0.83rem;font-family:'Source Serif 4',serif;cursor:pointer;}
+.ai-spin{text-align:center;padding:18px;display:none;}
+.ai-spin-icon{font-size:1.6rem;animation:spin 1s linear infinite;display:block;margin-bottom:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* TIP */
-.tip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
-.tip-card{border:2px solid var(--border);border-radius:5px;padding:16px;cursor:pointer;transition:all 0.2s;text-align:center;}
-.tip-card:hover{border-color:var(--crimson);transform:translateY(-1px);box-shadow:0 3px 12px rgba(0,0,0,0.08);}
-.tip-card.sel{border-color:var(--crimson);background:#fff8f8;}
-.tc-icon{font-size:1.6rem;margin-bottom:7px;}
-.tc-title{font-family:'Playfair Display',serif;font-size:0.82rem;font-weight:700;color:var(--ink);margin-bottom:5px;}
-.tc-secs{font-size:0.7rem;color:var(--muted);line-height:1.55;text-align:left;}
-
-/* INSERT */
-.ins-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.ins-opt{border:1px solid var(--border);border-radius:3px;padding:12px;cursor:pointer;text-align:center;transition:all 0.2s;}
+.ins-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.ins-opt{border:1px solid var(--border);border-radius:3px;padding:11px;cursor:pointer;text-align:center;transition:all 0.2s;}
 .ins-opt:hover{border-color:var(--crimson);background:var(--paper);}
-.ins-icon{font-size:1.3rem;margin-bottom:4px;}
-.ins-lbl{font-size:0.74rem;font-weight:600;color:var(--ink);}
+.ins-icon{font-size:1.2rem;margin-bottom:4px;}
+.ins-lbl{font-size:0.72rem;font-weight:600;color:var(--ink);}
 
 /* DRAG */
 .sb-item.dragging{opacity:0.3;}
 .sb-item.drag-over{border-top:2px solid var(--crimson);}
 
 /* TOAST */
-#toast-w{position:fixed;bottom:18px;right:18px;z-index:999;display:flex;flex-direction:column;gap:5px;}
-.toast{display:flex;align-items:center;gap:7px;background:#1a1108;color:#fff;padding:9px 14px;border-radius:3px;font-size:0.8rem;box-shadow:0 3px 14px rgba(0,0,0,0.2);animation:slideUp 0.2s ease;}
+#toast-w{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:5px;}
+.toast{display:flex;align-items:center;gap:6px;background:#1a1108;color:#fff;padding:8px 13px;border-radius:3px;font-size:0.78rem;box-shadow:0 3px 14px rgba(0,0,0,0.2);animation:slideUp 0.2s ease;}
 .toast.ok{border-left:3px solid #66bb6a;}
 .toast.err{border-left:3px solid #ef5350;}
 .toast.info{border-left:3px solid var(--gold);}
@@ -202,70 +225,92 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 </head>
 <body>
 
-<header class="app-header">
-  <div class="header-mid">
-    <div class="app-logo">Revista <span>Dokimasia</span></div>
-    <span style="color:rgba(255,255,255,0.3);margin:0 8px;">—</span>
-    <span style="font-size:0.75rem;color:rgba(255,255,255,0.6);">Editor articol</span>
-    <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">Inițializare...</span></div>
+<!-- AUTH GUARD -->
+<div id="authGuard">
+  <div class="guard-box">
+    <div class="guard-logo">Revista <span>Dokimasia</span></div>
+    <div class="guard-title">Editor articol</div>
+    <div class="guard-sub">Această pagină este disponibilă doar pentru utilizatorii autentificați. Vă rugăm să vă conectați pentru a accesa editorul și istoricul articolelor.</div>
+    <a href="revista.html" class="guard-btn">→ Conectați-vă pe revista.ro</a>
   </div>
-  <div class="header-right">
-    <button class="hbtn hbtn-ghost" onclick="deschideModalAI()">✨ AI</button>
-    <button class="hbtn hbtn-white" onclick="exportPDF()">⬇ PDF</button>
-    <button class="hbtn hbtn-gold" onclick="exportDOCX()">⬇ Word</button>
+</div>
+
+<!-- HEADER -->
+<header class="app-header" id="appHeader" style="display:none;">
+  <div class="header-top">
+    <div class="header-mid">
+      <div class="app-logo">Revista <span>Dokimasia</span></div>
+      <span style="color:rgba(255,255,255,0.3);margin:0 8px;">—</span>
+      <span style="font-size:0.74rem;color:rgba(255,255,255,0.6);">Editor articol</span>
+      <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">Se inițializează...</span></div>
+    </div>
+    <div class="header-right">
+      <button class="hbtn hbtn-ghost" onclick="deschideModalAI()">✨ AI</button>
+      <button class="hbtn hbtn-white" onclick="exportPDF()">⬇ PDF</button>
+      <button class="hbtn hbtn-gold" onclick="exportDOCX()">⬇ Word</button>
+    </div>
+  </div>
+
+  <!-- TIP BAR — permanent -->
+  <div class="tip-bar">
+    <div class="tip-tab" id="tab-practic" onclick="schimbaTip('practic')">
+      <span class="tt-icon">🎓</span>
+      <span class="tt-label">Practici educaționale<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">și inovare didactică</small></span>
+    </div>
+    <div class="tip-tab" id="tab-cercetare" onclick="schimbaTip('cercetare')">
+      <span class="tt-icon">🔬</span>
+      <span class="tt-label">Cercetare și analiză<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">în educație</small></span>
+    </div>
+    <div class="tip-tab" id="tab-dezvoltare" onclick="schimbaTip('dezvoltare')">
+      <span class="tt-icon">🌱</span>
+      <span class="tt-label">Dezvoltare educațională<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">și profesională</small></span>
+    </div>
   </div>
 </header>
 
-<div class="app-body">
-  <aside class="sidebar-l">
-    <div class="sb-head">Structura articolului</div>
-    <div class="sb-list" id="sbList"></div>
-    <div class="sb-foot">
-      <button class="btn-add-s" onclick="adaugaSecLibera()">+ Adaugă secțiune</button>
+<!-- BODY -->
+<div class="app-body" id="appBody" style="display:none;">
+
+  <!-- SIDEBAR STÂNGA — Istoric -->
+  <aside class="sidebar-hist">
+    <div class="sh-head">
+      <span class="sh-title">Istoricul meu</span>
+      <span class="sh-user" id="shUser">—</span>
+    </div>
+    <div class="sh-list" id="shList">
+      <div class="sh-empty">Se încarcă...</div>
+    </div>
+    <div class="sh-foot">
+      <button class="btn-new-art" onclick="articolNou()">+ Articol nou</button>
+    </div>
+  </aside>
+
+  <!-- EDITOR -->
+  <main class="editor-area">
+    <div id="editorInner">
+      <div class="editor-placeholder" style="height:100%;display:flex;">
+        <div style="text-align:center;padding:60px 20px;">
+          <div style="font-size:3rem;margin-bottom:16px;">📝</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">Selectați tipul lucrării</h3>
+          <p style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Alegeți una dintre cele trei arii tematice din bara de sus pentru a configura editorul și a începe redactarea.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SIDEBAR DREAPTA — Structură -->
+  <aside class="sidebar-sec">
+    <div class="ss-head">Structura articolului</div>
+    <div class="ss-list" id="sbList">
+      <div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării pentru a vedea structura.</div>
+    </div>
+    <div class="ss-foot">
+      <button class="btn-add-s" onclick="adaugaSecLibera()" id="btnAddSec" style="display:none;">+ Adaugă secțiune</button>
       <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
       <div class="prog-txt"><span>Completare</span><span id="progPct">0%</span></div>
       <div class="prog-warn" id="progWarn"></div>
     </div>
   </aside>
-
-  <main class="editor-area">
-    <div class="editor-inner" id="editorInner"></div>
-  </main>
-
-  <aside class="sidebar-r">
-    <div class="prev-head">Previzualizare live</div>
-    <div class="prev-body"><div class="prev-page" id="prevPage"><div class="prev-empty">Selectați tipul lucrării pentru a începe.</div></div></div>
-  </aside>
-</div>
-
-<!-- MODAL TIP -->
-<div class="modal-ov open" id="modalTip">
-  <div class="modal-box" style="max-width:640px;">
-    <div class="modal-head"><h3>📂 Selectați tipul lucrării</h3></div>
-    <div class="modal-body">
-      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:14px;">Structura editorului se adaptează automat în funcție de tipul selectat.</p>
-      <div class="tip-grid">
-        <div class="tip-card" id="tc-practic" onclick="selectTip('practic')">
-          <div class="tc-icon">🎓</div>
-          <div class="tc-title">Practici educaționale și inovare didactică</div>
-          <div class="tc-secs">• Introducere și context<br>• Descrierea demersului didactic<br>• Rezultate și observații<br>• Concluzii și recomandări</div>
-        </div>
-        <div class="tip-card" id="tc-cercetare" onclick="selectTip('cercetare')">
-          <div class="tc-icon">🔬</div>
-          <div class="tc-title">Cercetare și analiză în educație</div>
-          <div class="tc-secs">• Introducere și fundamentare<br>• Metodologie<br>• Rezultate și analiză<br>• Concluzii și implicații</div>
-        </div>
-        <div class="tip-card" id="tc-dezvoltare" onclick="selectTip('dezvoltare')">
-          <div class="tc-icon">🌱</div>
-          <div class="tc-title">Dezvoltare educațională și profesională</div>
-          <div class="tc-secs">• Introducere și context<br>• Descrierea intervenției<br>• Rezultate și observații<br>• Concluzii și implicații</div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-ok" id="btnConfirmaTip" onclick="confirmaTip()" disabled style="opacity:0.45;">Confirmă și începe →</button>
-    </div>
-  </div>
 </div>
 
 <!-- MODAL AI -->
@@ -308,6 +353,9 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 <div id="toast-w"></div>
 
 <script>
+// ══════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════
 const WORKER='https://dokimasia-articole.m-ciprian1387.workers.dev';
 const SB_URL='https://jaoxhsyplnkanhqevnnr.supabase.co';
 const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw';
@@ -316,13 +364,13 @@ const TIPURI={
   practic:{label:'Practici educaționale și inovare didactică',icon:'🎓',sectiuni:[
     {id:'s_intro',label:'Introducere și context',icon:'🔹',required:true,hint:'Prezentați contextul educațional, nevoia identificată și scopul demersului didactic.'},
     {id:'s_demers',label:'Descrierea demersului didactic',icon:'📋',required:true,hint:'Descrieți activitatea didactică: etape, metode, resurse și desfășurarea efectivă.'},
-    {id:'s_rezultate',label:'Rezultate și observații',icon:'📊',required:true,hint:'Prezentați rezultatele, reacțiile elevilor și dificultățile întâmpinate.'},
+    {id:'s_rezultate',label:'Rezultate și observații',icon:'📊',required:true,hint:'Prezentați rezultatele obținute, reacțiile elevilor și aspectele relevante observate.'},
     {id:'s_concluzii',label:'Concluzii și recomandări',icon:'✅',required:true,hint:'Sintetizați concluziile și formulați recomandări pentru cadre didactice interesate.'},
   ]},
   cercetare:{label:'Cercetare și analiză în educație',icon:'🔬',sectiuni:[
     {id:'s_intro',label:'Introducere și fundamentare teoretică',icon:'🔹',required:true,hint:'Prezentați contextul teoretic, literatura relevantă, problema și ipotezele.'},
     {id:'s_metodologie',label:'Metodologie',icon:'⚙️',required:true,hint:'Descrieți designul cercetării, participanții, instrumentele și procedura de analiză.'},
-    {id:'s_rezultate',label:'Rezultate și analiză',icon:'📊',required:true,hint:'Prezentați datele, rezultatele analizei și interpretarea în raport cu ipotezele.'},
+    {id:'s_rezultate',label:'Rezultate și analiză',icon:'📊',required:true,hint:'Prezentați datele, rezultatele și interpretarea în raport cu ipotezele.'},
     {id:'s_concluzii',label:'Concluzii și implicații',icon:'✅',required:true,hint:'Sintetizați concluziile, limitele studiului și implicațiile practice sau teoretice.'},
   ]},
   dezvoltare:{label:'Dezvoltare educațională și profesională',icon:'🌱',sectiuni:[
@@ -334,6 +382,12 @@ const TIPURI={
 };
 
 const FIX_IDS=['titlu','autori','abstract','cuvinte'];
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let sbClient=null;
+let currentUser=null;
 let tipSelectat=null;
 let autori=[{id:1,nume:'',institutie:'',email:''}];
 let biblio=[''];
@@ -343,86 +397,237 @@ let secActiva=null;
 let activeEd=null;
 let autosaveTimer=null;
 let articleId=null;
-let sb=null;
 let autorContor=2;
+let istoricArticole=[];
 
-// SUPABASE
-function initSB(){
-  try{sb=supabase.createClient(SB_URL,SB_ANON);setBadge('','Nesalvat');}
-  catch(e){setBadge('err','Offline');}
-}
-function setBadge(cls,txt){
+// ══════════════════════════════════════════════════════════
+// AUTH — via auth.js
+// ══════════════════════════════════════════════════════════
+window.onUserLoaded = function(user) {
+  if (!user) {
+    // Nu e autentificat — guard vizibil
+    document.getElementById('authGuard').classList.remove('hidden');
+    return;
+  }
+  currentUser = user;
+  // Inițializează Supabase cu același client din auth.js (window.sb)
+  sbClient = window.sb || supabase.createClient(SB_URL, SB_ANON);
+  // Ascunde guard, arată app
+  document.getElementById('authGuard').classList.add('hidden');
+  document.getElementById('appHeader').style.display = 'block';
+  document.getElementById('appBody').style.display = 'grid';
+  // Setează user în sidebar
+  document.getElementById('shUser').textContent = user.email.split('@')[0];
+  setBadge('', 'Nesalvat');
+  // Încarcă istoricul
+  incarcaIstoric();
+};
+
+// ══════════════════════════════════════════════════════════
+// SUPABASE AUTOSAVE
+// ══════════════════════════════════════════════════════════
+function setBadge(cls, txt){
   const b=document.getElementById('autosaveBadge');
   const t=document.getElementById('autosaveText');
   b.className='autosave '+cls; t.textContent=txt;
 }
+
 async function autosave(){
-  if(!sb||!tipSelectat)return;
+  if(!sbClient||!tipSelectat||!currentUser)return;
   setBadge('saving','Se salvează...');
   const data=colDate();
   try{
-    if(articleId){await sb.from('articole_draft').update({data,updated_at:new Date().toISOString()}).eq('id',articleId);}
-    else{const r=await sb.from('articole_draft').insert({data,tip:tipSelectat}).select().single();if(r.data)articleId=r.data.id;}
-    setBadge('saved','Salvat '+new Date().toLocaleTimeString('ro'));
-  }catch(e){setBadge('err','Eroare salvare');}
+    if(articleId){
+      await sbClient.from('articole_draft').update({data,tip:tipSelectat,updated_at:new Date().toISOString()}).eq('id',articleId);
+    } else {
+      const r=await sbClient.from('articole_draft').insert({
+        user_id:currentUser.id, data, tip:tipSelectat
+      }).select().single();
+      if(r.data){ articleId=r.data.id; incarcaIstoric(); }
+    }
+    setBadge('saved','Salvat '+new Date().toLocaleTimeString('ro-RO',{hour:'2-digit',minute:'2-digit'}));
+  }catch(e){ setBadge('err','Eroare salvare'); console.error(e); }
 }
-function schedAS(){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(autosave,1800);}
+
+function schedAS(){ clearTimeout(autosaveTimer); autosaveTimer=setTimeout(autosave,1800); }
+
 function colDate(){
-  const d={tip:tipSelectat,autori,biblio,sectiuni:sectiuni.map(s=>s.id)};
-  d.titlu=gv('f-titlu');d.subtitlu=gv('f-subtitlu');d.cuvinte=gv('f-cuvinte');
-  d.abRo=gi('rich-abstract');d.abEn=gi('rich-abstract-en');
-  sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{d['r_'+s.id]=gi('rich-'+s.id);});
+  const d={tip:tipSelectat,autori,biblio};
+  d.titlu=gv('f-titlu'); d.subtitlu=gv('f-subtitlu'); d.cuvinte=gv('f-cuvinte');
+  d.abRo=gi('rich-abstract'); d.abEn=gi('rich-abstract-en');
+  d.sectiuniLibere=sectiuni.filter(s=>s.tip==='liber').map(s=>({id:s.id,label:s.label,icon:s.icon,hint:s.hint,continut:gi('rich-'+s.id)}));
+  sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
+    d['r_'+s.id]=gi('rich-'+s.id);
+  });
   return d;
 }
 function gv(id){const e=document.getElementById(id);return e?e.value:'';}
 function gi(id){const e=document.getElementById(id);return e?e.innerHTML:'';}
 
-// TIP
-function selectTip(tip){
-  tipSelectat=tip;
-  document.querySelectorAll('.tip-card').forEach(c=>c.classList.remove('sel'));
-  document.getElementById('tc-'+tip).classList.add('sel');
-  const b=document.getElementById('btnConfirmaTip');
-  b.disabled=false;b.style.opacity='1';
+// ══════════════════════════════════════════════════════════
+// ISTORIC
+// ══════════════════════════════════════════════════════════
+async function incarcaIstoric(){
+  if(!sbClient||!currentUser)return;
+  const {data}=await sbClient.from('articole_draft')
+    .select('id,tip,data,updated_at')
+    .eq('user_id',currentUser.id)
+    .order('updated_at',{ascending:false});
+  istoricArticole=data||[];
+  renderIstoric();
 }
-function confirmaTip(){
-  if(!tipSelectat)return;
-  document.getElementById('modalTip').classList.remove('open');
+
+function renderIstoric(){
+  const list=document.getElementById('shList');
+  if(!istoricArticole.length){
+    list.innerHTML='<div class="sh-empty">Niciun articol salvat încă.<br>Începeți unul nou!</div>';
+    return;
+  }
+  list.innerHTML=istoricArticole.map(art=>{
+    const d=art.data||{};
+    const titlu=d.titlu||'Articol fără titlu';
+    const data=new Date(art.updated_at).toLocaleDateString('ro-RO',{day:'numeric',month:'short',year:'numeric'});
+    const t=art.tip||'practic';
+    return `<div class="hist-item ${art.id===articleId?'active':''}" id="hi-${art.id}">
+      <div class="hi-tip ${t}">${TIPURI[t]?TIPURI[t].icon+' '+t.charAt(0).toUpperCase()+t.slice(1):'—'}</div>
+      <div class="hi-titlu" title="${escVal(titlu)}">${escVal(titlu)}</div>
+      <div class="hi-data">Salvat: ${data}</div>
+      <div class="hi-actions">
+        <button class="hi-btn" onclick="incarcaArticol('${art.id}')">Deschide</button>
+        <button class="hi-btn del" onclick="stergeArticol('${art.id}')">Șterge</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function incarcaArticol(id){
+  const art=istoricArticole.find(a=>a.id===id);
+  if(!art)return;
+  if(articleId&&articleId!==id){
+    if(!confirm('Doriți să deschideți alt articol? Modificările nesalvate se vor pierde.'))return;
+  }
+  articleId=id;
+  const d=art.data||{};
+  tipSelectat=art.tip||'practic';
+  autori=d.autori||[{id:1,nume:'',institutie:'',email:''}];
+  biblio=d.biblio||[''];
+  buildSectiuni();
+  renderAll();
+  // Restore field values
+  setTimeout(()=>{
+    setFld('f-titlu',d.titlu||'');
+    setFld('f-subtitlu',d.subtitlu||'');
+    setFld('f-cuvinte',d.cuvinte||'');
+    setRich('rich-abstract',d.abRo||'');
+    setRich('rich-abstract-en',d.abEn||'');
+    sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{
+      setRich('rich-'+s.id,d['r_'+s.id]||'');
+    });
+    onChange();
+  },100);
+  activaSec('titlu');
+  updateTipBar();
+  renderIstoric();
+  toast('Articol deschis!','ok');
+}
+
+async function stergeArticol(id){
+  if(!confirm('Ștergem definitiv acest articol?'))return;
+  await sbClient.from('articole_draft').delete().eq('id',id);
+  if(articleId===id){ articleId=null; resetEditor(); }
+  await incarcaIstoric();
+  toast('Articol șters.','info');
+}
+
+function setFld(id,val){const e=document.getElementById(id);if(e)e.value=val;}
+function setRich(id,val){const e=document.getElementById(id);if(e&&val){e.innerHTML=val;e.dataset.ph&&(e.dataset.ph=e.dataset.ph);}}
+
+function articolNou(){
+  if(articleId){
+    if(!confirm('Începeți un articol nou? Salvați mai întâi articolul curent dacă doriți.'))return;
+  }
+  articleId=null;tipSelectat=null;
+  autori=[{id:1,nume:'',institutie:'',email:''}];
+  biblio=[''];secContor=0;sectiuni=[];
+  resetEditor();
+  updateTipBar();
+  setBadge('','Nesalvat');
+  renderIstoric();
+  toast('Editor resetat. Selectați tipul lucrării.','info');
+}
+
+function resetEditor(){
+  document.getElementById('editorInner').innerHTML=`<div style="height:100%;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;padding:60px 20px;"><div style="font-size:3rem;margin-bottom:16px;">📝</div><h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--ink);margin-bottom:8px;">Selectați tipul lucrării</h3><p style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Alegeți una dintre cele trei arii tematice din bara de sus.</p></div></div>`;
+  document.getElementById('sbList').innerHTML='<div style="padding:16px;text-align:center;color:var(--muted);font-size:0.78rem;font-style:italic;">Selectați tipul lucrării.</div>';
+  document.getElementById('btnAddSec').style.display='none';
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('progPct').textContent='0%';
+  document.getElementById('progWarn').textContent='';
+}
+
+// ══════════════════════════════════════════════════════════
+// TIP BAR
+// ══════════════════════════════════════════════════════════
+function schimbaTip(tip){
+  if(tipSelectat===tip)return;
+  if(tipSelectat&&articleId){
+    if(!confirm('Schimbați tipul lucrării? Secțiunile specifice tipului curent vor fi înlocuite.'))return;
+  }
+  tipSelectat=tip;
   buildSectiuni();
   renderAll();
   activaSec('titlu');
-  toast('Editor configurat: '+TIPURI[tipSelectat].label,'ok');
+  updateTipBar();
+  onChange();
 }
+
+function updateTipBar(){
+  document.querySelectorAll('.tip-tab').forEach(t=>t.classList.remove('active'));
+  if(tipSelectat){
+    const tab=document.getElementById('tab-'+tipSelectat);
+    if(tab)tab.classList.add('active');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// SECTIUNI
+// ══════════════════════════════════════════════════════════
 function buildSectiuni(){
+  const libere=sectiuni.filter(s=>s.tip==='liber');
   sectiuni=[
     {id:'titlu',label:'Titlu',icon:'📌',required:true,tip:'fix'},
     {id:'autori',label:'Autori',icon:'👤',required:true,tip:'fix'},
     {id:'abstract',label:'Abstract',icon:'📄',required:false,tip:'fix'},
     {id:'cuvinte',label:'Cuvinte-cheie',icon:'🔑',required:false,tip:'fix'},
     ...TIPURI[tipSelectat].sectiuni.map(s=>({...s,tip:'tip'})),
+    ...libere,
     {id:'biblio',label:'Bibliografie',icon:'📚',required:false,tip:'fix'},
   ];
 }
 
+// ══════════════════════════════════════════════════════════
 // RENDER ALL
-function renderAll(){renderSidebar();renderEditor();}
+// ══════════════════════════════════════════════════════════
+function renderAll(){ renderSidebar(); renderEditor(); document.getElementById('btnAddSec').style.display='flex'; }
 
 // SIDEBAR
 function renderSidebar(){
-  if(!tipSelectat){document.getElementById('sbList').innerHTML='';return;}
-  const fixe=sectiuni.filter(s=>FIX_IDS.includes(s.id));
-  const mobile=sectiuni.filter(s=>!FIX_IDS.includes(s.id));
-  let html=fixe.map(s=>sbItem(s,false)).join('');
+  if(!tipSelectat){ return; }
+  const fix=sectiuni.filter(s=>FIX_IDS.includes(s.id));
+  const mob=sectiuni.filter(s=>!FIX_IDS.includes(s.id));
+  let html=fix.map(s=>sbItem(s,false)).join('');
   html+=`<div class="sb-divider">Secțiuni articol</div>`;
-  html+=mobile.map(s=>sbItem(s,s.tip!=='fix')).join('');
+  html+=mob.map(s=>sbItem(s,s.tip!=='fix')).join('');
   document.getElementById('sbList').innerHTML=html;
   updateProg();
   initDrag();
 }
+
 function sbItem(s,drag){
   const f=isFilled(s.id);
-  return `<div class="sb-item ${s.id===secActiva?'active':''}" id="sb-${s.id}" onclick="activaSec('${s.id}')" ${drag?`draggable="true" data-id="${s.id}"`:''}>${drag?`<span class="si-drag">⠿</span>`:'<span style="width:14px"></span>'}<span class="si-icon">${s.icon||'📄'}</span><span class="si-label">${s.label}${s.required?'<span class="si-req"> *</span>':''}</span><span class="si-dot ${f?'ok':s.required?'warn':''}"></span><span class="si-acts">${s.tip==='liber'?`<button class="si-btn" onclick="event.stopPropagation();renum('${s.id}')" title="Redenumește">✎</button><button class="si-btn del" onclick="event.stopPropagation();delSec('${s.id}')" title="Șterge">✕</button>`:''}</span></div>`;
+  return `<div class="sb-item ${s.id===secActiva?'active':''}" id="sb-${s.id}" onclick="activaSec('${s.id}')" ${drag?`draggable="true" data-id="${s.id}"`:''}>${drag?`<span class="si-drag">⠿</span>`:'<span style="width:12px"></span>'}<span class="si-icon">${s.icon||'📄'}</span><span class="si-label">${s.label}${s.required?'<span class="si-req"> *</span>':''}</span><span class="si-dot ${f?'ok':s.required?'warn':''}"></span><span class="si-acts">${s.tip==='liber'?`<button class="si-btn" onclick="event.stopPropagation();renum('${s.id}')" title="Redenumește">✎</button><button class="si-btn del" onclick="event.stopPropagation();delSec('${s.id}')" title="Șterge">✕</button>`:''}</span></div>`;
 }
+
 function isFilled(id){
   if(id==='autori')return autori.some(a=>a.nume.trim());
   if(id==='biblio')return biblio.some(b=>b.trim());
@@ -431,6 +636,7 @@ function isFilled(id){
   const e=document.getElementById('rich-'+id);
   return e?e.innerText.trim().length>0:false;
 }
+
 function updateProg(){
   if(!tipSelectat)return;
   const req=sectiuni.filter(s=>s.required);
@@ -443,13 +649,13 @@ function updateProg(){
   const lipsa=req.filter(s=>!isFilled(s.id)).map(s=>s.label);
   document.getElementById('progWarn').textContent=lipsa.length?'⚠ '+lipsa.join(', '):'';
 }
+
 function activaSec(id){
   secActiva=id;
   document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active'));
   const s=document.getElementById('sb-'+id);if(s)s.classList.add('active');
   const sec=document.getElementById('sec-'+id);
   if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
-  updatePrev();
 }
 
 // DRAG
@@ -474,7 +680,6 @@ function initDrag(){
       const rest=mob.filter(s=>s.id!=='biblio');
       sectiuni=[...fix,...rest,bib];
       renderSidebar();
-      // Reorder DOM
       const inner=document.getElementById('editorInner');
       const bdom=document.getElementById('sec-biblio');
       rest.forEach(s=>{const el=document.getElementById('sec-'+s.id);if(el&&bdom)inner.insertBefore(el,bdom);});
@@ -483,77 +688,39 @@ function initDrag(){
   });
 }
 
+// ══════════════════════════════════════════════════════════
 // EDITOR
+// ══════════════════════════════════════════════════════════
 function renderEditor(){
-  const inner=document.getElementById('editorInner');
-  inner.innerHTML=sectiuni.map(s=>renderSec(s)).join('');
+  document.getElementById('editorInner').innerHTML=sectiuni.map(s=>renderSec(s)).join('');
   renderAutori();renderBiblio();initEditors();
 }
 function renderSec(s){
   if(s.id==='titlu')return secTitlu();
-  if(s.id==='autori')return secAutori();
+  if(s.id==='autori')return secAutoriHTML();
   if(s.id==='abstract')return secAbstract();
   if(s.id==='cuvinte')return secCuvinte();
   if(s.id==='biblio')return secBiblio();
   return secRich(s);
 }
 function tb(id){
-  return `<div class="word-tb">
-    <div class="tb-grp">
-      <select class="tb-sel" onchange="execF('fontName',this.value)"><option value="Times New Roman">Times New Roman</option><option value="Calibri">Calibri</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option></select>
-      <select class="tb-sel" style="width:44px" onchange="execF('fontSize',this.value)"><option value="3">12</option><option value="4">14</option><option value="5">18</option><option value="2">10</option></select>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-grp">
-      <button class="tb-btn" onclick="execF('bold')" title="Bold"><b>B</b></button>
-      <button class="tb-btn" onclick="execF('italic')" title="Italic"><i>I</i></button>
-      <button class="tb-btn" onclick="execF('underline')" title="Subliniat"><u>U</u></button>
-      <button class="tb-btn" onclick="execF('strikeThrough')" title="Tăiat"><s>S</s></button>
-      <input type="color" class="tb-color" title="Culoare text" onchange="execF('foreColor',this.value)"/>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-grp">
-      <button class="tb-btn" onclick="execF('justifyLeft')" title="Stânga">⬅</button>
-      <button class="tb-btn" onclick="execF('justifyCenter')" title="Centrat">☰</button>
-      <button class="tb-btn" onclick="execF('justifyRight')" title="Dreapta">➡</button>
-      <button class="tb-btn" onclick="execF('justifyFull')" title="Justify">≡</button>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-grp">
-      <button class="tb-btn" onclick="execF('insertUnorderedList')">• List</button>
-      <button class="tb-btn" onclick="execF('insertOrderedList')">1. List</button>
-      <button class="tb-btn" onclick="execF('indent')" title="Indent">→</button>
-      <button class="tb-btn" onclick="execF('outdent')" title="Outdent">←</button>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-grp">
-      <button class="tb-btn" onclick="deschideIns()" title="Inserează">⊞</button>
-    </div>
-    <div class="tb-sep"></div>
-    <div class="tb-grp">
-      <button class="tb-btn" onclick="execF('undo')" title="Anulează">↩</button>
-      <button class="tb-btn" onclick="execF('redo')" title="Refă">↪</button>
-    </div>
-  </div>`;
+  return `<div class="word-tb"><div class="tb-grp"><select class="tb-sel" onchange="execF('fontName',this.value)"><option value="Times New Roman">Times New Roman</option><option value="Calibri">Calibri</option><option value="Arial">Arial</option></select><select class="tb-sel" style="width:42px" onchange="execF('fontSize',this.value)"><option value="3">12</option><option value="4">14</option><option value="5">18</option><option value="2">10</option></select></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('bold')"><b>B</b></button><button class="tb-btn" onclick="execF('italic')"><i>I</i></button><button class="tb-btn" onclick="execF('underline')"><u>U</u></button><button class="tb-btn" onclick="execF('strikeThrough')"><s>S</s></button><input type="color" class="tb-color" title="Culoare" onchange="execF('foreColor',this.value)"/></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('justifyLeft')">⬅</button><button class="tb-btn" onclick="execF('justifyCenter')">☰</button><button class="tb-btn" onclick="execF('justifyRight')">➡</button><button class="tb-btn" onclick="execF('justifyFull')">≡</button></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('insertUnorderedList')">• List</button><button class="tb-btn" onclick="execF('insertOrderedList')">1.</button><button class="tb-btn" onclick="execF('indent')">→</button><button class="tb-btn" onclick="execF('outdent')">←</button></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="deschideIns()" title="Inserează">⊞</button></div><div class="tb-sep"></div><div class="tb-grp"><button class="tb-btn" onclick="execF('undo')">↩</button><button class="tb-btn" onclick="execF('redo')">↪</button></div></div>`;
 }
 function secTitlu(){return `<div class="sec-wrap" id="sec-titlu"><div class="sec-h"><h2>📌 Titlu <span class="req">*</span></h2><div class="sec-line"></div><p class="sec-hint">Titlul trebuie să fie concis și reprezentativ. Evitați titlurile vagi sau prea lungi.</p></div><div class="fld"><label class="fld-label">Titlul articolului <span class="req">*</span></label><input type="text" class="fld-input" id="f-titlu" placeholder="Introduceți titlul articolului..." oninput="onChange()"/></div><div class="fld"><label class="fld-label">Subtitlu <small style="text-transform:none;font-weight:400;">(opțional)</small></label><input type="text" class="fld-input" id="f-subtitlu" placeholder="Subtitlu opțional..." oninput="onChange()"/></div></div>`;}
-function secAutori(){return `<div class="sec-wrap" id="sec-autori"><div class="sec-h"><h2>👤 Autori <span class="req">*</span></h2><div class="sec-line"></div><p class="sec-hint">Scrieți prenumele cu literă mică și NUMELE DE FAMILIE CU MAJUSCULE. Ex: <strong>Andrei Ionuț POPESCU</strong>, <strong>Maria IONESCU</strong>. Instituția și emailul apar ca notă de subsol.</p></div><div id="autoriList"></div><button class="btn-add-autor" onclick="addAutor()">+ Adaugă autor</button></div>`;}
-function secAbstract(){return `<div class="sec-wrap" id="sec-abstract"><div class="sec-h"><h2>📄 Abstract</h2><div class="sec-line"></div></div><div class="ab-info"><strong>Notă:</strong> Abstractul se generează pe baza tuturor secțiunilor articolului (Introducere, metodologie/demers, rezultate, concluzii), cu excepția bibliografiei. Recomandat: 150–200 cuvinte.</div><div class="ab-actions"><button class="btn-ai-gen" onclick="genAbstract()">✨ AI — Generează abstract (RO)</button><button class="btn-ai-tr" onclick="tradAbstract()">🌐 AI — Traduce în engleză</button></div><div class="fld"><label class="fld-label">Abstract (Română)</label>${tb('abstract')}<div class="rich-ed" id="rich-abstract" contenteditable="true" data-ph="Scrieți sau generați abstractul în română..." oninput="onChange()"></div><div class="fld-count" id="abCnt">0 cuvinte</div></div><div class="ab-en-head">Abstract (English)</div><div class="fld">${tb('abstract-en')}<div class="rich-ed" id="rich-abstract-en" contenteditable="true" data-ph="English abstract..." oninput="onChange()"></div></div></div>`;}
-function secCuvinte(){return `<div class="sec-wrap" id="sec-cuvinte"><div class="sec-h"><h2>🔑 Cuvinte-cheie</h2><div class="sec-line"></div><p class="sec-hint">5-7 cuvinte cheie separate prin virgulă, relevante pentru conținut.</p></div><div class="fld"><label class="fld-label">Cuvinte-cheie</label><input type="text" class="fld-input" id="f-cuvinte" placeholder="ex: educație, didactică, inovare, formare, curriculum" oninput="onChange()"/><div class="fld-count" id="kwCnt">0 cuvinte-cheie</div></div></div>`;}
+function secAutoriHTML(){return `<div class="sec-wrap" id="sec-autori"><div class="sec-h"><h2>👤 Autori <span class="req">*</span></h2><div class="sec-line"></div><p class="sec-hint">Format: <strong>Prenume NUME</strong>. Ex: <strong>Andrei Ionuț POPESCU</strong>. Al doilea autor se separă cu virgulă. Instituția și emailul apar ca notă de subsol.</p></div><div id="autoriList"></div><button class="btn-add-autor" onclick="addAutor()">+ Adaugă autor</button></div>`;}
+function secAbstract(){return `<div class="sec-wrap" id="sec-abstract"><div class="sec-h"><h2>📄 Abstract</h2><div class="sec-line"></div></div><div class="ab-info"><strong>Notă:</strong> Abstractul se generează pe baza conținutului tuturor secțiunilor (Introducere, metodologie/demers, rezultate, concluzii), cu excepția bibliografiei. Recomandat: 150–200 cuvinte.</div><div class="ab-actions"><button class="btn-ai-gen" onclick="genAbstract()">✨ AI — Generează abstract (RO)</button><button class="btn-ai-tr" onclick="tradAbstract()">🌐 AI — Traduce în engleză</button></div><div class="fld"><label class="fld-label">Abstract (română)</label>${tb('abstract')}<div class="rich-ed" id="rich-abstract" contenteditable="true" data-ph="Scrieți sau generați abstractul în română..." oninput="onChange()"></div><div class="fld-count" id="abCnt">0 cuvinte</div></div><div class="ab-en-head">Abstract (English)</div><div class="fld">${tb('abstract-en')}<div class="rich-ed" id="rich-abstract-en" contenteditable="true" data-ph="English abstract..." oninput="onChange()"></div></div></div>`;}
+function secCuvinte(){return `<div class="sec-wrap" id="sec-cuvinte"><div class="sec-h"><h2>🔑 Cuvinte-cheie</h2><div class="sec-line"></div><p class="sec-hint">5-7 cuvinte cheie separate prin virgulă.</p></div><div class="fld"><label class="fld-label">Cuvinte-cheie</label><input type="text" class="fld-input" id="f-cuvinte" placeholder="ex: educație, didactică, inovare, formare, curriculum" oninput="onChange()"/><div class="fld-count" id="kwCnt">0 cuvinte-cheie</div></div></div>`;}
 function secBiblio(){return `<div class="sec-wrap" id="sec-biblio"><div class="sec-h"><h2>📚 Bibliografie</h2><div class="sec-line"></div><p class="sec-hint">Format APA, ordonate alfabetic. Ex: Ionescu, M. (2020). Titlul lucrării. Editura.</p></div><div id="biblioList"></div><button class="btn-add-bib" onclick="addBib()">+ Adaugă referință</button></div>`;}
 function secRich(s){
   const canDel=s.tip==='liber';
-  return `<div class="sec-wrap" id="sec-${s.id}">${canDel?`<div class="sec-ctrl"><button class="sec-ctrl-btn" onclick="renum('${s.id}')">✎ Redenumește</button><button class="sec-ctrl-btn del" onclick="delSec('${s.id}')">✕ Șterge</button></div>`:''}<div class="sec-h"><h2>${s.icon||'📄'} ${s.label}${s.required?' <span class="req">*</span>':''}</h2><div class="sec-line"></div><p class="sec-hint">${s.hint||'Scrieți conținutul acestei secțiuni.'}</p></div><div class="fld">${tb(s.id)}<div class="rich-ed" id="rich-${s.id}" contenteditable="true" data-ph="${(s.hint||'').split('.')[0]}..." oninput="onChange()"></div></div></div>`;
+  return `<div class="sec-wrap" id="sec-${s.id}">${canDel?`<div class="sec-ctrl"><button class="sec-ctrl-btn" onclick="renum('${s.id}')">✎</button><button class="sec-ctrl-btn del" onclick="delSec('${s.id}')">✕ Șterge</button></div>`:''}<div class="sec-h"><h2>${s.icon||'📄'} ${s.label}${s.required?' <span class="req">*</span>':''}</h2><div class="sec-line"></div><p class="sec-hint">${s.hint||'Scrieți conținutul acestei secțiuni.'}</p></div><div class="fld">${tb(s.id)}<div class="rich-ed" id="rich-${s.id}" contenteditable="true" data-ph="${(s.hint||'').split('.')[0]}..." oninput="onChange()"></div></div></div>`;
 }
 function execF(cmd,val){document.execCommand(cmd,false,val||null);onChange();}
 function initEditors(){
   document.querySelectorAll('.rich-ed').forEach(el=>{
     el.addEventListener('focus',()=>{activeEd=el;});
     el.addEventListener('keydown',e=>{
-      if(e.key==='Enter'&&!e.shiftKey){
-        e.preventDefault();
-        document.execCommand('insertParagraph',false,null);
-      }
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.execCommand('insertParagraph',false,null);}
     });
   });
 }
@@ -561,7 +728,7 @@ function initEditors(){
 // AUTORI
 function renderAutori(){
   const l=document.getElementById('autoriList');if(!l)return;
-  l.innerHTML=autori.map((a,i)=>`<div class="autor-row" id="ar-${a.id}"><div class="autor-nr">${i+1}</div><div class="autor-fields"><div class="autor-fields"><input type="text" class="fld-input" value="${esc(a.nume)}" placeholder="Andrei Ionuț POPESCU" oninput="updAutor(${a.id},'nume',this.value)" title="Format: Prenume NUME"/></div><div class="autor-meta"><div><div class="autor-meta-lbl">Instituție</div><input type="text" class="fld-input" value="${esc(a.institutie)}" placeholder="Școala Gimnazială Nr. 1, Iași" oninput="updAutor(${a.id},'institutie',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div><div><div class="autor-meta-lbl">Email</div><input type="email" class="fld-input" value="${esc(a.email)}" placeholder="email@institutie.ro" oninput="updAutor(${a.id},'email',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div></div></div>${autori.length>1?`<button class="btn-rm-autor" onclick="rmAutor(${a.id})">✕</button>`:''}</div>`).join('');
+  l.innerHTML=autori.map((a,i)=>`<div class="autor-row" id="ar-${a.id}"><div class="autor-nr">${i+1}</div><div><input type="text" class="fld-input" value="${esc(a.nume)}" placeholder="Andrei Ionuț POPESCU" oninput="updAutor(${a.id},'nume',this.value)"/><div class="autor-meta"><div><div class="autor-meta-lbl">Instituție</div><input type="text" class="fld-input" value="${esc(a.institutie)}" placeholder="Școala Gimnazială Nr. 1, Iași" oninput="updAutor(${a.id},'institutie',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div><div><div class="autor-meta-lbl">Email</div><input type="email" class="fld-input" value="${esc(a.email)}" placeholder="email@institutie.ro" oninput="updAutor(${a.id},'email',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div></div></div>${autori.length>1?`<button class="btn-rm-autor" onclick="rmAutor(${a.id})">✕</button>`:''}</div>`).join('');
 }
 function addAutor(){autori.push({id:autorContor++,nume:'',institutie:'',email:''});renderAutori();onChange();}
 function rmAutor(id){if(autori.length<=1)return;autori=autori.filter(a=>a.id!==id);renderAutori();onChange();}
@@ -576,7 +743,7 @@ function addBib(){biblio.push('');renderBiblio();onChange();}
 function rmBib(i){biblio.splice(i,1);renderBiblio();onChange();}
 function updBib(i,v){biblio[i]=v;onChange();}
 
-// SECȚIUNI LIBERE
+// SECTIUNI LIBERE
 function adaugaSecLibera(){
   if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
   secContor++;
@@ -594,10 +761,10 @@ function adaugaSecLibera(){
   renderSidebar();activaSec(id);onChange();
 }
 function delSec(id){
-  if(!confirm('Ștergem secțiunea? Conținutul va fi pierdut.'))return;
+  if(!confirm('Ștergem secțiunea?'))return;
   sectiuni=sectiuni.filter(s=>s.id!==id);
   const el=document.getElementById('sec-'+id);if(el)el.remove();
-  renderSidebar();activaSec('titlu');onChange();
+  renderSidebar();onChange();
 }
 function renum(id){
   const s=sectiuni.find(x=>x.id===id);if(!s)return;
@@ -610,9 +777,7 @@ function renum(id){
 }
 
 // CHANGE
-function onChange(){
-  updAbCnt();updKwCnt();updateProg();updatePrev();schedAS();
-}
+function onChange(){updAbCnt();updKwCnt();updateProg();renderSidebar();schedAS();}
 function updAbCnt(){
   const e=document.getElementById('rich-abstract');
   const c=document.getElementById('abCnt');
@@ -625,8 +790,7 @@ function updKwCnt(){
   const e=document.getElementById('f-cuvinte');
   const c=document.getElementById('kwCnt');
   if(!e||!c)return;
-  const n=e.value.split(',').map(s=>s.trim()).filter(Boolean).length;
-  c.textContent=n+' cuvinte-cheie';
+  c.textContent=e.value.split(',').map(s=>s.trim()).filter(Boolean).length+' cuvinte-cheie';
 }
 
 // INSERT
@@ -637,22 +801,14 @@ function insImagine(){closeIns();document.getElementById('imgInput').click();}
 function handleImg(inp){
   if(!inp.files[0])return;
   const r=new FileReader();
-  r.onload=e=>{const ed=getEd();if(!ed)return;ed.focus();document.execCommand('insertHTML',false,`<img src="${e.target.result}" alt="Imagine" style="max-width:100%;margin:8px 0;display:block;"/>`);onChange();};
+  r.onload=e=>{const ed=getEd();if(!ed)return;ed.focus();document.execCommand('insertHTML',false,`<img src="${e.target.result}" alt="Imagine" style="max-width:100%;margin:6px 0;display:block;"/>`);onChange();};
   r.readAsDataURL(inp.files[0]);inp.value='';
 }
-function insTabel(){
-  closeIns();
-  const rows=parseInt(prompt('Rânduri:','3'))||3;
-  const cols=parseInt(prompt('Coloane:','3'))||3;
-  let h='<table border="1" style="border-collapse:collapse;width:100%;margin:10px 0;">';
-  for(let r=0;r<rows;r++){h+='<tr>';for(let c=0;c<cols;c++)h+=`<td style="border:1px solid #ccc;padding:5px 8px;min-width:50px;">${r===0?'<strong>Col '+(c+1)+'</strong>':''}</td>`;h+='</tr>';}
-  h+='</table>';
-  const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,h);onChange();}
-}
-function insHR(){closeIns();const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,'<hr style="border:none;border-top:1px solid #ccc;margin:10px 0;"/>');onChange();}}
+function insTabel(){closeIns();const rows=parseInt(prompt('Rânduri:','3'))||3;const cols=parseInt(prompt('Coloane:','3'))||3;let h='<table border="1" style="border-collapse:collapse;width:100%;margin:8px 0;">';for(let r=0;r<rows;r++){h+='<tr>';for(let c=0;c<cols;c++)h+=`<td style="border:1px solid #ccc;padding:5px 8px;">${r===0?'<strong>Col '+(c+1)+'</strong>':''}</td>`;h+='</tr>';}h+='</table>';const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,h);onChange();}}
+function insHR(){closeIns();const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,'<hr style="border:none;border-top:1px solid #ccc;margin:8px 0;"/>');onChange();}}
 function insLink(){closeIns();const u=prompt('URL:','https://');if(!u)return;const t=prompt('Text:',u);const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,`<a href="${u}" target="_blank">${t||u}</a>`);onChange();}}
 function insEq(){closeIns();const eq=prompt('Ecuație:','E = mc²');if(!eq)return;const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,`<span style="font-style:italic;font-family:Times New Roman,serif;background:#f5f5f5;padding:1px 5px;border-radius:2px;">${eq}</span>`);onChange();}}
-function insCitare(){closeIns();const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,`<blockquote style="border-left:3px solid #b8963e;margin:8px 0;padding:6px 12px;font-style:italic;color:#555;background:#faf8f4;">Citare...</blockquote>`);onChange();}}
+function insCitare(){closeIns();const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,'<blockquote style="border-left:3px solid #b8963e;margin:8px 0;padding:6px 12px;font-style:italic;color:#555;background:#faf8f4;">Citare...</blockquote>');onChange();}}
 
 // AI
 function getCtx(){
@@ -662,15 +818,20 @@ function getCtx(){
     return t?`[${s.label}]\n${t}`:'';
   }).filter(Boolean).join('\n\n');
 }
+async function callWorkerAI(payload){
+  const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const d=await r.json();
+  if(!d.success)throw new Error(d.error);
+  return d.text;
+}
 async function genAbstract(){
   const ctx=getCtx();const titlu=gv('f-titlu');
   if(!ctx&&!titlu){toast('Completați mai întâi secțiunile articolului.','err');return;}
   toast('AI generează abstractul...','info');
   try{
-    const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opt:'abstract',context:`Titlu: ${titlu}\n\n${ctx}`,titlu,tipLucrare:tipSelectat?TIPURI[tipSelectat].label:''})});
-    const d=await r.json();if(!d.success)throw new Error(d.error);
+    const text=await callWorkerAI({opt:'abstract',context:`Titlu: ${titlu}\n\n${ctx}`,titlu,tipLucrare:tipSelectat?TIPURI[tipSelectat].label:''});
     const e=document.getElementById('rich-abstract');
-    if(e){e.innerHTML='<p>'+d.text.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';}
+    if(e){e.innerHTML='<p>'+text.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';}
     onChange();toast('Abstract generat!','ok');
   }catch(e){toast('Eroare AI: '+e.message,'err');}
 }
@@ -680,10 +841,9 @@ async function tradAbstract(){
   if(!t){toast('Scrieți mai întâi abstractul în română.','err');return;}
   toast('AI traduce abstractul...','info');
   try{
-    const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opt:'translate_abstract',context:t,titlu:gv('f-titlu')})});
-    const d=await r.json();if(!d.success)throw new Error(d.error);
+    const text=await callWorkerAI({opt:'translate_abstract',context:t,titlu:gv('f-titlu')});
     const en=document.getElementById('rich-abstract-en');
-    if(en){en.innerHTML='<p>'+d.text.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';}
+    if(en){en.innerHTML='<p>'+text.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';}
     onChange();toast('Abstract tradus în engleză!','ok');
   }catch(e){toast('Eroare AI: '+e.message,'err');}
 }
@@ -700,43 +860,14 @@ async function ruleazaAI(){
   document.getElementById('aiSpin').style.display='block';
   document.getElementById('aiOpts').style.display='none';
   document.getElementById('aiFooter').style.display='none';
-  const ctx=getCtx();const titlu=gv('f-titlu');
   try{
-    const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opt,context:ctx,titlu,tipLucrare:TIPURI[tipSelectat].label})});
-    const d=await r.json();if(!d.success)throw new Error(d.error);
-    if(opt==='abstract'){const e=document.getElementById('rich-abstract');if(e)e.innerHTML='<p>'+d.text.replace(/\n\n/g,'</p><p>')+'</p>';toast('Abstract generat!','ok');}
-    else if(opt==='keywords'){const e=document.getElementById('f-cuvinte');if(e)e.value=d.text;toast('Cuvinte-cheie extrase!','ok');}
+    const text=await callWorkerAI({opt,context:getCtx(),titlu:gv('f-titlu'),tipLucrare:tipSelectat?TIPURI[tipSelectat].label:''});
+    if(opt==='abstract'){const e=document.getElementById('rich-abstract');if(e)e.innerHTML='<p>'+text.replace(/\n\n/g,'</p><p>')+'</p>';toast('Abstract generat!','ok');}
+    else if(opt==='keywords'){const e=document.getElementById('f-cuvinte');if(e)e.value=text;toast('Cuvinte-cheie extrase!','ok');}
     else if(opt==='diacritice'){toast('Diacritice corectate!','ok');}
     onChange();
   }catch(e){toast('Eroare AI: '+e.message,'err');}
   inchideModalAI();
-}
-
-// PREVIEW
-function updatePrev(){
-  const p=document.getElementById('prevPage');
-  if(!tipSelectat){p.innerHTML='<div class="prev-empty">Selectați tipul lucrării.</div>';return;}
-  const titlu=gv('f-titlu');const sub=gv('f-subtitlu');const kw=gv('f-cuvinte');
-  const abRo=gi('rich-abstract');const abEn=gi('rich-abstract-en');
-  const autoriNm=autori.filter(a=>a.nume).map(a=>a.nume).join(', ');
-  const fns=autori.filter(a=>a.institutie||a.email);
-  if(!titlu&&!autoriNm){p.innerHTML='<div class="prev-empty">Completați câmpurile pentru previzualizare.</div>';return;}
-  let h='';
-  if(titlu)h+=`<div class="pv-titlu">${titlu}</div>`;
-  if(sub)h+=`<div class="pv-sub">${sub}</div>`;
-  if(autoriNm)h+=`<div class="pv-autori">${autoriNm}</div>`;
-  if(abRo&&abRo.replace(/<[^>]+>/g,'').trim())h+=`<div class="pv-ab-lbl">Abstract:</div><div class="pv-ab">${abRo}</div>`;
-  if(abEn&&abEn.replace(/<[^>]+>/g,'').trim())h+=`<div class="pv-ab-lbl" style="color:#01579b;">Abstract (EN):</div><div class="pv-ab">${abEn}</div>`;
-  if(kw)h+=`<div class="pv-kw"><strong>Cuvinte-cheie:</strong> ${kw}</div>`;
-  let nr=1;
-  sectiuni.filter(s=>!['titlu','autori','abstract','cuvinte','biblio'].includes(s.id)).forEach(s=>{
-    const e=document.getElementById('rich-'+s.id);
-    if(e&&e.innerText.trim())h+=`<div class="pv-sec">${nr++}. ${s.label}</div><div class="pv-corp">${e.innerHTML}</div>`;
-  });
-  const bf=biblio.filter(Boolean);
-  if(bf.length)h+=`<div class="pv-sec">Bibliografie</div>`+bf.map((b,i)=>`<div class="pv-bib">${i+1}. ${b}</div>`).join('');
-  if(fns.length)h+=`<div class="pv-fn">`+fns.map((a,i)=>`<div>${i+1}. ${a.institutie||''}${a.email?' — '+a.email:''}</div>`).join('')+'</div>';
-  p.innerHTML=h||'<div class="prev-empty">Completați câmpurile...</div>';
 }
 
 // EXPORT
@@ -778,20 +909,16 @@ function exportPDF(){
 
 // UTILS
 function slugify(s){return(s||'').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,40)||'articol';}
-function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function escVal(s){return(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function toast(msg,type='ok'){
   const w=document.getElementById('toast-w');
   const e=document.createElement('div');e.className='toast '+type;e.textContent=msg;
   w.appendChild(e);setTimeout(()=>e.remove(),4000);
 }
-
-// MODAL CLOSE
 document.querySelectorAll('.modal-ov').forEach(ov=>{
-  ov.addEventListener('click',e=>{if(e.target===ov&&ov.id!=='modalTip')ov.classList.remove('open');});
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('open');});
 });
-
-// START
-initSB();
 </script>
 </body>
 </html>
