@@ -1423,12 +1423,80 @@ function secPanelBiblio(){
   </div>`;
 }
 
+// Ghiduri specifice per secțiune și tip de articol
+const GHIDURI_SECTIUNI = {
+  s_intro: {
+    practic: {
+      titlu: '🔹 Ce să scrii în Introducere și context',
+      culoare: '#e8f5e9', border: '#a5d6a7', titluColor: '#2e7d32',
+      pasi: [
+        '<strong>Contextul educațional</strong> — Descrie pe scurt mediul școlar sau clasa în care s-a desfășurat activitatea (nivel, număr de elevi, caracteristici relevante).',
+        '<strong>Nevoia identificată</strong> — Ce problemă sau dificultate ai observat la elevi care te-a determinat să aplici această practică? (ex: lipsă motivație, dificultăți de înțelegere, nevoia de diferențiere)',
+        '<strong>Scopul activității</strong> — Ce ai urmărit să obții prin această intervenție didactică? Formulează clar obiectivul principal.',
+        '<strong>Justificarea abordării</strong> — De ce ai ales această metodă/activitate? Ce te-a inspirat sau ce surse ai consultat?',
+      ],
+      exemplu: 'Ex: „În clasa a VI-a B, cu 28 de elevi, am observat o scădere a motivației pentru lectură. Am decis să implementez metoda cercurilor literare pentru a stimula lectura activă și discuția critică..."',
+      lungime: '150–300 cuvinte'
+    },
+    cercetare: {
+      titlu: '🔹 Ce să scrii în Introducere și fundamentare teoretică',
+      culoare: '#e3f2fd', border: '#90caf9', titluColor: '#1565c0',
+      pasi: [
+        '<strong>Contextul și relevanța temei</strong> — De ce este importantă această temă în educația actuală? Ce probleme sau tendințe justifică cercetarea ta?',
+        '<strong>Revizuirea literaturii</strong> — Menționează 3–5 autori sau studii relevante care au abordat tema. Folosește formatul: Autor (An) a demonstrat că...',
+        '<strong>Problema de cercetare</strong> — Formulează clar întrebarea sau problema la care răspunde studiul tău. (ex: „Care este impactul metodelor colaborative asupra rezultatelor la matematică?")',
+        '<strong>Ipoteza / Obiectivele</strong> — Ce presupui că vei găsi? Care sunt obiectivele specifice ale cercetării?',
+        '<strong>Contribuția originală</strong> — Ce aduce nou față de ce există deja în literatură?',
+      ],
+      exemplu: 'Ex: „Impactul utilizării tehnologiei în educație a fost studiat extensiv (Hattie, 2009; Marzano, 2017), însă puține studii vizează contextul școlilor rurale din România. Prezenta cercetare urmărește să..."',
+      lungime: '250–400 cuvinte'
+    },
+    dezvoltare: {
+      titlu: '🔹 Ce să scrii în Introducere și context',
+      culoare: '#f3e5f5', border: '#ce93d8', titluColor: '#6a1b9a',
+      pasi: [
+        '<strong>Contextul instituțional</strong> — Prezintă instituția, echipa sau parteneriatul implicat în proiect/program.',
+        '<strong>Nevoia identificată</strong> — Ce problemă sau oportunitate a generat acest proiect? (ex: lipsa competențelor digitale, nevoia de formare, oportunitate Erasmus+)',
+        '<strong>Obiectivele proiectului</strong> — Care sunt obiectivele principale? Formulează-le clar și măsurabil.',
+        '<strong>Beneficiarii</strong> — Cine beneficiază de acest proiect? (cadre didactice, elevi, comunitate)',
+        '<strong>Cadrul de referință</strong> — Menționează programul, finanțarea sau politica educațională în care se înscrie proiectul.',
+      ],
+      exemplu: 'Ex: „Proiectul „Digital Minds" s-a desfășurat în cadrul programului Erasmus+ KA2 în perioada 2022–2024, implicând 4 școli partenere din România, Bulgaria și Turcia, cu scopul de a dezvolta competențele digitale ale cadrelor didactice..."',
+      lungime: '200–350 cuvinte'
+    }
+  }
+};
+
+// aiBar cu butoanele redenumite
+function aiBar(secId, label){
+  return `<div class="sec-ai-bar">
+    <span class="sec-ai-bar-label">✨ AI</span>
+    <button class="ai-sec-btn" id="ai-diac-${secId}" onclick="aiDiacritice('${secId}')">ă â î ș ț Diacritice</button>
+    <button class="ai-sec-btn" id="ai-imb-${secId}" onclick="aiImbunatatire('${secId}')">✍ Îmbunătățire text existent</button>
+    <button class="ai-sec-btn" id="ai-gen-${secId}" onclick="aiGenerare('${secId}','${label}')">⚡ Generează text cu AI</button>
+  </div>`;
+}
+
 function secPanelRich(s){
   const canDel = s.tip==='liber';
+  // Ghid specific dacă există pentru această secțiune și tipul curent
+  const ghidTip = GHIDURI_SECTIUNI[s.id]?.[tipSelectat];
+  const ghidHTML = ghidTip ? `
+    <div style="background:${ghidTip.culoare};border:1px solid ${ghidTip.border};border-radius:5px;padding:13px 15px;margin-bottom:14px;font-size:0.82rem;line-height:1.7;color:#1a1108;">
+      <div style="font-weight:700;font-size:0.8rem;margin-bottom:8px;color:${ghidTip.titluColor};">${ghidTip.titlu}</div>
+      <div style="font-size:0.72rem;color:${ghidTip.titluColor};margin-bottom:8px;font-weight:600;">Lungime recomandată: ${ghidTip.lungime}</div>
+      <ol style="margin-left:16px;display:flex;flex-direction:column;gap:5px;">
+        ${ghidTip.pasi.map(p=>`<li>${p}</li>`).join('')}
+      </ol>
+      <div style="margin-top:10px;padding:7px 10px;background:rgba(255,255,255,0.6);border-radius:3px;font-size:0.79rem;font-style:italic;color:#444;line-height:1.5;">
+        ${ghidTip.exemplu}
+      </div>
+    </div>` : `<p class="sec-hint">${s.hint||'Scrieți conținutul acestei secțiuni.'}</p>`;
+
   return `<div class="sec-panel">
     ${_panelHead(s.icon||'📄', s.label+(canDel?` <button class="sec-hbtn" onclick="renum('${s.id}')" style="margin-left:8px;">✎</button><button class="sec-hbtn del" onclick="delSec('${s.id}')">✕</button>`:''), s.required)}
     <div class="sec-panel-body">
-      <p class="sec-hint">${s.hint||'Scrieți conținutul acestei secțiuni.'}</p>
+      ${ghidHTML}
       ${aiBar(s.id, s.label)}
       <div class="fld">${tb(s.id)}
         <div class="rich-ed" id="rich-${s.id}" contenteditable="true" data-ph="${(s.hint||s.label).split('.')[0]}..." oninput="onChange()"></div>
