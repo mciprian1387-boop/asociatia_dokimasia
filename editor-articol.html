@@ -522,6 +522,43 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   </aside>
 </div>
 
+<!-- MODAL AI BIBLIOGRAFIE -->
+<div class="modal-ov" id="modalBiblioAI">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="modal-head">
+      <h3>⚡ AI — Extrage bibliografie din text</h3>
+      <button class="modal-x" onclick="inchideModalBiblioAI()">×</button>
+    </div>
+    <div class="modal-body" style="padding:14px 18px;">
+
+      <!-- Pas 1: input text brut -->
+      <div id="biblioBrutWrap">
+        <p style="font-size:0.83rem;color:var(--muted);margin-bottom:10px;line-height:1.6;">
+          Lipește mai jos orice text care conține surse bibliografice — o listă neformatată, note de final, referințe copiate de pe internet, sau chiar un paragraf cu citări. AI va extrage și va formata toate referințele în stil <strong>APA</strong>.
+        </p>
+        <textarea id="biblioBrut" style="width:100%;height:180px;padding:10px 12px;border:1px solid var(--border);border-radius:4px;font-family:'Source Serif 4',serif;font-size:0.82rem;line-height:1.6;resize:vertical;outline:none;"
+          placeholder="Ex:&#10;Hattie, J. (2009). Visible learning. Routledge.&#10;Marzano, R. (2017). The new art and science of teaching. ASCD.&#10;sau orice text care conține surse..."></textarea>
+        <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+          <button class="btn-ok" id="btnExtrageAI" onclick="extrageAIBiblio()">⚡ Extrage referințele</button>
+        </div>
+      </div>
+
+      <!-- Pas 2: rezultate -->
+      <div id="biblioAIResult" style="display:none;">
+        <p style="font-size:0.83rem;color:var(--muted);margin-bottom:10px;">
+          Bifați referințele pe care doriți să le importați în articol:
+        </p>
+        <div id="biblioAIList" style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;padding:10px 12px;background:var(--paper);"></div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+          <button class="btn-cancel" onclick="document.getElementById('biblioBrutWrap').style.display='block';document.getElementById('biblioAIResult').style.display='none';">← Înapoi</button>
+          <button class="btn-ok" onclick="importaBiblioAI()" style="margin-left:auto;">✓ Importă referințele selectate</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- MODAL AVERTISMENT EXPORT -->
 <div class="modal-ov" id="modalExportWarn">
   <div class="modal-box" style="max-width:460px;">
@@ -1416,11 +1453,106 @@ function secPanelBiblio(){
   return `<div class="sec-panel">
     ${_panelHead('📚','Bibliografie',false)}
     <div class="sec-panel-body">
-      <p class="sec-hint">Format APA, ordonate alfabetic. Ex: Ionescu, M. (2020). Titlul lucrării. Editura.</p>
+
+      <!-- Indicații + AI -->
+      <div style="background:#faf8f0;border:1px solid #e8d9a0;border-radius:5px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;line-height:1.6;color:#3a2e00;">
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:6px;color:#8B6000;">📚 Cum completezi bibliografia</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div>✍ Adaugă referințele manual, câte una, în câmpurile de mai jos — format <strong>APA</strong>.</div>
+          <div>🤖 Sau apasă <strong>„⚡ AI — Extrage din text"</strong>, lipești un text care conține surse (ex: nota de final a unui articol, o listă bibliografică neformatată, referințe copiate de pe internet) și AI le extrage și le formatează automat în APA.</div>
+          <div style="margin-top:4px;padding:6px 9px;background:#fff8e1;border-radius:3px;border-left:3px solid #ffc107;font-size:0.79rem;">
+            <strong>Format APA:</strong> Popescu, M., &amp; Ionescu, A. (2020). <em>Titlul lucrării</em>. Editura. &nbsp;|&nbsp; sau pentru articol: Autor, A. (2019). Titlul articolului. <em>Revista</em>, <em>12</em>(3), 45–67.
+          </div>
+        </div>
+      </div>
+
+      <!-- Buton AI -->
+      <button class="btn-ai-gen" style="margin-bottom:14px;font-size:0.78rem;" onclick="deschideModalBiblioAI()">
+        ⚡ AI — Extrage și formatează bibliografie din text
+      </button>
+
+      <!-- Lista referințelor -->
       <div id="biblioList"></div>
-      <button class="btn-add-bib" onclick="addBib()">+ Adaugă referință</button>
+      <button class="btn-add-bib" onclick="addBib()" style="margin-top:6px;">+ Adaugă referință manual</button>
     </div>
   </div>`;
+}
+
+// Modal AI Bibliografie
+function deschideModalBiblioAI(){
+  document.getElementById('modalBiblioAI').classList.add('open');
+  document.getElementById('biblioBrut').value='';
+  document.getElementById('biblioAIResult').style.display='none';
+  document.getElementById('biblioBrutWrap').style.display='block';
+}
+function inchideModalBiblioAI(){
+  document.getElementById('modalBiblioAI').classList.remove('open');
+}
+
+async function extrageAIBiblio(){
+  const text=document.getElementById('biblioBrut').value.trim();
+  if(!text){toast('Lipește mai întâi un text cu surse bibliografice.','err');return;}
+
+  const btn=document.getElementById('btnExtrageAI');
+  btn.disabled=true; btn.textContent='⏳ AI procesează...';
+
+  try{
+    const result=await callAI(
+      `Ești un expert în formatare bibliografică APA. Din textul următor, extrage TOATE referințele bibliografice și formatează-le corect în stilul APA 7th edition.
+
+Reguli APA:
+- Carte: Autor, A. A., & Autor, B. B. (An). Titlul cărții cu majusculă doar la primul cuvânt. Editura.
+- Articol: Autor, A. A. (An). Titlul articolului. Numele Revistei, volum(număr), pagini. https://doi.org/...
+- Capitol: Autor, A. A. (An). Titlul capitolului. În E. Editor (Ed.), Titlul cărții (pp. xx–xx). Editura.
+- Site web: Autor, A. A. (An, luna zi). Titlul paginii. Numele site-ului. URL
+
+Returnează DOAR lista referințelor, una pe linie, ordonate alfabetic după primul autor, fără numerotare, fără explicații, fără text suplimentar.
+
+Text de procesat:
+${text}`,
+      2000
+    );
+
+    // Parsează rezultatul — fiecare linie = o referință
+    const refs=result.split('\n').map(r=>r.trim()).filter(r=>r.length>5);
+
+    document.getElementById('biblioAIResult').style.display='block';
+    document.getElementById('biblioBrutWrap').style.display='none';
+    document.getElementById('biblioAIList').innerHTML=refs.map((r,i)=>`
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;">
+        <input type="checkbox" id="bref-${i}" checked style="margin-top:4px;flex-shrink:0;accent-color:var(--crimson);">
+        <label for="bref-${i}" style="font-size:0.82rem;line-height:1.5;cursor:pointer;">${escVal(r)}</label>
+      </div>`).join('');
+
+    // Stochează refs pentru import
+    document.getElementById('biblioAIResult').dataset.refs=JSON.stringify(refs);
+    toast(`${refs.length} referințe extrase!`,'ok');
+  }catch(e){
+    toast('Eroare AI: '+e.message,'err');
+  }
+  btn.disabled=false; btn.textContent='⚡ Extrage referințele';
+}
+
+function importaBiblioAI(){
+  const el=document.getElementById('biblioAIResult');
+  const refs=JSON.parse(el.dataset.refs||'[]');
+  const checkboxes=document.querySelectorAll('#biblioAIList input[type="checkbox"]');
+  const selectate=refs.filter((_,i)=>checkboxes[i]&&checkboxes[i].checked);
+  if(!selectate.length){toast('Selectați cel puțin o referință.','err');return;}
+
+  // Adaugă la bibliografie (fără duplicate)
+  selectate.forEach(r=>{
+    if(!biblio.includes(r)) biblio.push(r);
+  });
+  // Curăță intrările goale
+  biblio=biblio.filter(b=>b.trim());
+  if(!biblio.length) biblio=[''];
+
+  _stateCache.biblio=biblio;
+  inchideModalBiblioAI();
+  if(secActiva==='biblio') activaSec('biblio');
+  onChange();
+  toast(`${selectate.length} referințe adăugate!`,'ok');
 }
 
 // Ghiduri specifice per secțiune și tip de articol
