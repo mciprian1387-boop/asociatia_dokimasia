@@ -427,44 +427,63 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   <main class="editor-area" id="editorArea">
     <div id="editorInner" style="flex:1;display:flex;flex-direction:column;">
       <!-- Welcome placeholder — vizibil la prima deschidere -->
-      <div id="editorWelcome" class="editor-welcome">
-        <div class="editor-welcome-icon">📝</div>
-        <h2>Editor articol — Revista Dokimasia</h2>
-        <p style="font-size:0.95rem;color:var(--ink);font-weight:600;margin-bottom:4px;">Bun venit!</p>
-        <p>Selectați un articol din istoricul din dreapta sau creați unul nou.</p>
+      <div id="editorWelcome" class="editor-welcome" style="padding:16px 20px;justify-content:flex-start;overflow:hidden;">
 
-        <div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:18px 22px;margin-top:18px;text-align:left;max-width:420px;box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-          <div style="font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:12px;">Cum funcționează editorul</div>
-
-          <div style="display:flex;flex-direction:column;gap:10px;font-size:0.84rem;color:var(--ink);line-height:1.5;">
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <span style="font-size:1.1rem;flex-shrink:0;">📂</span>
-              <div><strong>Istoricul meu</strong> (dreapta) — toate articolele tale salvate. Apasă <em>Deschide</em> pentru a continua un articol.</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <span style="font-size:1.1rem;flex-shrink:0;">📋</span>
-              <div><strong>Structura articolului</strong> (stânga) — lista secțiunilor. <strong>Click</strong> pe o secțiune pentru a o deschide și edita.</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <span style="font-size:1.1rem;flex-shrink:0;">✏️</span>
-              <div><strong>Dublu-click</strong> pe numele unei secțiuni din stânga pentru a-l redenumi.</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <span style="font-size:1.1rem;flex-shrink:0;">⠿</span>
-              <div><strong>Trage</strong> secțiunile din stânga pentru a le reordona în articol.</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <span style="font-size:1.1rem;flex-shrink:0;">✨</span>
-              <div><strong>AI</strong> — fiecare secțiune are butoane AI pentru diacritice, îmbunătățire stil și generare conținut.</div>
-            </div>
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <span style="font-size:1.1rem;flex-shrink:0;">💾</span>
-              <div><strong>Salvare automată</strong> — conținutul se salvează în Supabase la fiecare tastă. Poți reveni oricând.</div>
-            </div>
-          </div>
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:1.8rem;margin-bottom:4px;">📝</div>
+          <h2 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--crimson);margin-bottom:2px;">Editor articol — Revista Dokimasia</h2>
+          <p style="font-size:0.82rem;color:var(--muted);">Selectați un articol din dreapta sau creați unul nou.</p>
         </div>
 
-        <div class="welcome-hint" style="margin-top:20px;">→ Apasă <strong>+ Articol nou</strong> în dreapta pentru a începe</div>
+        <!-- Grid 2 coloane -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:700px;font-size:0.79rem;line-height:1.5;color:var(--ink);">
+
+          <!-- Coloana 1 -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
+            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📋 Structura articolului (stânga)</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;gap:8px;"><span>👆</span><div><strong>Click</strong> pe o secțiune — o deschide în centru pentru editare.</div></div>
+              <div style="display:flex;gap:8px;"><span>✏️</span><div><strong>Dublu-click</strong> pe numele secțiunii — îl redenumești direct.</div></div>
+              <div style="display:flex;gap:8px;"><span>⠿</span><div><strong>Trage</strong> cu handleul ⠿ — reordonezi secțiunile.</div></div>
+              <div style="display:flex;gap:8px;"><span>🟢</span><div>Punct <span style="color:#66bb6a;font-weight:600;">verde</span> = completat, <span style="color:#ffa726;font-weight:600;">portocaliu</span> = obligatoriu și gol.</div></div>
+            </div>
+          </div>
+
+          <!-- Coloana 2 -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
+            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📂 Istoricul meu (dreapta)</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;gap:8px;"><span>📖</span><div><strong>Deschide</strong> — încarcă articolul cu tot conținutul salvat.</div></div>
+              <div style="display:flex;gap:8px;"><span>🗑</span><div><strong>✕ Șterge</strong> — elimină definitiv articolul din baza de date.</div></div>
+              <div style="display:flex;gap:8px;"><span>➕</span><div><strong>+ Articol nou</strong> — alegi tipul și pornești un editor curat.</div></div>
+            </div>
+          </div>
+
+          <!-- Coloana 1 jos -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
+            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📝 Editarea conținutului (centru)</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;gap:8px;"><span>🖊</span><div>Toolbar cu bold, italic, liste, tabele, aliniere.</div></div>
+              <div style="display:flex;gap:8px;"><span>✨</span><div>Bara AI per secțiune: <em>Diacritice</em>, <em>Îmbunătățire</em>, <em>Generează</em>.</div></div>
+              <div style="display:flex;gap:8px;"><span>⊞</span><div>Butonul <strong>⊞</strong> inserează imagini, tabele, linkuri, ecuații.</div></div>
+              <div style="display:flex;gap:8px;"><span>👥</span><div><strong>Autori</strong> — notele de subsol ¹ ² ³ se generează automat.</div></div>
+            </div>
+          </div>
+
+          <!-- Coloana 2 jos -->
+          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
+            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">🔴 Bara de sus</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;gap:8px;"><span>💾</span><div><strong>Salvare automată</strong> — se salvează în baza de date la fiecare tastă.</div></div>
+              <div style="display:flex;gap:8px;"><span>👁</span><div><strong>Preview</strong> — articol formatat ca publicație, printabil ca PDF.</div></div>
+              <div style="display:flex;gap:8px;"><span>✨</span><div><strong>AI global</strong> — abstract, cuvinte-cheie, diacritice pentru tot articolul.</div></div>
+              <div style="display:flex;gap:8px;"><span>⬇</span><div><strong>PDF / Word</strong> — exportă articolul în formatul ales.</div></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="welcome-hint" style="margin-top:12px;font-size:0.82rem;">→ Apasă <strong>+ Articol nou</strong> în dreapta pentru a începe</div>
       </div>
       <!-- Panoul secțiunii active — completat dinamic -->
       <div id="secPanel" style="display:none;flex:1;overflow-y:auto;"></div>
