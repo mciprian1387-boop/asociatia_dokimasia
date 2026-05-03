@@ -4,1052 +4,794 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Editor Articol — Revista Dokimasia</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --crimson:#8B0000; --crimson-dark:#5a0000; --crimson-light:#b91c1c;
-  --gold:#b8963e; --gold-light:#d4af6a;
-  --ink:#1a1108; --paper:#faf8f4; --paper-dark:#f0ece4;
-  --muted:#7a7060; --border:#ddd8cc;
-  --white:#ffffff; --shadow:0 2px 16px rgba(0,0,0,0.08);
-  --radius:6px;
-}
+:root{--crimson:#8B0000;--crimson-dark:#5a0000;--gold:#b8963e;--gold-light:#d4af6a;--ink:#1a1108;--paper:#faf8f4;--paper-dark:#f0ece4;--muted:#7a7060;--border:#ddd8cc;--shadow:0 2px 16px rgba(0,0,0,0.08);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:var(--ink);min-height:100vh;}
 
-/* ── HEADER ── */
-.app-header{
-  background:var(--crimson);
-  background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 39px,rgba(255,255,255,0.03) 40px);
-  padding:0 32px; display:flex; align-items:center; justify-content:space-between;
-  border-bottom:3px solid var(--gold); position:sticky; top:0; z-index:100;
-}
-.app-header-left{display:flex;align-items:center;gap:16px;padding:14px 0;}
-.app-logo{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+.app-header{background:var(--crimson);background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.03) 39px,rgba(255,255,255,0.03) 40px);padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:200;height:54px;}
+.app-logo{font-family:'Playfair Display',serif;font-size:0.92rem;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
 .app-logo span{color:var(--gold-light);}
-.app-header-right{display:flex;align-items:center;gap:10px;}
-.btn-header{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:4px;font-size:0.83rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;}
-.btn-docx{background:var(--gold);color:#fff;}
-.btn-docx:hover{background:var(--gold-light);}
-.btn-pdf{background:#fff;color:var(--crimson);}
-.btn-pdf:hover{background:var(--paper-dark);}
-.btn-ai{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);}
-.btn-ai:hover{background:rgba(255,255,255,0.25);}
-.btn-ai.loading{opacity:0.7;cursor:wait;}
+.header-mid{display:flex;align-items:center;gap:10px;}
+.autosave{font-size:0.7rem;display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:10px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);}
+.autosave.saved{color:#81c784;}
+.autosave.saving{color:var(--gold-light);}
+.autosave.err{color:#ef9a9a;}
+.header-right{display:flex;align-items:center;gap:6px;}
+.hbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;}
+.hbtn-gold{background:var(--gold);color:#fff;}
+.hbtn-gold:hover{background:var(--gold-light);}
+.hbtn-white{background:#fff;color:var(--crimson);}
+.hbtn-white:hover{background:var(--paper-dark);}
+.hbtn-ghost{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);}
+.hbtn-ghost:hover{background:rgba(255,255,255,0.22);}
 
-/* ── LAYOUT ── */
-.app-body{display:grid;grid-template-columns:280px 1fr 300px;min-height:calc(100vh - 64px);}
+.app-body{display:grid;grid-template-columns:250px 1fr 280px;height:calc(100vh - 54px);}
 
-/* ── SIDEBAR STÂNGA — structură ── */
-.sidebar-left{
-  background:#fff;border-right:1px solid var(--border);
-  padding:20px 0; position:sticky; top:64px; height:calc(100vh - 64px); overflow-y:auto;
-}
-.sidebar-section{padding:0 16px 16px;}
-.sidebar-title{font-size:0.65rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:12px 16px 8px;border-bottom:1px solid var(--border);margin-bottom:8px;}
-.section-item{
-  display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:4px;
-  cursor:pointer;font-size:0.84rem;color:#555;transition:all 0.15s;
-  border:1px solid transparent; margin-bottom:2px;
-}
-.section-item:hover{background:var(--paper);color:var(--crimson);}
-.section-item.active{background:var(--paper-dark);color:var(--crimson);border-color:var(--border);}
-.section-item .si-icon{font-size:0.9rem;flex-shrink:0;}
-.section-item .si-label{flex:1;font-weight:500;}
-.section-item .si-status{width:7px;height:7px;border-radius:50%;background:#ddd;flex-shrink:0;}
-.section-item .si-status.filled{background:#4caf50;}
-.section-item .si-del{opacity:0;font-size:0.75rem;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 4px;}
-.section-item:hover .si-del{opacity:1;}
-.section-item .si-del:hover{color:var(--crimson);}
-.btn-add-section{
-  display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;
-  background:none;border:1px dashed var(--border);border-radius:4px;
-  font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all 0.2s;
-  font-family:'Source Serif 4',serif; margin:8px 16px 0; width:calc(100% - 32px);
-}
-.btn-add-section:hover{border-color:var(--crimson);color:var(--crimson);background:var(--paper);}
-.progress-wrap{padding:16px;border-top:1px solid var(--border);margin-top:auto;}
-.progress-label{font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
-.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
-.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.4s;}
+/* SIDEBAR */
+.sidebar-l{background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.sb-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
+.sb-list{flex:1;overflow-y:auto;padding:4px 6px;}
+.sb-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:3px;cursor:pointer;font-size:0.81rem;color:#555;transition:all 0.15s;border:1px solid transparent;margin-bottom:1px;user-select:none;}
+.sb-item:hover{background:var(--paper);color:var(--crimson);}
+.sb-item.active{background:var(--paper-dark);color:var(--crimson);border-color:var(--border);}
+.si-drag{cursor:grab;color:#ccc;font-size:0.7rem;flex-shrink:0;}
+.si-icon{font-size:0.85rem;flex-shrink:0;}
+.si-label{flex:1;font-weight:500;font-size:0.8rem;}
+.si-req{color:var(--crimson);font-size:0.65rem;}
+.si-dot{width:6px;height:6px;border-radius:50%;background:#ddd;flex-shrink:0;}
+.si-dot.ok{background:#66bb6a;}
+.si-dot.warn{background:#ffa726;}
+.si-acts{display:flex;gap:1px;opacity:0;transition:opacity 0.15s;}
+.sb-item:hover .si-acts{opacity:1;}
+.si-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.68rem;padding:2px 3px;border-radius:2px;}
+.si-btn:hover{color:var(--crimson);}
+.si-btn.del:hover{color:#e53935;}
+.sb-divider{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:8px 8px 3px;border-top:1px solid var(--border);margin-top:3px;}
+.sb-foot{padding:8px 10px;border-top:1px solid var(--border);}
+.btn-add-s{display:flex;align-items:center;gap:6px;width:100%;padding:7px 10px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;margin-bottom:6px;}
+.btn-add-s:hover{border-color:var(--crimson);color:var(--crimson);}
+.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:3px;}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.4s;}
+.prog-txt{font-size:0.65rem;color:var(--muted);display:flex;justify-content:space-between;}
+.prog-warn{font-size:0.65rem;color:var(--crimson);margin-top:2px;line-height:1.4;}
 
-/* ── ZONA EDITOR ── */
-.editor-area{padding:32px 40px;overflow-y:auto;}
-.editor-section{display:none;}
-.editor-section.active{display:block;}
+/* EDITOR */
+.editor-area{overflow-y:auto;background:var(--paper);}
+.editor-inner{max-width:800px;margin:0 auto;padding:28px 36px 60px;}
 
-.section-header{margin-bottom:24px;}
-.section-header h2{
-  font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;
-  color:var(--crimson);margin-bottom:6px;
-}
-.section-header-line{height:2px;background:linear-gradient(to right,var(--gold),transparent);margin-bottom:8px;}
-.section-hint{font-size:0.85rem;color:var(--muted);font-style:italic;line-height:1.6;}
+.sec-wrap{position:relative;margin-bottom:24px;padding-top:4px;}
+.sec-ctrl{position:absolute;top:4px;right:0;display:flex;gap:3px;opacity:0;transition:opacity 0.2s;z-index:10;}
+.sec-wrap:hover .sec-ctrl{opacity:1;}
+.sec-ctrl-btn{background:#fff;border:1px solid var(--border);border-radius:3px;padding:3px 8px;font-size:0.7rem;cursor:pointer;color:var(--muted);transition:all 0.15s;}
+.sec-ctrl-btn:hover{border-color:var(--crimson);color:var(--crimson);}
+.sec-ctrl-btn.del:hover{border-color:#e53935;color:#e53935;}
 
-.field-group{margin-bottom:20px;}
-.field-label{
-  display:block;font-size:0.72rem;letter-spacing:1.5px;text-transform:uppercase;
-  font-weight:700;color:var(--muted);margin-bottom:6px;
-}
-.field-label .req{color:var(--crimson);}
-.field-input{
-  width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:4px;
-  font-family:'Source Serif 4',serif;font-size:0.96rem;color:var(--ink);
-  background:#fff;outline:none;transition:border-color 0.2s;line-height:1.6;
-}
-.field-input:focus{border-color:var(--crimson);box-shadow:0 0 0 3px rgba(139,0,0,0.06);}
-textarea.field-input{resize:vertical;min-height:120px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.field-count{font-size:0.72rem;color:var(--muted);text-align:right;margin-top:4px;}
+.sec-h{margin-bottom:14px;}
+.sec-h h2{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--crimson);}
+.sec-line{height:2px;background:linear-gradient(to right,var(--gold),transparent);margin:5px 0 7px;}
+.sec-hint{font-size:0.82rem;color:var(--muted);font-style:italic;line-height:1.55;}
 
-/* Rich text toolbar */
-.rich-toolbar{
-  display:flex;gap:2px;padding:6px 10px;background:var(--paper-dark);
-  border:1px solid var(--border);border-bottom:none;border-radius:4px 4px 0 0;
-}
-.rich-toolbar button{
-  padding:4px 8px;background:none;border:1px solid transparent;border-radius:3px;
-  font-size:0.8rem;cursor:pointer;color:#555;transition:all 0.15s;
-  font-family:'Source Serif 4',serif;
-}
-.rich-toolbar button:hover{background:#fff;border-color:var(--border);}
-.rich-toolbar button.active-fmt{background:#fff;border-color:var(--crimson);color:var(--crimson);}
-.rich-toolbar .tb-sep{width:1px;background:var(--border);margin:0 4px;}
-.rich-editor{
-  width:100%;min-height:180px;padding:12px 14px;
-  border:1px solid var(--border);border-radius:0 0 4px 4px;
-  font-family:'Source Serif 4',serif;font-size:0.96rem;color:var(--ink);
-  background:#fff;outline:none;line-height:1.85;
-}
-.rich-editor:focus{border-color:var(--crimson);}
-.rich-editor[data-empty="true"]:before{
-  content:attr(data-placeholder);color:#bbb;font-style:italic;pointer-events:none;
-}
+.fld{margin-bottom:16px;}
+.fld-label{display:block;font-size:0.66rem;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--muted);margin-bottom:4px;}
+.req{color:var(--crimson);}
+.fld-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:3px;font-family:'Source Serif 4',serif;font-size:0.93rem;color:var(--ink);background:#fff;outline:none;transition:border-color 0.2s;line-height:1.6;}
+.fld-input:focus{border-color:var(--crimson);box-shadow:0 0 0 2px rgba(139,0,0,0.06);}
+.fld-hint{font-size:0.72rem;color:var(--muted);margin-top:3px;font-style:italic;}
+.fld-count{font-size:0.7rem;color:var(--muted);text-align:right;margin-top:2px;}
 
-/* Autori multipli */
-.authors-list{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;}
-.author-row{
-  display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;
-  background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:12px;
-}
-.btn-remove-author{
-  background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;
-  padding:0 4px;align-self:center;transition:color 0.15s;
-}
-.btn-remove-author:hover{color:var(--crimson);}
-.btn-add-author{
-  display:inline-flex;align-items:center;gap:6px;padding:8px 14px;
-  background:none;border:1px dashed var(--border);border-radius:4px;
-  font-size:0.83rem;color:var(--muted);cursor:pointer;transition:all 0.2s;
-  font-family:'Source Serif 4',serif;
-}
-.btn-add-author:hover{border-color:var(--gold);color:var(--gold);}
+/* WORD TOOLBAR */
+.word-tb{display:flex;flex-wrap:wrap;gap:1px;padding:3px 6px;background:#f0f0f0;border:1px solid var(--border);border-bottom:none;border-radius:3px 3px 0 0;align-items:center;}
+.tb-grp{display:flex;gap:1px;align-items:center;}
+.tb-sep{width:1px;height:18px;background:var(--border);margin:0 3px;}
+.tb-btn{display:inline-flex;align-items:center;justify-content:center;padding:2px 5px;border:1px solid transparent;border-radius:2px;background:none;cursor:pointer;font-size:0.78rem;color:#333;transition:all 0.12s;min-width:24px;height:24px;}
+.tb-btn:hover{background:#e0e0e0;border-color:#ccc;}
+.tb-sel{padding:1px 5px;border:1px solid var(--border);border-radius:2px;font-size:0.74rem;background:#fff;height:24px;cursor:pointer;outline:none;}
+.tb-color{width:24px;height:24px;border:1px solid var(--border);border-radius:2px;cursor:pointer;padding:0;}
 
-/* Bibliografie */
-.bib-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
-.bib-row{display:flex;align-items:flex-start;gap:8px;}
-.bib-nr{width:24px;height:24px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;margin-top:10px;}
-.bib-input{flex:1;}
-.btn-remove-bib{background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.9rem;padding:0 4px;margin-top:10px;transition:color 0.15s;}
-.btn-remove-bib:hover{color:var(--crimson);}
-.btn-add-bib{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:none;border:1px dashed var(--border);border-radius:4px;font-size:0.83rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
+/* RICH EDITOR */
+.rich-ed{width:100%;min-height:180px;padding:12px 14px;border:1px solid var(--border);border-radius:0 0 3px 3px;font-family:'Times New Roman',Times,serif;font-size:12pt;color:var(--ink);background:#fff;outline:none;line-height:1.8;caret-color:var(--crimson);}
+.rich-ed:focus{border-color:var(--crimson);}
+.rich-ed p{text-indent:2em;text-align:justify;margin-bottom:0.3em;}
+.rich-ed[data-ph]:empty:before{content:attr(data-ph);color:#bbb;font-style:italic;font-size:11pt;pointer-events:none;}
+.rich-ed img{max-width:100%;border-radius:2px;margin:6px 0;display:block;}
+.rich-ed table{border-collapse:collapse;width:100%;margin:8px 0;}
+.rich-ed td,.rich-ed th{border:1px solid #ccc;padding:5px 8px;}
+.rich-ed blockquote{border-left:3px solid var(--gold);margin:8px 0;padding:6px 14px;font-style:italic;color:#555;background:#faf8f4;}
+.rich-ed hr{border:none;border-top:1px solid #ccc;margin:10px 0;}
+
+/* AUTORI */
+.autor-row{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;margin-bottom:12px;padding:12px;background:#fff;border:1px solid var(--border);border-radius:3px;position:relative;}
+.autor-nr{width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:2px;}
+.autor-fields{display:flex;flex-direction:column;gap:8px;}
+.autor-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.autor-meta-lbl{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:2px;}
+.autor-fn{font-size:0.68rem;color:var(--muted);font-style:italic;margin-top:1px;}
+.btn-rm-autor{position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;color:#ccc;font-size:0.8rem;padding:2px;transition:color 0.15s;}
+.btn-rm-autor:hover{color:#e53935;}
+.btn-add-autor{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
+.btn-add-autor:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ABSTRACT */
+.ab-info{background:var(--paper-dark);border-left:3px solid var(--gold);padding:9px 13px;border-radius:0 3px 3px 0;margin-bottom:10px;font-size:0.8rem;color:var(--muted);line-height:1.55;}
+.ab-actions{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.btn-ai-gen{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:linear-gradient(135deg,#6a0080,#4a0060);color:#fff;border:none;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-ai-gen:hover{background:linear-gradient(135deg,#7b1fa2,#5b006e);}
+.btn-ai-tr{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;background:linear-gradient(135deg,#01579b,#003c6e);color:#fff;border:none;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-ai-tr:hover{background:linear-gradient(135deg,#0277bd,#004d8e);}
+.ab-en-head{font-size:0.66rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:#01579b;margin:16px 0 8px;padding-top:14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.ab-en-head::after{content:'EN';background:#01579b;color:#fff;padding:1px 5px;border-radius:2px;font-size:0.58rem;}
+
+/* BIBLIO */
+.bib-row{display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;}
+.bib-nr{width:20px;height:20px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;margin-top:9px;}
+.btn-rm-bib{background:none;border:none;cursor:pointer;color:#ccc;font-size:0.78rem;padding:0 3px;margin-top:9px;}
+.btn-rm-bib:hover{color:#e53935;}
+.btn-add-bib{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;background:none;border:1px dashed var(--border);border-radius:3px;font-size:0.78rem;color:var(--muted);cursor:pointer;transition:all 0.2s;font-family:'Source Serif 4',serif;}
 .btn-add-bib:hover{border-color:var(--gold);color:var(--gold);}
 
-/* ── SIDEBAR DREAPTA — previzualizare ── */
-.sidebar-right{
-  background:var(--paper-dark);border-left:1px solid var(--border);
-  padding:20px; position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;
-}
-.preview-title{font-size:0.65rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:700;}
-.preview-page{
-  background:#fff;border:1px solid var(--border);border-radius:4px;
-  padding:24px 20px;box-shadow:var(--shadow);
-  font-family:'Times New Roman',Times,serif;font-size:11pt;line-height:1.5;
-  min-height:400px;
-}
-.preview-page .pv-titlu{font-size:13pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:6px;}
-.preview-page .pv-autor{text-align:center;font-size:11pt;margin-bottom:2px;}
-.preview-page .pv-institutie{text-align:center;font-style:italic;font-size:10pt;color:#555;margin-bottom:12px;}
-.preview-page .pv-abstract{border-left:3px solid #8B0000;padding:8px 12px;background:#fafafa;font-size:10pt;margin-bottom:10px;}
-.preview-page .pv-kw{font-style:italic;font-size:10pt;margin-bottom:14px;}
-.preview-page .pv-sectiune{font-weight:bold;font-size:12pt;margin:12px 0 4px;}
-.preview-page .pv-corp{text-align:justify;margin-bottom:6px;font-size:11pt;}
-.preview-page .pv-bib{font-size:10pt;margin-bottom:4px;}
-.preview-empty{text-align:center;padding:40px 10px;color:#bbb;font-style:italic;font-size:0.85rem;}
+/* PREVIEW */
+.sidebar-r{background:var(--paper-dark);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.prev-head{padding:9px 12px;border-bottom:1px solid var(--border);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--muted);}
+.prev-body{flex:1;overflow-y:auto;padding:12px;}
+.prev-page{background:#fff;border:1px solid var(--border);border-radius:2px;padding:18px 16px;box-shadow:var(--shadow);font-family:'Times New Roman',Times,serif;font-size:10pt;line-height:1.5;min-height:200px;}
+.pv-titlu{font-size:12pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:3px;}
+.pv-sub{font-size:10.5pt;font-style:italic;text-align:center;margin-bottom:3px;}
+.pv-autori{text-align:center;font-size:10pt;margin-bottom:2px;}
+.pv-ab-lbl{font-weight:bold;font-size:9.5pt;margin-top:10px;margin-bottom:1px;}
+.pv-ab{text-align:justify;font-size:9.5pt;margin-bottom:6px;}
+.pv-kw{font-style:italic;font-size:9pt;margin-bottom:10px;}
+.pv-sec{font-weight:bold;font-size:10.5pt;margin:10px 0 2px;}
+.pv-corp{text-align:justify;font-size:10pt;text-indent:1.2em;margin-bottom:4px;}
+.pv-bib{font-size:9pt;margin-bottom:2px;}
+.pv-fn{font-size:8pt;color:#666;border-top:1px solid #ddd;padding-top:5px;margin-top:10px;}
+.prev-empty{text-align:center;padding:24px 8px;color:#bbb;font-style:italic;font-size:0.78rem;}
 
-/* AI overlay */
-.ai-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
-  z-index:500;align-items:center;justify-content:center;
-  backdrop-filter:blur(4px);
-}
-.ai-overlay.open{display:flex;}
-.ai-box{
-  background:#fff;border-radius:8px;padding:32px 36px;max-width:560px;width:90%;
-  box-shadow:0 20px 60px rgba(0,0,0,0.2);
-}
-.ai-box h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--crimson);margin-bottom:8px;}
-.ai-box p{font-size:0.9rem;color:#555;line-height:1.7;margin-bottom:20px;}
-.ai-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
-.ai-option{
-  display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--border);
-  border-radius:6px;cursor:pointer;transition:all 0.2s;
-}
-.ai-option:hover{border-color:var(--crimson);background:var(--paper);}
-.ai-option input[type=radio]{margin-top:3px;accent-color:var(--crimson);}
-.ai-option-label{font-size:0.9rem;font-weight:600;color:var(--ink);}
-.ai-option-desc{font-size:0.8rem;color:var(--muted);margin-top:2px;}
-.ai-footer{display:flex;gap:10px;justify-content:flex-end;}
-.btn-ai-run{background:var(--crimson);color:#fff;padding:10px 22px;border:none;border-radius:4px;font-size:0.88rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;}
-.btn-ai-cancel{background:none;color:var(--muted);padding:10px 16px;border:1px solid var(--border);border-radius:4px;font-size:0.88rem;font-family:'Source Serif 4',serif;cursor:pointer;}
-.ai-spinner{display:none;text-align:center;padding:20px;}
-.ai-spinner-icon{font-size:2rem;animation:spin 1s linear infinite;display:block;margin-bottom:8px;}
+/* MODALS */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.modal-ov.open{display:flex;}
+.modal-box{background:#fff;border-radius:5px;width:90%;max-width:520px;box-shadow:0 16px 48px rgba(0,0,0,0.2);overflow:hidden;}
+.modal-head{background:var(--crimson);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+.modal-head h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;font-weight:700;}
+.modal-x{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.2rem;cursor:pointer;}
+.modal-x:hover{color:#fff;}
+.modal-body{padding:20px;}
+.modal-foot{padding:12px 20px;background:var(--paper-dark);border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;}
+.modal-opt{display:flex;align-items:flex-start;gap:9px;padding:10px;border:1px solid var(--border);border-radius:3px;cursor:pointer;transition:all 0.2s;margin-bottom:7px;}
+.modal-opt:hover{border-color:var(--crimson);background:var(--paper);}
+.modal-opt input{margin-top:3px;accent-color:var(--crimson);}
+.mo-title{font-weight:600;font-size:0.85rem;}
+.mo-desc{font-size:0.74rem;color:var(--muted);margin-top:1px;}
+.btn-ok{background:var(--crimson);color:#fff;padding:8px 20px;border:none;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;}
+.btn-ok:hover{background:var(--crimson-dark);}
+.btn-cancel{background:none;color:var(--muted);padding:8px 14px;border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;cursor:pointer;}
+.ai-spin{text-align:center;padding:20px;display:none;}
+.ai-spin-icon{font-size:1.8rem;animation:spin 1s linear infinite;display:block;margin-bottom:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* Toast */
-#toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
-.toast{display:flex;align-items:center;gap:10px;background:#1a1108;color:#fff;padding:12px 18px;border-radius:4px;font-size:0.85rem;box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:slideUp 0.25s ease;}
-.toast.ok{border-left:3px solid #4caf50;}
-.toast.err{border-left:3px solid #f44336;}
-.toast.info{border-left:3px solid var(--gold);}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+/* TIP */
+.tip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;}
+.tip-card{border:2px solid var(--border);border-radius:5px;padding:16px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.tip-card:hover{border-color:var(--crimson);transform:translateY(-1px);box-shadow:0 3px 12px rgba(0,0,0,0.08);}
+.tip-card.sel{border-color:var(--crimson);background:#fff8f8;}
+.tc-icon{font-size:1.6rem;margin-bottom:7px;}
+.tc-title{font-family:'Playfair Display',serif;font-size:0.82rem;font-weight:700;color:var(--ink);margin-bottom:5px;}
+.tc-secs{font-size:0.7rem;color:var(--muted);line-height:1.55;text-align:left;}
 
-@media(max-width:900px){
-  .app-body{grid-template-columns:1fr;}
-  .sidebar-left,.sidebar-right{display:none;}
-  .editor-area{padding:20px 16px;}
-}
+/* INSERT */
+.ins-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.ins-opt{border:1px solid var(--border);border-radius:3px;padding:12px;cursor:pointer;text-align:center;transition:all 0.2s;}
+.ins-opt:hover{border-color:var(--crimson);background:var(--paper);}
+.ins-icon{font-size:1.3rem;margin-bottom:4px;}
+.ins-lbl{font-size:0.74rem;font-weight:600;color:var(--ink);}
+
+/* DRAG */
+.sb-item.dragging{opacity:0.3;}
+.sb-item.drag-over{border-top:2px solid var(--crimson);}
+
+/* TOAST */
+#toast-w{position:fixed;bottom:18px;right:18px;z-index:999;display:flex;flex-direction:column;gap:5px;}
+.toast{display:flex;align-items:center;gap:7px;background:#1a1108;color:#fff;padding:9px 14px;border-radius:3px;font-size:0.8rem;box-shadow:0 3px 14px rgba(0,0,0,0.2);animation:slideUp 0.2s ease;}
+.toast.ok{border-left:3px solid #66bb6a;}
+.toast.err{border-left:3px solid #ef5350;}
+.toast.info{border-left:3px solid var(--gold);}
+@keyframes slideUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="app-header">
-  <div class="app-header-left">
+  <div class="header-mid">
     <div class="app-logo">Revista <span>Dokimasia</span></div>
-    <div style="color:rgba(255,255,255,0.4);font-size:0.9rem;">—</div>
-    <div style="font-size:0.82rem;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Editor articol</div>
+    <span style="color:rgba(255,255,255,0.3);margin:0 8px;">—</span>
+    <span style="font-size:0.75rem;color:rgba(255,255,255,0.6);">Editor articol</span>
+    <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">Inițializare...</span></div>
   </div>
-  <div class="app-header-right">
-    <button class="btn-header btn-ai" onclick="deschideAI()">✨ Îmbunătățește cu AI</button>
-    <button class="btn-header btn-pdf" onclick="exportPDF()">⬇ Export PDF</button>
-    <button class="btn-header btn-docx" onclick="exportDOCX()">⬇ Export Word</button>
+  <div class="header-right">
+    <button class="hbtn hbtn-ghost" onclick="deschideModalAI()">✨ AI</button>
+    <button class="hbtn hbtn-white" onclick="exportPDF()">⬇ PDF</button>
+    <button class="hbtn hbtn-gold" onclick="exportDOCX()">⬇ Word</button>
   </div>
 </header>
 
-<!-- BODY -->
 <div class="app-body">
-
-  <!-- SIDEBAR STÂNGA -->
-  <aside class="sidebar-left">
-    <div class="sidebar-title">Structura articolului</div>
-    <div id="sectionList">
-      <!-- generate dinamic -->
-    </div>
-    <button class="btn-add-section" onclick="adaugaSectiuLibera()">+ Adaugă secțiune</button>
-    <div class="progress-wrap">
-      <div class="progress-label">
-        <span>Completare</span>
-        <span id="progressPct">0%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-      <div id="progress-warn" style="font-size:0.72rem;margin-top:6px;min-height:14px;line-height:1.4;"></div>
+  <aside class="sidebar-l">
+    <div class="sb-head">Structura articolului</div>
+    <div class="sb-list" id="sbList"></div>
+    <div class="sb-foot">
+      <button class="btn-add-s" onclick="adaugaSecLibera()">+ Adaugă secțiune</button>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-txt"><span>Completare</span><span id="progPct">0%</span></div>
+      <div class="prog-warn" id="progWarn"></div>
     </div>
   </aside>
 
-  <!-- EDITOR -->
-  <main class="editor-area" id="editorArea">
-    <!-- Sectiunile generate dinamic -->
+  <main class="editor-area">
+    <div class="editor-inner" id="editorInner"></div>
   </main>
 
-  <!-- SIDEBAR DREAPTA — previzualizare -->
-  <aside class="sidebar-right">
-    <div class="preview-title">Previzualizare</div>
-    <div class="preview-page" id="previewPage">
-      <div class="preview-empty">Completați câmpurile din stânga pentru a vedea previzualizarea.</div>
-    </div>
+  <aside class="sidebar-r">
+    <div class="prev-head">Previzualizare live</div>
+    <div class="prev-body"><div class="prev-page" id="prevPage"><div class="prev-empty">Selectați tipul lucrării pentru a începe.</div></div></div>
   </aside>
-
 </div>
 
-<!-- AI OVERLAY -->
-<div class="ai-overlay" id="aiOverlay">
-  <div class="ai-box">
-    <h3>✨ Îmbunătățire cu AI</h3>
-    <p>Alegeți ce doriți să îmbunătățiți. AI-ul va procesa conținutul introdus și va sugera îmbunătățiri bazate pe standardele revistei.</p>
-    <div class="ai-options">
-      <label class="ai-option">
-        <input type="radio" name="ai-opt" value="abstract" checked/>
-        <div>
-          <div class="ai-option-label">Generează / îmbunătățește abstractul</div>
-          <div class="ai-option-desc">Bazat pe conținutul articolului, AI va formula un abstract de 150-200 cuvinte.</div>
+<!-- MODAL TIP -->
+<div class="modal-ov open" id="modalTip">
+  <div class="modal-box" style="max-width:640px;">
+    <div class="modal-head"><h3>📂 Selectați tipul lucrării</h3></div>
+    <div class="modal-body">
+      <p style="font-size:0.84rem;color:var(--muted);margin-bottom:14px;">Structura editorului se adaptează automat în funcție de tipul selectat.</p>
+      <div class="tip-grid">
+        <div class="tip-card" id="tc-practic" onclick="selectTip('practic')">
+          <div class="tc-icon">🎓</div>
+          <div class="tc-title">Practici educaționale și inovare didactică</div>
+          <div class="tc-secs">• Introducere și context<br>• Descrierea demersului didactic<br>• Rezultate și observații<br>• Concluzii și recomandări</div>
         </div>
-      </label>
-      <label class="ai-option">
-        <input type="radio" name="ai-opt" value="keywords"/>
-        <div>
-          <div class="ai-option-label">Extrage cuvinte-cheie</div>
-          <div class="ai-option-desc">AI va identifica 5-7 cuvinte cheie relevante din conținut.</div>
+        <div class="tip-card" id="tc-cercetare" onclick="selectTip('cercetare')">
+          <div class="tc-icon">🔬</div>
+          <div class="tc-title">Cercetare și analiză în educație</div>
+          <div class="tc-secs">• Introducere și fundamentare<br>• Metodologie<br>• Rezultate și analiză<br>• Concluzii și implicații</div>
         </div>
-      </label>
-      <label class="ai-option">
-        <input type="radio" name="ai-opt" value="intro"/>
-        <div>
-          <div class="ai-option-label">Generează introducere</div>
-          <div class="ai-option-desc">AI va genera o introducere cu context, problemă de cercetare și obiective.</div>
+        <div class="tip-card" id="tc-dezvoltare" onclick="selectTip('dezvoltare')">
+          <div class="tc-icon">🌱</div>
+          <div class="tc-title">Dezvoltare educațională și profesională</div>
+          <div class="tc-secs">• Introducere și context<br>• Descrierea intervenției<br>• Rezultate și observații<br>• Concluzii și implicații</div>
         </div>
-      </label>
-      <label class="ai-option">
-        <input type="radio" name="ai-opt" value="concluzii"/>
-        <div>
-          <div class="ai-option-label">Generează concluzii</div>
-          <div class="ai-option-desc">AI va sintetiza concluzii din rezultatele prezentate în articol.</div>
-        </div>
-      </label>
-      <label class="ai-option">
-        <input type="radio" name="ai-opt" value="diacritice"/>
-        <div>
-          <div class="ai-option-label">Corectează diacritice și gramatică</div>
-          <div class="ai-option-desc">Corectează diacriticele românești lipsă și greșelile gramaticale evidente.</div>
-        </div>
-      </label>
+      </div>
     </div>
-    <div class="ai-spinner" id="aiSpinner">
-      <span class="ai-spinner-icon">⏳</span>
-      <div style="font-size:0.88rem;color:#888;">AI procesează...</div>
-    </div>
-    <div class="ai-footer" id="aiFooter">
-      <button class="btn-ai-cancel" onclick="inchideAI()">Anulează</button>
-      <button class="btn-ai-run" onclick="ruleazaAI()">✨ Aplică</button>
+    <div class="modal-foot">
+      <button class="btn-ok" id="btnConfirmaTip" onclick="confirmaTip()" disabled style="opacity:0.45;">Confirmă și începe →</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast-wrap"></div>
+<!-- MODAL AI -->
+<div class="modal-ov" id="modalAI">
+  <div class="modal-box">
+    <div class="modal-head"><h3>✨ Îmbunătățire cu AI</h3><button class="modal-x" onclick="inchideModalAI()">×</button></div>
+    <div class="modal-body">
+      <div class="ai-spin" id="aiSpin"><span class="ai-spin-icon">⏳</span><div style="font-size:0.84rem;color:#888;">AI procesează...</div></div>
+      <div id="aiOpts">
+        <label class="modal-opt"><input type="radio" name="aiO" value="abstract" checked/><div><div class="mo-title">Generează abstract</div><div class="mo-desc">Pe baza tuturor secțiunilor (fără bibliografie).</div></div></label>
+        <label class="modal-opt"><input type="radio" name="aiO" value="keywords"/><div><div class="mo-title">Extrage cuvinte-cheie</div><div class="mo-desc">5-7 cuvinte cheie din conținut.</div></div></label>
+        <label class="modal-opt"><input type="radio" name="aiO" value="diacritice"/><div><div class="mo-title">Corectează diacritice</div><div class="mo-desc">ă, â, î, ș, ț în toate secțiunile.</div></div></label>
+      </div>
+    </div>
+    <div class="modal-foot" id="aiFooter">
+      <button class="btn-cancel" onclick="inchideModalAI()">Anulează</button>
+      <button class="btn-ok" onclick="ruleazaAI()">✨ Aplică</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INSERT -->
+<div class="modal-ov" id="modalIns">
+  <div class="modal-box">
+    <div class="modal-head"><h3>Inserează element</h3><button class="modal-x" onclick="closeIns()">×</button></div>
+    <div class="modal-body">
+      <div class="ins-grid">
+        <div class="ins-opt" onclick="insImagine()"><div class="ins-icon">🖼️</div><div class="ins-lbl">Imagine</div></div>
+        <div class="ins-opt" onclick="insTabel()"><div class="ins-icon">📊</div><div class="ins-lbl">Tabel</div></div>
+        <div class="ins-opt" onclick="insHR()"><div class="ins-icon">—</div><div class="ins-lbl">Separator</div></div>
+        <div class="ins-opt" onclick="insLink()"><div class="ins-icon">🔗</div><div class="ins-lbl">Link</div></div>
+        <div class="ins-opt" onclick="insEq()"><div class="ins-icon">📐</div><div class="ins-lbl">Ecuație</div></div>
+        <div class="ins-opt" onclick="insCitare()"><div class="ins-icon">❝</div><div class="ins-lbl">Citare</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImg(this)"/>
+<div id="toast-w"></div>
 
 <script>
-// ══════════════════════════════════════════
-// CONFIG TIPURI
-// ══════════════════════════════════════════
-const WORKER_URL = 'https://dokimasia-articole.m-ciprian1387.workers.dev';
+const WORKER='https://dokimasia-articole.m-ciprian1387.workers.dev';
+const SB_URL='https://jaoxhsyplnkanhqevnnr.supabase.co';
+const SB_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw';
 
-const TIPURI = {
-  practic: {
-    label: 'Practici educaționale și inovare didactică',
-    icon: '🎓',
-    culoare: '#1565c0',
-    sectiuni: [
-      { id:'intro',    icon:'🔹', label:'Introducere și context',         required:true,  hint:'Prezentați contextul educațional în care se desfășoară activitatea, nevoia identificată și scopul demersului didactic.' },
-      { id:'demers',   icon:'📋', label:'Descrierea demersului didactic', required:true,  hint:'Descrieți în detaliu activitatea didactică: etape, metode utilizate, resurse, mod de organizare a clasei și desfășurarea efectivă.' },
-      { id:'rezultate',icon:'📊', label:'Rezultate și observații',        required:true,  hint:'Prezentați rezultatele obținute, reacțiile elevilor, aspectele pozitive și dificultățile întâmpinate.' },
-      { id:'concluzii',icon:'✅', label:'Concluzii și recomandări',       required:true,  hint:'Sintetizați concluziile și formulați recomandări pentru cadre didactice interesate de o abordare similară.' },
-    ]
-  },
-  cercetare: {
-    label: 'Cercetare și analiză în educație',
-    icon: '🔬',
-    culoare: '#1b5e20',
-    sectiuni: [
-      { id:'intro',      icon:'🔹', label:'Introducere și fundamentare teoretică', required:true,  hint:'Prezentați contextul teoretic al cercetării, literatura de specialitate relevantă, problema de cercetare și ipotezele.' },
-      { id:'metodologie',icon:'⚙️', label:'Metodologie',                           required:true,  hint:'Descrieți designul cercetării, participanții, instrumentele de colectare a datelor și procedura de analiză.' },
-      { id:'rezultate',  icon:'📊', label:'Rezultate și analiză',                  required:true,  hint:'Prezentați datele colectate, rezultatele analizei și interpretarea acestora în raport cu ipotezele formulate.' },
-      { id:'concluzii',  icon:'✅', label:'Concluzii și implicații',               required:true,  hint:'Sintetizați concluziile cercetării, limitele studiului și implicațiile practice sau teoretice pentru domeniu.' },
-    ]
-  },
-  dezvoltare: {
-    label: 'Dezvoltare educațională și profesională',
-    icon: '🌱',
-    culoare: '#4a148c',
-    sectiuni: [
-      { id:'intro',      icon:'🔹', label:'Introducere și context',                        required:true,  hint:'Prezentați contextul instituțional sau profesional, necesitatea intervenției și obiectivele urmărite.' },
-      { id:'interventie',icon:'🏗️', label:'Descrierea intervenției / proiectului',         required:true,  hint:'Descrieți în detaliu proiectul, programul sau intervenția: etape, parteneri, activități, resurse utilizate.' },
-      { id:'rezultate',  icon:'📊', label:'Rezultate și observații',                       required:true,  hint:'Prezentați rezultatele obținute, impactul asupra beneficiarilor și aspectele relevante observate în implementare.' },
-      { id:'concluzii',  icon:'✅', label:'Concluzii și implicații',                       required:true,  hint:'Sintetizați concluziile, lecțiile învățate și recomandările pentru proiecte sau intervenții similare.' },
-    ]
-  }
+const TIPURI={
+  practic:{label:'Practici educaționale și inovare didactică',icon:'🎓',sectiuni:[
+    {id:'s_intro',label:'Introducere și context',icon:'🔹',required:true,hint:'Prezentați contextul educațional, nevoia identificată și scopul demersului didactic.'},
+    {id:'s_demers',label:'Descrierea demersului didactic',icon:'📋',required:true,hint:'Descrieți activitatea didactică: etape, metode, resurse și desfășurarea efectivă.'},
+    {id:'s_rezultate',label:'Rezultate și observații',icon:'📊',required:true,hint:'Prezentați rezultatele, reacțiile elevilor și dificultățile întâmpinate.'},
+    {id:'s_concluzii',label:'Concluzii și recomandări',icon:'✅',required:true,hint:'Sintetizați concluziile și formulați recomandări pentru cadre didactice interesate.'},
+  ]},
+  cercetare:{label:'Cercetare și analiză în educație',icon:'🔬',sectiuni:[
+    {id:'s_intro',label:'Introducere și fundamentare teoretică',icon:'🔹',required:true,hint:'Prezentați contextul teoretic, literatura relevantă, problema și ipotezele.'},
+    {id:'s_metodologie',label:'Metodologie',icon:'⚙️',required:true,hint:'Descrieți designul cercetării, participanții, instrumentele și procedura de analiză.'},
+    {id:'s_rezultate',label:'Rezultate și analiză',icon:'📊',required:true,hint:'Prezentați datele, rezultatele analizei și interpretarea în raport cu ipotezele.'},
+    {id:'s_concluzii',label:'Concluzii și implicații',icon:'✅',required:true,hint:'Sintetizați concluziile, limitele studiului și implicațiile practice sau teoretice.'},
+  ]},
+  dezvoltare:{label:'Dezvoltare educațională și profesională',icon:'🌱',sectiuni:[
+    {id:'s_intro',label:'Introducere și context',icon:'🔹',required:true,hint:'Prezentați contextul instituțional, necesitatea intervenției și obiectivele.'},
+    {id:'s_interventie',label:'Descrierea intervenției / proiectului',icon:'🏗️',required:true,hint:'Descrieți proiectul: etape, parteneri, activități și resurse utilizate.'},
+    {id:'s_rezultate',label:'Rezultate și observații',icon:'📊',required:true,hint:'Prezentați rezultatele, impactul și aspectele relevante observate.'},
+    {id:'s_concluzii',label:'Concluzii și implicații',icon:'✅',required:true,hint:'Sintetizați concluziile, lecțiile învățate și recomandările pentru proiecte similare.'},
+  ]}
 };
 
-const SECTIUNI_COMUNE_INAINTE = [
-  { id:'titlu',   icon:'📌', label:'Titlu',         required:true,  tip:'fix' },
-  { id:'autori',  icon:'👤', label:'Autori',        required:true,  tip:'fix' },
-  { id:'abstract',icon:'📄', label:'Abstract',      required:false, tip:'fix' },
-  { id:'cuvinte', icon:'🔑', label:'Cuvinte-cheie', required:false, tip:'fix' },
-];
-const SECTIUNI_COMUNE_DUPA = [
-  { id:'biblio',  icon:'📚', label:'Bibliografie',  required:false, tip:'fix' },
-];
+const FIX_IDS=['titlu','autori','abstract','cuvinte'];
+let tipSelectat=null;
+let autori=[{id:1,nume:'',institutie:'',email:''}];
+let biblio=[''];
+let secContor=0;
+let sectiuni=[];
+let secActiva=null;
+let activeEd=null;
+let autosaveTimer=null;
+let articleId=null;
+let sb=null;
+let autorContor=2;
 
-// ══════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════
-let tipSelectat = null; // 'practic' | 'cercetare' | 'dezvoltare'
-let sectiuniLibere = [];
-let sectiuneActiva = 'selectare-tip';
-let autori = [{ nume:'', institutie:'', email:'' }];
-let biblio = [''];
-let sectiuniLibereContor = 0;
-
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
-function init() {
-  renderEditorTip();
-  renderSidebar();
-  activareSectiune('selectare-tip');
+// SUPABASE
+function initSB(){
+  try{sb=supabase.createClient(SB_URL,SB_ANON);setBadge('','Nesalvat');}
+  catch(e){setBadge('err','Offline');}
 }
-
-// ══════════════════════════════════════════
-// SELECTARE TIP
-// ══════════════════════════════════════════
-function selectTip(tip) {
-  tipSelectat = tip;
-  const t = TIPURI[tip];
-  // Update card-uri vizual
-  document.querySelectorAll('.tip-card').forEach(el => el.classList.remove('active'));
-  const card = document.getElementById('tip-card-' + tip);
-  if (card) card.classList.add('active');
-  document.getElementById('btn-confirma-tip').disabled = false;
-  document.getElementById('tip-selectat-label').textContent = t.label;
-  document.getElementById('tip-selectat-label').style.display = 'block';
+function setBadge(cls,txt){
+  const b=document.getElementById('autosaveBadge');
+  const t=document.getElementById('autosaveText');
+  b.className='autosave '+cls; t.textContent=txt;
 }
-
-function confirmaTip() {
-  if (!tipSelectat) return;
-  // Rebuild editor sections
-  renderEditorSections();
-  renderSidebar();
-  activareSectiune('titlu');
-  toast('Structura articolului a fost configurată pentru: ' + TIPURI[tipSelectat].label, 'ok');
+async function autosave(){
+  if(!sb||!tipSelectat)return;
+  setBadge('saving','Se salvează...');
+  const data=colDate();
+  try{
+    if(articleId){await sb.from('articole_draft').update({data,updated_at:new Date().toISOString()}).eq('id',articleId);}
+    else{const r=await sb.from('articole_draft').insert({data,tip:tipSelectat}).select().single();if(r.data)articleId=r.data.id;}
+    setBadge('saved','Salvat '+new Date().toLocaleTimeString('ro'));
+  }catch(e){setBadge('err','Eroare salvare');}
 }
+function schedAS(){clearTimeout(autosaveTimer);autosaveTimer=setTimeout(autosave,1800);}
+function colDate(){
+  const d={tip:tipSelectat,autori,biblio,sectiuni:sectiuni.map(s=>s.id)};
+  d.titlu=gv('f-titlu');d.subtitlu=gv('f-subtitlu');d.cuvinte=gv('f-cuvinte');
+  d.abRo=gi('rich-abstract');d.abEn=gi('rich-abstract-en');
+  sectiuni.filter(s=>!FIX_IDS.includes(s.id)&&s.id!=='biblio').forEach(s=>{d['r_'+s.id]=gi('rich-'+s.id);});
+  return d;
+}
+function gv(id){const e=document.getElementById(id);return e?e.value:'';}
+function gi(id){const e=document.getElementById(id);return e?e.innerHTML:'';}
 
-// ══════════════════════════════════════════
-// GET SECTIUNI CURENTE
-// ══════════════════════════════════════════
-function getSectiuniCurente() {
-  if (!tipSelectat) return [];
-  const tipSect = TIPURI[tipSelectat].sectiuni.map(s => ({...s, tip:'fix'}));
-  return [
-    ...SECTIUNI_COMUNE_INAINTE,
-    ...tipSect,
-    ...SECTIUNI_COMUNE_DUPA,
-    ...sectiuniLibere,
+// TIP
+function selectTip(tip){
+  tipSelectat=tip;
+  document.querySelectorAll('.tip-card').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('tc-'+tip).classList.add('sel');
+  const b=document.getElementById('btnConfirmaTip');
+  b.disabled=false;b.style.opacity='1';
+}
+function confirmaTip(){
+  if(!tipSelectat)return;
+  document.getElementById('modalTip').classList.remove('open');
+  buildSectiuni();
+  renderAll();
+  activaSec('titlu');
+  toast('Editor configurat: '+TIPURI[tipSelectat].label,'ok');
+}
+function buildSectiuni(){
+  sectiuni=[
+    {id:'titlu',label:'Titlu',icon:'📌',required:true,tip:'fix'},
+    {id:'autori',label:'Autori',icon:'👤',required:true,tip:'fix'},
+    {id:'abstract',label:'Abstract',icon:'📄',required:false,tip:'fix'},
+    {id:'cuvinte',label:'Cuvinte-cheie',icon:'🔑',required:false,tip:'fix'},
+    ...TIPURI[tipSelectat].sectiuni.map(s=>({...s,tip:'tip'})),
+    {id:'biblio',label:'Bibliografie',icon:'📚',required:false,tip:'fix'},
   ];
 }
 
-// ══════════════════════════════════════════
+// RENDER ALL
+function renderAll(){renderSidebar();renderEditor();}
+
 // SIDEBAR
-// ══════════════════════════════════════════
-function renderSidebar() {
-  const list = document.getElementById('sectionList');
-  
-  // Tipul lucrării mereu primul
-  let html = `
-    <div class="section-item ${sectiuneActiva === 'selectare-tip' ? 'active' : ''} ${tipSelectat ? 'tip-done' : 'tip-pending'}"
-      onclick="activareSectiune('selectare-tip')" id="nav-selectare-tip" style="border-left:3px solid var(--gold);">
-      <span class="si-icon">📂</span>
-      <span class="si-label" style="font-weight:700;">Tipul lucrării</span>
-      <span class="si-status ${tipSelectat ? 'filled' : ''}" title="${tipSelectat ? TIPURI[tipSelectat].label : 'Neselectat'}"></span>
-    </div>`;
-
-  if (tipSelectat) {
-    const t = TIPURI[tipSelectat];
-    html += `<div style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 16px 4px;border-top:1px solid var(--border);margin-top:4px;">${t.icon} ${t.label.split(' ').slice(0,2).join(' ')}...</div>`;
-    
-    const toate = getSectiuniCurente();
-    html += toate.map(s => {
-      const filled = isFilled(s.id);
-      const isReq = s.required;
-      return `<div class="section-item ${s.id === sectiuneActiva ? 'active' : ''}" onclick="activareSectiune('${s.id}')" id="nav-${s.id}">
-        <span class="si-icon">${s.icon || '📄'}</span>
-        <span class="si-label">${s.label}${isReq ? ' <span style="color:var(--crimson);font-size:0.7rem;">*</span>' : ''}</span>
-        <span class="si-status ${filled ? 'filled' : ''}" title="${filled ? 'Completat' : isReq ? 'Obligatoriu' : 'Gol'}"></span>
-        ${s.tip === 'liber' ? `<button class="si-del" onclick="event.stopPropagation();stergeSectiuLibera('${s.id}')" title="Șterge">✕</button>` : ''}
-      </div>`;
-    }).join('');
-  }
-
-  list.innerHTML = html;
-  updateProgress();
+function renderSidebar(){
+  if(!tipSelectat){document.getElementById('sbList').innerHTML='';return;}
+  const fixe=sectiuni.filter(s=>FIX_IDS.includes(s.id));
+  const mobile=sectiuni.filter(s=>!FIX_IDS.includes(s.id));
+  let html=fixe.map(s=>sbItem(s,false)).join('');
+  html+=`<div class="sb-divider">Secțiuni articol</div>`;
+  html+=mobile.map(s=>sbItem(s,s.tip!=='fix')).join('');
+  document.getElementById('sbList').innerHTML=html;
+  updateProg();
+  initDrag();
+}
+function sbItem(s,drag){
+  const f=isFilled(s.id);
+  return `<div class="sb-item ${s.id===secActiva?'active':''}" id="sb-${s.id}" onclick="activaSec('${s.id}')" ${drag?`draggable="true" data-id="${s.id}"`:''}>${drag?`<span class="si-drag">⠿</span>`:'<span style="width:14px"></span>'}<span class="si-icon">${s.icon||'📄'}</span><span class="si-label">${s.label}${s.required?'<span class="si-req"> *</span>':''}</span><span class="si-dot ${f?'ok':s.required?'warn':''}"></span><span class="si-acts">${s.tip==='liber'?`<button class="si-btn" onclick="event.stopPropagation();renum('${s.id}')" title="Redenumește">✎</button><button class="si-btn del" onclick="event.stopPropagation();delSec('${s.id}')" title="Șterge">✕</button>`:''}</span></div>`;
+}
+function isFilled(id){
+  if(id==='autori')return autori.some(a=>a.nume.trim());
+  if(id==='biblio')return biblio.some(b=>b.trim());
+  if(id==='titlu')return (document.getElementById('f-titlu')||{value:''}).value.trim().length>0;
+  if(id==='cuvinte')return (document.getElementById('f-cuvinte')||{value:''}).value.trim().length>0;
+  const e=document.getElementById('rich-'+id);
+  return e?e.innerText.trim().length>0:false;
+}
+function updateProg(){
+  if(!tipSelectat)return;
+  const req=sectiuni.filter(s=>s.required);
+  const fReq=req.filter(s=>isFilled(s.id)).length;
+  const fAll=sectiuni.filter(s=>isFilled(s.id)).length;
+  const pct=Math.round((fAll/sectiuni.length)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progFill').style.background=fReq<req.length?'var(--crimson)':'var(--gold)';
+  document.getElementById('progPct').textContent=pct+'%';
+  const lipsa=req.filter(s=>!isFilled(s.id)).map(s=>s.label);
+  document.getElementById('progWarn').textContent=lipsa.length?'⚠ '+lipsa.join(', '):'';
+}
+function activaSec(id){
+  secActiva=id;
+  document.querySelectorAll('.sb-item').forEach(e=>e.classList.remove('active'));
+  const s=document.getElementById('sb-'+id);if(s)s.classList.add('active');
+  const sec=document.getElementById('sec-'+id);
+  if(sec)sec.scrollIntoView({behavior:'smooth',block:'start'});
+  updatePrev();
 }
 
-function isFilled(id) {
-  if (id === 'autori') return autori.some(a => a.nume.trim());
-  if (id === 'biblio') return biblio.some(b => b.trim());
-  const el = document.getElementById('field-' + id);
-  if (el) return el.value.trim().length > 0;
-  const re = document.getElementById('rich-' + id);
-  return re ? re.innerText.trim().length > 0 : false;
-}
-
-function updateProgress() {
-  if (!tipSelectat) {
-    document.getElementById('progressPct').textContent = '0%';
-    document.getElementById('progressFill').style.width = '0%';
-    return;
-  }
-  const toate = getSectiuniCurente();
-  const obligatorii = toate.filter(s => s.required);
-  const completateOblig = obligatorii.filter(s => isFilled(s.id)).length;
-  const completateTot = toate.filter(s => isFilled(s.id)).length;
-  const pct = Math.round((completateTot / toate.length) * 100);
-  const pctOblig = Math.round((completateOblig / obligatorii.length) * 100);
-  document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressFill').style.background = pctOblig < 100 ? 'var(--crimson)' : 'var(--gold)';
-  // Avertizare secțiuni obligatorii
-  const warn = document.getElementById('progress-warn');
-  if (warn) {
-    const lipsa = obligatorii.filter(s => !isFilled(s.id)).map(s => s.label);
-    warn.textContent = lipsa.length ? '⚠ Lipsesc: ' + lipsa.join(', ') : '';
-    warn.style.color = lipsa.length ? 'var(--crimson)' : '#4caf50';
-  }
-}
-
-function activareSectiune(id) {
-  sectiuneActiva = id;
-  document.querySelectorAll('.section-item').forEach(el => el.classList.remove('active'));
-  const nav = document.getElementById('nav-' + id);
-  if (nav) nav.classList.add('active');
-  document.querySelectorAll('.editor-section').forEach(el => el.classList.remove('active'));
-  const sec = document.getElementById('sec-' + id);
-  if (sec) sec.classList.add('active');
-  updatePreview();
-}
-
-// ══════════════════════════════════════════
-// RENDER EDITOR
-// ══════════════════════════════════════════
-function renderEditorTip() {
-  const area = document.getElementById('editorArea');
-  area.innerHTML = `
-    <div class="editor-section active" id="sec-selectare-tip">
-      <div class="section-header">
-        <h2>📂 Tipul lucrării</h2>
-        <div class="section-header-line"></div>
-        <p class="section-hint">Selectați tipul lucrării pentru a configura structura editorului. Această alegere determină secțiunile disponibile și ghidurile de redactare.</p>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
-        ${Object.entries(TIPURI).map(([key, t]) => `
-          <div class="tip-card" id="tip-card-${key}" onclick="selectTip('${key}')"
-            style="border:2px solid var(--border);border-radius:8px;padding:20px;cursor:pointer;transition:all 0.2s;text-align:center;">
-            <div style="font-size:2rem;margin-bottom:10px;">${t.icon}</div>
-            <div style="font-weight:700;color:var(--ink);font-size:0.95rem;margin-bottom:8px;font-family:'Playfair Display',serif;">${t.label}</div>
-            <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">
-              ${t.sectiuni.map(s => '• ' + s.label).join('<br>')}
-            </div>
-          </div>`).join('')}
-      </div>
-      <div id="tip-selectat-label" style="display:none;font-size:0.88rem;color:var(--gold);font-weight:600;margin-bottom:16px;padding:10px 14px;background:var(--paper-dark);border-radius:4px;border-left:3px solid var(--gold);">—</div>
-      <button id="btn-confirma-tip" onclick="confirmaTip()" disabled
-        style="background:var(--crimson);color:#fff;padding:12px 28px;border:none;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;opacity:0.5;transition:opacity 0.2s;"
-        onmouseover="if(!this.disabled)this.style.background='var(--crimson-dark)'"
-        onmouseout="this.style.background='var(--crimson)'">
-        Confirmă și continuă →
-      </button>
-    </div>`;
-
-  // CSS pentru tip-card active
-  if (!document.getElementById('tip-card-style')) {
-    const style = document.createElement('style');
-    style.id = 'tip-card-style';
-    style.textContent = `
-      .tip-card:hover { border-color: var(--crimson) !important; background: var(--paper); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-      .tip-card.active { border-color: var(--crimson) !important; background: #fff8f8; box-shadow: 0 4px 16px rgba(139,0,0,0.12); }
-      .tip-card.active div:first-child { filter: drop-shadow(0 0 4px rgba(139,0,0,0.3)); }
-      #btn-confirma-tip:not([disabled]) { opacity: 1 !important; }
-    `;
-    document.head.appendChild(style);
-  }
-}
-
-function renderEditorSections() {
-  const area = document.getElementById('editorArea');
-  const t = TIPURI[tipSelectat];
-
-  // Rebuild all sections
-  let html = `<div class="editor-section" id="sec-selectare-tip">
-    <div class="section-header">
-      <h2>📂 Tipul lucrării</h2>
-      <div class="section-header-line"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;">
-      ${Object.entries(TIPURI).map(([key, tip]) => `
-        <div class="tip-card ${tipSelectat===key?'active':''}" id="tip-card-${key}" onclick="selectTip('${key}')"
-          style="border:2px solid var(--border);border-radius:8px;padding:20px;cursor:pointer;transition:all 0.2s;text-align:center;">
-          <div style="font-size:2rem;margin-bottom:10px;">${tip.icon}</div>
-          <div style="font-weight:700;color:var(--ink);font-size:0.95rem;margin-bottom:8px;font-family:'Playfair Display',serif;">${tip.label}</div>
-          <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">${tip.sectiuni.map(s=>'• '+s.label).join('<br>')}</div>
-        </div>`).join('')}
-    </div>
-    <button id="btn-confirma-tip" onclick="confirmaTip()"
-      style="background:var(--crimson);color:#fff;padding:12px 28px;border:none;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">
-      Schimbă tipul →
-    </button>
-  </div>`;
-
-  // Secțiuni comune înainte
-  SECTIUNI_COMUNE_INAINTE.forEach(s => { html += renderSectiuneHtml(s); });
-
-  // Secțiunile specifice tipului
-  t.sectiuni.forEach((s, idx) => {
-    html += renderSectiuneHtml({...s, tip:'fix', nrSectiune: idx+1});
-  });
-
-  // Secțiuni comune după
-  SECTIUNI_COMUNE_DUPA.forEach(s => { html += renderSectiuneHtml(s); });
-
-  // Secțiuni libere
-  sectiuniLibere.forEach(s => { html += renderSectiuneLibera(s); });
-
-  area.innerHTML = html;
-  attachRichEditors();
-  renderAutori();
-  renderBiblio();
-}
-
-function renderSectiuneHtml(s) {
-  const hints = {
-    titlu: 'Titlul trebuie să fie concis, clar și reprezentativ pentru conținut. Evitați titlurile prea lungi sau prea vagi.',
-    autori: 'Adăugați toți autorii contribuției cu datele de contact și afilierea instituțională.',
-    abstract: 'Rezumați conținutul articolului în 150-200 de cuvinte: contextul, metodologia, rezultatele și concluzia.',
-    cuvinte: 'Introduceți 5-7 cuvinte cheie separate prin virgulă, relevante pentru conținutul articolului.',
-    biblio: 'Listați sursele utilizate în format APA, ordonate alfabetic. Ex: Ionescu, M. (2020). Titlul lucrării. Editura.',
-  };
-  const hint = s.hint || hints[s.id] || 'Completați conținutul acestei secțiuni.';
-
-  if (s.id === 'autori') return `
-    <div class="editor-section" id="sec-autori">
-      <div class="section-header">
-        <h2>${s.icon} ${s.label}</h2>
-        <div class="section-header-line"></div>
-        <p class="section-hint">${hint}</p>
-      </div>
-      <div id="autoriList"></div>
-      <button class="btn-add-author" onclick="adaugaAutor()">+ Adaugă autor</button>
-    </div>`;
-
-  if (s.id === 'biblio') return `
-    <div class="editor-section" id="sec-biblio">
-      <div class="section-header">
-        <h2>${s.icon} ${s.label}</h2>
-        <div class="section-header-line"></div>
-        <p class="section-hint">${hint}</p>
-      </div>
-      <div id="biblioList"></div>
-      <button class="btn-add-bib" onclick="adaugaBibRef()">+ Adaugă referință</button>
-    </div>`;
-
-  if (s.id === 'titlu') return `
-    <div class="editor-section" id="sec-titlu">
-      <div class="section-header">
-        <h2>${s.icon} ${s.label} <span style="color:var(--crimson);font-size:0.8rem;">*</span></h2>
-        <div class="section-header-line"></div>
-        <p class="section-hint">${hint}</p>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Titlul articolului <span class="req">*</span></label>
-        <input type="text" class="field-input" id="field-titlu" placeholder="Introduceți titlul articolului..." oninput="onFieldChange()" />
-      </div>
-      <div class="field-group">
-        <label class="field-label">Subtitlu <span style="font-weight:400;text-transform:none;font-size:0.68rem;">(opțional)</span></label>
-        <input type="text" class="field-input" id="field-subtitlu" placeholder="Subtitlu opțional..." oninput="onFieldChange()" />
-      </div>
-    </div>`;
-
-  if (s.id === 'cuvinte') return `
-    <div class="editor-section" id="sec-cuvinte">
-      <div class="section-header">
-        <h2>${s.icon} ${s.label}</h2>
-        <div class="section-header-line"></div>
-        <p class="section-hint">${hint}</p>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Cuvinte-cheie</label>
-        <input type="text" class="field-input" id="field-cuvinte" placeholder="ex: educație, practici didactice, inovare, curriculum, formare" oninput="onFieldChange()" />
-        <div class="field-count" id="kw-count">0 cuvinte-cheie</div>
-      </div>
-    </div>`;
-
-  // Secțiune rich text (toate celelalte)
-  const nrLabel = s.nrSectiune ? `${s.nrSectiune}. ` : '';
-  const tipLabel = tipSelectat ? `<span style="font-size:0.68rem;letter-spacing:1px;background:var(--paper-dark);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--muted);margin-left:8px;vertical-align:middle;">${TIPURI[tipSelectat].icon} ${TIPURI[tipSelectat].label.split(' ').slice(0,2).join(' ')}</span>` : '';
-  return `
-    <div class="editor-section" id="sec-${s.id}">
-      <div class="section-header">
-        <h2>${s.icon} ${nrLabel}${s.label}${s.required ? ' <span style="color:var(--crimson);font-size:0.8rem;">*</span>' : ''} ${s.nrSectiune ? tipLabel : ''}</h2>
-        <div class="section-header-line"></div>
-        <p class="section-hint">${hint}</p>
-      </div>
-      <div class="field-group">
-        <div class="rich-toolbar">
-          <button onclick="fmt('bold')"><b>B</b></button>
-          <button onclick="fmt('italic')"><i>I</i></button>
-          <button onclick="fmt('underline')"><u>U</u></button>
-          <div class="tb-sep"></div>
-          <button onclick="fmt('insertUnorderedList')">• Listă</button>
-          <button onclick="fmt('insertOrderedList')">1. Listă</button>
-          <div class="tb-sep"></div>
-          <button onclick="fmt('justifyFull')">≡</button>
-        </div>
-        <div class="rich-editor" id="rich-${s.id}" contenteditable="true"
-          data-placeholder="${hint.split('.')[0]}..."
-          oninput="onRichChange()" onblur="onRichChange()"></div>
-        ${s.id === 'abstract' ? '<div class="field-count" id="abstract-count">0 cuvinte</div>' : ''}
-      </div>
-    </div>`;
-}
-
-function renderSectiuneLibera(s) {
-  return `
-    <div class="editor-section" id="sec-${s.id}">
-      <div class="section-header">
-        <h2>📄 <span id="title-display-${s.id}">${s.label}</span></h2>
-        <div class="section-header-line"></div>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-          <input type="text" class="field-input" value="${s.label}" style="max-width:300px;font-size:0.9rem;"
-            oninput="redenumesteSectiune('${s.id}', this.value)" placeholder="Denumire secțiune..." />
-        </div>
-      </div>
-      <div class="field-group">
-        <div class="rich-toolbar">
-          <button onclick="fmt('bold')"><b>B</b></button>
-          <button onclick="fmt('italic')"><i>I</i></button>
-          <button onclick="fmt('underline')"><u>U</u></button>
-          <div class="tb-sep"></div>
-          <button onclick="fmt('insertUnorderedList')">• Listă</button>
-          <button onclick="fmt('insertOrderedList')">1. Listă</button>
-          <div class="tb-sep"></div>
-          <button onclick="fmt('justifyFull')">≡</button>
-        </div>
-        <div class="rich-editor" id="rich-${s.id}" contenteditable="true"
-          data-placeholder="Scrieți conținutul secțiunii aici..."
-          oninput="onRichChange()" onblur="onRichChange()"></div>
-      </div>
-    </div>`;
-}
-
-function attachRichEditors() {
-  document.querySelectorAll('.rich-editor').forEach(el => {
-    el.addEventListener('input', function() {
-      this.dataset.empty = this.innerText.trim() === '' ? 'true' : 'false';
+// DRAG
+let dragId=null;
+function initDrag(){
+  document.querySelectorAll('.sb-item[draggable]').forEach(item=>{
+    item.addEventListener('dragstart',e=>{dragId=item.dataset.id;item.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    item.addEventListener('dragend',()=>{item.classList.remove('dragging');document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('drag-over'));});
+    item.addEventListener('dragover',e=>{e.preventDefault();item.classList.add('drag-over');});
+    item.addEventListener('dragleave',()=>item.classList.remove('drag-over'));
+    item.addEventListener('drop',e=>{
+      e.preventDefault();item.classList.remove('drag-over');
+      const tgtId=item.dataset.id;
+      if(!dragId||dragId===tgtId)return;
+      const mob=sectiuni.filter(s=>!FIX_IDS.includes(s.id));
+      const si=mob.findIndex(s=>s.id===dragId);
+      const ti=mob.findIndex(s=>s.id===tgtId);
+      if(si===-1||ti===-1)return;
+      const[moved]=mob.splice(si,1);mob.splice(ti,0,moved);
+      const fix=sectiuni.filter(s=>FIX_IDS.includes(s.id));
+      const bib=sectiuni.find(s=>s.id==='biblio');
+      const rest=mob.filter(s=>s.id!=='biblio');
+      sectiuni=[...fix,...rest,bib];
+      renderSidebar();
+      // Reorder DOM
+      const inner=document.getElementById('editorInner');
+      const bdom=document.getElementById('sec-biblio');
+      rest.forEach(s=>{const el=document.getElementById('sec-'+s.id);if(el&&bdom)inner.insertBefore(el,bdom);});
+      schedAS();
     });
-    el.dataset.empty = 'true';
   });
 }
 
-// ══════════════════════════════════════════
+// EDITOR
+function renderEditor(){
+  const inner=document.getElementById('editorInner');
+  inner.innerHTML=sectiuni.map(s=>renderSec(s)).join('');
+  renderAutori();renderBiblio();initEditors();
+}
+function renderSec(s){
+  if(s.id==='titlu')return secTitlu();
+  if(s.id==='autori')return secAutori();
+  if(s.id==='abstract')return secAbstract();
+  if(s.id==='cuvinte')return secCuvinte();
+  if(s.id==='biblio')return secBiblio();
+  return secRich(s);
+}
+function tb(id){
+  return `<div class="word-tb">
+    <div class="tb-grp">
+      <select class="tb-sel" onchange="execF('fontName',this.value)"><option value="Times New Roman">Times New Roman</option><option value="Calibri">Calibri</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option></select>
+      <select class="tb-sel" style="width:44px" onchange="execF('fontSize',this.value)"><option value="3">12</option><option value="4">14</option><option value="5">18</option><option value="2">10</option></select>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-grp">
+      <button class="tb-btn" onclick="execF('bold')" title="Bold"><b>B</b></button>
+      <button class="tb-btn" onclick="execF('italic')" title="Italic"><i>I</i></button>
+      <button class="tb-btn" onclick="execF('underline')" title="Subliniat"><u>U</u></button>
+      <button class="tb-btn" onclick="execF('strikeThrough')" title="Tăiat"><s>S</s></button>
+      <input type="color" class="tb-color" title="Culoare text" onchange="execF('foreColor',this.value)"/>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-grp">
+      <button class="tb-btn" onclick="execF('justifyLeft')" title="Stânga">⬅</button>
+      <button class="tb-btn" onclick="execF('justifyCenter')" title="Centrat">☰</button>
+      <button class="tb-btn" onclick="execF('justifyRight')" title="Dreapta">➡</button>
+      <button class="tb-btn" onclick="execF('justifyFull')" title="Justify">≡</button>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-grp">
+      <button class="tb-btn" onclick="execF('insertUnorderedList')">• List</button>
+      <button class="tb-btn" onclick="execF('insertOrderedList')">1. List</button>
+      <button class="tb-btn" onclick="execF('indent')" title="Indent">→</button>
+      <button class="tb-btn" onclick="execF('outdent')" title="Outdent">←</button>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-grp">
+      <button class="tb-btn" onclick="deschideIns()" title="Inserează">⊞</button>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-grp">
+      <button class="tb-btn" onclick="execF('undo')" title="Anulează">↩</button>
+      <button class="tb-btn" onclick="execF('redo')" title="Refă">↪</button>
+    </div>
+  </div>`;
+}
+function secTitlu(){return `<div class="sec-wrap" id="sec-titlu"><div class="sec-h"><h2>📌 Titlu <span class="req">*</span></h2><div class="sec-line"></div><p class="sec-hint">Titlul trebuie să fie concis și reprezentativ. Evitați titlurile vagi sau prea lungi.</p></div><div class="fld"><label class="fld-label">Titlul articolului <span class="req">*</span></label><input type="text" class="fld-input" id="f-titlu" placeholder="Introduceți titlul articolului..." oninput="onChange()"/></div><div class="fld"><label class="fld-label">Subtitlu <small style="text-transform:none;font-weight:400;">(opțional)</small></label><input type="text" class="fld-input" id="f-subtitlu" placeholder="Subtitlu opțional..." oninput="onChange()"/></div></div>`;}
+function secAutori(){return `<div class="sec-wrap" id="sec-autori"><div class="sec-h"><h2>👤 Autori <span class="req">*</span></h2><div class="sec-line"></div><p class="sec-hint">Scrieți prenumele cu literă mică și NUMELE DE FAMILIE CU MAJUSCULE. Ex: <strong>Andrei Ionuț POPESCU</strong>, <strong>Maria IONESCU</strong>. Instituția și emailul apar ca notă de subsol.</p></div><div id="autoriList"></div><button class="btn-add-autor" onclick="addAutor()">+ Adaugă autor</button></div>`;}
+function secAbstract(){return `<div class="sec-wrap" id="sec-abstract"><div class="sec-h"><h2>📄 Abstract</h2><div class="sec-line"></div></div><div class="ab-info"><strong>Notă:</strong> Abstractul se generează pe baza tuturor secțiunilor articolului (Introducere, metodologie/demers, rezultate, concluzii), cu excepția bibliografiei. Recomandat: 150–200 cuvinte.</div><div class="ab-actions"><button class="btn-ai-gen" onclick="genAbstract()">✨ AI — Generează abstract (RO)</button><button class="btn-ai-tr" onclick="tradAbstract()">🌐 AI — Traduce în engleză</button></div><div class="fld"><label class="fld-label">Abstract (Română)</label>${tb('abstract')}<div class="rich-ed" id="rich-abstract" contenteditable="true" data-ph="Scrieți sau generați abstractul în română..." oninput="onChange()"></div><div class="fld-count" id="abCnt">0 cuvinte</div></div><div class="ab-en-head">Abstract (English)</div><div class="fld">${tb('abstract-en')}<div class="rich-ed" id="rich-abstract-en" contenteditable="true" data-ph="English abstract..." oninput="onChange()"></div></div></div>`;}
+function secCuvinte(){return `<div class="sec-wrap" id="sec-cuvinte"><div class="sec-h"><h2>🔑 Cuvinte-cheie</h2><div class="sec-line"></div><p class="sec-hint">5-7 cuvinte cheie separate prin virgulă, relevante pentru conținut.</p></div><div class="fld"><label class="fld-label">Cuvinte-cheie</label><input type="text" class="fld-input" id="f-cuvinte" placeholder="ex: educație, didactică, inovare, formare, curriculum" oninput="onChange()"/><div class="fld-count" id="kwCnt">0 cuvinte-cheie</div></div></div>`;}
+function secBiblio(){return `<div class="sec-wrap" id="sec-biblio"><div class="sec-h"><h2>📚 Bibliografie</h2><div class="sec-line"></div><p class="sec-hint">Format APA, ordonate alfabetic. Ex: Ionescu, M. (2020). Titlul lucrării. Editura.</p></div><div id="biblioList"></div><button class="btn-add-bib" onclick="addBib()">+ Adaugă referință</button></div>`;}
+function secRich(s){
+  const canDel=s.tip==='liber';
+  return `<div class="sec-wrap" id="sec-${s.id}">${canDel?`<div class="sec-ctrl"><button class="sec-ctrl-btn" onclick="renum('${s.id}')">✎ Redenumește</button><button class="sec-ctrl-btn del" onclick="delSec('${s.id}')">✕ Șterge</button></div>`:''}<div class="sec-h"><h2>${s.icon||'📄'} ${s.label}${s.required?' <span class="req">*</span>':''}</h2><div class="sec-line"></div><p class="sec-hint">${s.hint||'Scrieți conținutul acestei secțiuni.'}</p></div><div class="fld">${tb(s.id)}<div class="rich-ed" id="rich-${s.id}" contenteditable="true" data-ph="${(s.hint||'').split('.')[0]}..." oninput="onChange()"></div></div></div>`;
+}
+function execF(cmd,val){document.execCommand(cmd,false,val||null);onChange();}
+function initEditors(){
+  document.querySelectorAll('.rich-ed').forEach(el=>{
+    el.addEventListener('focus',()=>{activeEd=el;});
+    el.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){
+        e.preventDefault();
+        document.execCommand('insertParagraph',false,null);
+      }
+    });
+  });
+}
+
 // AUTORI
-// ══════════════════════════════════════════
-function renderAutori() {
-  const list = document.getElementById('autoriList');
-  if (!list) return;
-  list.innerHTML = `<div class="authors-list">${autori.map((a, i) => `
-    <div class="author-row">
-      <div class="field-group" style="margin:0;">
-        <label class="field-label">Nume și prenume ${i===0?'<span class="req">*</span>':''}</label>
-        <input type="text" class="field-input" value="${a.nume}" placeholder="Ionescu Maria" oninput="updateAutor(${i},'nume',this.value)" />
-      </div>
-      <div class="field-group" style="margin:0;">
-        <label class="field-label">Instituție</label>
-        <input type="text" class="field-input" value="${a.institutie}" placeholder="Școala Gimnazială..." oninput="updateAutor(${i},'institutie',this.value)" />
-      </div>
-      <div class="field-group" style="margin:0;">
-        <label class="field-label">Email</label>
-        <input type="email" class="field-input" value="${a.email}" placeholder="email@exemplu.ro" oninput="updateAutor(${i},'email',this.value)" />
-      </div>
-      ${autori.length > 1 ? `<button class="btn-remove-author" onclick="stergeAutor(${i})" title="Șterge autor">✕</button>` : '<div></div>'}
-    </div>`).join('')}
-  </div>`;
+function renderAutori(){
+  const l=document.getElementById('autoriList');if(!l)return;
+  l.innerHTML=autori.map((a,i)=>`<div class="autor-row" id="ar-${a.id}"><div class="autor-nr">${i+1}</div><div class="autor-fields"><div class="autor-fields"><input type="text" class="fld-input" value="${esc(a.nume)}" placeholder="Andrei Ionuț POPESCU" oninput="updAutor(${a.id},'nume',this.value)" title="Format: Prenume NUME"/></div><div class="autor-meta"><div><div class="autor-meta-lbl">Instituție</div><input type="text" class="fld-input" value="${esc(a.institutie)}" placeholder="Școala Gimnazială Nr. 1, Iași" oninput="updAutor(${a.id},'institutie',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div><div><div class="autor-meta-lbl">Email</div><input type="email" class="fld-input" value="${esc(a.email)}" placeholder="email@institutie.ro" oninput="updAutor(${a.id},'email',this.value)"/><div class="autor-fn">↳ notă de subsol</div></div></div></div>${autori.length>1?`<button class="btn-rm-autor" onclick="rmAutor(${a.id})">✕</button>`:''}</div>`).join('');
 }
+function addAutor(){autori.push({id:autorContor++,nume:'',institutie:'',email:''});renderAutori();onChange();}
+function rmAutor(id){if(autori.length<=1)return;autori=autori.filter(a=>a.id!==id);renderAutori();onChange();}
+function updAutor(id,f,v){const a=autori.find(x=>x.id===id);if(a)a[f]=v;onChange();}
 
-function adaugaAutor() { autori.push({ nume:'', institutie:'', email:'' }); renderAutori(); }
-function stergeAutor(i) { autori.splice(i,1); renderAutori(); onFieldChange(); }
-function updateAutor(i, field, val) { autori[i][field] = val; onFieldChange(); }
-
-// ══════════════════════════════════════════
-// BIBLIOGRAFIE
-// ══════════════════════════════════════════
-function renderBiblio() {
-  const list = document.getElementById('biblioList');
-  if (!list) return;
-  list.innerHTML = `<div class="bib-list">${biblio.map((b, i) => `
-    <div class="bib-row">
-      <div class="bib-nr">${i+1}</div>
-      <input type="text" class="field-input bib-input" value="${b}" placeholder="Autor, A. A. (An). Titlul lucrării. Editor." oninput="updateBib(${i},this.value)" />
-      ${biblio.length > 1 ? `<button class="btn-remove-bib" onclick="stergeBib(${i})">✕</button>` : ''}
-    </div>`).join('')}
-  </div>`;
+// BIBLIO
+function renderBiblio(){
+  const l=document.getElementById('biblioList');if(!l)return;
+  l.innerHTML=biblio.map((b,i)=>`<div class="bib-row"><div class="bib-nr">${i+1}</div><input type="text" class="fld-input" value="${esc(b)}" placeholder="Autor, A. (An). Titlul. Editor." oninput="updBib(${i},this.value)"/>${biblio.length>1?`<button class="btn-rm-bib" onclick="rmBib(${i})">✕</button>`:''}</div>`).join('');
 }
+function addBib(){biblio.push('');renderBiblio();onChange();}
+function rmBib(i){biblio.splice(i,1);renderBiblio();onChange();}
+function updBib(i,v){biblio[i]=v;onChange();}
 
-function adaugaBibRef() { biblio.push(''); renderBiblio(); onFieldChange(); }
-function stergeBib(i) { biblio.splice(i,1); renderBiblio(); onFieldChange(); }
-function updateBib(i, val) { biblio[i] = val; onFieldChange(); }
-
-// ══════════════════════════════════════════
 // SECȚIUNI LIBERE
-// ══════════════════════════════════════════
-function adaugaSectiuLibera() {
-  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
-  sectiuniLibereContor++;
-  const id = 'liber_' + sectiuniLibereContor;
-  const label = 'Secțiunea suplimentară ' + sectiuniLibereContor;
-  sectiuniLibere.push({ id, icon:'📄', label, tip:'liber' });
-  const area = document.getElementById('editorArea');
-  // Insert before biblio section
-  const biblioSec = document.getElementById('sec-biblio');
-  const div = document.createElement('div');
-  div.innerHTML = renderSectiuneLibera({ id, label });
-  const newEl = div.firstElementChild;
-  if (biblioSec) area.insertBefore(newEl, biblioSec);
-  else area.appendChild(newEl);
-  const re = document.getElementById('rich-' + id);
-  if (re) { re.dataset.empty = 'true'; re.addEventListener('input', function(){ this.dataset.empty = this.innerText.trim()===''?'true':'false'; }); }
-  renderSidebar();
-  activareSectiune(id);
+function adaugaSecLibera(){
+  if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
+  secContor++;
+  const id='lib_'+secContor;
+  const label='Secțiune suplimentară '+secContor;
+  const s={id,label,icon:'📄',required:false,tip:'liber',hint:'Scrieți conținutul acestei secțiuni suplimentare.'};
+  const biIdx=sectiuni.findIndex(x=>x.id==='biblio');
+  sectiuni.splice(biIdx,0,s);
+  const biDom=document.getElementById('sec-biblio');
+  const div=document.createElement('div');
+  div.innerHTML=secRich(s);
+  document.getElementById('editorInner').insertBefore(div.firstElementChild,biDom);
+  const re=document.getElementById('rich-'+id);
+  if(re)re.addEventListener('focus',()=>{activeEd=re;});
+  renderSidebar();activaSec(id);onChange();
+}
+function delSec(id){
+  if(!confirm('Ștergem secțiunea? Conținutul va fi pierdut.'))return;
+  sectiuni=sectiuni.filter(s=>s.id!==id);
+  const el=document.getElementById('sec-'+id);if(el)el.remove();
+  renderSidebar();activaSec('titlu');onChange();
+}
+function renum(id){
+  const s=sectiuni.find(x=>x.id===id);if(!s)return;
+  const nv=prompt('Noul nume:',s.label);
+  if(!nv||!nv.trim())return;
+  s.label=nv.trim();
+  const sec=document.getElementById('sec-'+id);
+  if(sec){const h=sec.querySelector('h2');if(h)h.innerHTML=(s.icon||'📄')+' '+s.label;}
+  renderSidebar();onChange();
 }
 
-function stergeSectiuLibera(id) {
-  sectiuniLibere = sectiuniLibere.filter(s => s.id !== id);
-  const el = document.getElementById('sec-' + id);
-  if (el) el.remove();
-  renderSidebar();
-  activareSectiune('titlu');
+// CHANGE
+function onChange(){
+  updAbCnt();updKwCnt();updateProg();updatePrev();schedAS();
+}
+function updAbCnt(){
+  const e=document.getElementById('rich-abstract');
+  const c=document.getElementById('abCnt');
+  if(!e||!c)return;
+  const w=e.innerText.trim().split(/\s+/).filter(Boolean).length;
+  c.textContent=w+' cuvinte '+(w<150?'(min. 150)':w>250?'(max. 250)':'✓');
+  c.style.color=w>=150&&w<=250?'#4caf50':'var(--muted)';
+}
+function updKwCnt(){
+  const e=document.getElementById('f-cuvinte');
+  const c=document.getElementById('kwCnt');
+  if(!e||!c)return;
+  const n=e.value.split(',').map(s=>s.trim()).filter(Boolean).length;
+  c.textContent=n+' cuvinte-cheie';
 }
 
-function redenumesteSectiune(id, val) {
-  const s = sectiuniLibere.find(x => x.id === id);
-  if (s) s.label = val;
-  const disp = document.getElementById('title-display-' + id);
-  if (disp) disp.textContent = val;
-  const nav = document.getElementById('nav-' + id);
-  if (nav) { const lbl = nav.querySelector('.si-label'); if (lbl) lbl.textContent = val; }
-  updatePreview();
+// INSERT
+function deschideIns(){document.getElementById('modalIns').classList.add('open');}
+function closeIns(){document.getElementById('modalIns').classList.remove('open');}
+function getEd(){return activeEd||document.querySelector('.rich-ed');}
+function insImagine(){closeIns();document.getElementById('imgInput').click();}
+function handleImg(inp){
+  if(!inp.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{const ed=getEd();if(!ed)return;ed.focus();document.execCommand('insertHTML',false,`<img src="${e.target.result}" alt="Imagine" style="max-width:100%;margin:8px 0;display:block;"/>`);onChange();};
+  r.readAsDataURL(inp.files[0]);inp.value='';
 }
-
-// ══════════════════════════════════════════
-// RICH TEXT
-// ══════════════════════════════════════════
-function fmt(cmd) { document.execCommand(cmd, false, null); }
-
-// ══════════════════════════════════════════
-// CHANGE HANDLERS
-// ══════════════════════════════════════════
-function onFieldChange() {
-  updatePreview();
-  renderSidebar();
-  const kw = document.getElementById('field-cuvinte');
-  const kwCount = document.getElementById('kw-count');
-  if (kw && kwCount) {
-    const cnt = kw.value.split(',').map(s=>s.trim()).filter(Boolean).length;
-    kwCount.textContent = cnt + ' cuvinte-cheie';
-  }
+function insTabel(){
+  closeIns();
+  const rows=parseInt(prompt('Rânduri:','3'))||3;
+  const cols=parseInt(prompt('Coloane:','3'))||3;
+  let h='<table border="1" style="border-collapse:collapse;width:100%;margin:10px 0;">';
+  for(let r=0;r<rows;r++){h+='<tr>';for(let c=0;c<cols;c++)h+=`<td style="border:1px solid #ccc;padding:5px 8px;min-width:50px;">${r===0?'<strong>Col '+(c+1)+'</strong>':''}</td>`;h+='</tr>';}
+  h+='</table>';
+  const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,h);onChange();}
 }
+function insHR(){closeIns();const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,'<hr style="border:none;border-top:1px solid #ccc;margin:10px 0;"/>');onChange();}}
+function insLink(){closeIns();const u=prompt('URL:','https://');if(!u)return;const t=prompt('Text:',u);const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,`<a href="${u}" target="_blank">${t||u}</a>`);onChange();}}
+function insEq(){closeIns();const eq=prompt('Ecuație:','E = mc²');if(!eq)return;const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,`<span style="font-style:italic;font-family:Times New Roman,serif;background:#f5f5f5;padding:1px 5px;border-radius:2px;">${eq}</span>`);onChange();}}
+function insCitare(){closeIns();const ed=getEd();if(ed){ed.focus();document.execCommand('insertHTML',false,`<blockquote style="border-left:3px solid #b8963e;margin:8px 0;padding:6px 12px;font-style:italic;color:#555;background:#faf8f4;">Citare...</blockquote>`);onChange();}}
 
-function onRichChange() {
-  updatePreview();
-  renderSidebar();
-  const ab = document.getElementById('rich-abstract');
-  const abCount = document.getElementById('abstract-count');
-  if (ab && abCount) {
-    const words = ab.innerText.trim().split(/\s+/).filter(Boolean).length;
-    abCount.textContent = words + ' cuvinte ' + (words < 150 ? '(minim 150)' : words > 250 ? '(maxim 250)' : '✓');
-    abCount.style.color = words >= 150 && words <= 250 ? '#4caf50' : 'var(--muted)';
-  }
-}
-
-// ══════════════════════════════════════════
-// PREVIZUALIZARE
-// ══════════════════════════════════════════
-function updatePreview() {
-  const preview = document.getElementById('previewPage');
-  if (!tipSelectat) {
-    preview.innerHTML = '<div class="preview-empty">Selectați tipul lucrării pentru a începe.</div>';
-    return;
-  }
-  const titlu = (document.getElementById('field-titlu')||{}).value || '';
-  const subtitlu = (document.getElementById('field-subtitlu')||{}).value || '';
-  const autoriStr = autori.filter(a=>a.nume).map(a=>`${a.nume}${a.institutie?' ('+a.institutie+')':''}`).join(', ');
-  const abstract = (document.getElementById('rich-abstract')||{}).innerHTML || '';
-  const cuvinte = (document.getElementById('field-cuvinte')||{}).value || '';
-  const biblioFilled = biblio.filter(Boolean);
-  const t = TIPURI[tipSelectat];
-
-  if (!titlu && !autoriStr) {
-    preview.innerHTML = '<div class="preview-empty">Completați câmpurile pentru a vedea previzualizarea.</div>';
-    return;
-  }
-
-  let html = '';
-  if (titlu) html += `<div class="pv-titlu">${titlu}${subtitlu?'<br><span style="font-size:10pt;font-weight:normal;text-transform:none;font-style:italic;">'+subtitlu+'</span>':''}</div>`;
-  if (autoriStr) html += `<div class="pv-autor">${autoriStr}</div>`;
-  if (abstract && abstract.replace(/<[^>]+>/g,'').trim()) html += `<div class="pv-abstract"><strong>Abstract:</strong> ${abstract}</div>`;
-  if (cuvinte) html += `<p class="pv-kw"><strong>Cuvinte-cheie:</strong> ${cuvinte}</p>`;
-
-  let nr = 1;
-  t.sectiuni.forEach(s => {
-    const re = document.getElementById('rich-' + s.id);
-    if (re && re.innerText.trim()) {
-      html += `<div class="pv-sectiune">${nr++}. ${s.label}</div><div class="pv-corp">${re.innerHTML}</div>`;
-    }
-  });
-
-  sectiuniLibere.forEach(s => {
-    const re = document.getElementById('rich-' + s.id);
-    if (re && re.innerText.trim()) {
-      html += `<div class="pv-sectiune">${s.label}</div><div class="pv-corp">${re.innerHTML}</div>`;
-    }
-  });
-
-  if (biblioFilled.length) html += `<div class="pv-sectiune">Bibliografie</div>` + biblioFilled.map((b,i)=>`<div class="pv-bib">${i+1}. ${b}</div>`).join('');
-
-  preview.innerHTML = html || '<div class="preview-empty">Completați câmpurile...</div>';
-}
-
-// ══════════════════════════════════════════
 // AI
-// ══════════════════════════════════════════
-function deschideAI() {
-  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
-  document.getElementById('aiOverlay').classList.add('open');
-  document.getElementById('aiSpinner').style.display = 'none';
-  document.getElementById('aiFooter').style.display = 'flex';
-}
-
-function inchideAI() { document.getElementById('aiOverlay').classList.remove('open'); }
-
-async function ruleazaAI() {
-  const opt = document.querySelector('input[name="ai-opt"]:checked').value;
-  document.getElementById('aiSpinner').style.display = 'block';
-  document.getElementById('aiFooter').style.display = 'none';
-  const titlu = (document.getElementById('field-titlu')||{}).value || '';
-  const t = TIPURI[tipSelectat];
-  const sectiuniText = t.sectiuni.map(s => {
-    const re = document.getElementById('rich-' + s.id);
-    return re ? re.innerText.trim() : '';
+function getCtx(){
+  return sectiuni.filter(s=>!['titlu','autori','abstract','cuvinte','biblio'].includes(s.id)).map(s=>{
+    const e=document.getElementById('rich-'+s.id);
+    const t=e?e.innerText.trim():'';
+    return t?`[${s.label}]\n${t}`:'';
   }).filter(Boolean).join('\n\n');
-  const context = [titlu, sectiuniText].filter(Boolean).join('\n\n');
-  try {
-    const resp = await fetch(WORKER_URL + '/ai-editor', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ opt, context, titlu, tipLucrare: t.label })
-    });
-    const data = await resp.json();
-    if (!data.success) throw new Error(data.error);
-    aplicaRezultatAI(opt, data.text);
-  } catch(e) {
-    toast('Eroare AI: ' + e.message, 'err');
-  }
-  document.getElementById('aiSpinner').style.display = 'none';
-  document.getElementById('aiFooter').style.display = 'flex';
-  inchideAI();
+}
+async function genAbstract(){
+  const ctx=getCtx();const titlu=gv('f-titlu');
+  if(!ctx&&!titlu){toast('Completați mai întâi secțiunile articolului.','err');return;}
+  toast('AI generează abstractul...','info');
+  try{
+    const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opt:'abstract',context:`Titlu: ${titlu}\n\n${ctx}`,titlu,tipLucrare:tipSelectat?TIPURI[tipSelectat].label:''})});
+    const d=await r.json();if(!d.success)throw new Error(d.error);
+    const e=document.getElementById('rich-abstract');
+    if(e){e.innerHTML='<p>'+d.text.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';}
+    onChange();toast('Abstract generat!','ok');
+  }catch(e){toast('Eroare AI: '+e.message,'err');}
+}
+async function tradAbstract(){
+  const e=document.getElementById('rich-abstract');
+  const t=e?e.innerText.trim():'';
+  if(!t){toast('Scrieți mai întâi abstractul în română.','err');return;}
+  toast('AI traduce abstractul...','info');
+  try{
+    const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opt:'translate_abstract',context:t,titlu:gv('f-titlu')})});
+    const d=await r.json();if(!d.success)throw new Error(d.error);
+    const en=document.getElementById('rich-abstract-en');
+    if(en){en.innerHTML='<p>'+d.text.replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';}
+    onChange();toast('Abstract tradus în engleză!','ok');
+  }catch(e){toast('Eroare AI: '+e.message,'err');}
+}
+function deschideModalAI(){
+  if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
+  document.getElementById('modalAI').classList.add('open');
+  document.getElementById('aiSpin').style.display='none';
+  document.getElementById('aiOpts').style.display='block';
+  document.getElementById('aiFooter').style.display='flex';
+}
+function inchideModalAI(){document.getElementById('modalAI').classList.remove('open');}
+async function ruleazaAI(){
+  const opt=document.querySelector('input[name="aiO"]:checked').value;
+  document.getElementById('aiSpin').style.display='block';
+  document.getElementById('aiOpts').style.display='none';
+  document.getElementById('aiFooter').style.display='none';
+  const ctx=getCtx();const titlu=gv('f-titlu');
+  try{
+    const r=await fetch(WORKER+'/ai-editor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({opt,context:ctx,titlu,tipLucrare:TIPURI[tipSelectat].label})});
+    const d=await r.json();if(!d.success)throw new Error(d.error);
+    if(opt==='abstract'){const e=document.getElementById('rich-abstract');if(e)e.innerHTML='<p>'+d.text.replace(/\n\n/g,'</p><p>')+'</p>';toast('Abstract generat!','ok');}
+    else if(opt==='keywords'){const e=document.getElementById('f-cuvinte');if(e)e.value=d.text;toast('Cuvinte-cheie extrase!','ok');}
+    else if(opt==='diacritice'){toast('Diacritice corectate!','ok');}
+    onChange();
+  }catch(e){toast('Eroare AI: '+e.message,'err');}
+  inchideModalAI();
 }
 
-function aplicaRezultatAI(opt, text) {
-  const setRich = (id, val) => {
-    const el = document.getElementById('rich-' + id);
-    if (el) { el.innerHTML = val; el.dataset.empty = 'false'; }
-  };
-  if (opt === 'abstract') { setRich('abstract', text); activareSectiune('abstract'); toast('Abstract generat!', 'ok'); }
-  else if (opt === 'keywords') { const el = document.getElementById('field-cuvinte'); if (el) el.value = text; activareSectiune('cuvinte'); toast('Cuvinte-cheie extrase!', 'ok'); }
-  else if (opt === 'intro') { setRich('intro', text); activareSectiune('intro'); toast('Introducere generată!', 'ok'); }
-  else if (opt === 'concluzii') { setRich('concluzii', text); activareSectiune('concluzii'); toast('Concluzii generate!', 'ok'); }
-  else if (opt === 'diacritice') {
-    ['abstract','intro','corp','concluzii','metodologie','demers','interventie','rezultate'].forEach(id => {
-      const el = document.getElementById('rich-' + id);
-      if (el && el.innerText.trim()) el.innerHTML = text;
-    });
-    toast('Diacritice corectate!', 'ok');
-  }
-  onRichChange(); onFieldChange();
+// PREVIEW
+function updatePrev(){
+  const p=document.getElementById('prevPage');
+  if(!tipSelectat){p.innerHTML='<div class="prev-empty">Selectați tipul lucrării.</div>';return;}
+  const titlu=gv('f-titlu');const sub=gv('f-subtitlu');const kw=gv('f-cuvinte');
+  const abRo=gi('rich-abstract');const abEn=gi('rich-abstract-en');
+  const autoriNm=autori.filter(a=>a.nume).map(a=>a.nume).join(', ');
+  const fns=autori.filter(a=>a.institutie||a.email);
+  if(!titlu&&!autoriNm){p.innerHTML='<div class="prev-empty">Completați câmpurile pentru previzualizare.</div>';return;}
+  let h='';
+  if(titlu)h+=`<div class="pv-titlu">${titlu}</div>`;
+  if(sub)h+=`<div class="pv-sub">${sub}</div>`;
+  if(autoriNm)h+=`<div class="pv-autori">${autoriNm}</div>`;
+  if(abRo&&abRo.replace(/<[^>]+>/g,'').trim())h+=`<div class="pv-ab-lbl">Abstract:</div><div class="pv-ab">${abRo}</div>`;
+  if(abEn&&abEn.replace(/<[^>]+>/g,'').trim())h+=`<div class="pv-ab-lbl" style="color:#01579b;">Abstract (EN):</div><div class="pv-ab">${abEn}</div>`;
+  if(kw)h+=`<div class="pv-kw"><strong>Cuvinte-cheie:</strong> ${kw}</div>`;
+  let nr=1;
+  sectiuni.filter(s=>!['titlu','autori','abstract','cuvinte','biblio'].includes(s.id)).forEach(s=>{
+    const e=document.getElementById('rich-'+s.id);
+    if(e&&e.innerText.trim())h+=`<div class="pv-sec">${nr++}. ${s.label}</div><div class="pv-corp">${e.innerHTML}</div>`;
+  });
+  const bf=biblio.filter(Boolean);
+  if(bf.length)h+=`<div class="pv-sec">Bibliografie</div>`+bf.map((b,i)=>`<div class="pv-bib">${i+1}. ${b}</div>`).join('');
+  if(fns.length)h+=`<div class="pv-fn">`+fns.map((a,i)=>`<div>${i+1}. ${a.institutie||''}${a.email?' — '+a.email:''}</div>`).join('')+'</div>';
+  p.innerHTML=h||'<div class="prev-empty">Completați câmpurile...</div>';
 }
 
-// ══════════════════════════════════════════
 // EXPORT
-// ══════════════════════════════════════════
-function exportDOCX() {
-  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
-  const html = buildDocumentHTML();
-  const blob = new Blob([html], { type:'application/msword' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  const titlu = (document.getElementById('field-titlu')||{}).value || 'articol';
-  a.download = slugify(titlu) + '.doc';
-  a.click();
-  toast('Fișier Word descărcat!', 'ok');
-}
-
-function exportPDF() {
-  if (!tipSelectat) { toast('Selectați mai întâi tipul lucrării.', 'err'); return; }
-  const html = buildDocumentHTML(true);
-  const w = window.open('', '_blank');
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => { w.print(); }, 500);
-  toast('Deschide fereastra de printare pentru a salva ca PDF.', 'info');
-}
-
-function buildDocumentHTML(forPDF = false) {
-  const titlu = (document.getElementById('field-titlu')||{}).value || '';
-  const subtitlu = (document.getElementById('field-subtitlu')||{}).value || '';
-  const autoriStr = autori.filter(a=>a.nume).map(a=>a.nume).join(', ');
-  const institutiiStr = autori.filter(a=>a.institutie).map(a=>a.institutie).join(' | ');
-  const emailStr = autori.filter(a=>a.email).map(a=>a.email).join(', ');
-  const abstract = (document.getElementById('rich-abstract')||{}).innerHTML || '';
-  const cuvinte = (document.getElementById('field-cuvinte')||{}).value || '';
-  const biblioFilled = biblio.filter(Boolean);
-  const t = TIPURI[tipSelectat];
-
-  let body = '';
-  if (titlu) body += `<h1 style="font-size:14pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:6pt;">${titlu}</h1>`;
-  if (subtitlu) body += `<p style="text-align:center;font-style:italic;font-size:12pt;margin-bottom:6pt;">${subtitlu}</p>`;
-  if (autoriStr) body += `<p style="text-align:center;font-weight:bold;margin-bottom:2pt;">${autoriStr}</p>`;
-  if (institutiiStr) body += `<p style="text-align:center;font-style:italic;color:#555;margin-bottom:2pt;">${institutiiStr}</p>`;
-  if (emailStr) body += `<p style="text-align:center;font-size:10pt;color:#555;margin-bottom:12pt;">${emailStr}</p>`;
-  if (abstract && abstract.replace(/<[^>]+>/g,'').trim())
-    body += `<div style="border-left:3px solid #8B0000;padding:8pt 12pt;background:#fafafa;margin-bottom:10pt;"><strong>Abstract:</strong> ${abstract}</div>`;
-  if (cuvinte)
-    body += `<p style="font-style:italic;margin-bottom:16pt;"><strong>Cuvinte-cheie:</strong> ${cuvinte}</p>`;
-
-  let nr = 1;
-  t.sectiuni.forEach(s => {
-    const re = document.getElementById('rich-' + s.id);
-    if (re && re.innerText.trim()) {
-      body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${nr++}. ${s.label}</h2><div style="text-align:justify;margin-bottom:10pt;">${re.innerHTML}</div>`;
-    }
+function buildDoc(forPrint){
+  const titlu=gv('f-titlu');const sub=gv('f-subtitlu');const kw=gv('f-cuvinte');
+  const abRo=gi('rich-abstract');const abEn=gi('rich-abstract-en');
+  const autoriNm=autori.filter(a=>a.nume).map(a=>a.nume).join(', ');
+  const inst=autori.filter(a=>a.institutie||a.email);
+  const bf=biblio.filter(Boolean);
+  let body='';
+  if(titlu)body+=`<h1 style="text-align:center;font-size:14pt;font-weight:bold;text-transform:uppercase;margin-bottom:4pt;">${titlu}</h1>`;
+  if(sub)body+=`<p style="text-align:center;font-style:italic;margin-bottom:4pt;">${sub}</p>`;
+  if(autoriNm)body+=`<p style="text-align:center;font-weight:bold;margin-bottom:12pt;">${autoriNm}</p>`;
+  if(abRo&&abRo.replace(/<[^>]+>/g,'').trim())body+=`<p><strong>Abstract:</strong> ${abRo.replace(/<[^>]+>/g,' ').trim()}</p>`;
+  if(abEn&&abEn.replace(/<[^>]+>/g,'').trim())body+=`<p><strong>Abstract (EN):</strong> ${abEn.replace(/<[^>]+>/g,' ').trim()}</p>`;
+  if(kw)body+=`<p style="font-style:italic;margin-bottom:12pt;"><strong>Cuvinte-cheie:</strong> ${kw}</p>`;
+  let nr=1;
+  sectiuni.filter(s=>!['titlu','autori','abstract','cuvinte','biblio'].includes(s.id)).forEach(s=>{
+    const e=document.getElementById('rich-'+s.id);
+    if(e&&e.innerText.trim())body+=`<h2 style="font-size:12pt;font-weight:bold;margin:12pt 0 5pt;">${nr++}. ${s.label}</h2>${e.innerHTML}`;
   });
-
-  sectiuniLibere.forEach(s => {
-    const re = document.getElementById('rich-' + s.id);
-    if (re && re.innerText.trim())
-      body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">${nr++}. ${s.label}</h2><div style="text-align:justify;margin-bottom:10pt;">${re.innerHTML}</div>`;
-  });
-
-  if (biblioFilled.length) {
-    body += `<h2 style="font-size:12pt;font-weight:bold;margin:14pt 0 6pt;">Bibliografie</h2>`;
-    body += biblioFilled.map((b,i)=>`<p style="font-size:11pt;margin-bottom:4pt;">${i+1}. ${b}</p>`).join('');
-  }
-
-  const printStyle = forPDF ? `@page{size:A4;margin:2.5cm;}@media print{body{margin:0;}}` : '';
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${printStyle}body{font-family:Times New Roman,Times,serif;font-size:12pt;line-height:1.5;margin:2.5cm;}h1,h2,h3{font-family:Times New Roman,Times,serif;}p{margin-bottom:6pt;text-align:justify;}</style></head><body>${body}</body></html>`;
+  if(bf.length){body+=`<h2 style="font-size:12pt;font-weight:bold;margin:12pt 0 5pt;">Bibliografie</h2>`;bf.forEach((b,i)=>body+=`<p style="margin-bottom:3pt;">${i+1}. ${b}</p>`);}
+  if(inst.length){body+=`<hr style="border:none;border-top:1px solid #ccc;margin-top:18pt;"/>`;inst.forEach((a,i)=>body+=`<p style="font-size:9pt;color:#666;margin-bottom:2pt;">${i+1}. ${a.institutie||''}${a.email?' — '+a.email:''}</p>`);}
+  const ps=forPrint?`@page{size:A4;margin:2.5cm;}@media print{body{margin:0;}}`:'' ;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${ps}body{font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.5;margin:2.5cm;}p{text-indent:2em;text-align:justify;margin-bottom:4pt;}h1,h2{font-family:'Times New Roman',serif;}</style></head><body>${body}</body></html>`;
+}
+function exportDOCX(){
+  if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
+  const blob=new Blob([buildDoc(false)],{type:'application/msword'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(slugify(gv('f-titlu'))||'articol')+'.doc';a.click();
+  toast('Word descărcat!','ok');
+}
+function exportPDF(){
+  if(!tipSelectat){toast('Selectați mai întâi tipul lucrării.','err');return;}
+  const w=window.open('','_blank');w.document.write(buildDoc(true));w.document.close();
+  setTimeout(()=>w.print(),600);toast('Salvați ca PDF din fereastra de printare.','info');
 }
 
-// ══════════════════════════════════════════
 // UTILS
-// ══════════════════════════════════════════
-function slugify(str) { return str.toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,40)||'articol'; }
-function toast(msg, type='ok') {
-  const wrap = document.getElementById('toast-wrap');
-  const el = document.createElement('div');
-  el.className = 'toast '+type; el.textContent = msg;
-  wrap.appendChild(el);
-  setTimeout(()=>el.remove(), 4000);
+function slugify(s){return(s||'').toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'').slice(0,40)||'articol';}
+function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function toast(msg,type='ok'){
+  const w=document.getElementById('toast-w');
+  const e=document.createElement('div');e.className='toast '+type;e.textContent=msg;
+  w.appendChild(e);setTimeout(()=>e.remove(),4000);
 }
 
-// Start
-init();
+// MODAL CLOSE
+document.querySelectorAll('.modal-ov').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov&&ov.id!=='modalTip')ov.classList.remove('open');});
+});
+
+// START
+initSB();
 </script>
 </body>
 </html>
