@@ -23,11 +23,37 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 .guard-btn{display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:11px 28px;border-radius:4px;font-size:0.92rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:background 0.2s;}
 .guard-btn:hover{background:var(--crimson-dark);}
 
-/* HEADER editor — doar autosave badge, fără a suprascrie .header-top */
-.autosave{font-size:0.68rem;display:flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;background:rgba(139,0,0,0.07);color:#8B0000;}
-.autosave.saved{color:#2e7d32;}
-.autosave.saving{color:var(--gold);}
-.autosave.err{color:#c62828;}
+/* HEADER DOKIMASIA — identic cu celelalte pagini */
+header { border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.07); background: #fff; }
+.header-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; }
+.header-logo img { height: 80px; width: auto; display: block; }
+.header-center { text-align: center; text-decoration: none; color: inherit; }
+.header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
+.header-motto { display: block; font-size: clamp(0.65rem, 1.5vw, 0.95rem); color: #8B0000; font-weight: normal; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
+.header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end; }
+.social-icons { display: flex; align-items: center; gap: 10px; }
+.social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
+.social-icons a:hover { opacity: 0.7; }
+.social-icons svg { width: 26px; height: 26px; }
+.btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
+.btn-account:hover { background: #6a0000; }
+.account-wrapper { position: relative; }
+.account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 300; padding: 8px 0; }
+.account-dropdown.open { display: block; }
+.account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
+.account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
+nav.main-nav { background: #8B0000; display: flex; width: 100%; }
+nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); text-decoration: none; }
+nav.main-nav a:last-child { border-right: none; }
+nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
+.hamburger { display: none; }
+#siteHeader { position: sticky; top: 0; z-index: 200; }
+
+/* AUTOSAVE badge în tip-bar */
+.autosave { font-size: 0.68rem; display: flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 10px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+.autosave.saved { color: #a5d6a7; }
+.autosave.saving { color: #ffe082; }
+.autosave.err { color: #ef9a9a; }
 
 /* TIP BAR */
 .tip-bar{display:flex;align-items:stretch;background:#8B0000;border-top:1px solid rgba(255,255,255,0.1);}
@@ -208,31 +234,6 @@ body{font-family:'Source Serif 4',Georgia,serif;background:var(--paper);color:va
 .toast.info{border-left:3px solid var(--gold);}
 @keyframes slideUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-/* HEADER PRINCIPAL DOKIMASIA */
-.header-top { display: grid !important; grid-template-columns: auto 1fr auto; align-items: center; padding: 12px 40px; gap: 16px; height: auto !important; }
-.header-logo img { height: 80px; width: auto; display: block; }
-.header-center { text-align: center; text-decoration: none; }
-.header-title { display: block; font-size: clamp(1rem, 3vw, 2rem); font-weight: bold; color: #8B0000; text-transform: uppercase; letter-spacing: 3px; white-space: nowrap; }
-.header-motto { display: block; font-size: clamp(0.65rem, 1.5vw, 0.95rem); color: #8B0000; font-weight: normal; letter-spacing: 2px; margin-top: 4px; white-space: nowrap; }
-.header-right { display: flex !important; align-items: center; gap: 12px; justify-content: flex-end; }
-.social-icons { display: flex; align-items: center; gap: 10px; }
-.social-icons a { display: flex; align-items: center; transition: opacity 0.2s; cursor: pointer; }
-.social-icons a:hover { opacity: 0.7; }
-.social-icons svg { width: 26px; height: 26px; }
-.btn-account { display: flex; align-items: center; gap: 6px; background: #8B0000; color: #fff; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-family: 'Georgia', serif; cursor: pointer; border: none; transition: background 0.2s; white-space: nowrap; }
-.btn-account:hover { background: #6a0000; }
-.account-wrapper { position: relative; }
-.account-dropdown { display: none; position: absolute; top: 110%; right: 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 180px; z-index: 300; padding: 8px 0; }
-.account-dropdown.open { display: block; }
-.account-dropdown a { display: block; padding: 10px 20px; font-size: 0.9rem; color: #333; transition: background 0.15s; }
-.account-dropdown a:hover { background: #f5f5f5; color: #8B0000; }
-nav.main-nav { background: #8B0000; display: flex; width: 100%; }
-nav.main-nav a { flex: 1; color: #fff; font-size: 0.95rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 13px 0; transition: background 0.2s; border-right: 1px solid rgba(255,255,255,0.4); text-decoration: none; }
-nav.main-nav a:last-child { border-right: none; }
-nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15); }
-.hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; background: none; border: none; }
-.hamburger span { display: block; width: 26px; height: 3px; background: #8B0000; border-radius: 2px; }
-
 /* FIX: modals din auth.js să apară corect deasupra editorului */
 .modal-overlay { z-index: 10000 !important; }
 .contact-modal-overlay { z-index: 10000 !important; }
@@ -262,10 +263,7 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 /* AUTH VISIBILITY */
 .site-hidden { visibility:hidden; pointer-events:none; }
 .site-hidden * { pointer-events:none; }
-#siteHeader { position:sticky; top:0; z-index:200; }
-header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07); background:#fff; }
 .app-body.site-hidden { visibility:hidden; }
-/* Headerul Dokimasia rămâne mereu vizibil, indiferent de starea auth */
 #siteHeader { visibility:visible !important; pointer-events:auto !important; }
 </style>
 </head>
@@ -281,10 +279,9 @@ header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07);
   </div>
 </div>
 
-<!-- HEADER -->
+<!-- HEADER DESKTOP — identic cu celelalte pagini -->
 <div id="siteHeader">
-  <!-- HEADER PRINCIPAL -->
-  <header>
+<header>
   <div class="header-top">
     <a href="index.html" class="header-logo"><img src="Logo.gif" alt="Asociatia Dokimasia" /></a>
     <a href="index.html" class="header-center">
@@ -292,17 +289,11 @@ header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07);
       <span class="header-motto">Învățare. Implicare. Progres.</span>
     </a>
     <div class="header-right">
-      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:flex;align-items:center;">
+      <form action="https://www.paypal.com/donate" method="post" target="_top" style="display:inline;">
         <input type="hidden" name="hosted_button_id" value="N4UH5HAY9C7LJ" />
         <button type="submit" style="background:#8B0000;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:0.88rem;font-family:'Georgia',serif;cursor:pointer;font-weight:bold;letter-spacing:1px;">Donează</button>
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
-      <div style="display:flex;align-items:center;gap:5px;margin-right:8px;">
-        <div class="autosave" id="autosaveBadge" style="font-size:0.68rem;display:flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:rgba(139,0,0,0.07);color:#8B0000;"><span>●</span><span id="autosaveText">...</span></div>
-        <button onclick="deschideModalAI()" style="background:rgba(139,0,0,0.08);color:#8B0000;border:1px solid #ddd;padding:6px 11px;border-radius:4px;font-size:0.78rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">✨ AI</button>
-        <button onclick="exportPDF()" style="background:#f0ece4;color:#1a1108;border:1px solid #ddd;padding:6px 11px;border-radius:4px;font-size:0.78rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">⬇ PDF</button>
-        <button onclick="exportDOCX()" style="background:#8B0000;color:#fff;border:none;padding:6px 11px;border-radius:4px;font-size:0.78rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">⬇ Word</button>
-      </div>
       <div class="social-icons">
         <a onclick="openContactModal()" title="Contact" style="cursor:pointer;">
           <svg viewBox="0 0 24 24" fill="none" stroke="#8B0000" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -341,7 +332,7 @@ header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07);
   </nav>
 </header>
 
-  <!-- TIP BAR EDITOR -->
+  <!-- TIP BAR EDITOR — cu butoanele editorului -->
   <div class="tip-bar">
     <div class="tip-tab" id="tab-practic" onclick="schimbaTip('practic')">
       <span class="tt-icon">🎓</span>
@@ -354,6 +345,13 @@ header { border-bottom:1px solid #e0e0e0; box-shadow:0 2px 6px rgba(0,0,0,0.07);
     <div class="tip-tab" id="tab-dezvoltare" onclick="schimbaTip('dezvoltare')">
       <span class="tt-icon">🌱</span>
       <span class="tt-label">Dezvoltare educațională<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">și profesională</small></span>
+    </div>
+    <!-- Butoane editor în dreapta tip-bar -->
+    <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid rgba(255,255,255,0.15);flex-shrink:0;">
+      <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">...</span></div>
+      <button onclick="deschideModalAI()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">✨ AI</button>
+      <button onclick="exportPDF()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">⬇ PDF</button>
+      <button onclick="exportDOCX()" style="background:#fff;color:#8B0000;border:none;padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;">⬇ Word</button>
     </div>
   </div>
 </div>
