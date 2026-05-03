@@ -489,24 +489,58 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 
 <!-- MODAL INDICAȚII EDITARE -->
 <div class="modal-ov" id="modalIndicatii">
-  <div class="modal-box" style="max-width:420px;">
+  <div class="modal-box" style="max-width:520px;">
     <div class="modal-head">
-      <h3>💡 Indicații editare</h3>
+      <h3>💡 Ghid de utilizare — Editor articol</h3>
       <button class="modal-x" onclick="document.getElementById('modalIndicatii').classList.remove('open')">×</button>
     </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;padding:20px 24px;">
-      <div style="display:flex;gap:12px;align-items:flex-start;">
-        <span style="font-size:1.3rem;flex-shrink:0;">✏️</span>
-        <div style="font-size:0.88rem;line-height:1.6;color:var(--ink);">
-          <strong>Dublu-click pe numele unei secțiuni</strong> din stânga pentru a o redenumi.
-        </div>
+    <div class="modal-body" style="padding:16px 20px;max-height:70vh;overflow-y:auto;">
+
+      <!-- Secțiunea 1 -->
+      <div style="font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📋 Structura articolului (stânga)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;font-size:0.85rem;line-height:1.6;color:var(--ink);">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">👆</span><div><strong>Click</strong> pe o secțiune din lista din stânga — o deschide în zona centrală pentru editare.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">✏️</span><div><strong>Dublu-click pe numele</strong> unei secțiuni din stânga — îl poți redenumi direct, fără dialog. Apasă Enter pentru a confirma sau Escape pentru a anula.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">⠿</span><div><strong>Trage</strong> secțiunile cu handleul ⠿ pentru a le reordona în articol. Secțiunile fixe (Titlu, Autori, Abstract, Bibliografie) nu pot fi mutate.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">➕</span><div><strong>+ Adaugă secțiune liberă</strong> — adaugă o secțiune extra la finalul articolului, cu nume editabil și conținut liber.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">🟢</span><div>Punctul colorat din dreptul fiecărei secțiuni indică starea: <span style="color:#66bb6a;font-weight:600;">verde</span> = completată, <span style="color:#ffa726;font-weight:600;">portocaliu</span> = obligatorie și necompletată, <span style="color:#bbb;">gri</span> = opțională și goală.</div></div>
       </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;">
-        <span style="font-size:1.3rem;flex-shrink:0;">💾</span>
-        <div style="font-size:0.88rem;line-height:1.6;color:var(--ink);">
-          <strong>Salvare automată</strong> — conținutul se salvează în baza de date la fiecare tastă. Poți reveni oricând.
-        </div>
+
+      <div style="border-top:1px solid var(--border);margin-bottom:12px;"></div>
+
+      <!-- Secțiunea 2 -->
+      <div style="font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📝 Editarea conținutului (centru)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;font-size:0.85rem;line-height:1.6;color:var(--ink);">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">🖊</span><div>Fiecare secțiune are un <strong>editor text</strong> cu toolbar (bold, italic, liste, tabele, aliniere etc.). Scrie direct în zona albă de text.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">✨</span><div>Bara <strong>AI</strong> (violet) din fiecare secțiune oferă 3 funcții: <em>Diacritice</em> — corectează ă â î ș ț automat; <em>Îmbunătățire</em> — îmbunătățește stilul și claritatea; <em>Generează</em> — scrie conținut pentru acea secțiune pe baza titlului articolului.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">⊞</span><div>Butonul <strong>⊞ din toolbar</strong> inserează elemente speciale: imagini (upload de pe calculator), tabele, separatoare, linkuri, ecuații sau citate.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">👥</span><div>La secțiunea <strong>Autori</strong> — completează numele, instituția și emailul fiecărui autor. Superscriptul ¹ ² ³ și notele de subsol se generează automat.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">📄</span><div>La secțiunea <strong>Abstract</strong> — folosește butonul AI pentru a-l genera automat din conținutul secțiunilor sau pentru a-l traduce în engleză.</div></div>
       </div>
+
+      <div style="border-top:1px solid var(--border);margin-bottom:12px;"></div>
+
+      <!-- Secțiunea 3 -->
+      <div style="font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📂 Istoricul meu (dreapta)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;font-size:0.85rem;line-height:1.6;color:var(--ink);">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">📂</span><div>Toate articolele tale salvate apar în lista din dreapta, ordonate după data ultimei modificări.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">📖</span><div><strong>Deschide</strong> — încarcă articolul în editor cu toate datele salvate. Poți continua de unde ai rămas oricând.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">🗑</span><div><strong>✕ Șterge</strong> — șterge definitiv articolul din baza de date. Acțiunea nu poate fi anulată.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">➕</span><div><strong>+ Articol nou</strong> — deschide un dialog pentru a alege tipul noului articol și pornește un editor curat.</div></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin-bottom:12px;"></div>
+
+      <!-- Secțiunea 4 -->
+      <div style="font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">🔴 Bara de sus</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px;font-size:0.85rem;line-height:1.6;color:var(--ink);">
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">💾</span><div><strong>Salvare automată</strong> — conținutul se salvează în baza de date la fiecare tastă. Badge-ul din stânga barei arată starea: <em>Se salvează...</em> / <em>✓ Salvat HH:MM</em> / <em>⚠ Eroare</em>.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">👁</span><div><strong>Preview</strong> — deschide articolul formatat ca publicație academică într-un tab nou. Din acel tab poți printa sau salva ca PDF.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">✨</span><div><strong>AI (global)</strong> — instrumente AI pentru întreg articolul: generare abstract, extragere cuvinte-cheie, corectare diacritice în toate secțiunile.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">⬇</span><div><strong>PDF / Word</strong> — exportă articolul ca fișier descărcabil în formatul ales.</div></div>
+        <div style="display:flex;gap:10px;align-items:flex-start;"><span style="flex-shrink:0;">🎓</span><div><strong>Tipul lucrării</strong> (cele 3 butoane din bara roșie) — schimbă structura secțiunilor articolului. Atenție: schimbarea tipului înlocuiește secțiunile specifice.</div></div>
+      </div>
+
     </div>
     <div class="modal-foot">
       <button class="btn-ok" onclick="document.getElementById('modalIndicatii').classList.remove('open')">Am înțeles</button>
