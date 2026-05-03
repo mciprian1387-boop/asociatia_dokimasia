@@ -1425,46 +1425,190 @@ function secPanelBiblio(){
 
 // Ghiduri specifice per secțiune și tip de articol
 const GHIDURI_SECTIUNI = {
+
+  // ─── INTRODUCERE ─────────────────────────────────────────
   s_intro: {
     practic: {
-      titlu: '🔹 Ce să scrii în Introducere și context',
-      culoare: '#e8f5e9', border: '#a5d6a7', titluColor: '#2e7d32',
-      pasi: [
-        '<strong>Contextul educațional</strong> — Descrie pe scurt mediul școlar sau clasa în care s-a desfășurat activitatea (nivel, număr de elevi, caracteristici relevante).',
-        '<strong>Nevoia identificată</strong> — Ce problemă sau dificultate ai observat la elevi care te-a determinat să aplici această practică? (ex: lipsă motivație, dificultăți de înțelegere, nevoia de diferențiere)',
-        '<strong>Scopul activității</strong> — Ce ai urmărit să obții prin această intervenție didactică? Formulează clar obiectivul principal.',
-        '<strong>Justificarea abordării</strong> — De ce ai ales această metodă/activitate? Ce te-a inspirat sau ce surse ai consultat?',
+      titlu:'🔹 Ce să scrii în Introducere și context',
+      culoare:'#e8f5e9', border:'#a5d6a7', titluColor:'#2e7d32',
+      lungime:'150–300 cuvinte',
+      pasi:[
+        '<strong>Contextul educațional</strong> — Descrie clasa sau grupul de elevi (nivel, număr, caracteristici relevante).',
+        '<strong>Nevoia identificată</strong> — Ce problemă sau dificultate ai observat care te-a determinat să aplici această practică?',
+        '<strong>Scopul activității</strong> — Ce ai urmărit să obții? Formulează clar obiectivul principal.',
+        '<strong>Justificarea abordării</strong> — De ce ai ales această metodă? Ce te-a inspirat sau ce surse ai consultat?',
       ],
-      exemplu: 'Ex: „În clasa a VI-a B, cu 28 de elevi, am observat o scădere a motivației pentru lectură. Am decis să implementez metoda cercurilor literare pentru a stimula lectura activă și discuția critică..."',
-      lungime: '150–300 cuvinte'
+      exemplu:'„În clasa a VI-a B, cu 28 de elevi, am observat o scădere a motivației pentru lectură. Am decis să implementez metoda cercurilor literare pentru a stimula lectura activă..."'
     },
     cercetare: {
-      titlu: '🔹 Ce să scrii în Introducere și fundamentare teoretică',
-      culoare: '#e3f2fd', border: '#90caf9', titluColor: '#1565c0',
-      pasi: [
-        '<strong>Contextul și relevanța temei</strong> — De ce este importantă această temă în educația actuală? Ce probleme sau tendințe justifică cercetarea ta?',
-        '<strong>Revizuirea literaturii</strong> — Menționează 3–5 autori sau studii relevante care au abordat tema. Folosește formatul: Autor (An) a demonstrat că...',
-        '<strong>Problema de cercetare</strong> — Formulează clar întrebarea sau problema la care răspunde studiul tău. (ex: „Care este impactul metodelor colaborative asupra rezultatelor la matematică?")',
-        '<strong>Ipoteza / Obiectivele</strong> — Ce presupui că vei găsi? Care sunt obiectivele specifice ale cercetării?',
-        '<strong>Contribuția originală</strong> — Ce aduce nou față de ce există deja în literatură?',
+      titlu:'🔹 Ce să scrii în Introducere și fundamentare teoretică',
+      culoare:'#e3f2fd', border:'#90caf9', titluColor:'#1565c0',
+      lungime:'250–400 cuvinte',
+      pasi:[
+        '<strong>Contextul și relevanța temei</strong> — De ce este importantă această temă în educația actuală?',
+        '<strong>Revizuirea literaturii</strong> — Menționează 3–5 autori sau studii relevante. Format: Autor (An) a demonstrat că...',
+        '<strong>Problema de cercetare</strong> — Formulează clar întrebarea la care răspunde studiul tău.',
+        '<strong>Ipoteza / Obiectivele</strong> — Ce presupui că vei găsi? Care sunt obiectivele specifice?',
+        '<strong>Contribuția originală</strong> — Ce aduce nou față de literatura existentă?',
       ],
-      exemplu: 'Ex: „Impactul utilizării tehnologiei în educație a fost studiat extensiv (Hattie, 2009; Marzano, 2017), însă puține studii vizează contextul școlilor rurale din România. Prezenta cercetare urmărește să..."',
-      lungime: '250–400 cuvinte'
+      exemplu:'„Impactul tehnologiei în educație a fost studiat extensiv (Hattie, 2009; Marzano, 2017), însă puține studii vizează contextul școlilor rurale din România. Prezenta cercetare urmărește să..."'
     },
     dezvoltare: {
-      titlu: '🔹 Ce să scrii în Introducere și context',
-      culoare: '#f3e5f5', border: '#ce93d8', titluColor: '#6a1b9a',
-      pasi: [
-        '<strong>Contextul instituțional</strong> — Prezintă instituția, echipa sau parteneriatul implicat în proiect/program.',
-        '<strong>Nevoia identificată</strong> — Ce problemă sau oportunitate a generat acest proiect? (ex: lipsa competențelor digitale, nevoia de formare, oportunitate Erasmus+)',
-        '<strong>Obiectivele proiectului</strong> — Care sunt obiectivele principale? Formulează-le clar și măsurabil.',
+      titlu:'🔹 Ce să scrii în Introducere și context',
+      culoare:'#f3e5f5', border:'#ce93d8', titluColor:'#6a1b9a',
+      lungime:'200–350 cuvinte',
+      pasi:[
+        '<strong>Contextul instituțional</strong> — Prezintă instituția, echipa sau parteneriatul implicat.',
+        '<strong>Nevoia identificată</strong> — Ce problemă sau oportunitate a generat acest proiect?',
+        '<strong>Obiectivele proiectului</strong> — Care sunt obiectivele principale, formulate clar și măsurabil?',
         '<strong>Beneficiarii</strong> — Cine beneficiază de acest proiect? (cadre didactice, elevi, comunitate)',
-        '<strong>Cadrul de referință</strong> — Menționează programul, finanțarea sau politica educațională în care se înscrie proiectul.',
+        '<strong>Cadrul de referință</strong> — Menționează programul sau politica educațională în care se înscrie.',
       ],
-      exemplu: 'Ex: „Proiectul „Digital Minds" s-a desfășurat în cadrul programului Erasmus+ KA2 în perioada 2022–2024, implicând 4 școli partenere din România, Bulgaria și Turcia, cu scopul de a dezvolta competențele digitale ale cadrelor didactice..."',
-      lungime: '200–350 cuvinte'
+      exemplu:'„Proiectul Digital Minds s-a desfășurat în cadrul Erasmus+ KA2 în perioada 2022–2024, implicând 4 școli partenere, cu scopul de a dezvolta competențele digitale ale cadrelor didactice..."'
+    }
+  },
+
+  // ─── DEMERS DIDACTIC (practic) ───────────────────────────
+  s_demers: {
+    practic: {
+      titlu:'📋 Ce să scrii în Descrierea demersului didactic',
+      culoare:'#e8f5e9', border:'#a5d6a7', titluColor:'#2e7d32',
+      lungime:'300–500 cuvinte',
+      pasi:[
+        '<strong>Pregătirea activității</strong> — Ce materiale, resurse și pregătire au fost necesare? Cât timp ai alocat pregătirii?',
+        '<strong>Etapele desfășurării</strong> — Descrie pas cu pas cum s-a desfășurat activitatea (evocare, realizarea sensului, reflecție sau alt model).',
+        '<strong>Metodele și tehnicile utilizate</strong> — Numește explicit metodele active folosite și cum au fost aplicate.',
+        '<strong>Rolul profesorului și al elevilor</strong> — Cum ai intervenit? Ce au făcut elevii? Cine a coordonat?',
+        '<strong>Diferențierea</strong> — Cum ai adaptat activitatea pentru elevi cu nevoi diferite sau niveluri diferite?',
+        '<strong>Evaluarea</strong> — Cum ai evaluat rezultatele în timpul sau la finalul activității?',
+      ],
+      exemplu:'„Activitatea s-a desfășurat în 2 ore consecutive. În prima etapă (15 min), elevii au primit texte diferite și au completat fișa de lectură individuală. Ulterior, grupurile de 4–5 elevi s-au reunit și..."'
+    }
+  },
+
+  // ─── METODOLOGIE (cercetare) ─────────────────────────────
+  s_metodologie: {
+    cercetare: {
+      titlu:'⚙️ Ce să scrii în Metodologie',
+      culoare:'#e3f2fd', border:'#90caf9', titluColor:'#1565c0',
+      lungime:'250–400 cuvinte',
+      pasi:[
+        '<strong>Designul cercetării</strong> — Ce tip de cercetare este? (cantitativă, calitativă, mixtă, studiu de caz, cercetare-acțiune)',
+        '<strong>Participanții</strong> — Câți participanți? Ce criterii de selecție? Ce caracteristici relevante (vârstă, clasă, mediu)?',
+        '<strong>Instrumentele de colectare a datelor</strong> — Ce ai folosit? (chestionar, test, observație, interviu, analiză de documente) Descrie fiecare instrument.',
+        '<strong>Procedura</strong> — Cum s-a desfășurat cercetarea? Ce etape? Cât timp?',
+        '<strong>Analiza datelor</strong> — Cum ai prelucrat datele? Ce metode statistice sau calitative ai folosit?',
+        '<strong>Aspecte etice</strong> — Consimțământul participanților, confidențialitatea datelor.',
+      ],
+      exemplu:'„Cercetarea a implicat 62 de elevi din clasele a VII-a (grupul experimental: 31 elevi; grupul de control: 31 elevi). Datele au fost colectate prin pre-test și post-test standardizat, aplicate la interval de 8 săptămâni..."'
+    }
+  },
+
+  // ─── INTERVENȚIE / PROIECT (dezvoltare) ──────────────────
+  s_interventie: {
+    dezvoltare: {
+      titlu:'🏗️ Ce să scrii în Descrierea intervenției / proiectului',
+      culoare:'#f3e5f5', border:'#ce93d8', titluColor:'#6a1b9a',
+      lungime:'300–500 cuvinte',
+      pasi:[
+        '<strong>Planificarea și etapele</strong> — Prezintă cronologia proiectului: etape, activități principale și calendarul.',
+        '<strong>Partenerii și echipa</strong> — Cine a fost implicat? Ce roluri au avut partenerii/membrii echipei?',
+        '<strong>Activitățile desfășurate</strong> — Descrie în detaliu principalele activități: formare, mobilități, ateliere, produse realizate.',
+        '<strong>Resursele utilizate</strong> — Ce resurse materiale, financiare și umane au fost implicate?',
+        '<strong>Dificultăți și soluții</strong> — Ce obstacole ai întâmpinat și cum le-ai depășit?',
+        '<strong>Produsele și livrabilele</strong> — Ce a rezultat concret? (materiale didactice, ghiduri, platforme, rapoarte)',
+      ],
+      exemplu:'„Proiectul s-a desfășurat în 3 etape pe parcursul a 24 de luni. Prima etapă (lunile 1–8) a constat în analiza nevoilor și elaborarea curriculumului de formare. În a doua etapă au avut loc 3 mobilități internaționale..."'
+    }
+  },
+
+  // ─── REZULTATE ───────────────────────────────────────────
+  s_rezultate: {
+    practic: {
+      titlu:'📊 Ce să scrii în Rezultate și observații',
+      culoare:'#e8f5e9', border:'#a5d6a7', titluColor:'#2e7d32',
+      lungime:'200–350 cuvinte',
+      pasi:[
+        '<strong>Reacțiile și comportamentul elevilor</strong> — Cum au reacționat elevii? Au fost implicați? Au existat dificultăți neașteptate?',
+        '<strong>Rezultatele observate</strong> — Ce ai constatat concret la finalul activității? (calitativ: atitudini, participare, produse realizate)',
+        '<strong>Exemple sau citate</strong> — Poți include 1–2 exemple concrete din activitate (ce a spus un elev, ce a produs grupul).',
+        '<strong>Comparația cu așteptările</strong> — Activitatea s-a desfășurat conform planului? Ce a surprins?',
+        '<strong>Date colectate</strong> — Dacă ai aplicat fișe sau teste, prezintă pe scurt rezultatele.',
+      ],
+      exemplu:'„Toți cei 28 de elevi au participat activ la discuțiile din grup. S-a observat o creștere vizibilă a entuziasmului față de textele literare. Elevul X a afirmat că «aceasta a fost prima dată când lectura a simțit a joc»..."'
+    },
+    cercetare: {
+      titlu:'📊 Ce să scrii în Rezultate și analiză',
+      culoare:'#e3f2fd', border:'#90caf9', titluColor:'#1565c0',
+      lungime:'300–500 cuvinte',
+      pasi:[
+        '<strong>Prezentarea datelor</strong> — Prezintă datele colectate organizat: tabele, grafice sau statistici descriptive.',
+        '<strong>Testarea ipotezelor</strong> — Confirmă sau infirmă ipotezele formulate. Prezintă valorile statistice relevante.',
+        '<strong>Interpretarea rezultatelor</strong> — Ce înseamnă aceste date? Ce explică ele în raport cu problema cercetată?',
+        '<strong>Compararea cu literatura</strong> — Sunt rezultatele tale consistente cu studiile anterioare? Ce diferențe există și de ce?',
+        '<strong>Rezultate neașteptate</strong> — Ai obținut ceva surprinzător? Cum explici?',
+      ],
+      exemplu:'„Grupul experimental a obținut o medie de 8,42 (SD=0,87) față de 7,15 (SD=1,02) a grupului de control (t=4,23; p<0,001). Aceste rezultate confirmă ipoteza că metodele colaborative îmbunătățesc performanța la matematică..."'
+    },
+    dezvoltare: {
+      titlu:'📊 Ce să scrii în Rezultate și observații',
+      culoare:'#f3e5f5', border:'#ce93d8', titluColor:'#6a1b9a',
+      lungime:'200–350 cuvinte',
+      pasi:[
+        '<strong>Impactul asupra beneficiarilor</strong> — Ce schimbări concrete au apărut la participanți? (competențe dobândite, atitudini, practici noi)',
+        '<strong>Produsele realizate</strong> — Ce s-a produs concret? (materiale, resurse, parteneriate, rețele)',
+        '<strong>Date cantitative</strong> — Câți participanți? Câte activități? Ce procent de satisfacție? (dacă există)',
+        '<strong>Feedback-ul participanților</strong> — Ce au spus beneficiarii despre proiect?',
+        '<strong>Vizibilitatea proiectului</strong> — A fost diseminat? Cum? (prezentări, publicații, site, rețele sociale)',
+      ],
+      exemplu:'„Cei 45 de cadre didactice participante au evaluat formarea cu o medie de 9,2/10. Au fost produse 12 materiale didactice digitale, descărcate de peste 800 de profesori din întreaga țară..."'
+    }
+  },
+
+  // ─── CONCLUZII ───────────────────────────────────────────
+  s_concluzii: {
+    practic: {
+      titlu:'✅ Ce să scrii în Concluzii și recomandări',
+      culoare:'#e8f5e9', border:'#a5d6a7', titluColor:'#2e7d32',
+      lungime:'150–250 cuvinte',
+      pasi:[
+        '<strong>Sinteza rezultatelor</strong> — Rezumă în 2–3 propoziții ce s-a obținut prin această activitate.',
+        '<strong>Răspunsul la scopul inițial</strong> — A fost atins obiectivul formulat în introducere? Argumentează.',
+        '<strong>Limitele activității</strong> — Ce nu a funcționat conform planului? Ce ai face diferit data viitoare?',
+        '<strong>Recomandări practice</strong> — Ce sfaturi dai altor cadre didactice care vor să aplice această practică? (condiții, adaptări, resurse necesare)',
+        '<strong>Perspective de continuare</strong> — Cum poți dezvolta sau extinde această practică în viitor?',
+      ],
+      exemplu:'„Activitatea și-a atins obiectivul, stimulând lectura activă și gândirea critică. Recomandăm aplicarea metodei cercurilor literare cu precădere la clasele V–VIII, cu texte adaptate nivelului. O continuare firească ar fi..."'
+    },
+    cercetare: {
+      titlu:'✅ Ce să scrii în Concluzii și implicații',
+      culoare:'#e3f2fd', border:'#90caf9', titluColor:'#1565c0',
+      lungime:'200–350 cuvinte',
+      pasi:[
+        '<strong>Răspunsul la întrebarea de cercetare</strong> — Formulează clar concluzia principală în raport cu întrebarea inițială.',
+        '<strong>Confirmarea/infirmarea ipotezelor</strong> — Ipoteza a fost confirmată? Ce înseamnă asta?',
+        '<strong>Implicații teoretice</strong> — Ce contribuie acest studiu la teoria educațională sau la domeniu?',
+        '<strong>Implicații practice</strong> — Ce recomandări concrete poți face pentru profesori, directori, decidenți?',
+        '<strong>Limitele studiului</strong> — Ce limitări are cercetarea? (eșantion, durată, instrumente)',
+        '<strong>Direcții viitoare de cercetare</strong> — Ce întrebări noi ridică studiul tău?',
+      ],
+      exemplu:'„Studiul confirmă că metodele colaborative îmbunătățesc semnificativ performanța la matematică (p<0,001). Aceste rezultate sugerează necesitatea formării cadrelor didactice în pedagogia colaborativă. Limitele studiului includ eșantionul redus și durata de 8 săptămâni..."'
+    },
+    dezvoltare: {
+      titlu:'✅ Ce să scrii în Concluzii și implicații',
+      culoare:'#f3e5f5', border:'#ce93d8', titluColor:'#6a1b9a',
+      lungime:'150–250 cuvinte',
+      pasi:[
+        '<strong>Sinteza proiectului</strong> — Ce s-a realizat? A fost atins scopul inițial?',
+        '<strong>Impactul pe termen lung</strong> — Ce schimbări durabile a produs proiectul?',
+        '<strong>Lecțiile învățate</strong> — Ce ai face diferit? Ce a funcționat cel mai bine?',
+        '<strong>Recomandări pentru proiecte similare</strong> — Ce sfaturi dai celor care vor să implementeze un proiect asemănător?',
+        '<strong>Diseminarea și sustenabilitatea</strong> — Cum se va continua proiectul după finalizarea finanțării?',
+      ],
+      exemplu:'„Proiectul și-a atins obiectivele, formând 45 de cadre didactice și producând 12 resurse educaționale deschise. Principala lecție: implicarea activă a conducerii școlii este esențială pentru sustenabilitate..."'
     }
   }
+
 };
 
 // aiBar cu butoanele redenumite
