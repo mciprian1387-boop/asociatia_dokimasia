@@ -1536,6 +1536,9 @@ function buildPreview(){
 ${body}
 </body></html>`;
 }
+
+// Export Word / PDF — folosește buildDoc
+function buildDoc(forPrint){
   const titlu=gv('f-titlu');const sub=gv('f-subtitlu');const kw=gv('f-cuvinte');
   const abRo=gi('rich-abstract');const abEn=gi('rich-abstract-en');
   const autoriNm=autori.filter(a=>a.nume).map(a=>a.nume).join(', ');
