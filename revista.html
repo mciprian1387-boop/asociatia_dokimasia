@@ -98,6 +98,151 @@
     .info-panel ol { margin:8px 0 14px 20px; }
     .info-panel ol li { font-size:1.05rem; line-height:1.85; color:#333; margin-bottom:10px; text-align:justify; }
     .info-panel ol li strong { color:var(--crimson); }
+    /* ══════════════════════════════════════════
+       DESIGN SYSTEM — PANOURI REVISTA
+    ══════════════════════════════════════════ */
+
+    /* Header panou cu linie aurie */
+    .panel-header { margin-bottom:32px; }
+    .panel-header h2 {
+      font-family:'Playfair Display',serif; font-size:2rem; font-weight:900;
+      color:var(--crimson); margin-bottom:6px; padding-bottom:0; border-bottom:none;
+    }
+    .panel-header-line {
+      display:flex; align-items:center; gap:12px; margin-top:10px; margin-bottom:16px;
+    }
+    .panel-header-line::before { content:''; display:block; width:40px; height:3px; background:var(--gold); border-radius:2px; flex-shrink:0; }
+    .panel-header-line::after { content:''; flex:1; height:1px; background:var(--border); }
+    .panel-intro {
+      font-size:1.05rem; line-height:1.9; color:#444; text-align:justify;
+      border-left:3px solid var(--gold); padding-left:18px;
+      background:linear-gradient(to right, #fdf8f0, transparent);
+      padding:14px 18px; border-radius:0 4px 4px 0;
+    }
+
+    /* Card secțiune (subsecțiuni principale) */
+    .sec-card {
+      background:#fff; border:1px solid var(--border);
+      border-radius:6px; overflow:hidden;
+      box-shadow:0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom:20px; transition:box-shadow 0.2s;
+    }
+    .sec-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.10); }
+    .sec-card-header {
+      display:flex; align-items:center; gap:14px;
+      background:linear-gradient(135deg, var(--crimson) 0%, #6a0000 100%);
+      padding:16px 22px;
+    }
+    .sec-card-icon {
+      width:38px; height:38px; background:rgba(255,255,255,0.15);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:1.1rem; flex-shrink:0;
+    }
+    .sec-card-title {
+      font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700;
+      color:#fff; line-height:1.3;
+    }
+    .sec-card-subtitle {
+      font-size:0.82rem; color:rgba(255,255,255,0.75); margin-top:2px; font-style:italic;
+    }
+    .sec-card-body { padding:20px 22px; }
+    .sec-card-desc {
+      font-size:0.97rem; line-height:1.85; color:#444;
+      font-style:italic; margin-bottom:14px; padding-bottom:12px;
+      border-bottom:1px dashed var(--border); text-align:justify;
+    }
+
+    /* Listă stilizată în carduri */
+    .sec-list { list-style:none; margin:0; padding:0; }
+    .sec-list li {
+      display:flex; align-items:flex-start; gap:10px;
+      font-size:0.94rem; line-height:1.7; color:#333;
+      padding:5px 0; border-bottom:1px solid #f5f2ed;
+    }
+    .sec-list li:last-child { border-bottom:none; }
+    .sec-list li::before {
+      content:''; display:block; width:6px; height:6px;
+      background:var(--gold); border-radius:50%; margin-top:8px; flex-shrink:0;
+    }
+
+    /* Notă orientativă / citare */
+    .panel-note {
+      background:var(--paper-dark); border:1px solid var(--border);
+      border-left:4px solid var(--gold); border-radius:0 6px 6px 0;
+      padding:16px 20px; margin-top:24px;
+      font-size:0.92rem; line-height:1.8; color:#555; font-style:italic;
+    }
+    .panel-note strong { color:var(--crimson); font-style:normal; }
+
+    /* Grid 2 coloane pentru carduri */
+    .sec-cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px; }
+
+    /* Card simplu (ghid, colegiu etc) */
+    .info-card {
+      background:#fff; border:1px solid var(--border); border-radius:6px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05); overflow:hidden;
+    }
+    .info-card-head {
+      background:var(--paper-dark); border-bottom:1px solid var(--border);
+      padding:12px 18px; display:flex; align-items:center; gap:10px;
+    }
+    .info-card-head-icon { font-size:1.1rem; }
+    .info-card-head-title {
+      font-size:0.78rem; letter-spacing:1.5px; text-transform:uppercase;
+      font-weight:700; color:var(--crimson);
+    }
+    .info-card-body { padding:16px 18px; }
+    .info-card-body p { font-size:0.94rem; line-height:1.8; color:#444; margin-bottom:8px; text-align:justify; }
+    .info-card-body p:last-child { margin-bottom:0; }
+
+    /* Pas numerotat (ghid autori) */
+    .step-list { list-style:none; margin:0; padding:0; }
+    .step-item {
+      display:flex; gap:18px; padding:18px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .step-item:last-child { border-bottom:none; }
+    .step-nr {
+      width:36px; height:36px; background:var(--crimson); color:#fff;
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
+      flex-shrink:0; margin-top:2px;
+    }
+    .step-body { flex:1; }
+    .step-title { font-weight:700; color:var(--ink); font-size:1rem; margin-bottom:4px; }
+    .step-desc { font-size:0.93rem; line-height:1.8; color:#555; text-align:justify; }
+
+    /* Badge colegiu */
+    .colegiu-card-new {
+      background:#fff; border:1px solid var(--border); border-radius:6px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05); padding:20px 18px;
+      display:flex; flex-direction:column; align-items:center; text-align:center;
+      transition:box-shadow 0.2s, transform 0.2s;
+    }
+    .colegiu-card-new:hover { box-shadow:0 6px 20px rgba(0,0,0,0.10); transform:translateY(-2px); }
+    .colegiu-avatar {
+      width:56px; height:56px; background:linear-gradient(135deg, var(--crimson), #6a0000);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      color:#fff; font-size:1.4rem; margin-bottom:12px;
+      box-shadow:0 3px 10px rgba(139,0,0,0.3);
+    }
+    .colegiu-rol {
+      font-size:0.62rem; letter-spacing:2.5px; text-transform:uppercase;
+      color:var(--gold); font-weight:700; margin-bottom:6px;
+    }
+    .colegiu-name {
+      font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700;
+      color:var(--ink); line-height:1.4;
+    }
+    .colegiu-inst {
+      font-size:0.78rem; color:var(--muted); margin-top:4px; font-style:italic;
+    }
+
+    @media(max-width:768px){
+      .sec-cards-grid { grid-template-columns:1fr; }
+      .panel-header h2 { font-size:1.5rem; }
+    }
+
     /* Arhiva */
     .arhiva-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:20px; margin-top:20px; }
     .arhiva-card { background:var(--paper); border:1px solid var(--border); border-radius:2px; overflow:hidden; display:flex; flex-direction:column; }
@@ -458,115 +603,268 @@
 
     <!-- DESPRE -->
     <div class="info-panel active" id="panel-despre">
-      <h2>Despre revistă</h2>
-      <div style="font-size:1rem;line-height:1.85;">
-        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Revista Dokimasia – Inovație și perspective în educație este o publicație educațională interdisciplinară dedicată promovării ideilor, studiilor și practicilor relevante din domeniul educației și din ariile conexe acesteia. Revista își propune să ofere un cadru deschis pentru valorificarea contribuțiilor care susțin dezvoltarea profesională, inovarea didactică și adaptarea educației la cerințele actuale.</p>
+      <div class="panel-header">
+        <h2>Despre revistă</h2>
+        <div class="panel-header-line"></div>
+        <div class="panel-intro">
+          Revista Dokimasia – <em>Inovație și perspective în educație</em> este o publicație educațională interdisciplinară dedicată promovării ideilor, studiilor și practicilor relevante din domeniul educației și din ariile conexe acesteia. Revista își propune să ofere un cadru deschis pentru valorificarea contribuțiilor care susțin dezvoltarea profesională, inovarea didactică și adaptarea educației la cerințele actuale.
+        </div>
+      </div>
 
-        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Profilul revistei</p>
-        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Revista are un profil mixt, integrând atât articole cu fundament teoretic și științific, cât și contribuții cu caracter aplicativ. Prin această abordare, publicația facilitează dialogul între cercetare și practică, încurajând materiale care oferă soluții concrete și perspective relevante pentru activitatea educațională.</p>
+      <div class="sec-cards-grid">
+        <div class="sec-card">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">📋</div>
+            <div>
+              <div class="sec-card-title">Profilul revistei</div>
+            </div>
+          </div>
+          <div class="sec-card-body">
+            <p class="sec-card-desc">Revista are un profil mixt, integrând atât articole cu fundament teoretic și științific, cât și contribuții cu caracter aplicativ. Prin această abordare, publicația facilitează dialogul între cercetare și practică, încurajând materiale care oferă soluții concrete și perspective relevante pentru activitatea educațională.</p>
+          </div>
+        </div>
 
-        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Public țintă</p>
-        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Publicația se adresează cadrelor didactice din toate nivelurile de învățământ, personalului de conducere, consilierilor școlari, cercetătorilor, formatorilor, studenților și tuturor celor interesați de domeniul educației și de dezvoltarea acestuia.</p>
+        <div class="sec-card">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">👥</div>
+            <div>
+              <div class="sec-card-title">Public țintă</div>
+            </div>
+          </div>
+          <div class="sec-card-body">
+            <p class="sec-card-desc">Publicația se adresează cadrelor didactice din toate nivelurile de învățământ, personalului de conducere, consilierilor școlari, cercetătorilor, formatorilor, studenților și tuturor celor interesați de domeniul educației și de dezvoltarea acestuia.</p>
+          </div>
+        </div>
+      </div>
 
-        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Tipuri de contribuții</p>
-        <p style="text-align:justify;text-indent:2em;margin-bottom:0.5em;">Revista publică o gamă variată de materiale, inclusiv:</p>
-        <ul style="margin-left:3em;margin-bottom:0.5em;line-height:2;">
-          <li>articole de specialitate</li>
-          <li>studii și cercetări educaționale</li>
-          <li>analize și reflecții profesionale</li>
-          <li>exemple de bună practică</li>
-          <li>proiecte educaționale</li>
-          <li>recenzii și interviuri etc.</li>
-        </ul>
-        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Materialele pot avea caracter teoretic sau aplicativ, fiind încurajate contribuțiile care valorifică experiențe concrete și rezultate relevante.</p>
+      <div class="sec-card" style="margin-top:0;">
+        <div class="sec-card-header">
+          <div class="sec-card-icon">📝</div>
+          <div>
+            <div class="sec-card-title">Tipuri de contribuții</div>
+            <div class="sec-card-subtitle">Revista publică o gamă variată de materiale</div>
+          </div>
+        </div>
+        <div class="sec-card-body">
+          <ul class="sec-list">
+            <li>Articole de specialitate</li>
+            <li>Studii și cercetări educaționale</li>
+            <li>Analize și reflecții profesionale</li>
+            <li>Exemple de bună practică</li>
+            <li>Proiecte educaționale</li>
+            <li>Recenzii și interviuri etc.</li>
+          </ul>
+          <p style="font-size:0.9rem;color:#666;margin-top:12px;font-style:italic;">Materialele pot avea caracter teoretic sau aplicativ, fiind încurajate contribuțiile care valorifică experiențe concrete și rezultate relevante.</p>
+        </div>
+      </div>
 
-        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Criterii editoriale</p>
-        <p style="text-align:justify;text-indent:2em;margin-bottom:1.1em;">Materialele transmise sunt analizate din perspectivă editorială, în vederea asigurării calității, coerenței și relevanței conținutului publicat. Revista urmărește să ofere autorilor un cadru de valorizare profesională și să contribuie la dezvoltarea unei comunități educaționale active.</p>
-
-        <p style="font-weight:bold;color:var(--crimson);text-indent:2em;margin-bottom:0.4em;">Periodicitate</p>
-        <p style="text-align:justify;text-indent:2em;margin-bottom:0;">Revista apare de patru ori pe an și este disponibilă în format online, cu posibilitatea realizării unei versiuni tipărite, la cerere. Materialele publicate trebuie să fie originale și să respecte standardele editoriale ale publicației.</p>
+      <div class="sec-cards-grid" style="margin-top:20px;">
+        <div class="info-card">
+          <div class="info-card-head">
+            <span class="info-card-head-icon">✅</span>
+            <span class="info-card-head-title">Criterii editoriale</span>
+          </div>
+          <div class="info-card-body">
+            <p>Materialele transmise sunt analizate din perspectivă editorială, în vederea asigurării calității, coerenței și relevanței conținutului publicat. Revista urmărește să ofere autorilor un cadru de valorizare profesională și să contribuie la dezvoltarea unei comunități educaționale active.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-head">
+            <span class="info-card-head-icon">📅</span>
+            <span class="info-card-head-title">Periodicitate</span>
+          </div>
+          <div class="info-card-body">
+            <p>Revista apare de <strong>patru ori pe an</strong> și este disponibilă în format online, cu posibilitatea realizării unei versiuni tipărite, la cerere. Materialele publicate trebuie să fie originale și să respecte standardele editoriale ale publicației.</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- DOMENII -->
     <div class="info-panel" id="panel-domenii">
-      <h2>Arii tematice</h2>
-      <div style="font-size:1rem;line-height:1.85;">
+      <div class="panel-header">
+        <h2>Arii tematice</h2>
+        <div class="panel-header-line"></div>
+        <div class="panel-intro">
+          Revista Dokimasia este deschisă contribuțiilor din toate domeniile educației. Ariile tematice de mai jos au caracter orientativ și structurează principalele direcții de interes ale publicației.
+        </div>
+      </div>
 
-        <p style="font-weight:bold;color:var(--crimson);margin-bottom:0.3em;">Practici educaționale și inovare didactică</p>
-        <p style="font-style:italic;text-align:justify;margin-bottom:0.6em;">Include contribuții cu caracter aplicativ, centrate pe activitatea didactică și pe intervențiile educaționale realizate în mediul școlar.</p>
-        <p style="margin-bottom:0.3em;">Exemple de contribuții:</p>
-        <ul style="margin-left:2em;margin-bottom:1.4em;line-height:2;">
-          <li>articole și materiale metodice</li>
-          <li>planuri de lecție și scenarii didactice</li>
-          <li>auxiliare curriculare și suporturi educaționale</li>
-          <li>fișe de lucru, instrumente de evaluare și resurse educaționale</li>
-          <li>activități remediale și de sprijin</li>
-          <li>utilizarea tehnologiei și a resurselor digitale în educație</li>
-          <li>exemple de bună practică și intervenții didactice</li>
-          <li>comunicări scurte și note de practică</li>
-          <li>alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
-        </ul>
+      <div class="sec-card">
+        <div class="sec-card-header">
+          <div class="sec-card-icon">🎓</div>
+          <div>
+            <div class="sec-card-title">Practici educaționale și inovare didactică</div>
+            <div class="sec-card-subtitle">Contribuții cu caracter aplicativ din mediul școlar</div>
+          </div>
+        </div>
+        <div class="sec-card-body">
+          <p class="sec-card-desc">Include contribuții cu caracter aplicativ, centrate pe activitatea didactică și pe intervențiile educaționale realizate în mediul școlar.</p>
+          <ul class="sec-list">
+            <li>Articole și materiale metodice</li>
+            <li>Planuri de lecție și scenarii didactice</li>
+            <li>Auxiliare curriculare și suporturi educaționale</li>
+            <li>Fișe de lucru, instrumente de evaluare și resurse educaționale</li>
+            <li>Activități remediale și de sprijin</li>
+            <li>Utilizarea tehnologiei și a resurselor digitale în educație</li>
+            <li>Exemple de bună practică și intervenții didactice</li>
+            <li>Comunicări scurte și note de practică</li>
+            <li>Alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
+          </ul>
+        </div>
+      </div>
 
-        <p style="font-weight:bold;color:var(--crimson);margin-bottom:0.3em;">Cercetare și analiză în educație</p>
-        <p style="font-style:italic;text-align:justify;margin-bottom:0.6em;">Include contribuții cu caracter științific, teoretic sau analitic, care abordează fenomenul educațional din perspective diverse.</p>
-        <p style="margin-bottom:0.3em;">Exemple de contribuții:</p>
-        <ul style="margin-left:2em;margin-bottom:1.4em;line-height:2;">
-          <li>studii și cercetări educaționale</li>
-          <li>articole de specialitate</li>
-          <li>analize și reflecții asupra practicilor educaționale</li>
-          <li>sinteze tematice și articole de tip „review"</li>
-          <li>lucrări interdisciplinare</li>
-          <li>evaluarea impactului intervențiilor educaționale</li>
-          <li>studii de caz educaționale</li>
-          <li>recenzii de lucrări și resurse educaționale</li>
-          <li>interviuri și contribuții de specialitate</li>
-          <li>alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
-        </ul>
+      <div class="sec-card">
+        <div class="sec-card-header">
+          <div class="sec-card-icon">🔬</div>
+          <div>
+            <div class="sec-card-title">Cercetare și analiză în educație</div>
+            <div class="sec-card-subtitle">Contribuții cu caracter științific, teoretic sau analitic</div>
+          </div>
+        </div>
+        <div class="sec-card-body">
+          <p class="sec-card-desc">Include contribuții cu caracter științific, teoretic sau analitic, care abordează fenomenul educațional din perspective diverse.</p>
+          <ul class="sec-list">
+            <li>Studii și cercetări educaționale</li>
+            <li>Articole de specialitate</li>
+            <li>Analize și reflecții asupra practicilor educaționale</li>
+            <li>Sinteze tematice și articole de tip „review"</li>
+            <li>Lucrări interdisciplinare</li>
+            <li>Evaluarea impactului intervențiilor educaționale</li>
+            <li>Studii de caz educaționale</li>
+            <li>Recenzii de lucrări și resurse educaționale</li>
+            <li>Interviuri și contribuții de specialitate</li>
+            <li>Alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
+          </ul>
+        </div>
+      </div>
 
-        <p style="font-weight:bold;color:var(--crimson);margin-bottom:0.3em;">Dezvoltare educațională și profesională</p>
-        <p style="font-style:italic;text-align:justify;margin-bottom:0.6em;">Include contribuții privind evoluția sistemului educațional și dezvoltarea profesională a cadrelor didactice, precum și implicarea instituțiilor educaționale în comunitate.</p>
-        <p style="margin-bottom:0.3em;">Exemple de contribuții:</p>
-        <ul style="margin-left:2em;margin-bottom:1.4em;line-height:2;">
-          <li>articole de reflecție profesională</li>
-          <li>studii de caz și analize instituționale</li>
-          <li>management educațional și leadership</li>
-          <li>politici educaționale și dezvoltare instituțională</li>
-          <li>educație incluzivă și echitate</li>
-          <li>consiliere școlară și dezvoltare personală</li>
-          <li>activități de formare și dezvoltare profesională</li>
-          <li>proiecte educaționale și parteneriate</li>
-          <li>proiecte Erasmus+, proiecte cu finanțare externă și materiale privind implementarea, promovarea și diseminarea rezultatelor acestora</li>
-          <li>ghiduri, resurse și materiale dezvoltate în cadrul proiectelor educaționale</li>
-          <li>alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
-        </ul>
+      <div class="sec-card">
+        <div class="sec-card-header">
+          <div class="sec-card-icon">🌱</div>
+          <div>
+            <div class="sec-card-title">Dezvoltare educațională și profesională</div>
+            <div class="sec-card-subtitle">Evoluția sistemului și dezvoltarea profesională a cadrelor didactice</div>
+          </div>
+        </div>
+        <div class="sec-card-body">
+          <p class="sec-card-desc">Include contribuții privind evoluția sistemului educațional și dezvoltarea profesională a cadrelor didactice, precum și implicarea instituțiilor educaționale în comunitate.</p>
+          <ul class="sec-list">
+            <li>Articole de reflecție profesională</li>
+            <li>Studii de caz și analize instituționale</li>
+            <li>Management educațional și leadership</li>
+            <li>Politici educaționale și dezvoltare instituțională</li>
+            <li>Educație incluzivă și echitate</li>
+            <li>Consiliere școlară și dezvoltare personală</li>
+            <li>Activități de formare și dezvoltare profesională</li>
+            <li>Proiecte educaționale și parteneriate</li>
+            <li>Proiecte Erasmus+, proiecte cu finanțare externă și materiale privind implementarea, promovarea și diseminarea rezultatelor acestora</li>
+            <li>Ghiduri, resurse și materiale dezvoltate în cadrul proiectelor educaționale</li>
+            <li>Alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
+          </ul>
+        </div>
+      </div>
 
-        <p style="font-style:italic;color:var(--muted);font-size:0.95rem;text-align:justify;border-top:1px solid var(--border);padding-top:14px;margin-top:4px;">Ariile tematice și exemplele de contribuții au caracter orientativ. Revista încurajează transmiterea unor materiale diverse și relevante pentru activitatea didactică, cercetare și dezvoltare profesională, care pot fi valorificate în parcursul profesional al autorilor.</p>
+      <div class="panel-note">
+        <strong>Notă orientativă:</strong> Ariile tematice și exemplele de contribuții au caracter orientativ. Revista încurajează transmiterea unor materiale diverse și relevante pentru activitatea didactică, cercetare și dezvoltare profesională, care pot fi valorificate în parcursul profesional al autorilor.
       </div>
     </div>
-
     <!-- GHID -->
     <div class="info-panel" id="panel-ghid">
-      <h2>Ghid pentru autori</h2>
-      <p>Revista Dokimasia primește spre publicare materiale originale, relevante pentru domeniul educației și pentru ariile conexe acesteia, redactate într-un limbaj clar, corect și coerent. Pot trimite articole cadre didactice, cercetători, formatori, experți, studenți, doctoranzi și alți autori interesați de tematica revistei.</p>
-      <ol>
-        <li><strong>Tipuri de materiale acceptate</strong><br>Revista acceptă articole de specialitate, studii, cercetări, eseuri, exemple de bună practică, recenzii, interviuri, prezentări de proiecte educaționale, resurse utile pentru activitatea didactică și alte materiale cu valoare aplicativă sau teoretică.</li>
-        <li><strong>Condiții generale</strong><br>Materialele transmise trebuie să fie originale și să nu fi fost publicate anterior în aceeași formă în alte reviste, volume sau platforme. Autorii sunt responsabili pentru conținutul lucrării, corectitudinea datelor prezentate, respectarea normelor de redactare și asumarea surselor utilizate. Redacția își rezervă dreptul de a respinge materialele care nu respectă standardele editoriale ale revistei.</li>
-        <li><strong>Cerințe de redactare</strong><br>Articolul trebuie redactat într-o formă clară și îngrijită, cu diacritice, într-un stil adecvat domeniului educațional. Se recomandă o structură logică a textului care să includă, după caz, titlu, numele autorului, afilierea instituțională, adresa de e-mail, rezumat, cuvinte-cheie, conținutul propriu-zis și bibliografie.</li>
-        <li><strong>Dimensiunea materialelor</strong><br>Textele pot avea, orientativ, între 3 și 5 pagini, în funcție de tipul materialului. În cazul unor contribuții mai ample, publicarea se poate face cu acordul redacției.</li>
-        <li><strong>Formatul tehnic</strong><br>Materialele se transmit în format editabil, de tip Word. Se recomandă utilizarea unui font lizibil, de exemplu Times New Roman, corp 12, spațiere la 1,5 rânduri și margini standard. Titlurile și subtitlurile trebuie evidențiate clar. Tabelele, imaginile și graficele, dacă sunt incluse, trebuie să fie însoțite de titlu și, după caz, de sursa aferentă.</li>
-        <li><strong>Citarea surselor</strong><br>Autorii au obligația de a menționa corect toate sursele utilizate. Bibliografia trebuie redactată unitar, într-un stil consecvent ales de redacție. Materialele care conțin preluări neasumate, pasaje fără sursă sau alte abateri de la normele de etică editorială nu vor fi acceptate spre publicare.</li>
-        <li><strong>Trimiterea materialelor</strong><br>Articolele se transmit prin formularul de pe site sau la adresa de e-mail indicată de redacție, însoțite de datele de identificare ale autorului și, după caz, de documentele solicitate de revistă.</li>
-        <li><strong>Evaluarea materialelor</strong><br>Toate materialele sunt analizate din punct de vedere editorial. Autorii pot primi unul dintre următoarele răspunsuri: acceptat pentru publicare, acceptat cu modificări sau respins. Redacția poate solicita clarificări, revizuiri sau completări înainte de publicarea finală.</li>
-        <li><strong>Drepturi și responsabilități</strong><br>Prin transmiterea articolului, autorul declară că materialul îi aparține, că respectă normele de etică și că este de acord cu evaluarea și, după caz, cu publicarea acestuia în revista Dokimasia, în format online și tipărit, la cerere.</li>
-        <li><strong>Documente care pot fi solicitate</strong><br>În funcție de tipul materialului și de politica editorială a revistei, autorilor li se poate solicita o declarație de originalitate, un acord de publicare sau alte documente necesare procesului editorial.</li>
-      </ol>
-      <p style="margin-top:16px;font-style:italic;font-size:0.86rem;color:var(--muted);">Redacția își rezervă dreptul de a face modificări de formă, de stil și de tehnoredactare, fără a afecta conținutul de fond al materialului.</p>
-    </div>
+      <div class="panel-header">
+        <h2>Ghid pentru autori</h2>
+        <div class="panel-header-line"></div>
+        <div class="panel-intro">
+          Revista Dokimasia primește spre publicare materiale originale, relevante pentru domeniul educației și pentru ariile conexe acesteia, redactate într-un limbaj clar, corect și coerent. Pot trimite articole cadre didactice, cercetători, formatori, experți, studenți, doctoranzi și alți autori interesați de tematica revistei.
+        </div>
+      </div>
 
-    <!-- PROCEDURA -->
+      <div class="sec-card">
+        <div class="sec-card-header">
+          <div class="sec-card-icon">📋</div>
+          <div>
+            <div class="sec-card-title">Pași pentru publicare</div>
+            <div class="sec-card-subtitle">Urmați instrucțiunile de mai jos pentru a trimite un material</div>
+          </div>
+        </div>
+        <div class="sec-card-body">
+          <ol class="step-list">
+            <li class="step-item">
+              <div class="step-nr">1</div>
+              <div class="step-body">
+                <div class="step-title">Tipuri de materiale acceptate</div>
+                <div class="step-desc">Revista acceptă articole de specialitate, studii, cercetări, eseuri, exemple de bună practică, recenzii, interviuri, prezentări de proiecte educaționale, resurse utile pentru activitatea didactică și alte materiale cu valoare aplicativă sau teoretică.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-nr">2</div>
+              <div class="step-body">
+                <div class="step-title">Condiții generale</div>
+                <div class="step-desc">Materialele transmise trebuie să fie originale și să nu fi fost publicate anterior în aceeași formă în alte reviste, volume sau platforme. Autorii sunt responsabili pentru conținutul lucrării, corectitudinea datelor prezentate, respectarea normelor de redactare și asumarea surselor utilizate.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-nr">3</div>
+              <div class="step-body">
+                <div class="step-title">Cerințe de redactare</div>
+                <div class="step-desc">Articolul trebuie redactat într-o formă clară și îngrijită, cu diacritice, într-un stil adecvat domeniului educațional. Se recomandă o structură logică a textului care să includă, după caz, titlu, numele autorului, afilierea instituțională, adresa de e-mail, rezumat, cuvinte-cheie, conținutul propriu-zis și bibliografie.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-nr">4</div>
+              <div class="step-body">
+                <div class="step-title">Dimensiunea materialelor</div>
+                <div class="step-desc">Textele pot avea, orientativ, între 3 și 5 pagini, în funcție de tipul materialului. În cazul unor contribuții mai ample, publicarea se poate face cu acordul redacției.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-nr">5</div>
+              <div class="step-body">
+                <div class="step-title">Formatul tehnic</div>
+                <div class="step-desc">Materialele se transmit în format editabil, de tip Word. Se recomandă utilizarea unui font lizibil, de exemplu Times New Roman, corp 12, spațiere la 1,5 rânduri și margini standard. Titlurile și subtitlurile trebuie evidențiate clar.</div>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-nr">6</div>
+              <div class="step-body">
+                <div class="step-title">Trimiterea materialului</div>
+                <div class="step-desc">Materialele se transmit exclusiv prin formularul online disponibil în secțiunea <strong>Trimite un articol</strong>. Redacția va confirma primirea și va comunica decizia editorială în cel mai scurt timp posibil.</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="sec-cards-grid" style="margin-top:20px;">
+        <div class="info-card">
+          <div class="info-card-head">
+            <span class="info-card-head-icon">📜</span>
+            <span class="info-card-head-title">Drepturi și responsabilități</span>
+          </div>
+          <div class="info-card-body">
+            <p>Prin trimiterea materialului, autorul declară că lucrarea este originală, că nu a mai fost publicată și că nu este în curs de evaluare la altă publicație. Redacția își rezervă dreptul de a respinge materialele care nu respectă standardele editoriale.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-head">
+            <span class="info-card-head-icon">🏆</span>
+            <span class="info-card-head-title">Beneficii pentru autori</span>
+          </div>
+          <div class="info-card-body">
+            <p>Autorii publicați primesc adeverință de publicare și diplomă, documente utile în activitatea profesională și în mobilitatea personalului didactic. Materialele sunt disponibile online, cu acces liber.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-note">
+        <strong>Important:</strong> Redacția își rezervă dreptul de a solicita completări, modificări sau clarificări înainte de acceptarea unui material. Decizia finală de publicare aparține colegiului editorial.
+      </div>
+    </div>
     <div class="info-panel" id="panel-trimitere">
-      <h2>Trimite un articol</h2>
+      <div class="panel-header">
+        <h2>Trimite un articol</h2>
+        <div class="panel-header-line"></div>
+      </div>
       <p>Pentru publicarea în Revista Dokimasia este necesară achitarea contribuției editoriale. Ai flexibilitatea de a plăti acum — formularul se activează imediat — sau de a trimite materialul mai întâi și de a achita ulterior, bifând opțiunea „Plătește mai târziu".</p>
 
       <!-- PASUL 1: Selectare număr articole -->
@@ -807,39 +1105,71 @@
 
         <!-- FAQ -->
     <div class="info-panel" id="panel-colegiu">
-      <h2>Colegiul editorial și științific</h2>
-      <p>Revista Dokimasia este realizată de un colectiv de redacție dedicat calității editoriale și promovării excelenței în educație.</p>
-      <div class="colegiu-grid">
-        <div class="colegiu-card">
-          <div class="c-rol">Redactor-șef</div>
-          <div class="c-avatar">✦</div>
-          <div class="c-name">—</div>
-        </div>
-        <div class="colegiu-card">
-          <div class="c-rol">Secretar de redacție</div>
-          <div class="c-avatar">✦</div>
-          <div class="c-name">—</div>
-        </div>
-        <div class="colegiu-card">
-          <div class="c-rol">Redactori</div>
-          <div class="c-avatar">✦</div>
-          <div class="c-name">—</div>
-        </div>
-        <div class="colegiu-card">
-          <div class="c-rol">Tehnoredactor / Grafician</div>
-          <div class="c-avatar">✦</div>
-          <div class="c-name">—</div>
-        </div>
-        <div class="colegiu-card">
-          <div class="c-rol">Referenți științifici</div>
-          <div class="c-avatar">✦</div>
-          <div class="c-name">—</div>
+      <div class="panel-header">
+        <h2>Colegiul editorial</h2>
+        <div class="panel-header-line"></div>
+        <div class="panel-intro">
+          Revista Dokimasia este realizată de un colectiv de redacție dedicat calității editoriale și promovării excelenței în educație. Colegiul editorial este format din specialiști cu experiență în domeniul educațional, care asigură rigoarea și relevanța conținutului publicat.
         </div>
       </div>
-      <p style="margin-top:20px;font-style:italic;font-size:0.86rem;color:var(--muted);">Componența completă a colegiului editorial și științific va fi publicată în curând.</p>
-    </div>
 
-    <!-- ARHIVA -->
+      <div class="sec-card" style="margin-bottom:24px;">
+        <div class="sec-card-header">
+          <div class="sec-card-icon">👥</div>
+          <div>
+            <div class="sec-card-title">Echipa editorială</div>
+            <div class="sec-card-subtitle">Membri ai colegiului de redacție</div>
+          </div>
+        </div>
+        <div class="sec-card-body">
+          <div class="colegiu-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-top:4px;">
+            <div class="colegiu-card-new">
+              <div class="colegiu-avatar">✦</div>
+              <div class="colegiu-rol">Redactor-șef</div>
+              <div class="colegiu-name">—</div>
+            </div>
+            <div class="colegiu-card-new">
+              <div class="colegiu-avatar">✦</div>
+              <div class="colegiu-rol">Secretar de redacție</div>
+              <div class="colegiu-name">—</div>
+            </div>
+            <div class="colegiu-card-new">
+              <div class="colegiu-avatar">✦</div>
+              <div class="colegiu-rol">Redactor</div>
+              <div class="colegiu-name">—</div>
+            </div>
+            <div class="colegiu-card-new">
+              <div class="colegiu-avatar">✦</div>
+              <div class="colegiu-rol">Redactor</div>
+              <div class="colegiu-name">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-cards-grid">
+        <div class="info-card">
+          <div class="info-card-head">
+            <span class="info-card-head-icon">🏛️</span>
+            <span class="info-card-head-title">Despre colegiu</span>
+          </div>
+          <div class="info-card-body">
+            <p>Colegiul editorial al Revistei Dokimasia este format din specialiști cu experiență în domeniul educațional, care contribuie la asigurarea calității, coerenței și relevanței materialelor publicate.</p>
+            <p>Membrii colegiului participă la evaluarea materialelor și la orientarea editorială a publicației, în acord cu valorile și misiunea revistei.</p>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-head">
+            <span class="info-card-head-icon">📬</span>
+            <span class="info-card-head-title">Contact redacție</span>
+          </div>
+          <div class="info-card-body">
+            <p>Pentru informații suplimentare, propuneri de colaborare sau orice altă solicitare adresată redacției, vă rugăm să ne contactați prin formularul de contact disponibil pe site sau prin e-mail.</p>
+            <p style="margin-top:8px;"><a href="mailto:revista@dokimasia.ro" style="color:var(--crimson);font-weight:600;">revista@dokimasia.ro</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="info-panel" id="panel-arhiva">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);">
         <h2 style="margin:0;padding:0;border:none;">Arhivă reviste</h2>
