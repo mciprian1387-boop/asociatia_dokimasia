@@ -562,19 +562,32 @@ let secContor=0;
 let sectiuni=[];
 let secActiva=null;
 let activeEd=null;
-let saveInProgress=false;
 let articleId=null;
 let autorContor=2;
 let istoricArticole=[];
 
 // ══════════════════════════════════════════════════════════
-// AUTH — citeşte sesiunea direct din window.sb (auth.js)
-// Nu depinde de onUserLoaded care nu e apelat de auth.js
+// AUTH — editor își creează propriul client Supabase
+// auth.js folosește `sb` local (nu window.sb), deci
+// editorul nu poate folosi clientul lui. Creem unul propriu
+// cu ACELEAȘI credențiale și ACELAȘI storageKey — sesiunea
+// e partajată prin localStorage.
 // ══════════════════════════════════════════════════════════
+
+// Crează clientul imediat — supabase e disponibil din CDN
+const { createClient: _createClient } = supabase;
+sbClient = _createClient(SB_URL, SB_ANON, {
+  auth: {
+    persistSession: true,
+    storageKey: 'dokimasia-auth',   // ACELAȘI key ca auth.js
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 function initEditor(user) {
   if (!user) {
-    // Neautentificat — guard vizibil, rest ascuns
     document.getElementById('authGuard').classList.remove('hidden');
     document.getElementById('siteHeader').classList.add('site-hidden');
     document.getElementById('appBody').classList.add('site-hidden');
@@ -582,77 +595,63 @@ function initEditor(user) {
   }
 
   currentUser = user;
-  sbClient = window.sb;
+  console.log('[Editor] Autentificat ca:', user.email);
 
-  console.log('[Editor] User:', user.email);
-  console.log('[Editor] sbClient:', sbClient ? 'OK' : 'NULL');
-
-  // Ascunde guard, arată tot
+  // Ascunde guard, arată app
   document.getElementById('authGuard').classList.add('hidden');
   document.getElementById('siteHeader').classList.remove('site-hidden');
   document.getElementById('appBody').classList.remove('site-hidden');
 
-  // UI header/sidebar
+  // UI
   const displayName = (user.user_metadata?.full_name || user.user_metadata?.name || user.email).split(/[ @]/)[0];
-  const shUser = document.getElementById('shUser');
-  const accLabel = document.getElementById('accountLabel');
-  if (shUser) shUser.textContent = displayName;
-  if (accLabel) accLabel.textContent = displayName;
-  const loggedOut = document.getElementById('loggedOut');
-  const loggedIn = document.getElementById('loggedIn');
-  if (loggedOut) loggedOut.style.display = 'none';
-  if (loggedIn) loggedIn.style.display = 'block';
+  ['shUser','accountLabel'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = displayName;
+  });
+  const lo = document.getElementById('loggedOut');
+  const li = document.getElementById('loggedIn');
+  if (lo) lo.style.display = 'none';
+  if (li) li.style.display = 'block';
   if (user.email === 'm.ciprian1387@gmail.com') {
-    const adminBtn = document.getElementById('adminBtn');
-    if (adminBtn) adminBtn.style.display = 'block';
+    const ab = document.getElementById('adminBtn');
+    if (ab) ab.style.display = 'block';
   }
 
   setBadge('', 'Nesalvat');
+  incarcaIstoric();
 
-  // Test conectivitate Supabase
-  sbClient.from('articole_draft').select('id').limit(1).then(({data, error}) => {
-    if (error) {
-      console.error('[Supabase] Eroare:', error.message, '| Cod:', error.code);
-      setBadge('err', '⚠ ' + (error.message||'Eroare DB').slice(0, 35));
-    } else {
-      console.log('[Supabase] OK — draft-uri user:', data?.length || 0);
-      incarcaIstoric();
-    }
-  });
-
-  // Dacă vine cu ?tip= din revista.html
+  // ?tip= din URL
   const tipParam = new URLSearchParams(window.location.search).get('tip');
   if (tipParam && TIPURI[tipParam]) {
     setTimeout(() => {
       tipSelectat = tipParam;
       buildSectiuni(); renderAll(); activaSec('titlu'); updateTipBar();
-      toast('Editor configurat: ' + TIPURI[tipParam].label, 'ok');
-    }, 400);
+      toast('Editor: ' + TIPURI[tipParam].label, 'ok');
+    }, 300);
   }
 }
 
-// Pornire: aşteaptă auth.js să creeze window.sb, apoi citeşte sesiunea
-function startEditor() {
-  if (!window.sb) {
-    // auth.js nu a terminat încă — mai aşteaptă
-    setTimeout(startEditor, 100);
-    return;
-  }
-  window.sb.auth.getUser().then(({ data: { user } }) => {
+// Pornire la DOMContentLoaded
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    // Încearcă să obțină sesiunea curentă
+    const { data: { user } } = await sbClient.auth.getUser();
     initEditor(user || null);
-  });
+  } catch(e) {
+    console.error('[Editor] Eroare getUser:', e);
+    initEditor(null);
+  }
 
-  // Ascultă schimbările de sesiune (login/logout în timp real)
-  window.sb.auth.onAuthStateChange((event, session) => {
+  // Ascultă schimbările de sesiune
+  sbClient.auth.onAuthStateChange((event, session) => {
+    console.log('[Editor] Auth event:', event);
     if (event === 'SIGNED_IN') initEditor(session?.user || null);
     if (event === 'SIGNED_OUT') initEditor(null);
   });
-}
+});
 
-// Compatibilitate cu auth.js care poate apela onUserLoaded
+// Compatibilitate cu orice apel extern
 window.onUserLoaded = function(user) { initEditor(user); };
-
-document.addEventListener('DOMContentLoaded', startEditor);
 
 // ══════════════════════════════════════════════════════════
 // SUPABASE AUTOSAVE — robust cu diagnostic
@@ -667,16 +666,10 @@ function setBadge(cls, txt){
 let saveInProgress=false;
 
 async function autosave(){
-  // Verifică prerechizituri
-  if(saveInProgress){ schedAS(); return; } // reprogramează dacă e în curs
+  if(saveInProgress){ schedAS(); return; }
   if(!tipSelectat){ setBadge('','Nesalvat'); return; }
-  if(!currentUser){ console.warn('[Autosave] currentUser null'); setBadge('err','Neautentificat'); return; }
-
-  // Asigură-ne că avem client Supabase
-  if(!sbClient){
-    sbClient = window.sb || (typeof supabase!=='undefined' ? supabase.createClient(SB_URL, SB_ANON) : null);
-  }
-  if(!sbClient){ console.error('[Autosave] sbClient null'); setBadge('err','Eroare client'); return; }
+  if(!currentUser){ console.warn('[Autosave] currentUser null'); return; }
+  if(!sbClient){ console.error('[Autosave] sbClient null'); return; }
 
   saveInProgress=true;
   setBadge('saving','Se salvează...');
