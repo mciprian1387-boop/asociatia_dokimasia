@@ -964,7 +964,17 @@
       </div>
       <p>Pentru publicarea în Revista Dokimasia este necesară achitarea contribuției editoriale. Ai flexibilitatea de a plăti acum — formularul se activează imediat — sau de a trimite materialul mai întâi și de a achita ulterior, bifând opțiunea „Plătește mai târziu".</p>
 
-      <!-- PASUL 1: Selectare număr articole -->
+      <!-- Banner draft-uri salvate (vizibil doar dacă utilizatorul e autentificat și are draft-uri) -->
+      <div id="tr-drafts-banner" style="display:none;margin-bottom:16px;">
+        <div style="background:#fff8e1;border:2px solid var(--gold);border-radius:8px;padding:20px 24px;">
+          <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:12px;">📝 Ai articole salvate în editorul online</div>
+          <div id="tr-drafts-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.5;">Selectează un articol pentru a-l prelua automat în formular, sau încarcă un fișier mai jos.</p>
+        </div>
+      </div>
+
+      <!-- Mesaj încărcare draft-uri -->
+      <div id="tr-drafts-loading" style="display:none;color:var(--muted);font-size:1rem;font-style:italic;margin-bottom:12px;">⏳ Se verifică articolele salvate...</div>
       <div id="tr-step1">
         <div class="form-section">
           <div class="form-section-title">Pasul 1 — Selectează numărul de articole</div>
@@ -1071,11 +1081,39 @@
         </div>
 
         <div class="form-section">
-          <div class="form-section-title">Pasul 5 — Fișiere atașate</div>
-          <p style="font-size:1rem;color:var(--ink);margin-bottom:16px;line-height:1.5;">
-            Atașează câte un fișier pentru fiecare articol. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
-          </p>
-          <div id="articole-fisiere-wrap" style="display:flex;flex-direction:column;gap:16px;"></div>
+          <div class="form-section-title">Pasul 5 — Articolul tău</div>
+
+          <!-- Selector mod: draft sau fișier -->
+          <div style="display:flex;gap:8px;margin-bottom:16px;" id="tr-mod-selector">
+            <button id="tr-mod-btn-draft" onclick="selectModArticol('draft')"
+              style="flex:1;padding:12px;border:2px solid var(--border);border-radius:6px;background:#fff;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;">
+              📝 Din editorul online
+            </button>
+            <button id="tr-mod-btn-fisier" onclick="selectModArticol('fisier')"
+              style="flex:1;padding:12px;border:2px solid var(--border);border-radius:6px;background:#fff;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;">
+              📎 Încarcă fișier
+            </button>
+          </div>
+
+          <!-- Mod draft: lista articolelor salvate -->
+          <div id="tr-mod-draft" style="display:none;">
+            <div id="tr-draft-select-list" style="display:flex;flex-direction:column;gap:8px;">
+              <p style="font-size:1rem;color:var(--muted);font-style:italic;">Nu ești autentificat sau nu ai articole salvate în editor.</p>
+            </div>
+            <div id="tr-draft-selectat-info" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:6px;padding:14px 18px;margin-top:12px;">
+              <div style="font-weight:700;color:#2e7d32;margin-bottom:4px;">✅ Articol preluat: <span id="tr-draft-titlu-selectat"></span></div>
+              <div style="font-size:1rem;color:var(--ink);">Articolul va fi trimis direct din editorul online.</div>
+            </div>
+          </div>
+
+          <!-- Mod fișier: upload normal -->
+          <div id="tr-mod-fisier" style="display:none;">
+            <p style="font-size:1rem;color:var(--ink);margin-bottom:16px;line-height:1.5;">
+              Atașează câte un fișier pentru fiecare articol. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
+            </p>
+            <div id="articole-fisiere-wrap" style="display:flex;flex-direction:column;gap:16px;"></div>
+          </div>
+
         </div>
 
         <div class="form-section" style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:18px 20px;">
@@ -1482,7 +1520,150 @@
   }
 
   // =====================
-  // TRIMITERE ARTICOL
+  // DRAFT-URI DIN EDITOR
+  // =====================
+  var trDraftSelectat = null;
+  var trModArticol = null; // 'draft' sau 'fisier'
+
+  function selectModArticol(mod) {
+    trModArticol = mod;
+    document.getElementById('tr-mod-draft').style.display = mod === 'draft' ? 'block' : 'none';
+    document.getElementById('tr-mod-fisier').style.display = mod === 'fisier' ? 'block' : 'none';
+    var btnDraft = document.getElementById('tr-mod-btn-draft');
+    var btnFisier = document.getElementById('tr-mod-btn-fisier');
+    if (btnDraft) {
+      btnDraft.style.borderColor = mod === 'draft' ? 'var(--crimson)' : 'var(--border)';
+      btnDraft.style.color = mod === 'draft' ? 'var(--crimson)' : 'var(--muted)';
+      btnDraft.style.background = mod === 'draft' ? '#fff3f3' : '#fff';
+    }
+    if (btnFisier) {
+      btnFisier.style.borderColor = mod === 'fisier' ? 'var(--crimson)' : 'var(--border)';
+      btnFisier.style.color = mod === 'fisier' ? 'var(--crimson)' : 'var(--muted)';
+      btnFisier.style.background = mod === 'fisier' ? '#fff3f3' : '#fff';
+    }
+    if (mod === 'draft') {
+      trDraftSelectat = null;
+      document.getElementById('tr-draft-selectat-info').style.display = 'none';
+    }
+  }
+
+  function selectDraft(draft) {
+    trDraftSelectat = draft;
+    var titlu = draft.titlu_rapid || (draft.data && draft.data.titlu) || 'Articol fără titlu';
+    document.getElementById('tr-draft-titlu-selectat').textContent = titlu;
+    document.getElementById('tr-draft-selectat-info').style.display = 'block';
+    // Completează automat titlul în câmpul de detalii dacă există
+    var tipEl = document.getElementById('tr-tip');
+    if (tipEl && draft.tip) {
+      var tipMap = {
+        'practic': 'Studiu de caz și exemple de bună practică',
+        'cercetare': 'Articol științific / de cercetare',
+        'dezvoltare': 'Analiză și reflecție profesională'
+      };
+      var mapped = tipMap[draft.tip] || '';
+      if (mapped) tipEl.value = mapped;
+    }
+  }
+
+  async function incarcaDrafturi() {
+    var banner = document.getElementById('tr-drafts-banner');
+    var loading = document.getElementById('tr-drafts-loading');
+    var modSelector = document.getElementById('tr-mod-selector');
+    var btnDraft = document.getElementById('tr-mod-btn-draft');
+
+    // Verifică autentificare
+    var session = null;
+    try { session = await sb.auth.getSession(); } catch(e) {}
+    var user = session && session.data && session.data.session && session.data.session.user;
+
+    if (!user) {
+      // Nu e autentificat — ascunde butonul de draft, arată direct fișier
+      if (btnDraft) btnDraft.style.display = 'none';
+      selectModArticol('fisier');
+      return;
+    }
+
+    if (loading) loading.style.display = 'block';
+
+    try {
+      var r = await sb.from('articole_draft')
+        .select('id, tip, titlu_rapid, data, status, updated_at')
+        .eq('user_id', user.id)
+        .in('status', ['draft', 'editat', 'in_asteptare'])
+        .order('updated_at', { ascending: false });
+
+      if (loading) loading.style.display = 'none';
+
+      var drafts = r.data || [];
+
+      if (drafts.length === 0) {
+        // Fără draft-uri — ascunde butonul de draft, arată direct fișier
+        if (btnDraft) btnDraft.style.display = 'none';
+        selectModArticol('fisier');
+        return;
+      }
+
+      // Are draft-uri — afișează bannerul și lasă utilizatorul să aleagă
+      var listEl = document.getElementById('tr-drafts-list');
+      if (listEl) {
+        listEl.innerHTML = drafts.map(function(d) {
+          var titlu = d.titlu_rapid || (d.data && d.data.titlu) || 'Articol fără titlu';
+          var data = d.updated_at ? new Date(d.updated_at).toLocaleDateString('ro-RO') : '';
+          return '<div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--border);border-radius:6px;padding:12px 16px;gap:12px;">' +
+            '<div>' +
+              '<div style="font-weight:700;font-size:1rem;color:var(--ink);">' + titlu + '</div>' +
+              '<div style="font-size:1rem;color:var(--muted);margin-top:2px;">Ultima modificare: ' + data + '</div>' +
+            '</div>' +
+            '<button onclick="selectModArticol(\'draft\');selectDraft(' + JSON.stringify(d).replace(/"/g, '&quot;') + ')" ' +
+              'style="background:var(--crimson);color:#fff;border:none;padding:8px 18px;border-radius:4px;font-size:1rem;font-family:\'Source Serif 4\',serif;font-weight:600;cursor:pointer;white-space:nowrap;">Preia articolul</button>' +
+          '</div>';
+        }).join('');
+      }
+
+      if (banner) banner.style.display = 'block';
+
+    } catch(e) {
+      if (loading) loading.style.display = 'none';
+      if (btnDraft) btnDraft.style.display = 'none';
+      selectModArticol('fisier');
+    }
+
+    // Populează și lista din modul draft
+    try {
+      var r2 = await sb.from('articole_draft')
+        .select('id, tip, titlu_rapid, data, status, updated_at')
+        .eq('user_id', user.id)
+        .in('status', ['draft', 'editat', 'in_asteptare'])
+        .order('updated_at', { ascending: false });
+      var drafts2 = r2.data || [];
+      var draftListEl = document.getElementById('tr-draft-select-list');
+      if (draftListEl && drafts2.length > 0) {
+        draftListEl.innerHTML = drafts2.map(function(d) {
+          var titlu = d.titlu_rapid || (d.data && d.data.titlu) || 'Articol fără titlu';
+          var data = d.updated_at ? new Date(d.updated_at).toLocaleDateString('ro-RO') : '';
+          var statusLabel = { draft: 'Draft', editat: 'Editat', in_asteptare: 'În așteptare' }[d.status] || d.status;
+          return '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--paper);border:1px solid var(--border);border-radius:6px;padding:12px 16px;gap:12px;">' +
+            '<div>' +
+              '<div style="font-weight:700;font-size:1rem;color:var(--ink);">' + titlu + '</div>' +
+              '<div style="font-size:1rem;color:var(--muted);margin-top:2px;">' + statusLabel + ' · ' + data + '</div>' +
+            '</div>' +
+            '<button onclick="selectDraft(' + JSON.stringify(d).replace(/"/g, '&quot;') + ')" ' +
+              'style="background:var(--crimson);color:#fff;border:none;padding:8px 18px;border-radius:4px;font-size:1rem;font-family:\'Source Serif 4\',serif;font-weight:600;cursor:pointer;">Selectează</button>' +
+          '</div>';
+        }).join('');
+      }
+    } catch(e) {}
+  }
+
+  // Extinde showTab pentru a încărca draft-urile la deschiderea tab-ului trimitere
+  var _origShowTab2 = showTab;
+  showTab = function(id) {
+    _origShowTab2(id);
+    if (id === 'trimitere') {
+      incarcaDrafturi();
+    }
+  };
+
   // =====================
   // selectedFiles[i] = File object pentru articolul i (0-indexed), sau null
   var selectedFiles = [null, null, null];
@@ -1642,8 +1823,13 @@
     if (!email || !email.includes('@')) { setMsg(msg, 'error', '⚠ Introduceți o adresă de e-mail validă.'); return; }
     if (!sectiune) { setMsg(msg, 'error', '⚠ Selectați secțiunea tematică.'); return; }
     if (!tip)      { setMsg(msg, 'error', '⚠ Selectați tipul materialului.'); return; }
-    var missingFile = selectedFiles.some(function(f) { return !f; });
-    if (missingFile) { setMsg(msg, 'error', '⚠ Atașați câte un fișier pentru fiecare articol selectat.'); return; }
+    var missingFile = false;
+    if (trModArticol === 'draft') {
+      if (!trDraftSelectat) { setMsg(msg, 'error', '⚠ Selectează un articol din editor sau alege modul de încărcare fișier.'); return; }
+    } else {
+      missingFile = selectedFiles.some(function(f) { return !f; });
+      if (missingFile) { setMsg(msg, 'error', '⚠ Atașați câte un fișier pentru fiecare articol selectat.'); return; }
+    }
     if (!gdpr)     { setMsg(msg, 'error', '⚠ Bifați acordul pentru prelucrarea datelor.'); return; }
 
     btn.disabled = true;
@@ -1665,6 +1851,10 @@
     fd.append('tip_material',  tip);
     fd.append('nr_articole',   selectedFiles.filter(Boolean).length);
     fd.append('optiune_plata', optiunePlata);
+    if (trModArticol === 'draft' && trDraftSelectat) {
+      fd.append('draft_id', trDraftSelectat.id);
+      fd.append('titlu', trDraftSelectat.titlu_rapid || (trDraftSelectat.data && trDraftSelectat.data.titlu) || '');
+    }
 
     for (var i = 0; i < selectedFiles.length; i++) {
       if (selectedFiles[i]) fd.append('fisiere', selectedFiles[i]);
