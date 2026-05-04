@@ -967,9 +967,10 @@
       <!-- Banner draft-uri salvate (vizibil doar dacă utilizatorul e autentificat și are draft-uri) -->
       <div id="tr-drafts-banner" style="display:none;margin-bottom:16px;">
         <div style="background:#fff8e1;border:2px solid var(--gold);border-radius:8px;padding:20px 24px;">
-          <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:12px;">📝 Ai articole salvate în editorul online</div>
-          <div id="tr-drafts-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
-          <p style="font-size:1rem;color:var(--muted);line-height:1.5;">Selectează un articol pentru a-l prelua automat în formular, sau încarcă un fișier mai jos.</p>
+          <div style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:4px;" id="tr-drafts-titlu-banner">📝 Ai articole salvate în editorul online</div>
+          <div style="font-size:1rem;color:var(--muted);margin-bottom:16px;">Găsim mai jos toate articolele tale nefinalizate. Previzualizează-le înainte de a alege pe care să îl trimiți.</div>
+          <div id="tr-drafts-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;"></div>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.5;border-top:1px solid #e0c97a;padding-top:12px;">Preferi să trimiți un fișier formatat după template? Alege <strong>„📎 Încarcă fișier"</strong> de mai jos.</p>
         </div>
       </div>
 
@@ -1588,6 +1589,31 @@
     '</div>';
   }
 
+  function previzualizeazaDraft(idx) {
+    var drafts = window._trDraftsAll || [];
+    var draft = drafts[idx];
+    if (!draft) return;
+    trDraftSelectat = null; // nu e confirmat încă
+    var previewEl = document.getElementById('tr-draft-preview');
+    if (previewEl) {
+      previewEl.innerHTML = randDraftPreview(draft);
+      previewEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Modifică butonul de confirmare să seteze draft-ul corect
+      previewEl.querySelector('button[onclick="confirmaSelectareDraft()"]') && (previewEl.querySelector('button[onclick="confirmaSelectareDraft()"]').onclick = function() {
+        trDraftSelectat = draft;
+        confirmaSelectareDraft();
+      });
+    }
+  }
+
+  function selecteazaDraftDirect(idx) {
+    var drafts = window._trDraftsAll || [];
+    var draft = drafts[idx];
+    if (!draft) return;
+    trDraftSelectat = draft;
+    confirmaSelectareDraft();
+  }
+
   function confirmaSelectareDraft() {
     if (!trDraftSelectat) return;
     var data = trDraftSelectat.data || {};
@@ -1663,8 +1689,7 @@
         .select('id, tip, titlu_rapid, data, status, updated_at')
         .eq('user_id', user.id)
         .in('status', ['draft', 'editat', 'in_asteptare'])
-        .order('updated_at', { ascending: false })
-        .limit(1); // Cel mai recent draft
+        .order('updated_at', { ascending: false });
 
       if (loading) loading.style.display = 'none';
 
@@ -1678,22 +1703,48 @@
         return;
       }
 
-      // Are draft — afișează bannerul și previzualizarea automată
-      var draft = drafts[0];
-      trDraftSelectat = draft;
-
+      // Are draft-uri — afișează bannerul explicit cu toate
+      var tipMap2 = { practic: 'Practici educaționale și inovare didactică', cercetare: 'Cercetare și analiză în educație', dezvoltare: 'Dezvoltare educațională și profesională' };
       var listEl = document.getElementById('tr-drafts-list');
       if (listEl) {
-        var titlu = (draft.data && draft.data.titlu) || draft.titlu_rapid || 'Articol fără titlu';
-        var data = draft.updated_at ? new Date(draft.updated_at).toLocaleDateString('ro-RO') : '';
-        listEl.innerHTML = '<div style="font-size:1rem;color:var(--ink);">Am găsit un articol salvat în editor: <strong>' + titlu + '</strong> · Ultima modificare: ' + data + '</div>';
+        listEl.innerHTML = '<div style="font-size:1rem;color:var(--muted);font-style:italic;margin-bottom:8px;">Selectează articolul pe care vrei să îl trimiți. Poți previzualiza conținutul înainte de confirmare.</div>' +
+          drafts.map(function(d, i) {
+            var titlu = (d.data && d.data.titlu && d.data.titlu.trim()) ? d.data.titlu : null;
+            var subtitlu = (d.data && d.data.subtitlu && d.data.subtitlu.trim()) ? d.data.subtitlu : null;
+            var tip = tipMap2[d.tip] || d.tip || '—';
+            var dataStr = d.updated_at ? new Date(d.updated_at).toLocaleDateString('ro-RO', {day:'2-digit',month:'long',year:'numeric'}) : '';
+            var autori = ((d.data && d.data.autori) || []).map(function(a) {
+              return [a.prenume, a.nume].filter(Boolean).join(' ');
+            }).filter(Boolean).join(', ');
+            return '<div style="background:#fff;border:1px solid var(--border);border-left:4px solid var(--crimson);border-radius:6px;padding:16px 20px;">' +
+              '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
+                '<div style="flex:1;">' +
+                  '<div style="font-size:0.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--crimson);margin-bottom:5px;">Articolul ' + (i+1) + ' din ' + drafts.length + ' · ' + tip + '</div>' +
+                  '<div style="font-weight:700;font-size:1rem;color:var(--ink);">' + (titlu || '<em style="color:var(--muted);font-weight:400;">Fără titlu</em>') + '</div>' +
+                  (subtitlu ? '<div style="font-size:1rem;color:var(--muted);margin-top:2px;font-style:italic;">' + subtitlu + '</div>' : '') +
+                  (autori ? '<div style="font-size:1rem;color:var(--ink);margin-top:4px;">✍ ' + autori + '</div>' : '') +
+                  '<div style="font-size:1rem;color:var(--muted);margin-top:4px;">🕐 Ultima modificare: ' + dataStr + '</div>' +
+                '</div>' +
+                '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">' +
+                  '<button onclick="previzualizeazaDraft(' + i + ')" style="background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);padding:8px 16px;border-radius:4px;font-size:1rem;font-family:\'Source Serif 4\',serif;font-weight:600;cursor:pointer;white-space:nowrap;">👁 Previzualizează</button>' +
+                  '<button onclick="selecteazaDraftDirect(' + i + ')" style="background:var(--crimson);color:#fff;border:none;padding:8px 16px;border-radius:4px;font-size:1rem;font-family:\'Source Serif 4\',serif;font-weight:600;cursor:pointer;white-space:nowrap;">✅ Trimite acesta</button>' +
+                '</div>' +
+              '</div>' +
+            '</div>';
+          }).join('');
       }
-      if (banner) banner.style.display = 'block';
 
-      // Afișează previzualizarea în zona de draft
+      window._trDraftsAll = drafts;
+
+      // Actualizează titlul bannerului cu numărul exact
+      var titluBanner = document.getElementById('tr-drafts-titlu-banner');
+      if (titluBanner) titluBanner.innerHTML = '📝 Ai ' + drafts.length + (drafts.length === 1 ? ' articol salvat' : ' articole salvate') + ' în editorul online';
+
+      if (banner) banner.style.display = 'block';
+      // Nu selectăm automat — lăsăm utilizatorul să aleagă
       selectModArticol('draft');
       var previewEl = document.getElementById('tr-draft-preview');
-      if (previewEl) previewEl.innerHTML = randDraftPreview(draft);
+      if (previewEl) previewEl.innerHTML = '';
 
     } catch(e) {
       if (loading) loading.style.display = 'none';
