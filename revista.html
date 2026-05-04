@@ -962,45 +962,41 @@
         <h2>Trimite un articol</h2>
         <div class="panel-header-line"></div>
       </div>
-      <!-- Ghid pas cu pas -->
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:24px;">
 
-        <div onclick="trScrollTo('tr-articol-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
-          <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">1</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Pregătește articolul</div>
-            <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Redactează-l în editorul online de pe site sau descarcă template-ul și completează-l în Word.</div>
+      <!-- Introducere editorială -->
+      <div class="panel-intro" style="margin-bottom:12px;">
+        <strong style="color:var(--crimson);">Trimite materialul tău către Revista Dokimasia.</strong> Materialele transmise sunt analizate editorial înainte de publicare, din perspectiva încadrării tematice, a clarității, a originalității și a respectării cerințelor de redactare.
+      </div>
+      <div style="background:#fff3f3;border-left:3px solid var(--crimson);padding:10px 16px;border-radius:0 4px 4px 0;margin-bottom:24px;font-size:1rem;color:var(--ink);line-height:1.5;">
+        ⚠ <strong>Publicarea nu este automată.</strong> Acceptarea spre publicare se realizează numai după analiza editorială.
+      </div>
+
+      <!-- Pasul 1: Alege modul de trimitere -->
+      <div class="form-section" id="tr-mod-alegere-section">
+        <div class="form-section-title">Pasul 1. Alege modul de trimitere</div>
+        <p style="font-size:1rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Poți redacta articolul direct pe site, în editorul online, sau poți încărca un fișier deja pregătit în format editabil.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+          <!-- Card 1: Editor online -->
+          <a href="editor-articol.html" style="text-decoration:none;">
+            <div style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:24px 20px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='var(--crimson)';this.style.background='#fff3f3'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--paper-dark)'">
+              <div style="font-size:1.6rem;">✏️</div>
+              <div style="font-weight:700;font-size:1rem;color:var(--ink);">Scriu articolul în editorul online</div>
+              <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Redactează materialul direct pe site, într-un format ghidat, potrivit pentru Revista Dokimasia.</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 20px;border-radius:4px;font-size:1rem;font-weight:600;margin-top:4px;width:fit-content;">Deschide editorul online →</div>
+            </div>
+          </a>
+
+          <!-- Card 2: Încarcă fișier -->
+          <div onclick="trAlegereMod('fisier')" style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:24px 20px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box;cursor:pointer;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='var(--crimson)';this.style.background='#fff3f3'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--paper-dark)'">
+            <div style="font-size:1.6rem;">📎</div>
+            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Încarc articolul redactat</div>
+            <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Trimite un fișier pregătit anterior, în format editabil, pentru analiza editorială.</div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;padding:10px 20px;border-radius:4px;font-size:1rem;font-weight:600;margin-top:4px;width:fit-content;">Continui cu încărcarea fișierului →</div>
           </div>
-          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
-        </div>
 
-        <div onclick="trScrollTo('tr-date-autor-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
-          <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">2</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Completează datele tale</div>
-            <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Nume, instituție, funcție și date de contact — necesare pentru publicare.</div>
-          </div>
-          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
         </div>
-
-        <div onclick="trScrollTo('tr-pachet-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
-          <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">3</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Alege pachetul și plătește</div>
-            <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Poți plăti acum cu cardul sau poți trimite articolul mai întâi și achita ulterior.</div>
-          </div>
-          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
-        </div>
-
-        <div onclick="trScrollTo('tr-submit-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
-          <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">4</div>
-          <div style="flex:1;">
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Trimite</div>
-            <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Redacția confirmă primirea și te contactează cu pașii următori.</div>
-          </div>
-          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
-        </div>
-
       </div>
 
       <!-- Banner draft-uri salvate (vizibil doar dacă utilizatorul e autentificat și are draft-uri) -->
@@ -1015,9 +1011,13 @@
 
       <!-- Mesaj încărcare draft-uri -->
       <div id="tr-drafts-loading" style="display:none;color:var(--muted);font-size:1rem;font-style:italic;margin-bottom:12px;">⏳ Se verifică articolele salvate...</div>
+
+      <!-- Restul formularului — ascuns până la alegerea modului -->
+      <div id="tr-form-rest" style="display:none;">
+
       <div id="tr-step1">
         <div class="form-section" id="tr-pachet-section">
-          <div class="form-section-title">Pasul 1 — Selectează numărul de articole</div>
+          <div class="form-section-title">Pasul 2. Alege contribuția editorială</div>
           <div class="tr-pachete">
             <div class="tr-pachet" onclick="selectPachet(1)" id="pach-1">
               <div class="tr-pach-nr">1 articol</div>
@@ -1032,16 +1032,15 @@
               <div class="tr-pach-pret">100 <span>lei</span></div>
             </div>
           </div>
+          <p style="font-size:1rem;color:var(--muted);line-height:1.5;margin-top:14px;padding:12px 16px;background:var(--paper-dark);border-radius:4px;">Contribuția acoperă procesarea editorială, tehnoredactarea și administrarea materialelor transmise. Publicarea nu este garantată prin achitarea contribuției; acceptarea se face numai după analiza editorială.</p>
         </div>
-
-
       </div>
 
-      <!-- PASUL 3: Formular trimitere (vizibil după selectarea pachetului) -->
+      <!-- Formular trimitere (vizibil după selectarea pachetului) -->
       <div id="trimitereForm" style="display:none;margin-top:8px;">
 
         <div class="form-section" id="tr-date-autor-section">
-          <div class="form-section-title">Pasul 3 — Date autor</div>
+          <div class="form-section-title">Pasul 3. Datele autorului</div>
           <!-- Notificare date salvate -->
           <div id="autor-saved-notif" style="display:none;align-items:center;justify-content:space-between;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:10px 14px;margin-bottom:16px;font-size:0.87rem;color:#5d4037;transition:opacity 0.5s;">
             <span>💾 Datele tale au fost completate automat din vizita anterioară.</span>
@@ -1084,7 +1083,7 @@
         </div>
 
         <div class="form-section">
-          <div class="form-section-title">Pasul 4 — Detalii despre material</div>
+          <div class="form-section-title">Pasul 4. Date despre material</div>
           <div class="form-row-2">
             <div class="fld-group">
               <label class="fld-label">Secțiunea tematică <span class="req">*</span></label>
@@ -1121,7 +1120,7 @@
         </div>
 
         <div class="form-section" id="tr-articol-section">
-          <div class="form-section-title">Pasul 5 — Articolul tău</div>
+          <div class="form-section-title">Pasul 5. Încarcă articolul</div>
 
           <!-- Selector mod: draft sau fișier -->
           <div style="display:flex;gap:8px;margin-bottom:16px;" id="tr-mod-selector">
@@ -1256,7 +1255,10 @@
           <span style="font-size:1rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare"></span>
         </div>
 
-        <div id="tr-submit-section" style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="margin-top:8px;" id="tr-confirmare-section">
+          <div class="form-section-title">Pasul 6. Confirmare și trimitere</div>
+        </div>
+        <div id="tr-submit-section" style="margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <button id="btnTrimite" onclick="trimitereArticol()" disabled
             style="display:inline-flex;align-items:center;gap:10px;background:#aaa;color:#fff;padding:14px 36px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:not-allowed;transition:background 0.2s;opacity:0.7;"
             title="Confirmați mai întâi opțiunea de plată">
@@ -1266,6 +1268,7 @@
           <span id="trimitereMsg" style="font-size:1rem;"></span>
         </div>
       </div>
+      </div><!-- /tr-form-rest -->
 
       <!-- Succes final -->
       <div id="trimitereSuccess" style="display:none;text-align:center;padding:48px 20px;">
@@ -1556,6 +1559,19 @@
       ppRendered = true
       for (var i = 1; i <= 5; i++) renderPPButton(i)
     }
+  }
+
+  function trAlegereMod(mod) {
+    // Afișează restul formularului
+    var formRest = document.getElementById('tr-form-rest');
+    if (formRest) formRest.style.display = 'block';
+    // Setează modul articol
+    selectModArticol(mod);
+    // Scroll la pasul 2
+    setTimeout(function() {
+      var el = document.getElementById('tr-pachet-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
   function trScrollTo(sectionId) {
@@ -2068,6 +2084,8 @@
     document.getElementById('tr-plata-confirmare').textContent = '';
     document.getElementById('trimitereForm').style.display = 'none';
     document.getElementById('trimitereSuccess').style.display = 'none';
+    var formRest = document.getElementById('tr-form-rest');
+    if (formRest) formRest.style.display = 'none';
   }
 
 
