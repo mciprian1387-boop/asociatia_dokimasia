@@ -58,17 +58,92 @@
     .revista-subnav .subnav-btn.active { border-bottom-color:var(--crimson); background:#fdf9f4; }
 
     /* HERO */
-    .revista-hero {
-      background:var(--paper-dark);
-      border-bottom:1px solid var(--border);
-      padding:36px 40px 30px;
+    @keyframes heroShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    .revista-hero-inner { max-width:720px; margin:0 auto; text-align:center; }
-    .revista-hero-label { display:block; font-size:0.68rem; letter-spacing:3.5px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
-    .revista-hero h1 { font-family:'Source Serif 4',Georgia,serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:900; color:var(--crimson); line-height:1.15; margin-bottom:6px; }
-    .revista-hero-subtitle { font-size:0.98rem; color:var(--muted); font-style:italic; margin-bottom:14px; line-height:1.5; }
-    .revista-hero-desc { font-size:0.97rem; color:var(--ink); line-height:1.55; margin-bottom:22px; text-align:center; max-width:580px; margin-left:auto; margin-right:auto; }
-    .revista-hero-buttons { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .revista-hero {
+      position: relative;
+      background: linear-gradient(120deg, #f7f3eb 0%, #faf8f4 45%, #f2ede3 80%, #f5f0e8 100%);
+      background-size: 280% 280%;
+      animation: heroShift 22s ease infinite;
+      border-bottom: 1px solid var(--border);
+      padding: 20px 40px 18px;
+      overflow: hidden;
+    }
+    /* Linii orizontale fine — fundal academic discret */
+    .revista-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 28px,
+        rgba(139,0,0,0.032) 28px,
+        rgba(139,0,0,0.032) 29px
+      );
+      pointer-events: none;
+    }
+    /* Linie aurie verticală stânga — ornament editorial */
+    .revista-hero::after {
+      content: '';
+      position: absolute; left: 0; top: 15%; bottom: 15%;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, var(--gold) 30%, var(--gold) 70%, transparent);
+      opacity: 0.45;
+    }
+    .revista-hero-inner {
+      max-width: 640px; margin: 0 auto; text-align: center;
+      position: relative; z-index: 1;
+    }
+    .revista-hero-label {
+      display: block; font-size: 0.62rem; letter-spacing: 3.5px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 7px;
+    }
+    .revista-hero h1 {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: clamp(1.5rem, 3.2vw, 2.15rem);
+      font-weight: 900; color: var(--crimson);
+      line-height: 1.12; margin-bottom: 3px;
+    }
+    .revista-hero-subtitle {
+      font-size: 0.88rem; color: var(--muted);
+      font-style: italic; margin-bottom: 9px; line-height: 1.4;
+    }
+    .revista-hero-divider {
+      width: 36px; height: 2px; background: var(--gold);
+      margin: 0 auto 9px; border-radius: 2px;
+    }
+    .revista-hero-desc {
+      font-size: 0.9rem; color: var(--ink); line-height: 1.6;
+      margin-bottom: 14px; text-align: center;
+      max-width: 500px; margin-left: auto; margin-right: auto;
+      opacity: 0.85;
+    }
+    .revista-hero-buttons { display: flex; gap: 9px; justify-content: center; flex-wrap: wrap; }
+    .hero-btn-primary {
+      background: var(--crimson); color: #fff; border: none;
+      padding: 8px 20px; border-radius: 4px;
+      font-size: 0.87rem; font-family: 'Source Serif 4', serif; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; letter-spacing: 0.2px;
+    }
+    .hero-btn-primary:hover { background: var(--crimson-dark); }
+    .hero-btn-secondary {
+      background: transparent; color: var(--crimson);
+      border: 1.5px solid var(--crimson);
+      padding: 8px 20px; border-radius: 4px;
+      font-size: 0.87rem; font-family: 'Source Serif 4', serif; font-weight: 700;
+      cursor: pointer; transition: background 0.2s, color 0.2s; letter-spacing: 0.2px;
+    }
+    .hero-btn-secondary:hover { background: var(--crimson); color: #fff; }
+    @media (max-width: 768px) {
+      .revista-hero { padding: 14px 16px 12px; }
+      .revista-hero h1 { font-size: 1.4rem; }
+      .revista-hero-desc { font-size: 0.87rem; }
+      .revista-hero-buttons { gap: 7px; }
+      .hero-btn-primary, .hero-btn-secondary { padding: 8px 16px; font-size: 0.84rem; width: 100%; text-align: center; }
+    }
 
     /* ADMIN BAR */
     .admin-bar { display:none; background:#111; color:#fff; padding:9px 24px; align-items:center; justify-content:space-between; font-size:0.82rem; }
@@ -414,9 +489,6 @@
       .despre-cols-grid { grid-template-columns:1fr !important; }
       .pub-tipuri-grid { grid-template-columns:1fr 1fr !important; }
       .pub-beneficii-grid { grid-template-columns:1fr !important; }
-      .revista-hero { padding:18px 16px 14px; }
-      .revista-hero-inner { grid-template-columns:1fr; gap:20px; }
-      .hero-cover-placeholder { height:160px; }
       .info-tabs { grid-template-columns:repeat(2,1fr); }
       .info-tab:nth-child(4n) { border-right:1px solid var(--border); }
       .info-tab:nth-child(2n) { border-right:none; }
@@ -600,10 +672,11 @@
     <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
     <h1>Revista Dokimasia</h1>
     <p class="revista-hero-subtitle">Inovație și perspective în educație</p>
+    <div class="revista-hero-divider"></div>
     <p class="revista-hero-desc">Revista Dokimasia este o publicație educațională interdisciplinară, dedicată promovării articolelor, studiilor, resurselor educaționale și exemplelor de bună practică din domeniul educației.</p>
     <div class="revista-hero-buttons">
-      <button onclick="showTab('publicare')" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:4px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol</button>
-      <button onclick="showTab('ghid')" style="background:transparent;color:var(--crimson);border:2px solid var(--crimson);padding:12px 28px;border-radius:4px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;transition:background 0.2s,color 0.2s;" onmouseover="this.style.background='var(--crimson)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='var(--crimson)'">Consultă ghidul pentru autori</button>
+      <button class="hero-btn-primary" onclick="showTab('publicare')">Trimite un articol</button>
+      <button class="hero-btn-secondary" onclick="showTab('ghid')">Consultă ghidul pentru autori</button>
     </div>
   </div>
 </div>
