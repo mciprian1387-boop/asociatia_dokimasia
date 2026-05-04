@@ -1393,7 +1393,8 @@
       '<div class="faq-a">' + f[1] + '</div>' +
     '</div>'
   }).join('')
-  document.getElementById('faqList').innerHTML = faqHtml
+  var faqEl = document.getElementById('faqList')
+  if (faqEl) faqEl.innerHTML = faqHtml
 
   function toggleFaq(i) {
     document.getElementById('faq-' + i).classList.toggle('open')
@@ -1424,16 +1425,18 @@
 
   function adjustAmount(id, delta) {
     ppAmounts[id] += delta
-    document.getElementById('disp-' + id).textContent = ppAmounts[id]
-    document.getElementById('pp-btn-' + id).innerHTML = ''
-    renderPPButton(id)
+    var dispEl = document.getElementById('disp-' + id)
+    var ppEl = document.getElementById('pp-btn-' + id)
+    if (dispEl) dispEl.textContent = ppAmounts[id]
+    if (ppEl) { ppEl.innerHTML = ''; renderPPButton(id) }
   }
 
   function resetAmount(id, base) {
     ppAmounts[id] = base
-    document.getElementById('disp-' + id).textContent = base
-    document.getElementById('pp-btn-' + id).innerHTML = ''
-    renderPPButton(id)
+    var dispEl = document.getElementById('disp-' + id)
+    var ppEl = document.getElementById('pp-btn-' + id)
+    if (dispEl) dispEl.textContent = base
+    if (ppEl) { ppEl.innerHTML = ''; renderPPButton(id) }
   }
 
   function renderPPButton(id) {
@@ -1461,8 +1464,8 @@
         })
       },
       onError: function(err) {
-        document.getElementById('pp-btn-' + id).innerHTML =
-          '<div class="pp-msg error">A apărut o eroare. Încearcă din nou.</div>'
+        var ppEl = document.getElementById('pp-btn-' + id)
+        if (ppEl) ppEl.innerHTML = '<div class="pp-msg error">A apărut o eroare. Încearcă din nou.</div>'
         console.error(err)
       }
     }).render('#pp-btn-' + id)
