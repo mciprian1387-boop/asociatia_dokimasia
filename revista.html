@@ -428,7 +428,30 @@
       .doc-list { grid-template-columns:1fr; }
     }
 
-    /* PayPal SDK styles */
+    /* GHID AUTORI — acordeon */
+    .ghid-item { border:1px solid var(--border); border-radius:4px; overflow:hidden; background:#fff; }
+    .ghid-btn {
+      width:100%; display:flex; align-items:center; justify-content:space-between;
+      background:var(--paper-dark); border:none; padding:13px 18px;
+      font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700;
+      color:var(--ink); cursor:pointer; text-align:left; gap:12px;
+      transition:background 0.2s;
+    }
+    .ghid-btn:hover { background:#f0ece4; }
+    .ghid-btn[aria-expanded="true"] { border-bottom:1px solid var(--border); }
+    .ghid-litera { color:var(--crimson); margin-right:4px; }
+    .ghid-arrow { color:var(--crimson); font-size:0.9rem; flex-shrink:0; transition:transform 0.2s; }
+    .ghid-btn[aria-expanded="true"] .ghid-arrow { transform:rotate(180deg); }
+    .ghid-body { display:none; padding:14px 18px; font-size:0.97rem; line-height:1.65; color:var(--ink); }
+    .ghid-body.open { display:block; }
+    .ghid-body p { margin-bottom:0; }
+    .ghid-lista { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px; }
+    .ghid-lista li { display:flex; align-items:flex-start; gap:8px; font-size:0.97rem; color:var(--ink); line-height:1.55; }
+    .ghid-lista li::before { content:''; display:block; width:5px; height:5px; background:var(--gold); border-radius:50%; flex-shrink:0; margin-top:8px; }
+    .ghid-nota { font-size:0.88rem; color:var(--muted); font-style:italic; margin-top:10px !important; padding-top:10px; border-top:1px dashed var(--border); }
+    /* Flux editorial */
+    .ghid-etapa { background:var(--paper-dark); border:1px solid var(--border); border-radius:3px; padding:5px 11px; font-size:0.82rem; font-weight:600; color:var(--ink); white-space:nowrap; margin:4px 0; }
+    .ghid-etapa-arrow { display:flex; align-items:center; padding:0 4px; color:var(--muted); font-size:0.85rem; margin:4px 0; }
     .t-adjust { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:12px 0 10px; }
     .t-adj-btn { font-size:0.72rem; font-family:'Source Serif 4',serif; font-weight:600; padding:4px 10px; border-radius:2px; cursor:pointer; border:1px solid var(--crimson); color:var(--crimson); background:transparent; transition:background 0.15s, color 0.15s; }
     .t-adj-btn:hover { background:var(--crimson); color:#fff; }
@@ -746,198 +769,139 @@
       <div class="panel-header">
         <h2>Ghid pentru autori</h2>
         <div class="panel-header-line"></div>
-        <div class="panel-intro">
-          Revista Dokimasia publică lucrări originale din domeniul educației și din ariile conexe acesteia. Materialele transmise trebuie să fie originale, să nu fi fost publicate anterior și să nu fie în curs de evaluare în cadrul altor publicații.
-        </div>
       </div>
 
-      <!-- Precizare vizibilă — opțiuni de trimitere -->
-      <div style="background:var(--paper-dark);border:2px solid var(--crimson);border-radius:8px;padding:24px 28px;margin-bottom:16px;">
-        <div style="font-size:1rem;font-weight:700;color:var(--crimson);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;">📌 Cum îți poți trimite materialul?</div>
-        <div style="display:flex;flex-direction:column;gap:16px;">
+      <p style="font-size:1.02rem;line-height:1.65;color:var(--ink);margin-bottom:28px;">
+        Ghidul pentru autori stabilește principalele cerințe privind redactarea, originalitatea și transmiterea materialelor către Revista Dokimasia. Respectarea acestor indicații facilitează procesul editorial și contribuie la publicarea unor materiale clare, coerente și relevante pentru domeniul educației.
+      </p>
 
-          <div style="display:flex;align-items:flex-start;gap:16px;">
-            <div style="font-size:1.6rem;flex-shrink:0;">✏️</div>
-            <div style="flex:1;">
-              <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:4px;">Editare online, asistată de AI</div>
-              <div style="font-size:1rem;line-height:1.5;color:var(--ink);">Redactează-ți articolul direct pe site, folosind editorul nostru online. Ești ghidat pas cu pas de un asistent AI care te ajută să structurezi și să formatezi corect materialul.</div>
-              <a href="editor-articol.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--crimson);color:#fff;padding:10px 22px;border-radius:4px;font-size:1rem;font-weight:600;font-family:'Source Serif 4',serif;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editează online</a>
-            </div>
-          </div>
+      <!-- Subsecțiuni ghid — acordeon compact -->
+      <div class="ghid-acordeon" style="display:flex;flex-direction:column;gap:6px;margin-bottom:28px;">
 
-          <div style="border-top:1px solid var(--border);"></div>
-
-          <div style="display:flex;align-items:flex-start;gap:16px;">
-            <div style="font-size:1.6rem;flex-shrink:0;">📄</div>
-            <div style="flex:1;">
-              <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:4px;">Trimite document formatat după template</div>
-              <div style="font-size:1rem;line-height:1.5;color:var(--ink);">Descarcă template-ul oficial al revistei, completează-l respectând cerințele de formatare și trimite-l prin formularul de trimitere articole.</div>
-              <a href="template_general.docx" download style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--ink);color:#fff;padding:10px 22px;border-radius:4px;font-size:1rem;font-weight:600;font-family:'Source Serif 4',serif;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--ink)'">⬇ Descarcă template</a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-      <div class="sec-card">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">📝</div>
-          <div>
-            <div class="sec-card-title">Tipologia lucrărilor</div>
-            <div class="sec-card-subtitle">Revista acceptă, în funcție de specificul contribuției, următoarele tipuri de lucrări</div>
+        <!-- A -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="true">
+            <span><span class="ghid-litera">A.</span> Originalitatea materialului</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body open">
+            <p>Materialele transmise trebuie să fie originale, să nu fi fost publicate anterior și să nu fie în curs de evaluare în cadrul altor publicații. Autorul își asumă responsabilitatea pentru conținutul articolului, pentru corectitudinea informațiilor, pentru respectarea normelor de citare și pentru utilizarea etică a surselor.</p>
           </div>
         </div>
-        <div class="sec-card-body">
-          <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;display:grid;grid-template-columns:1fr 1fr;gap:0 24px;">
-            <li>Articole de specialitate</li>
-            <li>Studii și cercetări educaționale</li>
-            <li>Articole teoretice</li>
-            <li>Articole metodologice</li>
-            <li>Sinteze tematice</li>
-            <li>Articole de tip review</li>
-            <li>Studii de caz</li>
-            <li>Analize educaționale</li>
-            <li>Analize instituționale</li>
-            <li>Analize de politici educaționale</li>
-            <li>Materiale metodice</li>
-            <li>Ghiduri metodice</li>
-            <li>Auxiliare curriculare</li>
-            <li>Suporturi educaționale</li>
-            <li>Planuri de lecție</li>
-            <li>Scenarii didactice</li>
-            <li>Proiecte didactice</li>
-            <li>Fișe de lucru</li>
-            <li>Instrumente de evaluare</li>
-            <li>Exemple de bună practică</li>
-            <li>Intervenții educaționale</li>
-            <li>Activități remediale</li>
-            <li>Resurse educaționale</li>
-            <li>Resurse digitale</li>
-            <li>Articole de reflecție profesională</li>
-            <li>Eseuri educaționale</li>
-            <li>Comunicări scurte</li>
-            <li>Rapoarte de activitate</li>
-            <li>Rapoarte de implementare</li>
-            <li>Prezentări de proiecte</li>
-            <li>Materiale Erasmus+</li>
-            <li>Materiale de diseminare</li>
-            <li>Interviuri</li>
-            <li>Recenzii de carte și resurse</li>
-            <li>Alte materiale relevante</li>
-          </ul>
-          <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);">Încadrarea lucrărilor în ariile tematice ale revistei se realizează de către redacție, în funcție de conținutul acestora.</p>
-        </div>
-      </div>
 
-      <!-- Structura -->
-      <div class="sec-card" style="margin-bottom:0;">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">🏗️</div>
-          <div>
-            <div class="sec-card-title">Structura lucrărilor</div>
-            <div class="sec-card-subtitle">Structura trebuie să fie adecvată tipului de contribuție și să asigure coerența demersului</div>
-          </div>
-        </div>
-        <div class="sec-card-body">
-          <div style="display:flex;flex-direction:column;gap:8px;">
-
-            <div style="background:var(--paper);border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px;">
-              <div style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Practici educaționale și inovare didactică</div>
-              <ol style="margin-left:1.2em;font-size:1rem;line-height:1.5;color:var(--ink);">
-                <li>Introducere și context</li>
-                <li>Descrierea demersului didactic</li>
-                <li>Rezultate și observații</li>
-                <li>Concluzii și recomandări</li>
-              </ol>
-              <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.5;">Planuri de lecție, materiale metodice, resurse educaționale și exemple de bună practică.</p>
-              <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-                <a href="editor-articol.html?tip=practic" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
-                <a href="template_practic.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
-              </div>
-            </div>
-
-            <div style="background:var(--paper);border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px;">
-              <div style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Cercetare și analiză în educație</div>
-              <ol style="margin-left:1.2em;font-size:1rem;line-height:1.5;color:var(--ink);">
-                <li>Introducere și fundamentare teoretică</li>
-                <li>Metodologie</li>
-                <li>Rezultate și analiză</li>
-                <li>Concluzii și implicații</li>
-              </ol>
-              <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.5;">Studii, cercetări, articole teoretice și analize de tip academic.</p>
-              <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-                <a href="editor-articol.html?tip=cercetare" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
-                <a href="template_cercetare.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
-              </div>
-            </div>
-
-            <div style="background:var(--paper);border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px;">
-              <div style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Dezvoltare educațională și profesională</div>
-              <ol style="margin-left:1.2em;font-size:1rem;line-height:1.5;color:var(--ink);">
-                <li>Introducere și context</li>
-                <li>Descrierea intervenției / proiectului / analizei</li>
-                <li>Rezultate și observații</li>
-                <li>Concluzii și implicații</li>
-              </ol>
-              <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.5;">Proiecte educaționale, studii de caz, analize instituționale și reflecții profesionale.</p>
-              <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
-                <a href="editor-articol.html?tip=dezvoltare" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
-                <a href="template_dezvoltare.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Cerințe + Etică + Precizări — o coloană -->
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-
-        <div class="sec-card" style="margin-bottom:0;">
-          <div class="sec-card-header">
-            <div class="sec-card-icon">✏️</div>
-            <div><div class="sec-card-title">Cerințe de redactare</div></div>
-          </div>
-          <div class="info-card-body">
-            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-bottom:10px;">Materialele transmise spre publicare trebuie să respecte următoarele cerințe de formatare, pentru a facilita procesul editorial și a asigura uniformitatea publicației:</p>
-            <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;">
-              <li>Format editabil (.doc / .docx) sau editor online</li>
-              <li>Font Times New Roman, 12 pt</li>
-              <li>Spațiere 1.5</li>
-              <li>Aliniere justify</li>
-              <li>Diacritice obligatorii</li>
-              <li>Titluri evidențiate clar</li>
+        <!-- B -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="false">
+            <span><span class="ghid-litera">B.</span> Structura recomandată a articolului</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body">
+            <p style="margin-bottom:10px;">Pentru o structură clară și coerentă, materialele pot include:</p>
+            <ul class="ghid-lista">
+              <li>Titlul articolului</li>
+              <li>Numele autorului / autorilor</li>
+              <li>Instituția de afiliere</li>
+              <li>Rezumat</li>
+              <li>Cuvinte-cheie</li>
+              <li>Conținutul propriu-zis</li>
+              <li>Concluzii</li>
+              <li>Bibliografie</li>
             </ul>
-            <p style="font-size:1rem;color:var(--ink);margin-top:8px;line-height:1.5;">Toate materialele acceptate vor fi tehnoredactate de redacție.</p>
+            <p class="ghid-nota">Structura poate varia în funcție de tipul contribuției. Redacția poate oferi indicații suplimentare la cerere.</p>
           </div>
         </div>
 
-        <div class="sec-card" style="margin-bottom:0;">
-          <div class="sec-card-header">
-            <div class="sec-card-icon">⚖️</div>
-            <div><div class="sec-card-title">Etică și originalitate</div></div>
-          </div>
-          <div class="info-card-body">
-            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Autorii au responsabilitatea de a transmite lucrări originale și de a respecta normele de etică academică. Lucrările trebuie să reflecte contribuția proprie și să includă indicarea corectă a surselor utilizate.</p>
-            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-top:6px;">Nu sunt acceptate materiale plagiate sau preluări neasumate.</p>
-          </div>
-        </div>
-
-        <div class="sec-card" style="margin-bottom:0;">
-          <div class="sec-card-header">
-            <div class="sec-card-icon">📌</div>
-            <div><div class="sec-card-title">Precizări finale</div></div>
-          </div>
-          <div class="info-card-body">
-            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Lucrările trebuie să se încadreze în profilul și ariile tematice ale revistei. Redacția își rezervă dreptul de a decide încadrarea contribuțiilor și de a solicita clarificări.</p>
+        <!-- C -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="false">
+            <span><span class="ghid-litera">C.</span> Cerințe de redactare</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body">
+            <p style="margin-bottom:10px;">Materialele trebuie redactate clar, coerent și îngrijit, cu respectarea normelor gramaticale și ortografice. Se recomandă utilizarea diacriticelor, structurarea textului pe secțiuni și menținerea unei formatări unitare.</p>
+            <ul class="ghid-lista">
+              <li>Redactare în limba română, cu diacritice</li>
+              <li>Font Times New Roman, 12 pt; spațiere 1,5; aliniere justify</li>
+              <li>Titluri și subtitluri marcate clar</li>
+              <li>Format editabil: <strong>.doc</strong> / <strong>.docx</strong> sau editor online</li>
+              <li>Evitarea textelor copiate sau generate automat fără verificare și asumare de autor</li>
+            </ul>
+            <p class="ghid-nota">Toate materialele acceptate vor fi tehnoredactate de redacție.</p>
           </div>
         </div>
 
+        <!-- D -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="false">
+            <span><span class="ghid-litera">D.</span> Dimensiunea materialului</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body">
+            <p>Dimensiunea materialului poate varia în funcție de tipul contribuției. Articolele, studiile și materialele metodice trebuie să fie suficient de dezvoltate pentru a susține ideile prezentate, dar redactate într-o formă clară și concisă.</p>
+          </div>
+        </div>
+
+        <!-- E -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="false">
+            <span><span class="ghid-litera">E.</span> Citare și bibliografie</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body">
+            <p style="margin-bottom:10px;">Sursele utilizate trebuie indicate în mod clar, iar bibliografia se include la finalul materialului. Autorii trebuie să evite preluarea unor fragmente, idei sau imagini fără menționarea sursei.</p>
+            <ul class="ghid-lista">
+              <li>Citările trebuie să fie clare și verificabile</li>
+              <li>Bibliografia se plasează la finalul materialului</li>
+              <li>Preluarea fără sursa indicată nu este acceptată</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- F -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="false">
+            <span><span class="ghid-litera">F.</span> Procesul editorial</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body">
+            <p style="margin-bottom:10px;">Materialele transmise sunt analizate editorial din perspectiva relevanței, coerenței, originalității și respectării cerințelor de redactare. Redacția poate solicita clarificări sau revizuiri înainte de publicare.</p>
+            <div style="display:flex;gap:0;flex-wrap:wrap;margin-top:6px;">
+              <div class="ghid-etapa">Primire material</div>
+              <div class="ghid-etapa-arrow">→</div>
+              <div class="ghid-etapa">Verificare editorială</div>
+              <div class="ghid-etapa-arrow">→</div>
+              <div class="ghid-etapa">Revizuire (dacă e cazul)</div>
+              <div class="ghid-etapa-arrow">→</div>
+              <div class="ghid-etapa">Acceptare</div>
+              <div class="ghid-etapa-arrow">→</div>
+              <div class="ghid-etapa">Publicare</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- G -->
+        <div class="ghid-item">
+          <button class="ghid-btn" onclick="toggleGhid(this)" aria-expanded="false">
+            <span><span class="ghid-litera">G.</span> Responsabilitatea autorului</span>
+            <span class="ghid-arrow">▾</span>
+          </button>
+          <div class="ghid-body">
+            <p>Autorul își asumă integral conținutul materialului transmis, inclusiv corectitudinea informațiilor, utilizarea surselor, drepturile asupra imaginilor și respectarea normelor etice. Redacția își rezervă dreptul de a respinge materialele care nu respectă cerințele editoriale.</p>
+          </div>
+        </div>
+
+      </div><!-- /ghid-acordeon -->
+
+      <!-- CTA spre Publicare -->
+      <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:4px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:700;color:var(--ink);font-size:1rem;margin-bottom:3px;">Ești pregătit să trimiți un material?</div>
+          <div style="font-size:0.92rem;color:var(--muted);">Accesează secțiunea „Publicare" pentru formularul de trimitere și opțiunile disponibile.</div>
+        </div>
+        <button onclick="showTab('publicare')" style="background:var(--crimson);color:#fff;border:none;padding:10px 22px;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
       </div>
 
-      <div class="panel-note" style="background:linear-gradient(to right,#fdf8f0,#fff8ec);border-left-color:var(--crimson);">
-        <strong>Ai nevoie de sprijin?</strong> Pentru întrebări privind redactarea, structurarea sau transmiterea materialelor, autorii pot contacta redacția Revistei Dokimasia la adresa de e-mail dedicată.
-      </div>
-    </div>
+    </div><!-- /panel-ghid -->
     <div class="info-panel" id="panel-publicare">
       <!-- TITLU -->
       <div class="panel-header">
@@ -1426,6 +1390,13 @@
     var sec = document.querySelector('.info-section');
     if (sec) sec.scrollTop = 0;
     if (id === 'arhiva') loadArhiva();
+  }
+
+  function toggleGhid(btn) {
+    var body = btn.nextElementSibling;
+    var isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    btn.setAttribute('aria-expanded', !isOpen);
   }
 
   // ARHIVA
