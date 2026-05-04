@@ -1649,6 +1649,9 @@
 
     if (!user) {
       if (btnDraft) btnDraft.style.display = 'none';
+      // Ascunde selectorul de mod, afișează direct zona de fișiere
+      var modSelector = document.getElementById('tr-mod-selector');
+      if (modSelector) modSelector.style.display = 'none';
       selectModArticol('fisier');
       return;
     }
@@ -1669,6 +1672,8 @@
 
       if (drafts.length === 0) {
         if (btnDraft) btnDraft.style.display = 'none';
+        var modSelector2 = document.getElementById('tr-mod-selector');
+        if (modSelector2) modSelector2.style.display = 'none';
         selectModArticol('fisier');
         return;
       }
@@ -1693,6 +1698,8 @@
     } catch(e) {
       if (loading) loading.style.display = 'none';
       if (btnDraft) btnDraft.style.display = 'none';
+      var modSelectorErr = document.getElementById('tr-mod-selector');
+      if (modSelectorErr) modSelectorErr.style.display = 'none';
       selectModArticol('fisier');
     }
   }
