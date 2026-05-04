@@ -1122,16 +1122,10 @@
         <div class="form-section" id="tr-articol-section">
           <div class="form-section-title">Pasul 5. Încarcă articolul</div>
 
-          <!-- Selector mod: draft sau fișier -->
-          <div style="display:flex;gap:8px;margin-bottom:16px;" id="tr-mod-selector">
-            <button id="tr-mod-btn-draft" onclick="selectModArticol('draft')"
-              style="flex:1;padding:12px;border:2px solid var(--border);border-radius:6px;background:#fff;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;">
-              📝 Din editorul online
-            </button>
-            <button id="tr-mod-btn-fisier" onclick="selectModArticol('fisier')"
-              style="flex:1;padding:12px;border:2px solid var(--border);border-radius:6px;background:#fff;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s;">
-              📎 Încarcă fișier
-            </button>
+          <!-- Selector mod: ascuns — decizia se ia la Pasul 1 -->
+          <div style="display:none;" id="tr-mod-selector">
+            <button id="tr-mod-btn-draft" onclick="selectModArticol('draft')"></button>
+            <button id="tr-mod-btn-fisier" onclick="selectModArticol('fisier')"></button>
           </div>
 
           <!-- Mod draft: previzualizare articol salvat -->
@@ -1167,7 +1161,7 @@
         <!-- PASUL 2: Plată -->
         <div id="tr-step2">
           <div class="form-section">
-            <div class="form-section-title">Contribuția editorială</div>
+            <div class="form-section-title">Pasul 6. Contribuția editorială</div>
             <p style="font-size:1rem;color:var(--ink);margin-bottom:20px;line-height:1.5;">
               Ai selectat <strong id="tr-pach-label">1 articol</strong>. Contribuția editorială este de <strong id="tr-pach-suma">40 lei</strong>.
             </p>
@@ -1256,7 +1250,7 @@
         </div>
 
         <div style="margin-top:8px;" id="tr-confirmare-section">
-          <div class="form-section-title">Pasul 6. Confirmare și trimitere</div>
+          <div class="form-section-title">Pasul 7. Confirmare și trimitere</div>
         </div>
         <div id="tr-submit-section" style="margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <button id="btnTrimite" onclick="trimitereArticol()" disabled
