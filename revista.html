@@ -422,17 +422,6 @@
     .arhiva-loading { text-align:center; padding:48px 20px; color:var(--muted); font-size:0.95rem; font-style:italic; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
-    /* NEWSLETTER — compact */
-    .newsletter { background:#5a0000; padding:22px 20px; text-align:center; }
-    .newsletter h3 { font-family:'Source Serif 4',Georgia,serif; font-size:1rem; color:#fff; margin-bottom:4px; }
-    .newsletter p { color:rgba(255,255,255,0.65); font-size:0.82rem; margin-bottom:10px; font-style:italic; }
-    .newsletter-form { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
-    .newsletter-form input { padding:8px 12px; border-radius:3px; border:none; font-family:'Source Serif 4',serif; font-size:0.9rem; }
-    .newsletter-form input:first-child { width:130px; }
-    .newsletter-form input:nth-child(2) { width:190px; }
-    .newsletter-form button { padding:8px 16px; background:var(--gold); color:#fff; border:none; border-radius:3px; font-family:'Source Serif 4',serif; font-size:0.9rem; font-weight:600; cursor:pointer; }
-    #subMsg { color:rgba(255,255,255,0.85); font-size:0.78rem; margin-top:8px; min-height:14px; }
-
     footer { background:var(--crimson); color:#fff; text-align:center; padding:26px 20px; font-size:0.84rem; }
     footer a { color:rgba(255,255,255,0.7); }
     footer a:hover { color:#fff; }
@@ -670,7 +659,7 @@
     <p class="revista-hero-desc">Revista Dokimasia este o publicație educațională interdisciplinară, dedicată promovării articolelor, studiilor, resurselor educaționale și exemplelor de bună practică din domeniul educației.</p>
     <div class="revista-hero-buttons">
       <button class="hero-btn-primary" onclick="goToFormularTrimitere()">Trimite un articol</button>
-      <button class="hero-btn-secondary" onclick="showTab('ghid')">Consultă ghidul pentru autori</button>
+      <button class="hero-btn-secondary" onclick="goToGhidAutori()">Consultă ghidul pentru autori</button>
     </div>
   </div>
 </div>
@@ -1378,19 +1367,6 @@
   </div><!-- /info-panels -->
 </div><!-- /info-section -->
 
-<!-- NEWSLETTER -->
-<div class="newsletter">
-  <div style="max-width:500px;margin:0 auto;">
-    <h3>Abonează-te la newsletter</h3>
-    <p>Fii primul care primește noile ediții ale revistei.</p>
-    <div class="newsletter-form">
-      <input type="text" id="subNume" placeholder="Numele tău" />
-      <input type="email" id="subEmail" placeholder="Email-ul tău" />
-      <button onclick="subscribe()">Abonează-mă</button>
-    </div>
-    <p id="subMsg"></p>
-  </div>
-</div>
 
 <footer>
   <p>© <span id="year"></span> Asociația Dokimasia. Toate drepturile rezervate.</p>
@@ -1400,37 +1376,60 @@
 <script>
   // Set hero height CSS variable for info-section height calc
 
+  // ─── NAVIGARE ───────────────────────────────────────────────────────────────
+
+  // Tab-uri valide și maparea ID-urilor vechi → noi
+  var TAB_MAP = {
+    despre:     'despre',
+    publicare:  'publicare',
+    trimitere:  'publicare',   // vechi → publicare
+    contributie:'publicare',   // vechi → publicare
+    domenii:    'despre',      // vechi → despre
+    ghid:       'ghid',
+    arhiva:     'arhiva',
+    colegiu:    'arhiva'       // integrat în arhivă
+  };
+
+  function showTab(id) {
+    var panelId = TAB_MAP[id] || id;
+
+    // Subnav — activează butonul corect
+    document.querySelectorAll('.revista-subnav .subnav-btn').forEach(function(btn) {
+      btn.classList.remove('active');
+    });
+    var activeBtn = document.getElementById('subnav-' + panelId);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Panouri — ascunde toate, afișează cel activ
+    document.querySelectorAll('.info-panel').forEach(function(p) { p.classList.remove('active'); });
+    var panel = document.getElementById('panel-' + panelId);
+    if (panel) panel.classList.add('active');
+
+    // Scroll la începutul secțiunii de conținut
+    var sec = document.querySelector('.info-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Acțiuni secundare per panou
+    if (panelId === 'arhiva') loadArhiva();
+    if (panelId === 'publicare') incarcaDrafturi();
+  }
+
+  // Scroll direct la formular (butonul „Trimite un articol" din hero)
   function goToFormularTrimitere() {
     showTab('publicare');
     setTimeout(function() {
       var el = document.getElementById('formular-trimitere');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
+    }, 150);
   }
 
-  // TABS
-  // Mapare subnav → tab
-  var subnavMap = { despre:'despre', publicare:'publicare', trimitere:'publicare', ghid:'ghid', arhiva:'arhiva' };
-
-  function showTab(id) {
-    // Actualizează subnav
-    document.querySelectorAll('.revista-subnav .subnav-btn').forEach(function(btn) {
-      btn.classList.remove('active');
-    });
-    var mappedId = (id === 'trimitere') ? 'publicare' : (id === 'colegiu') ? 'arhiva' : id;
-    var subnavId = 'subnav-' + (mappedId === 'domenii' ? 'despre' : mappedId);
-    var activeBtn = document.getElementById(subnavId);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    // Afișează panoul
-    document.querySelectorAll('.info-panel').forEach(function(p) { p.classList.remove('active'); });
-    var panelId = (id === 'trimitere') ? 'publicare' : (id === 'colegiu') ? 'arhiva' : id;
-    var panel = document.getElementById('panel-' + panelId);
-    if (panel) panel.classList.add('active');
-
-    var sec = document.querySelector('.info-section');
-    if (sec) sec.scrollTop = 0;
-    if (panelId === 'arhiva') loadArhiva();
+  // Scroll direct la ghid (butonul „Consultă ghidul" din hero)
+  function goToGhidAutori() {
+    showTab('ghid');
+    setTimeout(function() {
+      var el = document.getElementById('panel-ghid');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
   }
 
   function toggleGhid(btn) {
@@ -1596,12 +1595,11 @@
   }
 
   var ppRendered = false
-  var _origShowTab = showTab
-  showTab = function(id) {
-    _origShowTab(id)
-    if (id === 'contributie' && !ppRendered) {
-      ppRendered = true
-      for (var i = 1; i <= 5; i++) renderPPButton(i)
+
+  function _renderPPIfNeeded() {
+    if (!ppRendered) {
+      ppRendered = true;
+      for (var i = 1; i <= 5; i++) renderPPButton(i);
     }
   }
 
@@ -1861,12 +1859,7 @@
     }
   }
 
-  // Extinde showTab pentru a încărca draft-urile la deschiderea tab-ului trimitere
-  var _origShowTab2 = showTab;
-  showTab = function(id) {
-    _origShowTab2(id);
-    if (id === 'trimitere') incarcaDrafturi();
-  };
+  // Draft-urile se încarcă acum direct din showTab('publicare') — nu mai e nevoie de override
 
   // =====================
   // selectedFiles[i] = File object pentru articolul i (0-indexed), sau null
