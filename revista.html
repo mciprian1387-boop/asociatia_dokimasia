@@ -965,36 +965,40 @@
       <!-- Ghid pas cu pas -->
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:24px;">
 
-        <div style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;">
+        <div onclick="trScrollTo('tr-articol-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
           <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">1</div>
-          <div>
+          <div style="flex:1;">
             <div style="font-weight:700;font-size:1rem;color:var(--ink);">Pregătește articolul</div>
             <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Redactează-l în editorul online de pe site sau descarcă template-ul și completează-l în Word.</div>
           </div>
+          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
         </div>
 
-        <div style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;">
+        <div onclick="trScrollTo('tr-date-autor-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
           <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">2</div>
-          <div>
+          <div style="flex:1;">
             <div style="font-weight:700;font-size:1rem;color:var(--ink);">Completează datele tale</div>
             <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Nume, instituție, funcție și date de contact — necesare pentru publicare.</div>
           </div>
+          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
         </div>
 
-        <div style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;">
+        <div onclick="trScrollTo('tr-pachet-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
           <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">3</div>
-          <div>
+          <div style="flex:1;">
             <div style="font-weight:700;font-size:1rem;color:var(--ink);">Alege pachetul și plătește</div>
             <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Poți plăti acum cu cardul sau poți trimite articolul mai întâi și achita ulterior.</div>
           </div>
+          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
         </div>
 
-        <div style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;">
+        <div onclick="trScrollTo('tr-submit-section')" style="display:flex;align-items:flex-start;gap:16px;background:var(--paper-dark);border-radius:6px;padding:14px 18px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#e8e2d8'" onmouseout="this.style.background='var(--paper-dark)'">
           <div style="width:28px;height:28px;background:var(--crimson);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;">4</div>
-          <div>
+          <div style="flex:1;">
             <div style="font-weight:700;font-size:1rem;color:var(--ink);">Trimite</div>
             <div style="font-size:1rem;color:var(--muted);margin-top:2px;">Redacția confirmă primirea și te contactează cu pașii următori.</div>
           </div>
+          <div style="color:var(--muted);font-size:1rem;align-self:center;">↓</div>
         </div>
 
       </div>
@@ -1012,7 +1016,7 @@
       <!-- Mesaj încărcare draft-uri -->
       <div id="tr-drafts-loading" style="display:none;color:var(--muted);font-size:1rem;font-style:italic;margin-bottom:12px;">⏳ Se verifică articolele salvate...</div>
       <div id="tr-step1">
-        <div class="form-section">
+        <div class="form-section" id="tr-pachet-section">
           <div class="form-section-title">Pasul 1 — Selectează numărul de articole</div>
           <div class="tr-pachete">
             <div class="tr-pachet" onclick="selectPachet(1)" id="pach-1">
@@ -1036,7 +1040,7 @@
       <!-- PASUL 3: Formular trimitere (vizibil după selectarea pachetului) -->
       <div id="trimitereForm" style="display:none;margin-top:8px;">
 
-        <div class="form-section">
+        <div class="form-section" id="tr-date-autor-section">
           <div class="form-section-title">Pasul 3 — Date autor</div>
           <!-- Notificare date salvate -->
           <div id="autor-saved-notif" style="display:none;align-items:center;justify-content:space-between;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:10px 14px;margin-bottom:16px;font-size:0.87rem;color:#5d4037;transition:opacity 0.5s;">
@@ -1116,7 +1120,7 @@
           </div>
         </div>
 
-        <div class="form-section">
+        <div class="form-section" id="tr-articol-section">
           <div class="form-section-title">Pasul 5 — Articolul tău</div>
 
           <!-- Selector mod: draft sau fișier -->
@@ -1252,7 +1256,7 @@
           <span style="font-size:1rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare"></span>
         </div>
 
-        <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div id="tr-submit-section" style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <button id="btnTrimite" onclick="trimitereArticol()" disabled
             style="display:inline-flex;align-items:center;gap:10px;background:#aaa;color:#fff;padding:14px 36px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;border:none;cursor:not-allowed;transition:background 0.2s;opacity:0.7;"
             title="Confirmați mai întâi opțiunea de plată">
@@ -1552,6 +1556,17 @@
       ppRendered = true
       for (var i = 1; i <= 5; i++) renderPPButton(i)
     }
+  }
+
+  function trScrollTo(sectionId) {
+    var form = document.getElementById('trimitereForm');
+    if (form && form.style.display === 'none') {
+      if (!trPachetSelectat) selectPachet(1);
+    }
+    setTimeout(function() {
+      var el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
   }
 
   // =====================
