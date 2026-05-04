@@ -551,7 +551,7 @@
     .file-item .fi-size { color:var(--muted); font-size:0.82rem; margin-left:8px; }
     .file-item .fi-remove { background:none; border:none; color:#999; cursor:pointer; font-size:1rem; padding:0 4px; transition:color 0.15s; }
     .file-item .fi-remove:hover { color:var(--crimson); }
-    #dropZone:hover { border-color:var(--crimson); background:var(--paper-dark); }
+    #formular-trimitere { scroll-margin-top: 120px; }
     #dropZone.drag-over { border-color:var(--crimson); background:#fff3f3; }
     #btnTrimite:hover { background:var(--crimson-dark); }
     #btnTrimite:disabled { background:var(--muted); cursor:not-allowed; }
@@ -669,7 +669,7 @@
     <div class="revista-hero-divider"></div>
     <p class="revista-hero-desc">Revista Dokimasia este o publicație educațională interdisciplinară, dedicată promovării articolelor, studiilor, resurselor educaționale și exemplelor de bună practică din domeniul educației.</p>
     <div class="revista-hero-buttons">
-      <button class="hero-btn-primary" onclick="showTab('publicare')">Trimite un articol</button>
+      <button class="hero-btn-primary" onclick="goToFormularTrimitere()">Trimite un articol</button>
       <button class="hero-btn-secondary" onclick="showTab('ghid')">Consultă ghidul pentru autori</button>
     </div>
   </div>
@@ -1043,7 +1043,7 @@
       </div>
 
       <!-- FORMULARUL DE TRIMITERE — păstrat integral, reorganizat vizual -->
-      <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:6px;padding:24px 28px;margin-bottom:32px;" id="tr-form-container">
+      <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:6px;padding:24px 28px;margin-bottom:32px;" id="formular-trimitere">
 
       <!-- Introducere formular -->
       <div style="margin-bottom:20px;">
@@ -1399,6 +1399,14 @@
 
 <script>
   // Set hero height CSS variable for info-section height calc
+
+  function goToFormularTrimitere() {
+    showTab('publicare');
+    setTimeout(function() {
+      var el = document.getElementById('formular-trimitere');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
 
   // TABS
   // Mapare subnav → tab
