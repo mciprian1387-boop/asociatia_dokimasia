@@ -966,8 +966,14 @@ function colDate(){
     const el=document.getElementById('rich-'+s.id);
     if(el) _stateCache['r_'+s.id]=el.innerHTML;
   });
+  // Bibliografie — citește din rich-biblio sau din cache
+  const rb=document.getElementById('rich-biblio');
+  if(rb){
+    const linii=rb.innerText.split('\n').map(l=>l.trim()).filter(Boolean);
+    biblio=linii.length?linii:[''];
+    _stateCache.biblio=biblio;
+  }
   _stateCache.autori=autori;
-  _stateCache.biblio=biblio;
 
   // Construiește obiectul de salvat din cache (complet)
   const d={
@@ -1351,7 +1357,12 @@ function _restaurezInPanel(id, s){
     } else if(id==='autori'){
       renderAutori();
     } else if(id==='biblio'){
-      renderBiblio();
+      // Restaurează bibliografia din array → text în casetă (una per linie)
+      const rb=document.getElementById('rich-biblio');
+      if(rb){
+        const txt=(_stateCache.biblio||[]).filter(Boolean).join('\n');
+        rb.innerHTML=txt?txt.split('\n').map(l=>`<p>${escVal(l)}</p>`).join(''):'';
+      }
     } else {
       setRich('rich-'+id, _stateCache['r_'+id]||'');
     }
@@ -1500,27 +1511,24 @@ function secPanelBiblio(){
   return `<div class="sec-panel">
     ${_panelHead('📚','Bibliografie',false)}
     <div class="sec-panel-body">
-
-      <!-- Indicații + AI -->
-      <div style="background:#faf8f0;border:1px solid #e8d9a0;border-radius:5px;padding:12px 14px;margin-bottom:14px;font-size:0.82rem;line-height:1.6;color:#3a2e00;">
-        <div style="font-weight:700;font-size:0.78rem;margin-bottom:6px;color:#8B6000;">📚 Cum completezi bibliografia</div>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <div>✍ Adaugă referințele manual, câte una, în câmpurile de mai jos — format <strong>APA</strong>.</div>
-          <div>🤖 Sau apasă <strong>„⚡ AI — Extrage din text"</strong>, lipești un text care conține surse (ex: nota de final a unui articol, o listă bibliografică neformatată, referințe copiate de pe internet) și AI le extrage și le formatează automat în APA.</div>
-          <div style="margin-top:4px;padding:6px 9px;background:#fff8e1;border-radius:3px;border-left:3px solid #ffc107;font-size:0.79rem;">
-            <strong>Format APA:</strong> Popescu, M., &amp; Ionescu, A. (2020). <em>Titlul lucrării</em>. Editura. &nbsp;|&nbsp; sau pentru articol: Autor, A. (2019). Titlul articolului. <em>Revista</em>, <em>12</em>(3), 45–67.
-          </div>
-        </div>
+      <div style="background:#faf8f0;border:1px solid #e8d9a0;border-radius:5px;padding:10px 14px;margin-bottom:12px;font-size:0.82rem;line-height:1.6;color:#3a2e00;">
+        <div style="font-weight:700;font-size:0.78rem;margin-bottom:4px;color:#8B6000;">📚 Cum completezi bibliografia</div>
+        <div>Scrie sau lipește referințele bibliografice în caseta de mai jos — una pe linie sau în orice format. Apasă <strong>„✨ AI — Formatează în APA"</strong> și AI le ordonează și le formatează automat.</div>
+        <div style="margin-top:5px;padding:5px 8px;background:#fff8e1;border-radius:3px;font-size:0.78rem;"><strong>Format APA:</strong> Popescu, M. (2020). <em>Titlul lucrării</em>. Editura.</div>
       </div>
 
-      <!-- Buton AI -->
-      <button class="btn-ai-gen" style="margin-bottom:14px;font-size:0.78rem;" onclick="deschideModalBiblioAI()">
-        ⚡ AI — Extrage și formatează bibliografie din text
-      </button>
+      <div style="margin-bottom:10px;display:flex;gap:7px;flex-wrap:wrap;">
+        <button class="ai-sec-btn" onclick="aiBiblio()" id="ai-biblio-btn">✨ AI — Formatează în APA</button>
+        <button class="ai-sec-btn" onclick="deschideModalImportWord()" style="border-color:#1565c0;color:#1565c0;">📄 Importă articol Word</button>
+      </div>
 
-      <!-- Lista referințelor -->
-      <div id="biblioList"></div>
-      <button class="btn-add-bib" onclick="addBib()" style="margin-top:6px;">+ Adaugă referință manual</button>
+      <div class="fld">
+        ${tb('biblio')}
+        <div class="rich-ed" id="rich-biblio" contenteditable="true"
+          data-ph="Scrie sau lipește referințele bibliografice aici (una pe linie sau orice format)..."
+          oninput="onChange()"
+          style="min-height:160px;"></div>
+      </div>
     </div>
   </div>`;
 }
@@ -2117,7 +2125,26 @@ function aiBtnLoading(id, loading){
   btn.classList.toggle('loading',loading);
 }
 
-// AI extrage cuvinte-cheie
+// AI formatează bibliografia în APA
+async function aiBiblio(){
+  const rb=document.getElementById('rich-biblio');
+  if(!rb){toast('Deschideți secțiunea Bibliografie.','err');return;}
+  const text=rb.innerText.trim();
+  if(!text){toast('Scrieți mai întâi referințele bibliografice.','err');return;}
+  const btn=document.getElementById('ai-biblio-btn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Se formatează...';}
+  try{
+    const result=await callAI(
+      `Ești expert în formatare bibliografică APA 7th edition. Formatează corect în APA toate referințele de mai jos. Returnează DOAR lista formatată, una pe linie, ordonate alfabetic după primul autor, fără numerotare, fără explicații.\n\nReferințe:\n${text}`,
+      1500
+    );
+    const linii=result.split('\n').map(l=>l.trim()).filter(l=>l.length>5);
+    rb.innerHTML=linii.map(l=>`<p>${escVal(l)}</p>`).join('');
+    onChange();
+    toast('✓ Bibliografie formatată în APA!','ok');
+  }catch(e){toast('Eroare AI: '+e.message,'err');}
+  if(btn){btn.disabled=false;btn.textContent='✨ AI — Formatează în APA';}
+}
 async function aiExtrageCuvinte(){
   const ctx=getCtx();
   const titlu=_stateCache.titlu||'';
