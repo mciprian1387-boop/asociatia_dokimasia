@@ -18,15 +18,15 @@
       --ink: #1a1108; --paper: #faf8f4; --paper-dark: #f0ece4;
       --muted: #7a7060; --border: #ddd8cc;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Source Serif 4',Georgia,serif; background:var(--paper); color:var(--ink); }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Source Serif 4',Georgia,serif; line-height:1.5; }
+    body { font-family:'Source Serif 4',Georgia,serif; background:var(--paper); color:var(--ink); line-height:1.5; }
     a { text-decoration:none; color:inherit; }
 
     header { background:#fff; border-bottom:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.06); position:sticky; top:0; z-index:200; }
     .header-top { display:grid; grid-template-columns:auto 1fr auto; align-items:center; padding:12px 40px; gap:16px; }
     .header-logo img { height:80px; width:auto; display:block; }
     .header-center { text-align:center; }
-    .header-title { display:block; font-family:'Playfair Display',serif; font-size:clamp(1rem,3vw,2rem); font-weight:900; color:var(--crimson); text-transform:uppercase; letter-spacing:3px; }
+    .header-title { display:block; font-family:'Source Serif 4',Georgia,serif; font-size:clamp(1rem,3vw,2rem); font-weight:900; color:var(--crimson); text-transform:uppercase; letter-spacing:3px; }
     .header-motto { display:block; font-size:clamp(0.65rem,1.5vw,0.9rem); color:var(--crimson); letter-spacing:2px; margin-top:4px; font-style:italic; }
     .header-right { display:flex; align-items:center; gap:12px; justify-content:flex-end; }
     .social-icons { display:flex; align-items:center; gap:10px; }
@@ -38,7 +38,7 @@
     .account-wrapper { position:relative; }
     .account-dropdown { display:none; position:absolute; top:110%; right:0; background:#fff; border:1px solid var(--border); border-radius:6px; box-shadow:0 4px 20px rgba(0,0,0,0.12); min-width:190px; z-index:200; padding:6px 0; }
     .account-dropdown.open { display:block; }
-    .account-dropdown a { display:block; padding:10px 18px; font-size:0.88rem; color:#444; transition:background 0.15s; }
+    .account-dropdown a { display:block; padding:10px 18px; font-size:1rem; color:var(--ink); transition:background 0.15s; }
     .account-dropdown a:hover { background:var(--paper); color:var(--crimson); }
     nav.main-nav { background:var(--crimson); display:flex; width:100%; }
     nav.main-nav a { flex:1; color:#fff; font-size:0.85rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; text-align:center; padding:13px 0; transition:background 0.2s; border-right:1px solid rgba(255,255,255,0.25); font-family:'Source Serif 4',serif; }
@@ -51,13 +51,16 @@
       background-image:
         repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px),
         repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.04) 39px,rgba(255,255,255,0.04) 40px);
-      padding:14px 40px 12px;
+      padding:3px 40px 3px;
+      position:sticky;
+      top:var(--header-height, 130px);
+      z-index:190;
     }
     .revista-hero-inner { max-width:1200px; margin:0 auto; display:flex; justify-content:center; text-align:center; }
-    .revista-hero-label { display:block; font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold-light); margin-bottom:8px; text-align:center; }
-    .revista-hero h1 { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,3.5vw,2.5rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:8px; text-align:center; }
-    .revista-hero-subtitle { font-size:0.93rem; color:rgba(255,255,255,0.85); font-style:italic; margin-bottom:12px; line-height:1.55; text-align:center; }
-    .revista-hero-desc { font-size:0.84rem; color:rgba(255,255,255,0.7); line-height:1.75; text-align:justify; }
+    .revista-hero-label { display:block; font-size:0.7rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold-light); margin-bottom:2px; text-align:center; }
+    .revista-hero h1 { font-family:'Source Serif 4',Georgia,serif; font-size:clamp(1.2rem,2.5vw,1.8rem); font-weight:900; color:#fff; line-height:1.1; margin-bottom:2px; text-align:center; }
+    .revista-hero-subtitle { font-size:0.88rem; color:rgba(255,255,255,0.85); font-style:italic; margin-bottom:0; line-height:1.1; text-align:center; }
+    .revista-hero-desc { font-size:0.84rem; color:rgba(255,255,255,0.7); line-height:1.5; text-align:justify; }
     .hero-ornament { color:var(--gold-light); font-size:0.9rem; margin:10px 0 0; letter-spacing:8px; opacity:0.6; }
     .hero-nav-buttons { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:16px; }
     .hero-nav-btn { background:#fff; border:2px solid #fff; color:var(--crimson); padding:9px 10px; border-radius:3px; font-size:0.76rem; font-family:'Source Serif 4',serif; font-weight:700; letter-spacing:0.5px; cursor:pointer; transition:background 0.2s, color 0.2s, border-color 0.2s; white-space:nowrap; text-align:center; width:100%; }
@@ -65,7 +68,7 @@
     /* Hero cards */
     .hero-card { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.25); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center; color:#fff; min-width:150px; }
     .hero-card .hc-label { font-size:0.62rem; letter-spacing:3px; text-transform:uppercase; color:var(--gold-light); }
-    .hero-card .hc-title { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; line-height:1.3; }
+    .hero-card .hc-title { font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700; line-height:1.5; }
     .hero-card .hc-orn { color:var(--gold-light); letter-spacing:4px; opacity:0.6; font-size:0.75rem; }
     .hero-card .hc-btn { margin-top:4px; font-size:0.75rem; font-weight:700; background:#fff; border:none; color:var(--crimson); padding:7px 16px; border-radius:3px; cursor:pointer; transition:background 0.2s, color 0.2s; text-decoration:none; font-family:'Source Serif 4',serif; display:inline-block; }
     .hero-card .hc-btn:hover { background:var(--gold); color:#fff; }
@@ -88,24 +91,24 @@
     .info-tab:hover { color:var(--crimson); background:var(--paper); }
     .info-tab.active { color:var(--crimson); border-bottom-color:var(--crimson); background:var(--paper); }
     .info-panels { max-width:1200px; margin:0 auto; }
-    .info-panel { display:none; padding:36px 40px 44px; }
+    .info-panel { display:none; padding:8px 40px 44px; }
     .info-panel.active { display:block; }
-    .info-panel h2 { font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:var(--crimson); margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); }
-    .info-panel h3 { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:var(--ink); margin:22px 0 8px; }
-    .info-panel p { font-size:1.08rem; line-height:1.9; color:#333; margin-bottom:12px; text-align:justify; }
+    .info-panel h2 { font-family:'Source Serif 4',Georgia,serif; font-size:1.75rem; font-weight:700; color:var(--crimson); margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .info-panel h3 { font-family:'Source Serif 4',Georgia,serif; font-size:1.25rem; font-weight:700; color:var(--ink); margin:22px 0 8px; }
+    .info-panel p { font-size:1rem; line-height:1.5; color:var(--ink); margin-bottom:12px; text-align:justify; }
     .info-panel ul { margin:8px 0 14px 20px; }
-    .info-panel ul li { font-size:1.05rem; line-height:1.85; color:#333; margin-bottom:4px; text-align:justify; }
+    .info-panel ul li { font-size:1rem; line-height:1.5; color:var(--ink); margin-bottom:4px; text-align:justify; }
     .info-panel ol { margin:8px 0 14px 20px; }
-    .info-panel ol li { font-size:1.05rem; line-height:1.85; color:#333; margin-bottom:10px; text-align:justify; }
+    .info-panel ol li { font-size:1rem; line-height:1.5; color:var(--ink); margin-bottom:10px; text-align:justify; }
     .info-panel ol li strong { color:var(--crimson); }
     /* ══════════════════════════════════════════
        DESIGN SYSTEM — PANOURI REVISTA
     ══════════════════════════════════════════ */
 
     /* Header panou cu linie aurie */
-    .panel-header { margin-bottom:32px; }
+    .panel-header { margin-bottom:8px; }
     .panel-header h2 {
-      font-family:'Playfair Display',serif; font-size:2rem; font-weight:900;
+      font-family:'Source Serif 4',Georgia,serif; font-size:2rem; font-weight:900;
       color:var(--crimson); margin-bottom:6px; padding-bottom:0; border-bottom:none;
     }
     .panel-header-line {
@@ -114,7 +117,7 @@
     .panel-header-line::before { content:''; display:block; width:40px; height:3px; background:var(--gold); border-radius:2px; flex-shrink:0; }
     .panel-header-line::after { content:''; flex:1; height:1px; background:var(--border); }
     .panel-intro {
-      font-size:1.05rem; line-height:1.9; color:#444; text-align:justify;
+      font-size:1rem; line-height:1.5; color:var(--ink); text-align:justify;
       border-left:3px solid var(--gold); padding-left:18px;
       background:linear-gradient(to right, #fdf8f0, transparent);
       padding:14px 18px; border-radius:0 4px 4px 0;
@@ -122,32 +125,33 @@
 
     /* Card secțiune (subsecțiuni principale) */
     .sec-card {
-      background:#fff; border:1px solid var(--border);
+      background:#f7f5f2; border:1px solid var(--border);
       border-radius:6px; overflow:hidden;
       box-shadow:0 2px 12px rgba(0,0,0,0.06);
-      margin-bottom:20px; transition:box-shadow 0.2s;
+      margin-bottom:8px; transition:box-shadow 0.2s;
     }
     .sec-card:hover { box-shadow:0 4px 20px rgba(0,0,0,0.10); }
     .sec-card-header {
       display:flex; align-items:center; gap:14px;
-      background:linear-gradient(135deg, var(--crimson) 0%, #6a0000 100%);
-      padding:16px 22px;
+      background:var(--paper-dark);
+      border-bottom:1px solid var(--border);
+      padding:10px 22px;
     }
     .sec-card-icon {
-      width:38px; height:38px; background:rgba(255,255,255,0.15);
+      width:38px; height:38px; background:rgba(0,0,0,0.06);
       border-radius:50%; display:flex; align-items:center; justify-content:center;
       font-size:1.1rem; flex-shrink:0;
     }
     .sec-card-title {
-      font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700;
-      color:#fff; line-height:1.3;
+      font-family:'Source Serif 4',Georgia,serif; font-size:1.1rem; font-weight:700;
+      color:var(--ink); line-height:1.5;
     }
     .sec-card-subtitle {
-      font-size:0.82rem; color:rgba(255,255,255,0.75); margin-top:2px; font-style:italic;
+      font-size:0.82rem; color:var(--muted); margin-top:2px; font-style:italic;
     }
-    .sec-card-body { padding:20px 22px; }
+    .sec-card-body { padding:10px 22px; }
     .sec-card-desc {
-      font-size:0.97rem; line-height:1.85; color:#444;
+      font-size:1rem; line-height:1.5; color:var(--ink);
       font-style:italic; margin-bottom:14px; padding-bottom:12px;
       border-bottom:1px dashed var(--border); text-align:justify;
     }
@@ -156,7 +160,7 @@
     .sec-list { list-style:none; margin:0; padding:0; }
     .sec-list li {
       display:flex; align-items:flex-start; gap:10px;
-      font-size:0.94rem; line-height:1.4; color:#333;
+      font-size:1rem; line-height:1.5; color:var(--ink);
       padding:3px 0; border-bottom:1px solid #f5f2ed;
     }
     .sec-list li:last-child { border-bottom:none; }
@@ -170,7 +174,7 @@
       background:var(--paper-dark); border:1px solid var(--border);
       border-left:4px solid var(--gold); border-radius:0 6px 6px 0;
       padding:16px 20px; margin-top:24px;
-      font-size:0.92rem; line-height:1.8; color:#555; font-style:italic;
+      font-size:1rem; line-height:1.5; color:var(--ink); font-style:italic;
     }
     .panel-note strong { color:var(--crimson); font-style:normal; }
 
@@ -179,7 +183,7 @@
 
     /* Card simplu (ghid, colegiu etc) */
     .info-card {
-      background:#fff; border:1px solid var(--border); border-radius:6px;
+      background:#f7f5f2; border:1px solid var(--border); border-radius:6px;
       box-shadow:0 2px 10px rgba(0,0,0,0.05); overflow:hidden;
     }
     .info-card-head {
@@ -192,7 +196,7 @@
       font-weight:700; color:var(--crimson);
     }
     .info-card-body { padding:16px 18px; }
-    .info-card-body p { font-size:0.94rem; line-height:1.8; color:#444; margin-bottom:8px; text-align:justify; }
+    .info-card-body p { font-size:1rem; line-height:1.5; color:var(--ink); margin-bottom:8px; text-align:justify; }
     .info-card-body p:last-child { margin-bottom:0; }
 
     /* Pas numerotat (ghid autori) */
@@ -205,12 +209,12 @@
     .step-nr {
       width:36px; height:36px; background:var(--crimson); color:#fff;
       border-radius:50%; display:flex; align-items:center; justify-content:center;
-      font-family:'Playfair Display',serif; font-size:1rem; font-weight:700;
+      font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700;
       flex-shrink:0; margin-top:2px;
     }
     .step-body { flex:1; }
     .step-title { font-weight:700; color:var(--ink); font-size:1rem; margin-bottom:4px; }
-    .step-desc { font-size:0.93rem; line-height:1.8; color:#555; text-align:justify; }
+    .step-desc { font-size:1rem; line-height:1.5; color:var(--ink); text-align:justify; }
 
     /* Badge colegiu */
     .colegiu-card-new {
@@ -231,8 +235,8 @@
       color:var(--gold); font-weight:700; margin-bottom:6px;
     }
     .colegiu-name {
-      font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700;
-      color:var(--ink); line-height:1.4;
+      font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700;
+      color:var(--ink); line-height:1.5;
     }
     .colegiu-inst {
       font-size:0.78rem; color:var(--muted); margin-top:4px; font-style:italic;
@@ -249,7 +253,7 @@
     .arhiva-cover { height:160px; background:linear-gradient(160deg,var(--crimson),var(--crimson-dark)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:#fff; padding:16px; text-align:center; }
     .arhiva-cover img { width:100%; height:100%; object-fit:cover; }
     .arhiva-cover .a-nr { font-size:0.62rem; letter-spacing:3px; text-transform:uppercase; opacity:0.7; }
-    .arhiva-cover .a-titlu { font-family:'Playfair Display',serif; font-size:0.9rem; font-weight:700; line-height:1.3; }
+    .arhiva-cover .a-titlu { font-family:'Source Serif 4',Georgia,serif; font-size:0.9rem; font-weight:700; line-height:1.5; }
     .arhiva-info { padding:12px 14px; flex:1; display:flex; flex-direction:column; gap:6px; }
     .arhiva-info .a-data { font-size:0.73rem; color:var(--muted); font-style:italic; }
     .arhiva-info .a-link { display:inline-flex; align-items:center; gap:4px; font-size:0.76rem; color:var(--crimson); font-weight:600; margin-top:auto; padding-top:6px; border-top:1px solid var(--border); }
@@ -258,21 +262,21 @@
     .domenii-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; margin-top:20px; }
     .domeniu-card { background:var(--paper); border:1px solid var(--border); border-left:3px solid var(--crimson); padding:16px 18px; border-radius:2px; }
     .domeniu-card .d-nr { font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; color:var(--gold); font-weight:700; margin-bottom:4px; }
-    .domeniu-card .d-titlu { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; color:var(--ink); margin-bottom:6px; }
-    .domeniu-card .d-desc { font-size:0.82rem; color:var(--muted); line-height:1.6; }
+    .domeniu-card .d-titlu { font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700; color:var(--ink); margin-bottom:6px; }
+    .domeniu-card .d-desc { font-size:0.82rem; color:var(--muted); line-height:1.5; }
 
     /* Colegiu */
     .colegiu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px; margin-top:20px; }
     .colegiu-card { background:var(--paper); border:1px solid var(--border); padding:16px 18px; text-align:center; border-radius:2px; }
     .colegiu-card .c-rol { font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; color:var(--crimson); font-weight:700; margin-bottom:8px; }
     .colegiu-card .c-avatar { width:48px; height:48px; background:var(--crimson); border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.2rem; }
-    .colegiu-card .c-name { font-family:'Playfair Display',serif; font-size:0.9rem; font-weight:700; color:var(--ink); }
+    .colegiu-card .c-name { font-family:'Source Serif 4',Georgia,serif; font-size:0.9rem; font-weight:700; color:var(--ink); }
 
     /* Tarife */
     .tarife-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; margin:20px 0; }
     .tarif-card { background:var(--paper); border:1px solid var(--border); padding:20px; text-align:center; border-radius:2px; }
     .tarif-card .t-titlu { font-size:0.75rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; font-weight:600; }
-    .tarif-card .t-pret { font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; color:var(--crimson); line-height:1; }
+    .tarif-card .t-pret { font-family:'Source Serif 4',Georgia,serif; font-size:2rem; font-weight:900; color:var(--crimson); line-height:1.5; }
     .tarif-card .t-unit { font-size:0.78rem; color:var(--muted); margin-top:4px; }
     .tarif-card.featured { background:var(--crimson); border-color:var(--crimson); }
     .tarif-card.featured .t-titlu { color:rgba(255,255,255,0.7); }
@@ -282,18 +286,18 @@
     /* FAQ */
     .faq-list { margin-top:16px; }
     .faq-item { border-bottom:1px solid var(--border); }
-    .faq-q { display:flex; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; font-size:0.92rem; font-weight:600; color:var(--ink); gap:12px; }
+    .faq-q { display:flex; align-items:center; justify-content:space-between; padding:14px 0; cursor:pointer; font-size:1rem; font-weight:600; color:var(--ink); gap:12px; }
     .faq-q:hover { color:var(--crimson); }
     .faq-q .faq-arrow { color:var(--crimson); font-size:0.8rem; transition:transform 0.25s; flex-shrink:0; }
     .faq-item.open .faq-arrow { transform:rotate(180deg); }
-    .faq-a { display:none; padding:0 0 16px; font-size:0.88rem; line-height:1.8; color:#444; }
+    .faq-a { display:none; padding:0 0 16px; font-size:1rem; line-height:1.5; color:var(--ink); }
     .faq-item.open .faq-a { display:block; }
 
     /* Documente */
     .doc-group { margin-bottom:28px; }
     .doc-group-title { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--crimson); font-weight:700; margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
     .doc-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; }
-    .doc-item { display:flex; align-items:center; gap:10px; background:var(--paper); border:1px solid var(--border); padding:12px 14px; border-radius:2px; font-size:0.84rem; color:#333; transition:background 0.15s, color 0.15s; }
+    .doc-item { display:flex; align-items:center; gap:10px; background:var(--paper); border:1px solid var(--border); padding:12px 14px; border-radius:2px; font-size:0.84rem; color:var(--ink); transition:background 0.15s, color 0.15s; }
     .doc-item:hover { background:var(--paper-dark); color:var(--crimson); }
     .doc-item .doc-icon { color:var(--gold); font-size:1rem; flex-shrink:0; }
 
@@ -307,17 +311,17 @@
     .featured-coperta img { width:100%; height:100%; object-fit:cover; }
     .featured-placeholder { width:100%; height:100%; background:linear-gradient(160deg,var(--crimson),var(--crimson-dark)); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:12px; padding:28px; }
     .featured-placeholder .fp-nr { font-size:0.68rem; letter-spacing:4px; text-transform:uppercase; opacity:0.6; }
-    .featured-placeholder .fp-titlu { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; text-align:center; line-height:1.4; }
+    .featured-placeholder .fp-titlu { font-family:'Source Serif 4',Georgia,serif; font-size:1.3rem; font-weight:700; text-align:center; line-height:1.5; }
     .featured-placeholder .fp-orn { color:var(--gold-light); letter-spacing:6px; opacity:0.7; }
 
     .featured-info { padding:36px 44px; display:flex; flex-direction:column; justify-content:center; }
     .featured-badge { display:inline-block; background:var(--gold); color:#fff; font-size:0.65rem; letter-spacing:2px; text-transform:uppercase; padding:4px 10px; border-radius:2px; margin-bottom:14px; align-self:flex-start; }
     .featured-nr { font-size:0.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--crimson); font-weight:600; margin-bottom:10px; }
-    .featured-titlu { font-family:'Playfair Display',serif; font-size:clamp(1.5rem,2.5vw,2.2rem); font-weight:900; color:var(--ink); line-height:1.25; margin-bottom:10px; }
+    .featured-titlu { font-family:'Source Serif 4',Georgia,serif; font-size:clamp(1.5rem,2.5vw,2.2rem); font-weight:900; color:var(--ink); line-height:1.5; margin-bottom:10px; }
     .featured-data { font-size:0.8rem; color:var(--muted); font-style:italic; margin-bottom:16px; }
-    .featured-desc { font-size:0.92rem; line-height:1.75; color:#444; margin-bottom:28px; flex:1; }
+    .featured-desc { font-size:1rem; line-height:1.5; color:var(--ink); margin-bottom:28px; flex:1; }
     .featured-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-    .btn-featured { display:inline-flex; align-items:center; gap:8px; background:var(--crimson); color:#fff; padding:11px 26px; border-radius:3px; font-size:0.88rem; font-family:'Source Serif 4',serif; transition:background 0.2s; font-weight:600; }
+    .btn-featured { display:inline-flex; align-items:center; gap:8px; background:var(--crimson); color:#fff; padding:11px 26px; border-radius:3px; font-size:1rem; font-family:'Source Serif 4',serif; transition:background 0.2s; font-weight:600; }
     .btn-featured:hover { background:var(--crimson-dark); }
     .feat-art-count { font-size:0.76rem; color:var(--muted); }
 
@@ -325,7 +329,7 @@
     .revista-wrap { max-width:1200px; margin:44px auto 0; padding:0 24px 56px; }
     .section-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:32px; padding-bottom:14px; border-bottom:2px solid var(--crimson); position:relative; }
     .section-header::after { content:''; position:absolute; bottom:-6px; left:0; width:56px; height:2px; background:var(--gold); }
-    .section-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--ink); }
+    .section-title { font-family:'Source Serif 4',Georgia,serif; font-size:1.4rem; font-weight:700; color:var(--ink); }
     .section-count { font-size:0.78rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
     .editii-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:26px; }
 
@@ -336,15 +340,15 @@
     .editie-card:hover .coperta-wrap img { transform:scale(1.04); }
     .coperta-placeholder { width:100%; height:100%; background:linear-gradient(160deg,var(--crimson),var(--crimson-dark)); display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; gap:10px; padding:20px; }
     .coperta-placeholder .nr { font-size:0.68rem; letter-spacing:4px; text-transform:uppercase; opacity:0.6; }
-    .coperta-placeholder .titlu-cop { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; text-align:center; line-height:1.4; }
+    .coperta-placeholder .titlu-cop { font-family:'Source Serif 4',Georgia,serif; font-size:1.1rem; font-weight:700; text-align:center; line-height:1.5; }
     .coperta-placeholder .ornament { color:var(--gold-light); font-size:0.85rem; letter-spacing:6px; opacity:0.7; }
     .editie-badge-wrap { position:absolute; top:10px; right:10px; }
     .editie-badge { display:inline-block; background:var(--gold); color:#fff; font-size:0.63rem; letter-spacing:1.5px; text-transform:uppercase; padding:3px 8px; border-radius:2px; }
     .editie-info { padding:18px 18px 14px; flex:1; display:flex; flex-direction:column; }
     .editie-numar { font-size:0.68rem; letter-spacing:3px; text-transform:uppercase; color:var(--crimson); margin-bottom:6px; font-weight:600; }
-    .editie-titlu { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--ink); line-height:1.4; margin-bottom:4px; }
+    .editie-titlu { font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700; color:var(--ink); line-height:1.5; margin-bottom:4px; }
     .editie-data { font-size:0.74rem; color:var(--muted); margin-bottom:8px; font-style:italic; }
-    .editie-desc { font-size:0.82rem; color:#555; line-height:1.6; flex:1; }
+    .editie-desc { font-size:0.82rem; color:var(--ink); line-height:1.5; flex:1; }
     .editie-footer { display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--paper-dark); }
     .editie-art-count { font-size:0.71rem; color:var(--muted); }
     .btn-explore { display:inline-flex; align-items:center; gap:5px; background:var(--crimson); color:#fff; padding:6px 13px; border-radius:3px; font-size:0.76rem; font-family:'Source Serif 4',serif; transition:background 0.2s; }
@@ -352,13 +356,13 @@
 
     /* NEWSLETTER */
     .newsletter { background:#5a0000; padding:38px 20px; text-align:center; }
-    .newsletter h3 { font-family:'Playfair Display',serif; font-size:1.2rem; color:#fff; margin-bottom:6px; }
+    .newsletter h3 { font-family:'Source Serif 4',Georgia,serif; font-size:1.2rem; color:#fff; margin-bottom:6px; }
     .newsletter p { color:rgba(255,255,255,0.7); font-size:0.86rem; margin-bottom:16px; font-style:italic; }
     .newsletter-form { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-    .newsletter-form input { padding:10px 14px; border-radius:3px; border:none; font-family:'Source Serif 4',serif; font-size:0.88rem; }
+    .newsletter-form input { padding:10px 14px; border-radius:3px; border:none; font-family:'Source Serif 4',serif; font-size:1rem; }
     .newsletter-form input:first-child { width:145px; }
     .newsletter-form input:nth-child(2) { width:205px; }
-    .newsletter-form button { padding:10px 18px; background:var(--gold); color:#fff; border:none; border-radius:3px; font-family:'Source Serif 4',serif; font-size:0.88rem; font-weight:600; cursor:pointer; }
+    .newsletter-form button { padding:10px 18px; background:var(--gold); color:#fff; border:none; border-radius:3px; font-family:'Source Serif 4',serif; font-size:1rem; font-weight:600; cursor:pointer; }
     #subMsg { color:rgba(255,255,255,0.85); font-size:0.8rem; margin-top:10px; min-height:16px; }
 
     footer { background:var(--crimson); color:#fff; text-align:center; padding:26px 20px; font-size:0.84rem; }
@@ -372,17 +376,17 @@
     .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
     .modal-overlay.open { display:flex; }
     .modal { background:#fff; border-radius:8px; padding:40px; width:100%; max-width:400px; margin:20px; position:relative; box-shadow:0 8px 32px rgba(0,0,0,0.2); }
-    .modal h2 { color:var(--crimson); font-family:'Playfair Display',serif; font-size:1.5rem; margin-bottom:24px; text-align:center; }
+    .modal h2 { color:var(--crimson); font-family:'Source Serif 4',Georgia,serif; font-size:1.5rem; margin-bottom:24px; text-align:center; }
     .modal-close { position:absolute; top:16px; right:20px; font-size:1.5rem; cursor:pointer; color:#999; background:none; border:none; }
     .modal-tabs { display:flex; margin-bottom:24px; border-bottom:2px solid #e0e0e0; }
     .modal-tab { flex:1; text-align:center; padding:10px; cursor:pointer; font-size:0.9rem; color:#999; border-bottom:3px solid transparent; margin-bottom:-2px; }
     .modal-tab.active { color:var(--crimson); border-bottom-color:var(--crimson); font-weight:bold; }
     .modal-msg { text-align:center; font-size:0.85rem; margin-top:12px; color:var(--crimson); }
     .form-group { margin-bottom:16px; }
-    .form-group label { display:block; font-size:0.82rem; color:#555; margin-bottom:6px; }
-    .form-group input { width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:4px; font-size:0.95rem; font-family:'Source Serif 4',serif; outline:none; }
+    .form-group label { display:block; font-size:0.82rem; color:var(--ink); margin-bottom:6px; }
+    .form-group input { width:100%; padding:10px 14px; border:1px solid #ddd; border-radius:4px; font-size:1rem; font-family:'Source Serif 4',serif; outline:none; }
     .form-group input:focus { border-color:var(--crimson); }
-    .btn-primary { background:var(--crimson); color:#fff; padding:12px 30px; border-radius:4px; font-size:0.95rem; font-family:'Source Serif 4',serif; border:none; cursor:pointer; width:100%; margin-top:8px; }
+    .btn-primary { background:var(--crimson); color:#fff; padding:12px 30px; border-radius:4px; font-size:1rem; font-family:'Source Serif 4',serif; border:none; cursor:pointer; width:100%; margin-top:8px; }
     .btn-primary:hover { background:var(--crimson-dark); }
     .contact-modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
     .contact-modal-overlay.open { display:flex; }
@@ -396,14 +400,14 @@
       .mob-row1 { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; }
       .mob-logo img { height:50px; }
       .mob-row2 { text-align:center; padding:6px 16px 2px; }
-      .mob-title { display:block; font-family:'Playfair Display',serif; font-size:1rem; font-weight:900; color:var(--crimson); text-transform:uppercase; letter-spacing:2px; }
+      .mob-title { display:block; font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:900; color:var(--crimson); text-transform:uppercase; letter-spacing:2px; }
       .mob-motto { display:block; font-size:0.68rem; color:var(--crimson); letter-spacing:1px; margin-top:2px; font-style:italic; }
       .mob-row4 { display:flex; justify-content:center; padding:6px 16px 10px; border-top:1px solid var(--paper-dark); }
       .mob-hamburger { display:flex; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none; padding:6px; }
       .mob-hamburger span { display:block; width:28px; height:3px; background:var(--crimson); border-radius:2px; }
       .mob-nav { display:none; flex-direction:column; background:var(--crimson); }
       .mob-nav.open { display:flex; }
-      .mob-nav a { color:#fff; text-align:center; padding:14px; font-size:0.88rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.2); }
+      .mob-nav a { color:#fff; text-align:center; padding:14px; font-size:1rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.2); }
       .revista-hero { padding:18px 16px 14px; }
       .revista-hero-inner { grid-template-columns:1fr; gap:20px; }
       .hero-cover-placeholder { height:160px; }
@@ -438,17 +442,17 @@
 
     /* FORMULAR TRIMITERE ARTICOL */
     .form-section { margin-bottom:28px; }
-    .form-section-title { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--crimson); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    .form-section-title { font-family:'Source Serif 4',Georgia,serif; font-size:1rem; font-weight:700; color:var(--crimson); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
     .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px; }
     .form-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:14px; }
     .fld-group { display:flex; flex-direction:column; }
-    .fld-label { font-size:0.88rem; font-weight:600; color:#444; margin-bottom:6px; }
+    .fld-label { font-size:1rem; font-weight:600; color:var(--ink); margin-bottom:6px; }
     .req { color:var(--crimson); }
-    .fld-input { padding:10px 13px; border:1px solid var(--border); border-radius:3px; font-family:'Source Serif 4',serif; font-size:0.95rem; color:var(--ink); background:#fff; outline:none; transition:border-color 0.2s; }
+    .fld-input { padding:10px 13px; border:1px solid var(--border); border-radius:3px; font-family:'Source Serif 4',serif; font-size:1rem; color:var(--ink); background:#fff; outline:none; transition:border-color 0.2s; }
     .fld-input:focus { border-color:var(--crimson); }
     .fld-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B0000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
-    .file-item { display:flex; align-items:center; justify-content:space-between; background:var(--paper); border:1px solid var(--border); border-radius:3px; padding:10px 14px; font-size:0.88rem; }
-    .file-item .fi-name { display:flex; align-items:center; gap:8px; color:#333; font-weight:500; }
+    .file-item { display:flex; align-items:center; justify-content:space-between; background:var(--paper); border:1px solid var(--border); border-radius:3px; padding:10px 14px; font-size:1rem; }
+    .file-item .fi-name { display:flex; align-items:center; gap:8px; color:var(--ink); font-weight:500; }
     .file-item .fi-size { color:var(--muted); font-size:0.82rem; margin-left:8px; }
     .file-item .fi-remove { background:none; border:none; color:#999; cursor:pointer; font-size:1rem; padding:0 4px; transition:color 0.15s; }
     .file-item .fi-remove:hover { color:var(--crimson); }
@@ -466,7 +470,7 @@
     .tr-pachet:hover { border-color:var(--crimson); background:var(--paper); }
     .tr-pachet.selected { border-color:var(--crimson); background:#fff3f3; }
     .tr-pach-nr { font-size:0.85rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
-    .tr-pach-pret { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:900; color:var(--crimson); line-height:1; }
+    .tr-pach-pret { font-family:'Source Serif 4',Georgia,serif; font-size:2.2rem; font-weight:900; color:var(--crimson); line-height:1.5; }
     .tr-pach-pret span { font-size:1rem; font-weight:400; color:var(--muted); }
     .tr-pay-tabs { display:flex; gap:8px; margin-bottom:4px; }
     .tr-pay-tab { padding:10px 20px; border-radius:3px; border:2px solid var(--border); background:#fff; font-family:'Source Serif 4',serif; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--muted); }
@@ -570,27 +574,10 @@
 
 <!-- HERO -->
 <div class="revista-hero">
-  <div class="revista-hero-inner" style="display:grid;grid-template-columns:160px 1fr 160px;gap:24px;align-items:center;max-width:1200px;margin:0 auto;">
-    <!-- Card stânga: Ultimul număr -->
-    <div class="hero-card" onclick="showTab('arhiva')" style="cursor:pointer;">
-      <div class="hc-label">Nr. 1 · 2025</div>
-      <div class="hc-orn">— ✦ —</div>
-      <div class="hc-title">Revista Dokimasia</div>
-      <a class="hc-btn" onclick="showTab('arhiva');event.stopPropagation();">Ultimul număr</a>
-    </div>
-    <!-- Centru: titlu -->
-    <div style="text-align:center;">
-      <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
-      <h1>Revista Dokimasia</h1>
-      <p class="revista-hero-subtitle">Inovație și perspective în educație</p>
-    </div>
-    <!-- Card dreapta: Publică -->
-    <div class="hero-card" onclick="showTab('trimitere')" style="cursor:pointer;">
-      <div class="hc-label">Contribuie</div>
-      <div class="hc-orn">— ✦ —</div>
-      <div class="hc-title">Trimite un articol</div>
-      <a class="hc-btn" onclick="showTab('trimitere');event.stopPropagation();">Publică</a>
-    </div>
+  <div style="text-align:center;max-width:calc(1200px + 80px);margin:0 auto;padding:0 40px;box-sizing:border-box;">
+    <div class="revista-hero-label">Publicație periodică · Asociația Dokimasia</div>
+    <h1>Revista Dokimasia</h1>
+    <p class="revista-hero-subtitle">Inovație și perspective în educație</p>
   </div>
 </div>
 
@@ -607,75 +594,76 @@
         <h2>Despre revistă</h2>
         <div class="panel-header-line"></div>
         <div class="panel-intro">
-          Revista Dokimasia – <em>Inovație și perspective în educație</em> este o publicație educațională interdisciplinară dedicată promovării ideilor, studiilor și practicilor relevante din domeniul educației și din ariile conexe acesteia. Revista își propune să ofere un cadru deschis pentru valorificarea contribuțiilor care susțin dezvoltarea profesională, inovarea didactică și adaptarea educației la cerințele actuale.
+          <strong style="color:var(--crimson);">Revista Dokimasia – <em>Inovație și perspective în educație</em></strong> este o publicație educațională interdisciplinară dedicată promovării ideilor, studiilor și practicilor relevante din domeniul educației și din ariile conexe acesteia. Revista își propune să ofere un cadru deschis pentru valorificarea contribuțiilor care susțin dezvoltarea profesională, inovarea didactică și adaptarea educației la cerințele actuale.
         </div>
       </div>
 
-      <div class="sec-cards-grid">
-        <div class="sec-card">
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+
+        <!-- Profilul revistei -->
+        <div class="sec-card" style="margin-bottom:0;">
           <div class="sec-card-header">
             <div class="sec-card-icon">📋</div>
-            <div>
-              <div class="sec-card-title">Profilul revistei</div>
-            </div>
+            <div><div class="sec-card-title">Profilul revistei</div></div>
           </div>
           <div class="sec-card-body">
-            <p class="sec-card-desc">Revista are un profil mixt, integrând atât articole cu fundament teoretic și științific, cât și contribuții cu caracter aplicativ. Prin această abordare, publicația facilitează dialogul între cercetare și practică, încurajând materiale care oferă soluții concrete și perspective relevante pentru activitatea educațională.</p>
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Revista are un profil mixt, integrând atât articole cu fundament teoretic și științific, cât și contribuții cu caracter aplicativ. Publicația facilitează dialogul între cercetare și practică, încurajând materiale care oferă soluții concrete și perspective relevante pentru activitatea educațională.</p>
           </div>
         </div>
 
-        <div class="sec-card">
+        <!-- Public țintă -->
+        <div class="sec-card" style="margin-bottom:0;">
           <div class="sec-card-header">
             <div class="sec-card-icon">👥</div>
+            <div><div class="sec-card-title">Public țintă</div></div>
+          </div>
+          <div class="sec-card-body">
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Cadre didactice din toate nivelurile, personal de conducere, consilieri școlari, cercetători, formatori, studenți și toți cei interesați de domeniul educației.</p>
+          </div>
+        </div>
+
+        <!-- Periodicitate -->
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">📅</div>
+            <div><div class="sec-card-title">Periodicitate</div></div>
+          </div>
+          <div class="sec-card-body">
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Apare de <strong>patru ori pe an</strong>, disponibilă online cu posibilitatea versiunii tipărite la cerere. Materialele trebuie să fie originale și să respecte standardele editoriale.</p>
+          </div>
+        </div>
+
+        <!-- Tipuri de contribuții -->
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">📝</div>
             <div>
-              <div class="sec-card-title">Public țintă</div>
+              <div class="sec-card-title">Tipuri de contribuții</div>
+              <div class="sec-card-subtitle">Revista publică o gamă variată de materiale</div>
             </div>
           </div>
           <div class="sec-card-body">
-            <p class="sec-card-desc">Publicația se adresează cadrelor didactice din toate nivelurile de învățământ, personalului de conducere, consilierilor școlari, cercetătorilor, formatorilor, studenților și tuturor celor interesați de domeniul educației și de dezvoltarea acestuia.</p>
+            <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
+              <li>Articole de specialitate</li>
+              <li>Studii și cercetări educaționale</li>
+              <li>Analize și reflecții profesionale</li>
+              <li>Exemple de bună practică</li>
+              <li>Proiecte educaționale</li>
+              <li>Recenzii și interviuri</li>
+            </ul>
           </div>
         </div>
+
       </div>
 
-      <div class="sec-card" style="margin-top:0;">
+      <!-- Criterii editoriale — lățime completă -->
+      <div class="sec-card" style="margin-bottom:0;">
         <div class="sec-card-header">
-          <div class="sec-card-icon">📝</div>
-          <div>
-            <div class="sec-card-title">Tipuri de contribuții</div>
-            <div class="sec-card-subtitle">Revista publică o gamă variată de materiale</div>
-          </div>
+          <div class="sec-card-icon">✅</div>
+          <div><div class="sec-card-title">Criterii editoriale</div></div>
         </div>
         <div class="sec-card-body">
-          <ul class="sec-list">
-            <li>Articole de specialitate</li>
-            <li>Studii și cercetări educaționale</li>
-            <li>Analize și reflecții profesionale</li>
-            <li>Exemple de bună practică</li>
-            <li>Proiecte educaționale</li>
-            <li>Recenzii și interviuri etc.</li>
-          </ul>
-          <p style="font-size:0.9rem;color:#666;margin-top:12px;font-style:italic;">Materialele pot avea caracter teoretic sau aplicativ, fiind încurajate contribuțiile care valorifică experiențe concrete și rezultate relevante.</p>
-        </div>
-      </div>
-
-      <div class="sec-cards-grid" style="margin-top:20px;">
-        <div class="info-card">
-          <div class="info-card-head">
-            <span class="info-card-head-icon">✅</span>
-            <span class="info-card-head-title">Criterii editoriale</span>
-          </div>
-          <div class="info-card-body">
-            <p>Materialele transmise sunt analizate din perspectivă editorială, în vederea asigurării calității, coerenței și relevanței conținutului publicat. Revista urmărește să ofere autorilor un cadru de valorizare profesională și să contribuie la dezvoltarea unei comunități educaționale active.</p>
-          </div>
-        </div>
-        <div class="info-card">
-          <div class="info-card-head">
-            <span class="info-card-head-icon">📅</span>
-            <span class="info-card-head-title">Periodicitate</span>
-          </div>
-          <div class="info-card-body">
-            <p>Revista apare de <strong>patru ori pe an</strong> și este disponibilă în format online, cu posibilitatea realizării unei versiuni tipărite, la cerere. Materialele publicate trebuie să fie originale și să respecte standardele editoriale ale publicației.</p>
-          </div>
+          <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Materialele transmise sunt analizate din perspectivă editorială, în vederea asigurării calității, coerenței și relevanței conținutului publicat. Revista urmărește să ofere autorilor un cadru de valorizare profesională și să contribuie la dezvoltarea unei comunități educaționale active.</p>
         </div>
       </div>
     </div>
@@ -690,83 +678,86 @@
         </div>
       </div>
 
-      <div class="sec-card">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">🎓</div>
-          <div>
-            <div class="sec-card-title">Practici educaționale și inovare didactică</div>
-            <div class="sec-card-subtitle">Contribuții cu caracter aplicativ din mediul școlar</div>
-          </div>
-        </div>
-        <div class="sec-card-body">
-          <p class="sec-card-desc">Include contribuții cu caracter aplicativ, centrate pe activitatea didactică și pe intervențiile educaționale realizate în mediul școlar.</p>
-          <ul class="sec-list">
-            <li>Articole și materiale metodice</li>
-            <li>Planuri de lecție și scenarii didactice</li>
-            <li>Auxiliare curriculare și suporturi educaționale</li>
-            <li>Fișe de lucru, instrumente de evaluare și resurse educaționale</li>
-            <li>Activități remediale și de sprijin</li>
-            <li>Utilizarea tehnologiei și a resurselor digitale în educație</li>
-            <li>Exemple de bună practică și intervenții didactice</li>
-            <li>Comunicări scurte și note de practică</li>
-            <li>Alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
-          </ul>
-        </div>
-      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
 
-      <div class="sec-card">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">🔬</div>
-          <div>
-            <div class="sec-card-title">Cercetare și analiză în educație</div>
-            <div class="sec-card-subtitle">Contribuții cu caracter științific, teoretic sau analitic</div>
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">🎓</div>
+            <div>
+              <div class="sec-card-title">Practici educaționale și inovare didactică</div>
+              <div class="sec-card-subtitle">Contribuții cu caracter aplicativ din mediul școlar</div>
+            </div>
+          </div>
+          <div class="sec-card-body">
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-bottom:8px;">Include contribuții cu caracter aplicativ, centrate pe activitatea didactică și pe intervențiile educaționale realizate în mediul școlar.</p>
+            <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;">
+              <li>Articole și materiale metodice</li>
+              <li>Planuri de lecție și scenarii didactice</li>
+              <li>Auxiliare curriculare și suporturi educaționale</li>
+              <li>Fișe de lucru, instrumente de evaluare și resurse educaționale</li>
+              <li>Activități remediale și de sprijin</li>
+              <li>Utilizarea tehnologiei și a resurselor digitale în educație</li>
+              <li>Exemple de bună practică și intervenții didactice</li>
+              <li>Comunicări scurte și note de practică</li>
+              <li>Alte materiale educaționale relevante</li>
+            </ul>
           </div>
         </div>
-        <div class="sec-card-body">
-          <p class="sec-card-desc">Include contribuții cu caracter științific, teoretic sau analitic, care abordează fenomenul educațional din perspective diverse.</p>
-          <ul class="sec-list">
-            <li>Studii și cercetări educaționale</li>
-            <li>Articole de specialitate</li>
-            <li>Analize și reflecții asupra practicilor educaționale</li>
-            <li>Sinteze tematice și articole de tip „review"</li>
-            <li>Lucrări interdisciplinare</li>
-            <li>Evaluarea impactului intervențiilor educaționale</li>
-            <li>Studii de caz educaționale</li>
-            <li>Recenzii de lucrări și resurse educaționale</li>
-            <li>Interviuri și contribuții de specialitate</li>
-            <li>Alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
-          </ul>
-        </div>
-      </div>
 
-      <div class="sec-card">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">🌱</div>
-          <div>
-            <div class="sec-card-title">Dezvoltare educațională și profesională</div>
-            <div class="sec-card-subtitle">Evoluția sistemului și dezvoltarea profesională a cadrelor didactice</div>
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">🔬</div>
+            <div>
+              <div class="sec-card-title">Cercetare și analiză în educație</div>
+              <div class="sec-card-subtitle">Contribuții cu caracter științific, teoretic sau analitic</div>
+            </div>
+          </div>
+          <div class="sec-card-body">
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-bottom:8px;">Include contribuții cu caracter științific, teoretic sau analitic, care abordează fenomenul educațional din perspective diverse.</p>
+            <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;">
+              <li>Studii și cercetări educaționale</li>
+              <li>Articole de specialitate</li>
+              <li>Analize și reflecții asupra practicilor educaționale</li>
+              <li>Sinteze tematice și articole de tip „review"</li>
+              <li>Lucrări interdisciplinare</li>
+              <li>Evaluarea impactului intervențiilor educaționale</li>
+              <li>Studii de caz educaționale</li>
+              <li>Recenzii de lucrări și resurse educaționale</li>
+              <li>Interviuri și contribuții de specialitate</li>
+              <li>Alte materiale educaționale relevante</li>
+            </ul>
           </div>
         </div>
-        <div class="sec-card-body">
-          <p class="sec-card-desc">Include contribuții privind evoluția sistemului educațional și dezvoltarea profesională a cadrelor didactice, precum și implicarea instituțiilor educaționale în comunitate.</p>
-          <ul class="sec-list">
-            <li>Articole de reflecție profesională</li>
-            <li>Studii de caz și analize instituționale</li>
-            <li>Management educațional și leadership</li>
-            <li>Politici educaționale și dezvoltare instituțională</li>
-            <li>Educație incluzivă și echitate</li>
-            <li>Consiliere școlară și dezvoltare personală</li>
-            <li>Activități de formare și dezvoltare profesională</li>
-            <li>Proiecte educaționale și parteneriate</li>
-            <li>Proiecte Erasmus+, proiecte cu finanțare externă și materiale privind implementarea, promovarea și diseminarea rezultatelor acestora</li>
-            <li>Ghiduri, resurse și materiale dezvoltate în cadrul proiectelor educaționale</li>
-            <li>Alte materiale educaționale relevante, în concordanță cu specificul ariei tematice</li>
-          </ul>
+
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">🌱</div>
+            <div>
+              <div class="sec-card-title">Dezvoltare educațională și profesională</div>
+              <div class="sec-card-subtitle">Evoluția sistemului și dezvoltarea profesională a cadrelor didactice</div>
+            </div>
+          </div>
+          <div class="sec-card-body">
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-bottom:8px;">Include contribuții privind evoluția sistemului educațional și dezvoltarea profesională a cadrelor didactice, precum și implicarea instituțiilor educaționale în comunitate.</p>
+            <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;">
+              <li>Articole de reflecție profesională</li>
+              <li>Studii de caz și analize instituționale</li>
+              <li>Management educațional și leadership</li>
+              <li>Politici educaționale și dezvoltare instituțională</li>
+              <li>Educație incluzivă și echitate</li>
+              <li>Consiliere școlară și dezvoltare personală</li>
+              <li>Activități de formare și dezvoltare profesională</li>
+              <li>Proiecte educaționale și parteneriate</li>
+              <li>Proiecte Erasmus+ și finanțare externă</li>
+              <li>Alte materiale educaționale relevante</li>
+            </ul>
+          </div>
         </div>
+
       </div>
 
       <div class="panel-note">
-        <strong>Notă orientativă:</strong> Ariile tematice și exemplele de contribuții au caracter orientativ. Revista încurajează transmiterea unor materiale diverse și relevante pentru activitatea didactică, cercetare și dezvoltare profesională, care pot fi valorificate în parcursul profesional al autorilor.
+        <strong>Notă orientativă:</strong> Ariile tematice și exemplele de contribuții au caracter orientativ. Revista încurajează transmiterea unor materiale diverse și relevante pentru activitatea didactică, cercetare și dezvoltare profesională.
       </div>
     </div>
     <!-- GHID -->
@@ -775,13 +766,37 @@
         <h2>Ghid pentru autori</h2>
         <div class="panel-header-line"></div>
         <div class="panel-intro">
-          Revista Dokimasia – <em>Inovație și perspective în educație</em> publică lucrări originale din domeniul educației și din ariile conexe acesteia, cu scopul de a valorifica contribuții relevante pentru practica didactică, cercetarea educațională și dezvoltarea profesională.<br><br>
-          Sunt acceptate articole, studii, analize, materiale metodice, auxiliare curriculare, suporturi educaționale, precum și lucrări rezultate în urma implementării proiectelor educaționale sau a activităților de formare și dezvoltare profesională.<br><br>
-          Materialele transmise trebuie să fie originale, să nu fi fost publicate anterior și să nu fie în curs de evaluare în cadrul altor publicații.
+          Revista Dokimasia publică lucrări originale din domeniul educației și din ariile conexe acesteia. Materialele transmise trebuie să fie originale, să nu fi fost publicate anterior și să nu fie în curs de evaluare în cadrul altor publicații.
         </div>
       </div>
 
-      <!-- Tipologia lucrărilor -->
+      <!-- Precizare vizibilă — opțiuni de trimitere -->
+      <div style="background:var(--paper-dark);border:2px solid var(--crimson);border-radius:8px;padding:24px 28px;margin-bottom:16px;">
+        <div style="font-size:1rem;font-weight:700;color:var(--crimson);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;">📌 Cum îți poți trimite materialul?</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+
+          <div style="display:flex;align-items:flex-start;gap:16px;">
+            <div style="font-size:1.6rem;flex-shrink:0;">✏️</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:4px;">Editare online, asistată de AI</div>
+              <div style="font-size:1rem;line-height:1.5;color:var(--ink);">Redactează-ți articolul direct pe site, folosind editorul nostru online. Ești ghidat pas cu pas de un asistent AI care te ajută să structurezi și să formatezi corect materialul.</div>
+              <a href="editor-articol.html" style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--crimson);color:#fff;padding:10px 22px;border-radius:4px;font-size:1rem;font-weight:600;font-family:'Source Serif 4',serif;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editează online</a>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid var(--border);"></div>
+
+          <div style="display:flex;align-items:flex-start;gap:16px;">
+            <div style="font-size:1.6rem;flex-shrink:0;">📄</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:4px;">Trimite document formatat după template</div>
+              <div style="font-size:1rem;line-height:1.5;color:var(--ink);">Descarcă template-ul oficial al revistei, completează-l respectând cerințele de formatare și trimite-l prin formularul de trimitere articole.</div>
+              <a href="template_general.docx" download style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;background:var(--ink);color:#fff;padding:10px 22px;border-radius:4px;font-size:1rem;font-weight:600;font-family:'Source Serif 4',serif;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='var(--ink)'">⬇ Descarcă template</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
       <div class="sec-card">
         <div class="sec-card-header">
           <div class="sec-card-icon">📝</div>
@@ -791,53 +806,49 @@
           </div>
         </div>
         <div class="sec-card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;">
-            <ul class="sec-list">
-              <li>Articole de specialitate</li>
-              <li>Studii și cercetări educaționale</li>
-              <li>Articole teoretice</li>
-              <li>Articole metodologice</li>
-              <li>Sinteze tematice</li>
-              <li>Articole de tip review / analiză a literaturii</li>
-              <li>Studii de caz</li>
-              <li>Analize educaționale</li>
-              <li>Analize instituționale</li>
-              <li>Analize de politici educaționale</li>
-              <li>Materiale metodice</li>
-              <li>Ghiduri metodice</li>
-              <li>Auxiliare curriculare</li>
-              <li>Suporturi educaționale</li>
-              <li>Planuri de lecție</li>
-              <li>Scenarii didactice</li>
-              <li>Proiecte didactice</li>
-              <li>Fișe de lucru</li>
-            </ul>
-            <ul class="sec-list">
-              <li>Instrumente de evaluare</li>
-              <li>Exemple de bună practică</li>
-              <li>Intervenții educaționale</li>
-              <li>Activități remediale și de sprijin</li>
-              <li>Resurse educaționale</li>
-              <li>Resurse digitale și materiale pentru utilizarea tehnologiei în educație</li>
-              <li>Articole de reflecție profesională</li>
-              <li>Eseuri educaționale</li>
-              <li>Comunicări scurte / note de practică</li>
-              <li>Rapoarte de activitate educațională</li>
-              <li>Rapoarte de implementare a proiectelor</li>
-              <li>Prezentări de proiecte educaționale</li>
-              <li>Materiale privind proiecte Erasmus+ și alte proiecte cu finanțare externă</li>
-              <li>Materiale de promovare, valorizare și diseminare a rezultatelor proiectelor</li>
-              <li>Interviuri</li>
-              <li>Recenzii de carte, resurse sau platforme educaționale</li>
-              <li>Alte materiale educaționale relevante</li>
-            </ul>
-          </div>
-          <p style="font-size:0.88rem;color:var(--muted);font-style:italic;margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);">Încadrarea lucrărilor în ariile tematice ale revistei se realizează de către redacție, în funcție de conținutul acestora.</p>
+          <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;display:grid;grid-template-columns:1fr 1fr;gap:0 24px;">
+            <li>Articole de specialitate</li>
+            <li>Studii și cercetări educaționale</li>
+            <li>Articole teoretice</li>
+            <li>Articole metodologice</li>
+            <li>Sinteze tematice</li>
+            <li>Articole de tip review</li>
+            <li>Studii de caz</li>
+            <li>Analize educaționale</li>
+            <li>Analize instituționale</li>
+            <li>Analize de politici educaționale</li>
+            <li>Materiale metodice</li>
+            <li>Ghiduri metodice</li>
+            <li>Auxiliare curriculare</li>
+            <li>Suporturi educaționale</li>
+            <li>Planuri de lecție</li>
+            <li>Scenarii didactice</li>
+            <li>Proiecte didactice</li>
+            <li>Fișe de lucru</li>
+            <li>Instrumente de evaluare</li>
+            <li>Exemple de bună practică</li>
+            <li>Intervenții educaționale</li>
+            <li>Activități remediale</li>
+            <li>Resurse educaționale</li>
+            <li>Resurse digitale</li>
+            <li>Articole de reflecție profesională</li>
+            <li>Eseuri educaționale</li>
+            <li>Comunicări scurte</li>
+            <li>Rapoarte de activitate</li>
+            <li>Rapoarte de implementare</li>
+            <li>Prezentări de proiecte</li>
+            <li>Materiale Erasmus+</li>
+            <li>Materiale de diseminare</li>
+            <li>Interviuri</li>
+            <li>Recenzii de carte și resurse</li>
+            <li>Alte materiale relevante</li>
+          </ul>
+          <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);">Încadrarea lucrărilor în ariile tematice ale revistei se realizează de către redacție, în funcție de conținutul acestora.</p>
         </div>
       </div>
 
-      <!-- Structura lucrărilor -->
-      <div class="sec-card">
+      <!-- Structura -->
+      <div class="sec-card" style="margin-bottom:0;">
         <div class="sec-card-header">
           <div class="sec-card-icon">🏗️</div>
           <div>
@@ -846,50 +857,50 @@
           </div>
         </div>
         <div class="sec-card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:8px;">
 
             <div style="background:var(--paper);border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px;">
-              <div style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Practici educaționale și inovare didactică</div>
-              <ol style="margin-left:1.2em;font-size:0.9rem;line-height:1.8;color:#333;">
+              <div style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Practici educaționale și inovare didactică</div>
+              <ol style="margin-left:1.2em;font-size:1rem;line-height:1.5;color:var(--ink);">
                 <li>Introducere și context</li>
                 <li>Descrierea demersului didactic</li>
                 <li>Rezultate și observații</li>
                 <li>Concluzii și recomandări</li>
               </ol>
-              <p style="font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:10px;">Planuri de lecție, materiale metodice, resurse educaționale și exemple de bună practică.</p>
-              <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-                <a href="editor-articol.html?tip=practic" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
-                <a href="template_practic.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
+              <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.5;">Planuri de lecție, materiale metodice, resurse educaționale și exemple de bună practică.</p>
+              <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+                <a href="editor-articol.html?tip=practic" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
+                <a href="template_practic.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
               </div>
             </div>
 
             <div style="background:var(--paper);border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px;">
-              <div style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Cercetare și analiză în educație</div>
-              <ol style="margin-left:1.2em;font-size:0.9rem;line-height:1.8;color:#333;">
+              <div style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Cercetare și analiză în educație</div>
+              <ol style="margin-left:1.2em;font-size:1rem;line-height:1.5;color:var(--ink);">
                 <li>Introducere și fundamentare teoretică</li>
                 <li>Metodologie</li>
                 <li>Rezultate și analiză</li>
                 <li>Concluzii și implicații</li>
               </ol>
-              <p style="font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:10px;">Studii, cercetări, articole teoretice și analize de tip academic.</p>
-              <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-                <a href="editor-articol.html?tip=cercetare" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
-                <a href="template_cercetare.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
+              <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.5;">Studii, cercetări, articole teoretice și analize de tip academic.</p>
+              <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+                <a href="editor-articol.html?tip=cercetare" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
+                <a href="template_cercetare.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
               </div>
             </div>
 
             <div style="background:var(--paper);border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px;">
-              <div style="font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Dezvoltare educațională și profesională</div>
-              <ol style="margin-left:1.2em;font-size:0.9rem;line-height:1.8;color:#333;">
+              <div style="font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:10px;">🔷 Dezvoltare educațională și profesională</div>
+              <ol style="margin-left:1.2em;font-size:1rem;line-height:1.5;color:var(--ink);">
                 <li>Introducere și context</li>
                 <li>Descrierea intervenției / proiectului / analizei</li>
                 <li>Rezultate și observații</li>
                 <li>Concluzii și implicații</li>
               </ol>
-              <p style="font-size:0.8rem;color:var(--muted);font-style:italic;margin-top:10px;">Proiecte educaționale, studii de caz, analize instituționale și reflecții profesionale.</p>
-              <div style="display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-                <a href="editor-articol.html?tip=dezvoltare" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
-                <a href="template_dezvoltare.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.78rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
+              <p style="font-size:1rem;color:var(--muted);font-style:italic;margin-top:8px;line-height:1.5;">Proiecte educaționale, studii de caz, analize instituționale și reflecții profesionale.</p>
+              <div style="display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+                <a href="editor-articol.html?tip=dezvoltare" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--crimson);color:#fff;border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Editare online</a>
+                <a href="template_dezvoltare.docx" download style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);border-radius:3px;font-size:0.85rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Template Word</a>
               </div>
             </div>
 
@@ -897,57 +908,53 @@
         </div>
       </div>
 
-      <!-- Cerințe de redactare -->
-      <div class="sec-card">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">✏️</div>
-          <div>
-            <div class="sec-card-title">Cerințe de redactare</div>
-            <div class="sec-card-subtitle">Materialele trebuie redactate respectând următoarele cerințe</div>
+      <!-- Cerințe + Etică + Precizări — o coloană -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">✏️</div>
+            <div><div class="sec-card-title">Cerințe de redactare</div></div>
           </div>
-        </div>
-        <div class="sec-card-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 32px;">
-            <ul class="sec-list">
-              <li>Format editabil (.doc / .docx) sau completare în secțiunea dedicată de pe site</li>
+          <div class="info-card-body">
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-bottom:10px;">Materialele transmise spre publicare trebuie să respecte următoarele cerințe de formatare, pentru a facilita procesul editorial și a asigura uniformitatea publicației:</p>
+            <ul style="margin-left:1.1em;font-size:1rem;line-height:1.5;color:var(--ink);list-style:disc;">
+              <li>Format editabil (.doc / .docx) sau editor online</li>
               <li>Font Times New Roman, 12 pt</li>
               <li>Spațiere 1.5</li>
-            </ul>
-            <ul class="sec-list">
               <li>Aliniere justify</li>
-              <li>Utilizarea diacriticelor este obligatorie</li>
-              <li>Titlurile și subtitlurile trebuie evidențiate clar</li>
+              <li>Diacritice obligatorii</li>
+              <li>Titluri evidențiate clar</li>
             </ul>
+            <p style="font-size:1rem;color:var(--ink);margin-top:8px;line-height:1.5;">Toate materialele acceptate vor fi tehnoredactate de redacție.</p>
           </div>
-          <p style="font-size:0.9rem;color:#555;margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);text-align:justify;">Autorii care întâmpină dificultăți în redactarea, structurarea sau transmiterea materialului pot solicita sprijin din partea redacției. Toate materialele acceptate pentru publicare vor fi tehnoredactate și adaptate la formatul revistei, pentru asigurarea unității editoriale, a coerenței vizuale și a unei prezentări corespunzătoare.</p>
         </div>
-      </div>
 
-      <!-- Etică și originalitate + Precizări finale -->
-      <div class="sec-cards-grid" style="margin-top:20px;">
-        <div class="info-card">
-          <div class="info-card-head">
-            <span class="info-card-head-icon">⚖️</span>
-            <span class="info-card-head-title">Etică și originalitate</span>
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">⚖️</div>
+            <div><div class="sec-card-title">Etică și originalitate</div></div>
           </div>
           <div class="info-card-body">
-            <p>Autorii au responsabilitatea de a transmite lucrări originale și de a respecta normele de etică academică. Lucrările trebuie să reflecte contribuția proprie a autorilor și să includă indicarea corectă a surselor utilizate.</p>
-            <p>Nu sunt acceptate materiale plagiate sau preluări neasumate. În cazul lucrărilor realizate în coautorat, toți autorii își asumă conținutul și transmiterea materialului.</p>
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Autorii au responsabilitatea de a transmite lucrări originale și de a respecta normele de etică academică. Lucrările trebuie să reflecte contribuția proprie și să includă indicarea corectă a surselor utilizate.</p>
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);margin-top:6px;">Nu sunt acceptate materiale plagiate sau preluări neasumate.</p>
           </div>
         </div>
-        <div class="info-card">
-          <div class="info-card-head">
-            <span class="info-card-head-icon">📌</span>
-            <span class="info-card-head-title">Precizări finale</span>
+
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">📌</div>
+            <div><div class="sec-card-title">Precizări finale</div></div>
           </div>
           <div class="info-card-body">
-            <p>Lucrările trebuie să se încadreze în profilul și ariile tematice ale revistei. Redacția își rezervă dreptul de a decide încadrarea contribuțiilor și de a solicita clarificări sau completări, atunci când este necesar.</p>
+            <p style="font-size:1rem;line-height:1.5;color:var(--ink);">Lucrările trebuie să se încadreze în profilul și ariile tematice ale revistei. Redacția își rezervă dreptul de a decide încadrarea contribuțiilor și de a solicita clarificări.</p>
           </div>
         </div>
+
       </div>
 
       <div class="panel-note" style="background:linear-gradient(to right,#fdf8f0,#fff8ec);border-left-color:var(--crimson);">
-        <strong>Ai nevoie de sprijin?</strong> Pentru întrebări privind redactarea, structurarea sau transmiterea materialelor, autorii pot contacta redacția Revistei Dokimasia. Redacția poate oferi îndrumări privind încadrarea lucrării, cerințele de redactare și pașii necesari pentru trimiterea articolului.
+        <strong>Ai nevoie de sprijin?</strong> Pentru întrebări privind redactarea, structurarea sau transmiterea materialelor, autorii pot contacta redacția Revistei Dokimasia la adresa de e-mail dedicată.
       </div>
     </div>
     <div class="info-panel" id="panel-trimitere">
@@ -1053,10 +1060,10 @@
           <div class="fld-group">
             <label class="fld-label">Dorești exemplar tipărit al revistei?</label>
             <div style="display:flex;gap:20px;margin-top:8px;">
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.95rem;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1rem;">
                 <input type="radio" name="exemplar" value="Nu" checked style="accent-color:var(--crimson);"> Nu
               </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.95rem;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:1rem;">
                 <input type="radio" name="exemplar" value="Da (50 lei/exemplar)" style="accent-color:var(--crimson);"> Da (50 lei/exemplar)
               </label>
             </div>
@@ -1065,7 +1072,7 @@
 
         <div class="form-section">
           <div class="form-section-title">Pasul 5 — Fișiere atașate</div>
-          <p style="font-size:0.95rem;color:#555;margin-bottom:16px;line-height:1.7;">
+          <p style="font-size:1rem;color:var(--ink);margin-bottom:16px;line-height:1.5;">
             Atașează câte un fișier pentru fiecare articol. Formate acceptate: <strong>.doc, .docx, .pdf</strong>. Dimensiune maximă per fișier: 50 MB.
           </p>
           <div id="articole-fisiere-wrap" style="display:flex;flex-direction:column;gap:16px;"></div>
@@ -1074,7 +1081,7 @@
         <div class="form-section" style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:18px 20px;">
           <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;">
             <input type="checkbox" id="tr-gdpr" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
-            <span style="font-size:0.92rem;color:#444;line-height:1.65;">
+            <span style="font-size:1rem;color:var(--ink);line-height:1.5;">
               Sunt de acord cu transmiterea materialului spre evaluare editorială și cu publicarea acestuia în Revista Dokimasia, precum și cu prelucrarea datelor mele cu caracter personal în scopul desfășurării activității editoriale. <span class="req">*</span>
             </span>
           </label>
@@ -1085,7 +1092,7 @@
         <div id="tr-step2">
           <div class="form-section">
             <div class="form-section-title">Contribuția editorială</div>
-            <p style="font-size:0.95rem;color:#555;margin-bottom:20px;line-height:1.7;">
+            <p style="font-size:1rem;color:var(--ink);margin-bottom:20px;line-height:1.5;">
               Ai selectat <strong id="tr-pach-label">1 articol</strong>. Contribuția editorială este de <strong id="tr-pach-suma">40 lei</strong>.
             </p>
 
@@ -1096,7 +1103,7 @@
               <div id="sectiune-plateste-acum" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('acum')">
                 <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
                   <input type="radio" name="optiune-plata" id="radio-acum" style="accent-color:var(--crimson);" />
-                  <label for="radio-acum" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">💳 Plătește acum</label>
+                  <label for="radio-acum" style="font-size:1rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">💳 Plătește acum</label>
                 </div>
                 <div id="continut-plateste-acum" style="display:none;padding:16px 18px;">
                   <!-- Tabs plată -->
@@ -1127,7 +1134,7 @@
                   <div id="tr-iban-wrap" style="display:none;margin-top:16px;">
                     <div style="background:var(--paper);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:16px;">
                       <div style="font-size:0.8rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Date transfer bancar</div>
-                      <table style="font-size:0.95rem;border-collapse:collapse;width:100%;">
+                      <table style="font-size:1rem;border-collapse:collapse;width:100%;">
                         <tr><td style="padding:5px 0;color:#666;width:140px;">Beneficiar</td><td style="padding:5px 0;font-weight:600;">Asociația Dokimasia</td></tr>
                         <tr><td style="padding:5px 0;color:#666;">IBAN</td><td style="padding:5px 0;font-weight:600;font-family:monospace;">RO00 XXXX 0000 0000 0000 0000</td></tr>
                         <tr><td style="padding:5px 0;color:#666;">Bancă</td><td style="padding:5px 0;">—</td></tr>
@@ -1137,9 +1144,9 @@
                     </div>
                     <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
                       <input type="checkbox" id="tr-iban-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" />
-                      <span style="font-size:0.92rem;color:#444;line-height:1.65;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
+                      <span style="font-size:1rem;color:var(--ink);line-height:1.5;">Am efectuat transferul bancar și confirm că suma de <strong id="tr-iban-suma2">40 lei</strong> a fost trimisă.</span>
                     </label>
-                    <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
+                    <button onclick="confirmIban()" style="background:var(--crimson);color:#fff;border:none;padding:12px 28px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:600;cursor:pointer;">Continuă →</button>
                   </div>
                 </div>
               </div>
@@ -1148,15 +1155,15 @@
               <div id="sectiune-plateste-mai-tarziu" style="border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;" onclick="selectOptiunePlata('tarziu')">
                 <div style="background:var(--paper-dark);padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);">
                   <input type="radio" name="optiune-plata" id="radio-tarziu" style="accent-color:var(--crimson);" />
-                  <label for="radio-tarziu" style="font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">🕐 Plătește mai târziu</label>
+                  <label for="radio-tarziu" style="font-size:1rem;font-weight:700;color:var(--ink);cursor:pointer;letter-spacing:0.3px;">🕐 Plătește mai târziu</label>
                 </div>
                 <div id="continut-plateste-tarziu" style="display:none;padding:16px 18px;">
-                  <p style="font-size:0.92rem;color:#555;line-height:1.7;margin-bottom:16px;">
+                  <p style="font-size:1rem;color:var(--ink);line-height:1.5;margin-bottom:16px;">
                     Poți trimite articolul acum și achita contribuția editorială ulterior. Redacția va procesa materialul după confirmarea plății.
                   </p>
                   <label style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;margin-bottom:16px;">
                     <input type="checkbox" id="tr-tarziu-confirm" style="accent-color:var(--crimson);margin-top:3px;flex-shrink:0;" onchange="handleTarziuConfirm(this)" />
-                    <span style="font-size:0.92rem;color:#444;line-height:1.65;">
+                    <span style="font-size:1rem;color:var(--ink);line-height:1.5;">
                       Am luat la cunoștință că articolul va fi procesat după achitarea contribuției editoriale de <strong id="tr-tarziu-suma">40 lei</strong> și confirm că voi efectua plata ulterior. <span class="req">*</span>
                     </span>
                   </label>
@@ -1169,7 +1176,7 @@
         <!-- Confirmare plată -->
         <div id="tr-plata-confirmare-wrap" style="display:none;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:4px;padding:14px 18px;margin-top:20px;align-items:center;gap:10px;">
           <span style="font-size:1.3rem;">✅</span>
-          <span style="font-size:0.95rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare"></span>
+          <span style="font-size:1rem;color:#2e7d32;font-weight:600;" id="tr-plata-confirmare"></span>
         </div>
 
         <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
@@ -1179,16 +1186,16 @@
             <span>Trimite articolul</span>
             <span style="font-size:1.1rem;">→</span>
           </button>
-          <span id="trimitereMsg" style="font-size:0.92rem;"></span>
+          <span id="trimitereMsg" style="font-size:1rem;"></span>
         </div>
       </div>
 
       <!-- Succes final -->
       <div id="trimitereSuccess" style="display:none;text-align:center;padding:48px 20px;">
         <div style="font-size:3rem;margin-bottom:16px;">✅</div>
-        <h3 style="font-family:'Playfair Display',serif;color:var(--crimson);font-size:1.4rem;margin-bottom:10px;">Articolul a fost trimis cu succes!</h3>
-        <p style="font-size:1rem;color:#555;line-height:1.75;max-width:480px;margin:0 auto 24px;">Redacția Revistei Dokimasia a primit materialul tău și te va contacta în cel mai scurt timp la adresa de e-mail indicată.</p>
-        <button onclick="resetTrimitere()" style="background:var(--crimson);color:#fff;border:none;padding:11px 28px;border-radius:3px;font-size:0.95rem;font-family:'Source Serif 4',serif;cursor:pointer;">Trimite alt articol</button>
+        <h3 style="font-family:'Source Serif 4',Georgia,serif;color:var(--crimson);font-size:1.4rem;margin-bottom:10px;">Articolul a fost trimis cu succes!</h3>
+        <p style="font-size:1rem;color:var(--ink);line-height:1.5;max-width:480px;margin:0 auto 24px;">Redacția Revistei Dokimasia a primit materialul tău și te va contacta în cel mai scurt timp la adresa de e-mail indicată.</p>
+        <button onclick="resetTrimitere()" style="background:var(--crimson);color:#fff;border:none;padding:11px 28px;border-radius:3px;font-size:1rem;font-family:'Source Serif 4',serif;cursor:pointer;">Trimite alt articol</button>
       </div>
 
     </div>
@@ -1199,65 +1206,68 @@
         <h2>Colegiul editorial</h2>
         <div class="panel-header-line"></div>
         <div class="panel-intro">
-          Revista Dokimasia este realizată de un colectiv de redacție dedicat calității editoriale și promovării excelenței în educație. Colegiul editorial este format din specialiști cu experiență în domeniul educațional, care asigură rigoarea și relevanța conținutului publicat.
+          Revista Dokimasia este realizată de un colectiv de redacție dedicat calității editoriale și promovării excelenței în educație.
         </div>
       </div>
 
-      <div class="sec-card" style="margin-bottom:24px;">
-        <div class="sec-card-header">
-          <div class="sec-card-icon">👥</div>
-          <div>
-            <div class="sec-card-title">Echipa editorială</div>
-            <div class="sec-card-subtitle">Membri ai colegiului de redacție</div>
-          </div>
-        </div>
-        <div class="sec-card-body">
-          <div class="colegiu-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-top:4px;">
-            <div class="colegiu-card-new">
-              <div class="colegiu-avatar">✦</div>
-              <div class="colegiu-rol">Redactor-șef</div>
-              <div class="colegiu-name">—</div>
-            </div>
-            <div class="colegiu-card-new">
-              <div class="colegiu-avatar">✦</div>
-              <div class="colegiu-rol">Secretar de redacție</div>
-              <div class="colegiu-name">—</div>
-            </div>
-            <div class="colegiu-card-new">
-              <div class="colegiu-avatar">✦</div>
-              <div class="colegiu-rol">Redactor</div>
-              <div class="colegiu-name">—</div>
-            </div>
-            <div class="colegiu-card-new">
-              <div class="colegiu-avatar">✦</div>
-              <div class="colegiu-rol">Redactor</div>
-              <div class="colegiu-name">—</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
 
-      <div class="sec-cards-grid">
-        <div class="info-card">
-          <div class="info-card-head">
-            <span class="info-card-head-icon">🏛️</span>
-            <span class="info-card-head-title">Despre colegiu</span>
+        <!-- Echipa -->
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">👥</div>
+            <div><div class="sec-card-title">Echipa editorială</div></div>
           </div>
-          <div class="info-card-body">
-            <p>Colegiul editorial al Revistei Dokimasia este format din specialiști cu experiență în domeniul educațional, care contribuie la asigurarea calității, coerenței și relevanței materialelor publicate.</p>
-            <p>Membrii colegiului participă la evaluarea materialelor și la orientarea editorială a publicației, în acord cu valorile și misiunea revistei.</p>
+          <div class="sec-card-body">
+            <div class="colegiu-grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-top:0;">
+              <div class="colegiu-card-new">
+                <div class="colegiu-avatar">✦</div>
+                <div class="colegiu-rol">Redactor-șef</div>
+                <div class="colegiu-name">—</div>
+              </div>
+              <div class="colegiu-card-new">
+                <div class="colegiu-avatar">✦</div>
+                <div class="colegiu-rol">Secretar de redacție</div>
+                <div class="colegiu-name">—</div>
+              </div>
+              <div class="colegiu-card-new">
+                <div class="colegiu-avatar">✦</div>
+                <div class="colegiu-rol">Redactor</div>
+                <div class="colegiu-name">—</div>
+              </div>
+              <div class="colegiu-card-new">
+                <div class="colegiu-avatar">✦</div>
+                <div class="colegiu-rol">Redactor</div>
+                <div class="colegiu-name">—</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="info-card">
-          <div class="info-card-head">
-            <span class="info-card-head-icon">📬</span>
-            <span class="info-card-head-title">Contact redacție</span>
+
+        <!-- Despre colegiu -->
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">🏛️</div>
+            <div><div class="sec-card-title">Despre colegiu</div></div>
           </div>
-          <div class="info-card-body">
-            <p>Pentru informații suplimentare, propuneri de colaborare sau orice altă solicitare adresată redacției, vă rugăm să ne contactați prin formularul de contact disponibil pe site sau prin e-mail.</p>
-            <p style="margin-top:8px;"><a href="mailto:revista@dokimasia.ro" style="color:var(--crimson);font-weight:600;">revista@dokimasia.ro</a></p>
+          <div class="sec-card-body">
+            <p style="line-height:1.5;font-size:1rem;color:var(--ink);">Colegiul editorial al Revistei Dokimasia este format din specialiști cu experiență în domeniul educațional, care contribuie la asigurarea calității, coerenței și relevanței materialelor publicate.</p>
+            <p style="line-height:1.5;font-size:1rem;color:var(--ink);margin-top:6px;">Membrii colegiului participă la evaluarea materialelor și la orientarea editorială a publicației, în acord cu valorile și misiunea revistei.</p>
           </div>
         </div>
+
+        <!-- Contact -->
+        <div class="sec-card" style="margin-bottom:0;">
+          <div class="sec-card-header">
+            <div class="sec-card-icon">📬</div>
+            <div><div class="sec-card-title">Contact redacție</div></div>
+          </div>
+          <div class="sec-card-body">
+            <p style="line-height:1.5;font-size:1rem;color:var(--ink);">Pentru informații suplimentare, propuneri de colaborare sau orice altă solicitare adresată redacției, vă rugăm să ne contactați prin formularul de contact disponibil pe site sau prin e-mail.</p>
+            <p style="margin-top:8px;line-height:1.5;"><a href="mailto:revista@dokimasia.ro" style="color:var(--crimson);font-weight:600;">revista@dokimasia.ro</a></p>
+          </div>
+        </div>
+
       </div>
     </div>
     <div class="info-panel" id="panel-arhiva">
@@ -1267,7 +1277,7 @@
       </div>
       <p>Toate edițiile publicate ale Revistei Dokimasia sunt disponibile mai jos. Faceți clic pe o ediție pentru a o citi integral sau pentru a descărca varianta PDF.</p>
       <div class="arhiva-grid" id="arhivaGrid">
-        <div style="color:var(--muted);font-style:italic;font-size:0.88rem;">Se încarcă edițiile...</div>
+        <div style="color:var(--muted);font-style:italic;font-size:1rem;">Se încarcă edițiile...</div>
       </div>
     </div>
 
@@ -1544,7 +1554,7 @@
           '<div id="slot-drop-' + i + '" style="display:flex;align-items:center;gap:12px;cursor:pointer;">' +
             '<div style="font-size:1.8rem;">📎</div>' +
             '<div>' +
-              '<div style="font-size:0.93rem;color:#555;">Apasă pentru a selecta sau trage fișierul aici</div>' +
+              '<div style="font-size:1rem;color:var(--ink);">Apasă pentru a selecta sau trage fișierul aici</div>' +
               '<div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">.doc · .docx · .pdf · max. 50 MB</div>' +
             '</div>' +
           '</div>' +
@@ -1587,7 +1597,7 @@
       preview.style.display = 'flex';
       preview.style.cssText = 'display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--border);border-radius:3px;padding:8px 12px;margin-top:10px;';
       preview.innerHTML =
-        '<span style="font-size:0.88rem;color:#333;">📄 ' + escHtml(file.name) + ' <span style="color:var(--muted);font-size:0.78rem;">(' + fmtBytes(file.size) + ')</span></span>' +
+        '<span style="font-size:1rem;color:var(--ink);">📄 ' + escHtml(file.name) + ' <span style="color:var(--muted);font-size:0.78rem;">(' + fmtBytes(file.size) + ')</span></span>' +
         '<button onclick="clearSlotFile(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0 4px;" title="Elimină">✕</button>';
     }
   }
@@ -1923,6 +1933,14 @@
   if (new URLSearchParams(window.location.search).get('login') === '1') {
     setTimeout(() => { if (typeof openModal === 'function') openModal('login'); }, 600);
   }
+
+  // Setează dinamic înălțimea header-ului pentru sticky hero
+  function updateHeaderHeight() {
+    var h = document.querySelector('header');
+    if (h) document.documentElement.style.setProperty('--header-height', h.offsetHeight + 'px');
+  }
+  updateHeaderHeight();
+  window.addEventListener('resize', updateHeaderHeight);
 </script>
 </body>
 </html>
