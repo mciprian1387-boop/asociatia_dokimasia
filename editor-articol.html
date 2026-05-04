@@ -2085,34 +2085,38 @@ function insCitare(){closeIns();const ed=getEd();if(ed){ed.focus();document.exec
 // ══════════════════════════════════════════════════════════
 // AI — OpenAI primary, Claude fallback
 // ══════════════════════════════════════════════════════════
-const OPENAI_KEY=''; // se completează din config / env - apelul trece prin worker
-const OPENAI_MODEL='gpt-4o-mini';
-const CLAUDE_MODEL='claude-sonnet-4-20250514';
+// ══════════════════════════════════════════════════════════
+// AI — prin Supabase Edge Function (OpenAI primary, Claude fallback)
+// ══════════════════════════════════════════════════════════
+const EDGE_FN_URL = 'https://jaoxhsyplnkanhqevnnr.supabase.co/functions/v1/ai-editor';
 
-// Apel AI generic — încearcă OpenAI, dacă pică trece la Claude via Worker
 async function callAI(prompt, maxTokens=600){
-  // Încearcă OpenAI direct (sau prin worker dacă cheia nu e la client)
-  try{
-    const r=await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
-      body:JSON.stringify({model:OPENAI_MODEL,max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
-    });
-    if(r.ok){
-      const d=await r.json();
-      return d.choices[0].message.content.trim();
-    }
-  }catch(e){/* cade pe Claude */}
+  // Obține token-ul de sesiune curent pentru autorizare
+  let token = '';
+  try {
+    const { data } = await sbClient.auth.getSession();
+    token = data?.session?.access_token || '';
+  } catch(e) {}
 
-  // Fallback — Claude via Worker sau direct via API
-  const r2=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
-    body:JSON.stringify({model:CLAUDE_MODEL,max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
+  const r = await fetch(EDGE_FN_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYzNjM1NTgsImV4cCI6MjA2MTkzOTU1OH0.p8_9MYrFoNXx0b9LHd7B1kTf2OEFnYGGQs_G5MBDFrw',
+    },
+    body: JSON.stringify({ prompt, max_tokens: maxTokens }),
   });
-  if(!r2.ok) throw new Error('AI indisponibil momentan.');
-  const d2=await r2.json();
-  return d2.content[0].text.trim();
+
+  if (!r.ok) {
+    const err = await r.text();
+    throw new Error(`AI Edge Function: ${r.status} — ${err.slice(0,100)}`);
+  }
+
+  const d = await r.json();
+  if (d.error) throw new Error(d.error);
+  console.log('[AI] provider:', d.provider);
+  return d.text;
 }
 
 // Helper — setează buton în starea loading
