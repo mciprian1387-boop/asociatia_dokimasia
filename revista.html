@@ -1558,7 +1558,7 @@
     ['r_s_intro','r_s_demers','r_s_metodologie','r_s_interventie','r_s_rezultate','r_s_concluzii'].forEach(function(k) {
       if (data[k] && data[k].trim()) {
         var label = { r_s_intro:'Introducere', r_s_demers:'Demers didactic', r_s_metodologie:'Metodologie', r_s_interventie:'Intervenție', r_s_rezultate:'Rezultate', r_s_concluzii:'Concluzii' }[k];
-        sectiuni.push('<div style="margin-bottom:10px;"><div style="font-weight:700;font-size:1rem;color:var(--crimson);margin-bottom:3px;">' + label + '</div><div style="font-size:1rem;color:var(--ink);line-height:1.5;">' + data[k].substring(0,300) + (data[k].length > 300 ? '…' : '') + '</div></div>');
+        sectiuni.push('<div style="margin-bottom:10px;"><div style="font-weight:700;font-size:1rem;color:var(--crimson);margin-bottom:3px;">' + label + '</div><div style="font-size:1rem;color:var(--ink);line-height:1.5;">' + data[k] + '</div></div>');
       }
     });
 
@@ -1577,7 +1577,7 @@
           '<div style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Autori</div>' +
           '<div style="font-size:1rem;color:var(--ink);">' + autori + '</div>' +
         '</div>' +
-        (abRo ? '<div><div style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Rezumat</div><div style="font-size:1rem;color:var(--ink);line-height:1.5;font-style:italic;">' + abRo.substring(0,400) + (abRo.length > 400 ? '…' : '') + '</div></div>' : '') +
+        (abRo ? '<div><div style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Rezumat</div><div style="font-size:1rem;color:var(--ink);line-height:1.5;font-style:italic;">' + abRo + '</div></div>' : '') +
         (cuvinte ? '<div><div style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Cuvinte cheie</div><div style="font-size:1rem;color:var(--ink);">' + cuvinte + '</div></div>' : '') +
         (sectiuni.length ? '<div><div style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Conținut (previzualizare)</div>' + sectiuni.join('') + '</div>' : '') +
         '<div style="border-top:1px solid var(--border);padding-top:14px;display:flex;gap:10px;align-items:center;">' +
