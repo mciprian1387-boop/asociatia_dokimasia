@@ -1044,13 +1044,16 @@
       if (deleteBtn) { deleteBtn.textContent = '🗑 Șterge'; deleteBtn.onclick = deleteMesaj }
     }
     document.getElementById('msgDetail').style.display = 'block'
-    if (!isDeleted) await sb.from('messages').update({ citit: true }).eq('id', id)
+    if (!isDeleted) {
+      await sbAdmin.from('messages').update({ citit: true }).eq('id', id)
+      loadMesaje()
+    }
   }
 
   async function deleteMesaj() {
     if (!currentMsgId) return
     showConfirm('Mesajul va fi mutat în coșul de gunoi.', async () => {
-      await sb.from('messages').update({ sters: true }).eq('id', currentMsgId)
+      await sbAdmin.from('messages').update({ sters: true }).eq('id', currentMsgId)
       document.getElementById('msgDetail').style.display = 'none'
       loadMesaje()
     })
@@ -1059,7 +1062,7 @@
   async function deleteMesajDefinitiv() {
     if (!currentMsgId) return
     showConfirm('Mesajul va fi șters definitiv!', async () => {
-      await sb.from('messages').delete().eq('id', currentMsgId)
+      await sbAdmin.from('messages').delete().eq('id', currentMsgId)
       document.getElementById('msgDetail').style.display = 'none'
       loadMesaje()
     })
@@ -1067,7 +1070,7 @@
 
   async function revenireMesaj() {
     if (!currentMsgId) return
-    await sb.from('messages').update({ sters: false }).eq('id', currentMsgId)
+    await sbAdmin.from('messages').update({ sters: false }).eq('id', currentMsgId)
     document.getElementById('msgDetail').style.display = 'none'
     switchMsgTab('citite')
     loadMesaje()
@@ -1075,7 +1078,7 @@
 
   async function golireSterse() {
     showConfirm('Toate mesajele din coș vor fi șterse definitiv!', async () => {
-      await sb.from('messages').delete().eq('sters', true)
+      await sbAdmin.from('messages').delete().eq('sters', true)
       loadMesaje()
     })
   }
@@ -1098,9 +1101,9 @@
 
   async function loadUtilizatori() {
     try {
-      const { data: trashData } = await sb.from('users_trash').select('id')
+      const { data: trashData } = await sbAdmin.from('users_trash').select('id')
       const trashIds = (trashData || []).map(u => u.id)
-      const { data, error } = await sb.from('users_view').select('*').order('created_at', { ascending: false })
+      const { data, error } = await sbAdmin.from('users_view').select('*').order('created_at', { ascending: false })
       if (error) throw error
       const active = (data || []).filter(u => !trashIds.includes(u.id))
       if (!active.length) {
