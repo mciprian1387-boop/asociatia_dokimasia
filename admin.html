@@ -863,7 +863,7 @@
         storageKey: 'dokimasia-auth',
         storage: window.localStorage,
         autoRefreshToken: true,
-        detectSessionInUrl: true
+        detectSessionInUrl: false
       }
     }
   )
@@ -1198,17 +1198,8 @@
 
   // ── LOGIN CA UTILIZATOR (Magic Link) ─────────────────
   async function loginCaUtilizator(email) {
-    showConfirm(`Se va genera un magic link pentru „${email}". Se va deschide un tab nou unde vei fi autentificat ca acest utilizator.`, async () => {
+    showConfirm(`Se va genera un magic link pentru „${email}". Linkul se va deschide într-un tab nou în modul incognito — sesiunea ta de admin nu va fi afectată.`, async () => {
       try {
-        const res = await fetch(`https://jaoxhsyplnkanhqevnnr.supabase.co/auth/v1/admin/users`, {
-          method: 'GET',
-          headers: {
-            'apikey': sbAdmin.supabaseKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQwNDQ1NiwiZXhwIjoyMDkxOTgwNDU2fQ.XzUqltkqUHLZfMsIOWNI4O7WBvmzNcdoL8Saet05T-A',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQwNDQ1NiwiZXhwIjoyMDkxOTgwNDU2fQ.XzUqltkqUHLZfMsIOWNI4O7WBvmzNcdoL8Saet05T-A'
-          }
-        })
-
-        // Generăm OTP link direct
         const SB_URL = 'https://jaoxhsyplnkanhqevnnr.supabase.co'
         const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjQwNDQ1NiwiZXhwIjoyMDkxOTgwNDU2fQ.XzUqltkqUHLZfMsIOWNI4O7WBvmzNcdoL8Saet05T-A'
 
@@ -1227,7 +1218,10 @@
         })
         const json = await r.json()
         if (json.action_link) {
-          window.open(json.action_link, '_blank')
+          // Copiem în clipboard și afișăm instrucțiuni
+          try { await navigator.clipboard.writeText(json.action_link) } catch(e) {}
+          // Deschidem într-un tab nou — admin.html are detectSessionInUrl:false deci sesiunea admin e protejată
+          window.open(json.action_link, '_blank', 'noopener,noreferrer')
         } else {
           alert('Eroare la generarea linkului: ' + (json.message || JSON.stringify(json)))
         }
