@@ -1344,6 +1344,16 @@
 </footer>
 
 <script>
+  // ── Client Supabase pentru insert public ─────────
+  var _sbPublic = (function() {
+    try {
+      return supabase.createClient(
+        'https://jaoxhsyplnkanhqevnnr.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb3hoc3lwbG5rYW5ocWV2bm5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDQ0NTYsImV4cCI6MjA5MTk4MDQ1Nn0.usQM75JBijLwJqPNHifvGFogjQhzH0jJbWnqJGCL1iw'
+      );
+    } catch(e) { return null; }
+  })();
+
   // ── EmailJS pentru revista.html ───────────────────
   if (typeof window.EJS_SVC === 'undefined') window.EJS_SVC = 'service_4a8gp1c';
   if (typeof window.EJS_TPL === 'undefined') window.EJS_TPL = 'template_ole4m78';
@@ -1455,18 +1465,22 @@
 
     var ok1 = false, ok2 = false;
 
-    // 1. Salvare în Supabase (sb = client anonim, are permisiune INSERT pe messages)
+    // 1. Salvare în Supabase
     try {
-      await sb.from('messages').insert([{
-        name:      nume || 'Anonim',
-        email:     email,
-        subject:   subiect,
-        message:   mesajComplet,
-        citit:     false,
-        direction: 'inbox',
-        sters:     false
-      }]);
-      ok1 = true;
+      var client = _sbPublic || (typeof sb !== 'undefined' ? sb : null);
+      if (client) {
+        var res = await client.from('messages').insert([{
+          name:      nume || 'Anonim',
+          email:     email,
+          subject:   subiect,
+          message:   mesajComplet,
+          citit:     false,
+          direction: 'inbox',
+          sters:     false
+        }]);
+        if (res.error) throw res.error;
+        ok1 = true;
+      }
     } catch(e) { console.error('Supabase insert error:', e); }
 
     // 2. Email prin EmailJS
