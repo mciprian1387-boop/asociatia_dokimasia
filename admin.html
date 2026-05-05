@@ -1114,17 +1114,21 @@
       document.getElementById('utilizatoriList').innerHTML = `
         <table>
           <thead><tr><th>Nume</th><th>Email</th><th>Înregistrat</th><th>Acțiuni</th></tr></thead>
-          <tbody>${active.map(u => `
-            <tr>
-              <td>${u.full_name || u.google_name || '—'}</td>
-              <td>${u.email || '—'}</td>
-              <td>${u.created_at ? new Date(u.created_at.replace(' ', 'T')).toLocaleDateString('ro-RO') : '—'}</td>
-              <td style="display:flex;gap:6px;flex-wrap:wrap;">
-                <button class="btn btn-outline btn-sm" onclick="veziArticoleUtilizator('${u.id}','${(u.full_name||u.google_name||'Utilizator').replace(/'/g,\"\\'\")}')" >📝 Articole</button>
-                <button class="btn btn-outline btn-sm" onclick="loginCaUtilizator('${(u.email||'').replace(/'/g,\"\\'\")}')" >🔑 Intră ca el</button>
-                <button class="btn btn-danger btn-sm" onclick="stergeUtilizator('${u.id}','${(u.email||'').replace(/'/g,\"\\'\")}',' ${(u.full_name||u.google_name||'').replace(/'/g,\"\\'\")}',' ${u.created_at}')">🗑 Șterge</button>
-              </td>
-            </tr>`).join('')}
+          <tbody>${active.map(u => {
+            const nm = (u.full_name||u.google_name||'Utilizator').replace(/'/g, '&#39;')
+            const em = (u.email||'').replace(/'/g, '&#39;')
+            const dt = u.created_at ? new Date(u.created_at.replace(' ','T')).toLocaleDateString('ro-RO') : '—'
+            return '<tr>' +
+              '<td>' + (u.full_name||u.google_name||'—') + '</td>' +
+              '<td>' + (u.email||'—') + '</td>' +
+              '<td>' + dt + '</td>' +
+              '<td style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                '<button class="btn btn-outline btn-sm" onclick="veziArticoleUtilizator(\'' + u.id + '\',\'' + nm + '\')">📝 Articole</button>' +
+                '<button class="btn btn-outline btn-sm" onclick="loginCaUtilizator(\'' + em + '\')">🔑 Intră ca el</button>' +
+                '<button class="btn btn-danger btn-sm" onclick="stergeUtilizator(\'' + u.id + '\',\'' + em + '\',\'' + nm + '\',\'' + u.created_at + '\')">🗑 Șterge</button>' +
+              '</td>' +
+            '</tr>'
+          }).join('')}
           </tbody>
         </table>`
       document.getElementById('statUsers').textContent = active.length
