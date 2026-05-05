@@ -1455,9 +1455,9 @@
 
     var ok1 = false, ok2 = false;
 
-    // 1. Salvare în Supabase
+    // 1. Salvare în Supabase (sb = client anonim, are permisiune INSERT pe messages)
     try {
-      await sbAdmin.from('messages').insert([{
+      await sb.from('messages').insert([{
         name:      nume || 'Anonim',
         email:     email,
         subject:   subiect,
