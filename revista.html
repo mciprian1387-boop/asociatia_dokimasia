@@ -1471,13 +1471,17 @@
 
     // 2. Email prin EmailJS
     try {
-      await emailjs.send(EJS_SVC, EJS_TPL, {
-        to_email:  ADMIN_EMAIL,
-        to_name:   'Dokimasia Admin',
-        from_name: nume || 'Anonim',
-        subject:   subiect,
-        message:   mesajComplet + '\n\nRăspuns la: ' + email,
-        reply_to:  email
+      await emailjs.send(window.EJS_SVC, window.EJS_TPL, {
+        to_email:     window.ADMIN_EMAIL,
+        to_name:      'Dokimasia Admin',
+        from_name:    nume || 'Anonim',
+        subject:      subiect,
+        title:        subiect,
+        message:      mesajComplet,
+        message_html: '<p><strong>De la:</strong> ' + (nume || 'Anonim') + ' &lt;' + email + '&gt;</p><p><strong>Subiect:</strong> ' + subiect + '</p><hr/><p>' + mesajComplet.replace(/\n/g, '<br>') + '</p>',
+        nume:         nume || 'Anonim',
+        email:        email,
+        reply_to:     email
       });
       ok2 = true;
     } catch(e) { console.error('EmailJS error:', e); }
