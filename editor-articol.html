@@ -139,15 +139,20 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
 .editor-inner{max-width:820px;margin:0 auto;padding:20px 28px 60px;width:100%;}
 
 /* PLACEHOLDER prima deschidere */
-.editor-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px 24px;text-align:center;}
-.editor-welcome-icon{font-size:3rem;margin-bottom:16px;}
-.editor-welcome h2{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--crimson);margin-bottom:10px;}
-.editor-welcome p{font-size:0.9rem;color:var(--muted);line-height:1.7;max-width:340px;margin-bottom:6px;}
+.editor-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:60px 24px;text-align:center;}
+.editor-welcome-icon{font-size:2.5rem;margin-bottom:20px;opacity:0.6;}
+.editor-welcome h2{font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--crimson);margin-bottom:10px;font-weight:700;}
+.editor-welcome p{font-size:0.92rem;color:var(--muted);line-height:1.7;max-width:420px;margin-bottom:0;}
 .editor-welcome .welcome-hint{font-size:1.1rem;font-weight:700;color:var(--ink);background:var(--paper-dark);border:2px dashed var(--border);border-radius:6px;padding:12px 24px;margin-top:16px;display:inline-block;}
+.welcome-actions{display:flex;gap:12px;margin-top:28px;justify-content:center;flex-wrap:wrap;}
+.welcome-btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;border:none;padding:11px 26px;border-radius:5px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;transition:background 0.2s;}
+.welcome-btn-primary:hover{background:var(--crimson-dark);}
+.welcome-btn-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--ink);border:1px solid var(--border);padding:11px 22px;border-radius:5px;font-size:0.92rem;font-family:'Source Serif 4',serif;cursor:pointer;transition:all 0.2s;}
+.welcome-btn-secondary:hover{border-color:var(--crimson);color:var(--crimson);}
 
 /* SECȚIUNEA ACTIVĂ — o singură secțiune în editor */
-.sec-panel{background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 2px 16px rgba(0,0,0,0.07);overflow:hidden;margin:16px 20px;}
-.sec-panel-head{background:linear-gradient(135deg,var(--crimson),#6a0000);padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.sec-panel{background:#fff;border:1px solid var(--border);border-radius:6px;box-shadow:0 1px 8px rgba(0,0,0,0.05);overflow:hidden;margin:16px 20px;}
+.sec-panel-head{background:var(--crimson);padding:12px 20px;display:flex;align-items:center;gap:10px;}
 .sec-panel-icon{font-size:1.1rem;}
 .sec-panel-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:#fff;flex:1;}
 .sec-panel-req{color:var(--gold-light);font-size:0.75rem;}
@@ -396,23 +401,30 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   <div class="tip-bar">
     <div class="tip-tab" id="tab-practic" onclick="schimbaTip('practic')">
       <span class="tt-icon">🎓</span>
-      <span class="tt-label">Practici educaționale<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">și inovare didactică</small></span>
+      <span class="tt-label">Practici educaționale</span>
     </div>
     <div class="tip-tab" id="tab-cercetare" onclick="schimbaTip('cercetare')">
       <span class="tt-icon">🔬</span>
-      <span class="tt-label">Cercetare și analiză<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">în educație</small></span>
+      <span class="tt-label">Cercetare educațională</span>
     </div>
     <div class="tip-tab" id="tab-dezvoltare" onclick="schimbaTip('dezvoltare')">
       <span class="tt-icon">🌱</span>
-      <span class="tt-label">Dezvoltare educațională<br><small style="font-weight:400;font-size:0.7rem;opacity:0.8;">și profesională</small></span>
+      <span class="tt-label">Dezvoltare profesională</span>
     </div>
     <!-- Butoane editor în dreapta tip-bar -->
     <div style="display:flex;align-items:center;gap:6px;padding:0 14px;border-left:1px solid rgba(255,255,255,0.15);flex-shrink:0;">
       <div class="autosave" id="autosaveBadge"><span>●</span><span id="autosaveText">...</span></div>
-      <button onclick="document.getElementById('modalIndicatii').classList.add('open')" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.2);padding:5px 10px;border-radius:4px;font-size:0.73rem;font-family:'Georgia',serif;cursor:pointer;">💡 Indicații</button>
-      <button onclick="deschideModalImportWord()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Copiază textul din Word și AI îl organizează pe secțiuni.">⬆ Word</button>
-      <button onclick="previzualizeaza()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Deschide articolul formatat ca publicație într-un tab nou. Poți printa sau salva ca PDF.">👁 Preview</button>
-      <button onclick="exportDOCX()" style="background:#fff;color:#8B0000;border:none;padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Exportă articolul ca fișier Word (.doc) editabil.">⬇ Word</button>
+      <button onclick="previzualizeaza()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:5px 12px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Deschide articolul formatat ca publicație într-un tab nou.">👁 Preview</button>
+      <button onclick="exportDOCX()" style="background:#fff;color:#8B0000;border:none;padding:5px 12px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;font-weight:bold;cursor:pointer;" data-tip="Exportă articolul ca fișier Word (.doc) editabil.">⬇ Export Word</button>
+      <!-- Dropdown Mai multe -->
+      <div style="position:relative;" id="moreMenuWrap">
+        <button onclick="toggleMoreMenu()" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.2);padding:5px 10px;border-radius:4px;font-size:0.76rem;font-family:'Georgia',serif;cursor:pointer;">⋯ Mai multe</button>
+        <div id="moreMenuDropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--border);border-radius:5px;box-shadow:0 4px 20px rgba(0,0,0,0.12);min-width:170px;z-index:200;overflow:hidden;">
+          <button onclick="document.getElementById('modalIndicatii').classList.add('open');toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;background:none;border:none;font-size:0.82rem;font-family:'Source Serif 4',serif;color:var(--ink);cursor:pointer;text-align:left;" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='none'">💡 Indicații</button>
+          <button onclick="deschideModalImportWord();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;background:none;border:none;font-size:0.82rem;font-family:'Source Serif 4',serif;color:var(--ink);cursor:pointer;text-align:left;" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='none'">⬆ Import Word</button>
+          <button onclick="autosave();toggleMoreMenu()" style="display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;background:none;border:none;font-size:0.82rem;font-family:'Source Serif 4',serif;color:var(--ink);cursor:pointer;text-align:left;" onmouseover="this.style.background='var(--paper)'" onmouseout="this.style.background='none'">💾 Salvează acum</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -443,63 +455,17 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   <main class="editor-area" id="editorArea">
     <div id="editorInner" style="flex:1;display:flex;flex-direction:column;">
       <!-- Welcome placeholder — vizibil la prima deschidere -->
-      <div id="editorWelcome" class="editor-welcome" style="padding:16px 20px;justify-content:flex-start;overflow:hidden;">
+      <div id="editorWelcome" class="editor-welcome" style="justify-content:center;">
 
-        <div style="text-align:center;margin-bottom:14px;">
-          <div style="font-size:1.8rem;margin-bottom:4px;">📝</div>
-          <h2 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--crimson);margin-bottom:2px;">Editor articol — Revista Dokimasia</h2>
-          <p style="font-size:0.82rem;color:var(--muted);">Selectați un articol din dreapta sau creați unul nou.</p>
+        <div class="editor-welcome-icon">📝</div>
+        <h2>Editor articol — Revista Dokimasia</h2>
+        <p>Creează, editează și exportă articolul pentru publicare în Revista Dokimasia.</p>
+
+        <div class="welcome-actions">
+          <button class="welcome-btn-primary" onclick="articolNou()">+ Creează articol nou</button>
+          <button class="welcome-btn-secondary" onclick="document.getElementById('modalIndicatii').classList.add('open')">Indicații editor</button>
         </div>
 
-        <!-- Grid 2 coloane -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:700px;font-size:0.79rem;line-height:1.5;color:var(--ink);">
-
-          <!-- Coloana 1 -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
-            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📋 Structura articolului (stânga)</div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;gap:8px;"><span>👆</span><div><strong>Click</strong> pe o secțiune — o deschide în centru pentru editare.</div></div>
-              <div style="display:flex;gap:8px;"><span>✏️</span><div><strong>Dublu-click</strong> pe numele secțiunii — îl redenumești direct.</div></div>
-              <div style="display:flex;gap:8px;"><span>⠿</span><div><strong>Trage</strong> cu handleul ⠿ — reordonezi secțiunile.</div></div>
-              <div style="display:flex;gap:8px;"><span>🟢</span><div>Punct <span style="color:#66bb6a;font-weight:600;">verde</span> = completat, <span style="color:#ffa726;font-weight:600;">portocaliu</span> = obligatoriu și gol.</div></div>
-            </div>
-          </div>
-
-          <!-- Coloana 2 -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
-            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📂 Istoricul meu (dreapta)</div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;gap:8px;"><span>📖</span><div><strong>Deschide</strong> — încarcă articolul cu tot conținutul salvat.</div></div>
-              <div style="display:flex;gap:8px;"><span>🗑</span><div><strong>✕ Șterge</strong> — elimină definitiv articolul din baza de date.</div></div>
-              <div style="display:flex;gap:8px;"><span>➕</span><div><strong>+ Articol nou</strong> — alegi tipul și pornești un editor curat.</div></div>
-            </div>
-          </div>
-
-          <!-- Coloana 1 jos -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
-            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">📝 Editarea conținutului (centru)</div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;gap:8px;"><span>🖊</span><div>Toolbar cu bold, italic, liste, tabele, aliniere.</div></div>
-              <div style="display:flex;gap:8px;"><span>✨</span><div>Bara AI per secțiune: <em>Diacritice</em>, <em>Îmbunătățire</em>, <em>Generează</em>.</div></div>
-              <div style="display:flex;gap:8px;"><span>⊞</span><div>Butonul <strong>⊞</strong> inserează imagini, tabele, linkuri, ecuații.</div></div>
-              <div style="display:flex;gap:8px;"><span>👥</span><div><strong>Autori</strong> — notele de subsol ¹ ² ³ se generează automat.</div></div>
-            </div>
-          </div>
-
-          <!-- Coloana 2 jos -->
-          <div style="background:#fff;border:1px solid var(--border);border-radius:5px;padding:12px 14px;">
-            <div style="font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:var(--crimson);margin-bottom:8px;">🔴 Bara de sus</div>
-            <div style="display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;gap:8px;"><span>💾</span><div><strong>Salvare automată</strong> — se salvează în baza de date la fiecare tastă.</div></div>
-              <div style="display:flex;gap:8px;"><span>👁</span><div><strong>Preview</strong> — articol formatat ca publicație, printabil ca PDF.</div></div>
-              <div style="display:flex;gap:8px;"><span>✨</span><div><strong>AI global</strong> — abstract, cuvinte-cheie, diacritice pentru tot articolul.</div></div>
-              <div style="display:flex;gap:8px;"><span>⬇</span><div><strong>PDF / Word</strong> — exportă articolul în formatul ales.</div></div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="welcome-hint" style="margin-top:12px;font-size:0.82rem;">→ Apasă <strong>+ Articol nou</strong> în dreapta pentru a începe</div>
       </div>
       <!-- Panoul secțiunii active — completat dinamic -->
       <div id="secPanel" style="display:none;flex:1;overflow-y:auto;"></div>
@@ -509,7 +475,7 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
   <!-- SIDEBAR DREAPTA — Istoricul meu (legat de utilizator Supabase) -->
   <aside class="sidebar-istoric">
     <div class="si-head">
-      <span class="si-head-title">📂 Istoricul meu</span>
+      <span class="si-head-title">Istoricul meu</span>
       <span id="shUser" class="si-user">—</span>
     </div>
     <div class="si-list" id="shList">
@@ -517,7 +483,6 @@ nav.main-nav a:hover, nav.main-nav a.active { background: rgba(255,255,255,0.15)
     </div>
     <div class="si-foot">
       <button class="btn-new-art" onclick="articolNou()">+ Articol nou</button>
-      <button onclick="autosave()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;background:none;border:1px solid var(--border);border-radius:4px;font-size:0.78rem;font-family:'Source Serif 4',serif;color:var(--muted);cursor:pointer;margin-top:5px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">💾 Salvează acum</button>
     </div>
   </aside>
 </div>
@@ -1027,7 +992,7 @@ function renderIstoric(){
       <div class="hi-data">Salvat: ${data}</div>
       <div class="hi-actions">
         <button class="hi-btn" onclick="incarcaArticol('${art.id}')">Deschide</button>
-        <button class="hi-btn del" onclick="stergeArticol('${art.id}')">✕ Șterge</button>
+        <button class="hi-btn del" onclick="stergeArticol('${art.id}')" style="opacity:0.45;font-size:0.62rem;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.45'">✕</button>
       </div>
     </div>`;
   }).join('');
@@ -1102,6 +1067,25 @@ async function stergeArticol(id){
 
 function setFld(id,val){const e=document.getElementById(id);if(e)e.value=val;}
 function setRich(id,val){const e=document.getElementById(id);if(e&&val){e.innerHTML=val;e.dataset.ph&&(e.dataset.ph=e.dataset.ph);}}
+
+function toggleMoreMenu() {
+  var dd = document.getElementById('moreMenuDropdown');
+  if (!dd) return;
+  var isOpen = dd.style.display === 'block';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    // Închide la click în afară
+    setTimeout(function() {
+      document.addEventListener('click', function closeMenu(e) {
+        var wrap = document.getElementById('moreMenuWrap');
+        if (wrap && !wrap.contains(e.target)) {
+          dd.style.display = 'none';
+          document.removeEventListener('click', closeMenu);
+        }
+      });
+    }, 10);
+  }
+}
 
 function articolNou(){
   if(articleId){
