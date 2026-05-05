@@ -999,14 +999,39 @@
     document.getElementById('msgPlaceholder').style.display = 'flex'
   }
 
+  // Mapare topic → etichetă vizuală
+  var TOPIC_LABELS = {
+    'propune-intreaba': { label: 'Propune / Întreabă', color: '#8B6914', bg: '#fff8e1' },
+    'contact':          { label: 'Contact',             color: '#1565c0', bg: '#e3f2fd' },
+    'inscriere':        { label: 'Înscriere',           color: '#2e7d32', bg: '#e8f5e9' },
+    'revista':          { label: 'Revistă',             color: '#6a1b9a', bg: '#f3e5f5' }
+  }
+
+  function detectTopic(msgs) {
+    // Ia topic-ul din primul mesaj inbox
+    var inbox = msgs.find(function(m) { return m.direction !== 'sent' })
+    if (!inbox) return null
+    if (inbox.topic && TOPIC_LABELS[inbox.topic]) return inbox.topic
+    // Fallback după subject
+    var subj = (inbox.subject || '').toLowerCase()
+    if (subj.includes('propune') || subj.includes('întreabă') || subj.includes('intreab') || subj.includes('îmbunătățire')) return 'propune-intreaba'
+    if (subj.includes('înscriere') || subj.includes('inscriere')) return 'inscriere'
+    if (subj.includes('contact') || subj.includes('mesaj')) return 'contact'
+    return null
+  }
+
   // Grupează mesajele după email — returnează conversații sortate după ultimul mesaj
   function grupeazaDupaEmail(msgs) {
     var map = {}
     msgs.forEach(function(m) {
       var key = (m.email || '').toLowerCase()
-      if (!map[key]) map[key] = { email: key, name: m.name||'—', msgs: [], hasUnread: false }
+      if (!map[key]) map[key] = { email: key, name: m.name||'—', msgs: [], hasUnread: false, topic: null }
       map[key].msgs.push(m)
       if (!m.citit && m.direction !== 'sent') map[key].hasUnread = true
+    })
+    // Detectăm topic-ul per conversație
+    Object.values(map).forEach(function(conv) {
+      conv.topic = detectTopic(conv.msgs)
     })
     // sortăm după cel mai recent mesaj
     return Object.values(map).sort(function(a, b) {
@@ -1023,9 +1048,14 @@
     var unread = conv.hasUnread && !isDeleted ? 'unread' : ''
     var badge = conv.hasUnread && !isDeleted ? '<span class="badge badge-red">Nou</span>' : ''
     var count = conv.msgs.length > 1 ? '<span style="font-size:0.75rem;background:#f0e0e0;color:#8B0000;padding:1px 6px;border-radius:10px;margin-left:4px;">' + conv.msgs.length + '</span>' : ''
+    var topicBadge = ''
+    if (conv.topic && TOPIC_LABELS[conv.topic]) {
+      var tl = TOPIC_LABELS[conv.topic]
+      topicBadge = '<span style="font-size:0.68rem;background:' + tl.bg + ';color:' + tl.color + ';padding:1px 7px;border-radius:10px;font-weight:600;margin-left:4px;">' + tl.label + '</span>'
+    }
     return '<div class="msg-item ' + unread + '" onclick="deschideConversatie(\'' + conv.email.replace(/'/g,"&#39;") + '\',' + isDeleted + ')" style="cursor:pointer;">' +
       '<div class="msg-meta">' +
-        '<span class="msg-name">' + conv.name + count + '</span>' +
+        '<span class="msg-name">' + conv.name + count + topicBadge + '</span>' +
         '<span class="msg-date">' + date + '</span>' +
         badge +
       '</div>' +
