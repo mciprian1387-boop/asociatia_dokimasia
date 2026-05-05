@@ -786,10 +786,10 @@
         <p style="font-size:0.97rem;color:var(--muted);line-height:1.5;">Completează câmpurile de mai jos și atașează materialul. Redacția îți va confirma primirea prin e-mail.</p>
       </div>
 
-      <!-- PASUL 1: Alege modul de trimitere -->
+      <!-- PASUL 1: Pregătește articolul -->
       <div class="form-section" id="tr-mod-alegere-section">
-        <div class="form-section-title">Pasul 1. Alege modul de trimitere</div>
-        <p style="font-size:1rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Poți redacta articolul direct pe site, în editorul online, sau poți încărca un fișier deja pregătit în format editabil.</p>
+        <div class="form-section-title">Pasul 1. Pregătește articolul</div>
+        <p style="font-size:1rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">Poți redacta articolul în editorul online sau poți utiliza un document pregătit separat. După finalizare, articolul trebuie exportat/descărcat și încărcat în formularul de trimitere.</p>
 
         <!-- Banner draft-uri salvate — compact -->
         <div id="tr-drafts-banner" style="display:none;margin-bottom:16px;">
@@ -805,19 +805,21 @@
           <a href="editor-articol.html" style="text-decoration:none;">
             <div style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='var(--crimson)';this.style.background='#fff3f3'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--paper-dark)'">
               <div style="font-size:1.5rem;">✏️</div>
-              <div style="font-weight:700;font-size:1rem;color:var(--ink);">Scriu articolul în editorul online</div>
-              <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Redactează materialul direct pe site, într-un format ghidat, potrivit pentru Revista Dokimasia.</div>
+              <div style="font-weight:700;font-size:1rem;color:var(--ink);">Redactează în editorul online</div>
+              <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Folosește editorul online pentru a redacta articolul într-un format ghidat. După finalizare, exportă/descarcă documentul și revino la formular pentru încărcare.</div>
               <div style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 18px;border-radius:4px;font-size:1rem;font-weight:600;width:fit-content;">Deschide editorul online →</div>
             </div>
           </a>
           <!-- Card 2: Încarcă fișier -->
           <div onclick="trAlegereMod('fisier')" style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box;cursor:pointer;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='var(--crimson)';this.style.background='#fff3f3'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--paper-dark)'">
             <div style="font-size:1.5rem;">📎</div>
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Încarc articolul redactat</div>
-            <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Trimite un fișier pregătit anterior, în format editabil, pentru analiza editorială.</div>
+            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Încarcă articolul pentru trimitere</div>
+            <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Încarcă fișierul final al articolului, redactat anterior în editorul online sau într-un document separat, pentru analiza editorială.</div>
             <div style="display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;padding:10px 18px;border-radius:4px;font-size:1rem;font-weight:600;width:fit-content;">Continuă cu încărcarea →</div>
           </div>
         </div>
+
+        <p style="font-size:0.9rem;color:var(--muted);font-style:italic;margin-top:14px;text-align:center;">Transmiterea oficială a articolului se realizează numai după încărcarea fișierului final în formularul de trimitere.</p>
       </div>
 
       <!-- FORMULARUL — ascuns până la alegerea modului -->
@@ -825,7 +827,7 @@
 
         <!-- PASUL 2: Număr de articole -->
         <div class="form-section" id="tr-pachet-section">
-          <div class="form-section-title">Pasul 2. Câte articole dorești să trimiți?</div>
+          <div class="form-section-title">Pasul 2. Alege numărul de articole transmise</div>
           <div class="tr-pachete">
             <div class="tr-pachet" onclick="selectPachet(1)" id="pach-1">
               <div class="tr-pach-nr">1 articol</div>
@@ -844,7 +846,7 @@
         <div id="trimitereForm" style="display:none;margin-top:0;">
 
           <div class="form-section" id="tr-date-autor-section">
-            <div class="form-section-title">Pasul 3. Datele autorului</div>
+            <div class="form-section-title">Pasul 3. Completează datele autorului și ale articolului</div>
             <div id="autor-saved-notif" style="display:none;align-items:center;justify-content:space-between;background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:10px 14px;margin-bottom:16px;font-size:1rem;color:#5d4037;transition:opacity 0.5s;">
               <span>💾 Datele tale au fost completate automat din vizita anterioară.</span>
               <button onclick="stergeeDateAutor()" style="background:none;border:none;cursor:pointer;color:#8B0000;font-size:1rem;font-weight:600;padding:0 4px;text-decoration:underline;">Șterge datele salvate</button>
@@ -887,13 +889,13 @@
 
           <!-- PASUL 4: Date despre material — generat dinamic în funcție de numărul de articole -->
           <div class="form-section" id="tr-date-material-section">
-            <div class="form-section-title">Pasul 4. Date despre material</div>
+            <div class="form-section-title">Pasul 4. Încarcă fișierul final</div>
             <div id="tr-articole-detalii-wrap"></div>
           </div>
 
           <!-- PASUL 5: Încarcă articolul / articolele -->
           <div class="form-section" id="tr-articol-section">
-            <div class="form-section-title">Pasul 5. Încarcă articolul / articolele</div>
+            <div class="form-section-title">Pasul 5. Confirmă și trimite</div>
             <p style="font-size:1rem;color:var(--muted);margin-bottom:16px;line-height:1.5;">
               Atașează câte un fișier pentru fiecare articol. Formate acceptate: <strong>.doc, .docx</strong>. Dimensiune maximă per fișier: 50 MB.
             </p>
@@ -1543,7 +1545,7 @@
 
       // Actualizează titlul bannerului cu numărul exact
       var titluBanner = document.getElementById('tr-drafts-titlu-banner');
-      if (titluBanner) titluBanner.innerHTML = '📝 Ai ' + drafts.length + (drafts.length === 1 ? ' articol salvat' : ' articole salvate') + ' în editorul online';
+      if (titluBanner) titluBanner.innerHTML = '📝 Ai ' + drafts.length + (drafts.length === 1 ? ' articol salvat' : ' articole salvate') + ' în editorul online. Deschide editorul pentru a continua redactarea, apoi exportă documentul și încarcă-l în formular.';
 
       if (banner) banner.style.display = 'block';
       // Nu selectăm automat — lăsăm utilizatorul să aleagă
