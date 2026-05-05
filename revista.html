@@ -451,7 +451,7 @@
   </nav>
   <div class="revista-subnav" id="revista-subnav">
     <button class="subnav-btn active" id="subnav-despre" onclick="showTab('despre')">Despre</button>
-    <button class="subnav-btn" id="subnav-publicare" onclick="showTab('publicare')">Ce poți publica</button>
+    <button class="subnav-btn" id="subnav-publicare" onclick="showTab('publicare')">Publică în revistă</button>
     <button class="subnav-btn" id="subnav-ghid" onclick="showTab('ghid')">Ghid autori</button>
     <button class="subnav-btn" id="subnav-formular" onclick="showTab('formular')">Trimite articol</button>
     <button class="subnav-btn" id="subnav-arhiva" onclick="showTab('arhiva')">Arhivă</button>
@@ -699,31 +699,38 @@
 
       </div><!-- /ghid-acordeon -->
 
-      <!-- CTA spre Publicare -->
+      <!-- CTA spre Trimite articol -->
       <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:4px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
         <div>
           <div style="font-weight:700;color:var(--ink);font-size:1rem;margin-bottom:3px;">Ești pregătit să trimiți un material?</div>
-          <div style="font-size:0.92rem;color:var(--muted);">Accesează secțiunea „Publicare" pentru formularul de trimitere și opțiunile disponibile.</div>
+          <div style="font-size:0.92rem;color:var(--muted);">Accesează secțiunea «Trimite articol» pentru completarea formularului și încărcarea materialului.</div>
         </div>
         <button onclick="showTab('formular')" style="background:var(--crimson);color:#fff;border:none;padding:10px 22px;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
       </div>
 
     </div><!-- /panel-ghid -->
     <div class="info-panel" id="panel-publicare">
-      <!-- TITLU -->
       <div class="panel-header">
-        <h2>Ce poți publica</h2>
+        <h2>Publică în revistă</h2>
         <div class="panel-header-line"></div>
       </div>
 
-      <p style="font-size:1.02rem;line-height:1.65;color:var(--ink);margin-bottom:32px;">
-        Revista Dokimasia primește contribuții din domeniul educației și din ariile conexe acesteia. Autorii pot transmite articole, studii, resurse educaționale, exemple de bună practică și alte materiale relevante pentru activitatea educațională.
-      </p>
+      <!-- ══════════════════════════════════
+           1. DE CE SĂ PUBLICI?
+      ══════════════════════════════════ -->
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:12px;">De ce să publici în Revista Dokimasia?</h3>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:32px;" class="pub-tipuri-grid">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.88rem;line-height:1.5;color:var(--ink);">🌐 Vizibilitate pentru activitatea ta profesională</div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.88rem;line-height:1.5;color:var(--ink);">⭐ Valorizarea exemplelor de bună practică</div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.88rem;line-height:1.5;color:var(--ink);">📋 Publicare într-un cadru educațional organizat</div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.88rem;line-height:1.5;color:var(--ink);">📄 Adeverință de publicare după acceptarea materialului</div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.88rem;line-height:1.5;color:var(--ink);">📱 Acces la numărul revistei în format digital</div>
+      </div>
 
       <!-- ══════════════════════════════════
-           A. CE POȚI PUBLICA?
+           2. CE POȚI PUBLICA?
       ══════════════════════════════════ -->
-      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">A. Ce poți publica?</h3>
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:12px;">Ce poți publica?</h3>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:32px;" class="pub-tipuri-grid">
         <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.9rem;line-height:1.4;color:var(--ink);">📄 Articole de specialitate</div>
         <div style="background:#fff;border:1px solid var(--border);border-radius:4px;padding:12px 14px;font-size:0.9rem;line-height:1.4;color:var(--ink);">🔬 Studii și cercetări educaționale</div>
@@ -736,91 +743,146 @@
       </div>
 
       <!-- ══════════════════════════════════
-           B. CUM TRIMIȚI ARTICOLUL?
+           3. CUM PREGĂTEȘTI ARTICOLUL?
       ══════════════════════════════════ -->
-      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:16px;">B. Cum trimiți articolul?</h3>
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">Cum pregătești articolul?</h3>
+      <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:14px;">
+        <p style="font-size:0.97rem;color:var(--ink);line-height:1.7;margin:0;">Autorul poate redacta articolul în editorul online sau poate folosi template-ul Word. <strong>Editorul online este un instrument de lucru, nu o metodă de transmitere automată a articolului.</strong> După finalizarea materialului, articolul trebuie exportat sau salvat în format editabil și încărcat prin formularul de trimitere.</p>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;">
+        <a href="editor-articol.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--crimson);color:#fff;padding:9px 18px;border-radius:4px;font-size:0.92rem;font-family:'Source Serif 4',serif;font-weight:700;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">✏ Deschide editorul online</a>
+        <a href="template_practic.docx" download style="display:inline-flex;align-items:center;gap:6px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);padding:9px 18px;border-radius:4px;font-size:0.92rem;font-family:'Source Serif 4',serif;font-weight:700;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Descarcă template Word</a>
+      </div>
 
-      <!-- Pași numerotați -->
+      <!-- ══════════════════════════════════
+           4. CUM TRIMIȚI ARTICOLUL?
+      ══════════════════════════════════ -->
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:16px;">Cum trimiți articolul?</h3>
       <div style="display:flex;flex-direction:column;gap:0;margin-bottom:32px;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
-
-        <!-- Pasul 1 -->
         <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
           <div style="width:56px;min-height:100%;background:var(--crimson);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <span style="color:#fff;font-family:'Source Serif 4',Georgia,serif;font-size:1.2rem;font-weight:900;">1</span>
           </div>
-          <div style="padding:16px 20px;flex:1;">
-            <div style="font-weight:700;color:var(--ink);margin-bottom:6px;font-size:1rem;">Alege varianta de redactare</div>
-            <p style="font-size:0.97rem;color:var(--muted);line-height:1.55;margin-bottom:12px;">Poți redacta articolul direct pe site (editor online cu asistent AI) sau poți descărca template-ul Word și încărca fișierul completat.</p>
+          <div style="padding:14px 20px;flex:1;">
+            <div style="font-weight:700;color:var(--ink);margin-bottom:4px;font-size:1rem;">Pregătește articolul</div>
+            <p style="font-size:0.95rem;color:var(--muted);line-height:1.55;margin:0;">Redactează materialul folosind editorul online sau template-ul Word.</p>
           </div>
         </div>
-
-        <!-- Pasul 2 -->
         <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
           <div style="width:56px;min-height:100%;background:var(--crimson);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <span style="color:#fff;font-family:'Source Serif 4',Georgia,serif;font-size:1.2rem;font-weight:900;">2</span>
           </div>
-          <div style="padding:16px 20px;flex:1;">
-            <div style="font-weight:700;color:var(--ink);margin-bottom:6px;font-size:1rem;">Completează datele articolului</div>
-            <p style="font-size:0.97rem;color:var(--muted);line-height:1.55;">Nume și prenume · E-mail · Instituție · Titlul articolului · Domeniu tematic · Fișierul articolului</p>
+          <div style="padding:14px 20px;flex:1;">
+            <div style="font-weight:700;color:var(--ink);margin-bottom:4px;font-size:1rem;">Salvează sau exportă materialul</div>
+            <p style="font-size:0.95rem;color:var(--muted);line-height:1.55;margin:0;">Asigură-te că fișierul este în format editabil (.doc sau .docx).</p>
           </div>
         </div>
-
-        <!-- Pasul 3 -->
-        <div style="display:flex;gap:0;">
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
           <div style="width:56px;min-height:100%;background:var(--crimson);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <span style="color:#fff;font-family:'Source Serif 4',Georgia,serif;font-size:1.2rem;font-weight:900;">3</span>
           </div>
-          <div style="padding:16px 20px;flex:1;">
-            <div style="font-weight:700;color:var(--ink);margin-bottom:6px;font-size:1rem;">Trimite articolul</div>
-            <p style="font-size:0.97rem;color:var(--muted);line-height:1.55;margin-bottom:12px;">După completarea datelor, materialul este transmis spre analiză editorială. Publicarea nu este automată — acceptarea se face după analiza redacției.</p>
+          <div style="padding:14px 20px;flex:1;">
+            <div style="font-weight:700;color:var(--ink);margin-bottom:4px;font-size:1rem;">Completează formularul de trimitere</div>
+            <p style="font-size:0.95rem;color:var(--muted);line-height:1.55;margin:0;">Nume, e-mail, instituție, titlul articolului, domeniu tematic.</p>
           </div>
         </div>
-
-      </div>
-
-      <!-- ══════════════════════════════════
-           C. CE PRIMEȘTE AUTORUL?
-      ══════════════════════════════════ -->
-      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">C. Ce primește autorul?</h3>
-      <p style="font-size:0.97rem;color:var(--ink);line-height:1.6;margin-bottom:16px;">După acceptarea și publicarea materialului, autorul beneficiază de următoarele elemente editoriale:</p>
-
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:32px;" class="pub-beneficii-grid">
-        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:16px 18px;">
-          <div style="width:32px;height:32px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.9rem;">1</div>
-          <div>
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:3px;">Publicarea articolului</div>
-            <div style="font-size:0.92rem;color:var(--muted);line-height:1.5;">Materialul acceptat este publicat în Revista Dokimasia, în format online.</div>
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
+          <div style="width:56px;min-height:100%;background:var(--crimson);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="color:#fff;font-family:'Source Serif 4',Georgia,serif;font-size:1.2rem;font-weight:900;">4</span>
+          </div>
+          <div style="padding:14px 20px;flex:1;">
+            <div style="font-weight:700;color:var(--ink);margin-bottom:4px;font-size:1rem;">Încarcă fișierul articolului</div>
+            <p style="font-size:0.95rem;color:var(--muted);line-height:1.55;margin:0;">Atașează fișierul final în format .doc sau .docx.</p>
           </div>
         </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:16px 18px;">
-          <div style="width:32px;height:32px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.9rem;">2</div>
-          <div>
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:3px;">Adeverință de publicare</div>
-            <div style="font-size:0.92rem;color:var(--muted);line-height:1.5;">Autorul primește o adeverință care confirmă publicarea articolului în Revista Dokimasia.</div>
+        <div style="display:flex;gap:0;">
+          <div style="width:56px;min-height:100%;background:var(--crimson);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="color:#fff;font-family:'Source Serif 4',Georgia,serif;font-size:1.2rem;font-weight:900;">5</span>
           </div>
-        </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:16px 18px;">
-          <div style="width:32px;height:32px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.9rem;">3</div>
-          <div>
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:3px;">Acces la revista digitală</div>
-            <div style="font-size:0.92rem;color:var(--muted);line-height:1.5;">Autorul primește acces la numărul revistei în care este publicat articolul.</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:16px 18px;">
-          <div style="width:32px;height:32px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.9rem;">4</div>
-          <div>
-            <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:3px;">Versiune tipărită, la cerere</div>
-            <div style="font-size:0.92rem;color:var(--muted);line-height:1.5;">Autorul poate solicita versiunea tipărită a revistei, în condițiile stabilite de redacție.</div>
+          <div style="padding:14px 20px;flex:1;">
+            <div style="font-weight:700;color:var(--ink);margin-bottom:4px;font-size:1rem;">Trimite formularul</div>
+            <p style="font-size:0.95rem;color:var(--muted);line-height:1.55;margin:0;">Materialul tău este transmis spre analiză editorială.</p>
           </div>
         </div>
       </div>
 
       <!-- ══════════════════════════════════
-           D. CONTRIBUȚIA EDITORIALĂ
+           CASETA IMPORTANT
       ══════════════════════════════════ -->
-      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">D. Contribuția editorială</h3>
+      <div style="background:#fff8f0;border:1px solid #f5c6a0;border-left:4px solid var(--crimson);border-radius:4px;padding:14px 18px;margin-bottom:32px;">
+        <div style="font-weight:700;font-size:0.95rem;color:var(--crimson);margin-bottom:6px;">⚠ Important</div>
+        <p style="font-size:0.93rem;color:var(--ink);line-height:1.65;margin:0;">Trimiterea articolului și achitarea contribuției editoriale nu garantează publicarea automată. Materialele sunt analizate editorial, iar redacția poate solicita revizuiri sau poate respinge articolele care nu respectă cerințele revistei.</p>
+      </div>
+
+      <!-- ══════════════════════════════════
+           5. CONTRIBUȚIA EDITORIALĂ
+      ══════════════════════════════════ -->
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">Contribuția editorială</h3>
       <div style="background:var(--paper-dark);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;padding:16px 20px;margin-bottom:32px;">
         <p style="font-size:0.97rem;color:var(--ink);line-height:1.65;margin:0;">Contribuția editorială se achită la finalul procesului de transmitere a materialului, conform opțiunilor disponibile pe site. Aceasta acoperă costurile administrative și editoriale asociate procesării, pregătirii și publicării materialelor.</p>
+      </div>
+
+      <!-- ══════════════════════════════════
+           6. CE PRIMEȘTE AUTORUL DUPĂ ACCEPTARE?
+      ══════════════════════════════════ -->
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">Ce primește autorul după acceptare?</h3>
+      <p style="font-size:0.97rem;color:var(--ink);line-height:1.6;margin-bottom:16px;">După acceptarea și publicarea materialului, autorul beneficiază de următoarele elemente editoriale:</p>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:32px;" class="pub-beneficii-grid">
+        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:14px 16px;">
+          <div style="width:30px;height:30px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.85rem;">1</div>
+          <div><div style="font-weight:700;font-size:0.95rem;color:var(--ink);margin-bottom:3px;">Publicarea articolului</div><div style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Materialul acceptat este publicat în Revista Dokimasia, în format online.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:14px 16px;">
+          <div style="width:30px;height:30px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.85rem;">2</div>
+          <div><div style="font-weight:700;font-size:0.95rem;color:var(--ink);margin-bottom:3px;">Adeverință de publicare</div><div style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Confirmare oficială a publicării articolului în Revista Dokimasia.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:14px 16px;">
+          <div style="width:30px;height:30px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.85rem;">3</div>
+          <div><div style="font-weight:700;font-size:0.95rem;color:var(--ink);margin-bottom:3px;">Acces la revista digitală</div><div style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Acces la numărul revistei în care este publicat articolul.</div></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:4px;padding:14px 16px;">
+          <div style="width:30px;height:30px;background:var(--crimson);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-family:'Source Serif 4',serif;flex-shrink:0;font-size:0.85rem;">4</div>
+          <div><div style="font-weight:700;font-size:0.95rem;color:var(--ink);margin-bottom:3px;">Versiune tipărită, la cerere</div><div style="font-size:0.88rem;color:var(--muted);line-height:1.5;">Autorul poate solicita versiunea tipărită a revistei, în condițiile stabilite de redacție.</div></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           7. FAQ
+      ══════════════════════════════════ -->
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:14px;">Întrebări frecvente</h3>
+      <div style="display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:32px;" id="faq-pub">
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Este obligatoriu contul de utilizator? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Nu este obligatoriu un cont pentru a trimite un articol. Formularul de trimitere poate fi completat și fără autentificare. Contul oferă acces la editorul online și la istoricul materialelor trimise.</div>
+        </div>
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Pot trimite mai multe articole? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Da, poți trimite până la 3 articole prin același formular. Contribuția editorială se calculează în funcție de numărul de articole transmise.</div>
+        </div>
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Pot avea coautori? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Da, articolele pot fi transmise în coautorat. Toți autorii își asumă conținutul și trimiterea materialului, conform politicii editoriale.</div>
+        </div>
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Primesc adeverință de publicare? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Da, după acceptarea și publicarea articolului, autorul primește o adeverință de publicare. Documentul confirmă includerea materialului în Revista Dokimasia.</div>
+        </div>
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Când se publică articolul? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Publicarea se realizează în funcție de calendarul editorial al revistei. Revista apare de patru ori pe an, iar materialele acceptate sunt incluse în cel mai apropiat număr disponibil.</div>
+        </div>
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Pot modifica articolul după trimitere? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Da, modificările pot fi solicitate redacției înainte de publicare. Redacția poate solicita la rândul ei revizuiri dacă materialul necesită ajustări.</div>
+        </div>
+        <div class="faq-pub-item" style="border-bottom:1px solid var(--border);">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Ce formate de fișier sunt acceptate? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Sunt acceptate fișierele în format <strong>.doc</strong> și <strong>.docx</strong>. Dimensiunea maximă per fișier este de 50 MB.</div>
+        </div>
+        <div class="faq-pub-item">
+          <button onclick="toggleFaqPub(this)" style="width:100%;text-align:left;background:none;border:none;padding:13px 18px;font-size:0.95rem;font-weight:700;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Source Serif 4',serif;">Ce se întâmplă dacă articolul nu este acceptat? <span style="font-size:1.1rem;color:var(--crimson);">+</span></button>
+          <div style="display:none;padding:0 18px 13px;font-size:0.92rem;color:var(--muted);line-height:1.65;">Redacția comunică decizia și, acolo unde este posibil, motivele neacceptării. Autorul poate revizui materialul și îl poate retrimite pentru un număr viitor.</div>
+        </div>
       </div>
 
       <!-- CTA spre tab-ul de trimitere -->
@@ -829,7 +891,10 @@
           <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:4px;">Ești pregătit să trimiți un articol?</div>
           <p style="font-size:0.97rem;color:var(--muted);line-height:1.5;margin:0;">Accesează formularul de trimitere și transmite materialul tău spre analiză editorială.</p>
         </div>
-        <button onclick="showTab('formular')" style="background:var(--crimson);color:#fff;border:none;padding:11px 26px;border-radius:4px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="showTab('formular')" style="background:var(--crimson);color:#fff;border:none;padding:11px 26px;border-radius:4px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
+          <a href="template_practic.docx" download style="display:inline-flex;align-items:center;gap:6px;background:var(--paper-dark);color:var(--ink);border:1px solid var(--border);padding:11px 20px;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:600;text-decoration:none;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--paper-dark)'">⬇ Descarcă template Word</a>
+        </div>
       </div>
 
     </div><!-- /panel-publicare -->
@@ -1220,6 +1285,18 @@
     btn.setAttribute('aria-expanded', !isOpen);
   }
 
+  function toggleFaqPub(btn) {
+    var body = btn.nextElementSibling;
+    var isOpen = body.style.display === 'block';
+    // Închide toate celelalte
+    document.querySelectorAll('#faq-pub .faq-pub-item button + div').forEach(function(d) { d.style.display = 'none'; });
+    document.querySelectorAll('#faq-pub .faq-pub-item button span').forEach(function(s) { s.textContent = '+'; });
+    if (!isOpen) {
+      body.style.display = 'block';
+      btn.querySelector('span').textContent = '−';
+    }
+  }
+
   // ARHIVA
   var arhivaLoaded = false
   async function loadArhiva() {
@@ -1231,11 +1308,10 @@
       var data = r.data
       if (!data || data.length === 0) {
         grid.innerHTML =
-          '<div style="text-align:center;padding:48px 20px;max-width:480px;margin:0 auto;">' +
+          '<div style="text-align:center;padding:48px 20px;max-width:540px;margin:0 auto;">' +
             '<div style="font-size:2rem;margin-bottom:16px;opacity:0.4;">📖</div>' +
-            '<p style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:8px;">Primul număr al Revistei Dokimasia este în pregătire.</p>' +
-            '<p style="font-size:0.92rem;color:var(--muted);line-height:1.6;">Arhiva va fi disponibilă după publicarea acestuia.</p>' +
-            '<p style="font-size:0.88rem;color:var(--muted);margin-top:10px;font-style:italic;">Reveniți în această secțiune pentru a consulta edițiile publicate în format digital.</p>' +
+            '<p style="font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:10px;">Primul număr al Revistei Dokimasia va fi disponibil în curând.</p>' +
+            '<p style="font-size:0.92rem;color:var(--muted);line-height:1.7;">Arhiva va include numerele publicate, articolele acceptate și informații despre autorii publicați.</p>' +
           '</div>'
         return
       }
