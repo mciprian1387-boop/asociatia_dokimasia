@@ -46,16 +46,19 @@
     nav.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); }
 
     /* SUBNAV REVISTA — redesign compact */
-    .revista-subnav { background:#fff; border-bottom:1px solid var(--border); padding:0 32px; display:flex; gap:0; }
+    .revista-subnav { background:#fff; border-bottom:1px solid var(--border); padding:0; display:flex; justify-content:center; gap:0; width:100%; }
     .revista-subnav .subnav-btn {
-      background:transparent; border:none; border-bottom:2px solid transparent;
-      color:var(--crimson); font-size:0.78rem; font-weight:600;
+      background:transparent;
+      border-top:none; border-left:none; border-bottom:3px solid transparent;
+      border-right:1px solid var(--border);
+      color:var(--muted); font-size:0.78rem; font-weight:600;
       font-family:'Source Serif 4',serif; letter-spacing:0.3px;
-      padding:8px 16px; cursor:pointer;
-      transition:border-color 0.2s, background 0.2s; white-space:nowrap;
+      padding:12px 0; cursor:pointer; flex:1; text-align:center;
+      transition:background 0.2s, color 0.2s, border-bottom-color 0.2s; white-space:nowrap;
     }
-    .revista-subnav .subnav-btn:hover { background:var(--paper-dark); border-bottom-color:var(--crimson); }
-    .revista-subnav .subnav-btn.active { border-bottom-color:var(--crimson); background:#fdf9f4; }
+    .revista-subnav .subnav-btn:first-child { border-left:1px solid var(--border); }
+    .revista-subnav .subnav-btn:hover { background:var(--paper-dark); color:var(--crimson); border-bottom-color:rgba(139,0,0,0.3); }
+    .revista-subnav .subnav-btn.active { border-bottom-color:var(--crimson); background:#fdf9f4; color:var(--crimson); font-weight:700; }
 
     /* HERO */
     @keyframes heroShift {
@@ -324,9 +327,9 @@
       .mob-nav { display:none; flex-direction:column; background:var(--crimson); }
       .mob-nav.open { display:flex; }
       .mob-nav a { color:#fff; text-align:center; padding:14px; font-size:1rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.2); }
-      .revista-subnav { padding:0 8px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex-wrap:nowrap; }
+      .revista-subnav { padding:0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex-wrap:nowrap; justify-content:flex-start; }
       .revista-subnav::-webkit-scrollbar { display:none; }
-      .revista-subnav .subnav-btn { padding:8px 12px; font-size:0.75rem; flex-shrink:0; }
+      .revista-subnav .subnav-btn { padding:8px 0; font-size:0.72rem; flex:0 0 auto; min-width:100px; }
       .despre-prescurt-grid { grid-template-columns:1fr 1fr !important; }
       .despre-cols-grid { grid-template-columns:1fr !important; }
       .pub-tipuri-grid { grid-template-columns:1fr 1fr !important; }
