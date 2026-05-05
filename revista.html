@@ -46,17 +46,19 @@
     nav.main-nav a:hover, nav.main-nav a.active { background:rgba(255,255,255,0.15); }
 
     /* SUBNAV REVISTA — redesign compact */
-    .revista-subnav { background:#fff; border-bottom:1px solid var(--border); padding:0; display:flex; justify-content:center; gap:0; width:100%; }
+    .revista-subnav { background:#fff; border-bottom:1px solid var(--border); padding:0; display:flex; justify-content:center; gap:0; width:100%; overflow:hidden; }
     .revista-subnav .subnav-btn {
       background:transparent;
       border-top:none; border-left:none; border-bottom:3px solid transparent;
       border-right:1px solid var(--border);
       color:var(--muted); font-size:0.78rem; font-weight:600;
       font-family:'Source Serif 4',serif; letter-spacing:0.3px;
-      padding:12px 0; cursor:pointer; flex:1; text-align:center;
-      transition:background 0.2s, color 0.2s, border-bottom-color 0.2s; white-space:nowrap;
+      padding:12px 8px; cursor:pointer; flex:1; text-align:center;
+      transition:background 0.2s, color 0.2s, border-bottom-color 0.2s;
+      white-space:nowrap; box-sizing:border-box; min-width:0;
     }
     .revista-subnav .subnav-btn:first-child { border-left:1px solid var(--border); }
+    .revista-subnav .subnav-btn:last-child { border-right:1px solid var(--border); }
     .revista-subnav .subnav-btn:hover { background:var(--paper-dark); color:var(--crimson); border-bottom-color:rgba(139,0,0,0.3); }
     .revista-subnav .subnav-btn.active { border-bottom-color:var(--crimson); background:#fdf9f4; color:var(--crimson); font-weight:700; }
 
