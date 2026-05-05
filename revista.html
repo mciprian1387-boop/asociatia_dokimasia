@@ -453,6 +453,7 @@
     <button class="subnav-btn active" id="subnav-despre" onclick="showTab('despre')">Despre</button>
     <button class="subnav-btn" id="subnav-publicare" onclick="showTab('publicare')">Publicare</button>
     <button class="subnav-btn" id="subnav-ghid" onclick="showTab('ghid')">Ghid autori</button>
+    <button class="subnav-btn" id="subnav-formular" onclick="showTab('formular')">Trimite articol</button>
     <button class="subnav-btn" id="subnav-arhiva" onclick="showTab('arhiva')">Arhivă</button>
   </div>
 </header>
@@ -704,7 +705,7 @@
           <div style="font-weight:700;color:var(--ink);font-size:1rem;margin-bottom:3px;">Ești pregătit să trimiți un material?</div>
           <div style="font-size:0.92rem;color:var(--muted);">Accesează secțiunea „Publicare" pentru formularul de trimitere și opțiunile disponibile.</div>
         </div>
-        <button onclick="showTab('publicare')" style="background:var(--crimson);color:#fff;border:none;padding:10px 22px;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
+        <button onclick="showTab('formular')" style="background:var(--crimson);color:#fff;border:none;padding:10px 22px;border-radius:4px;font-size:0.95rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
       </div>
 
     </div><!-- /panel-ghid -->
@@ -777,7 +778,31 @@
 
       </div>
 
-      <!-- FORMULARUL DE TRIMITERE — păstrat integral, reorganizat vizual -->
+      <!-- CTA spre tab-ul de trimitere -->
+      <div style="background:linear-gradient(to right,#fdf8f0,#fff8ec);border:1px solid var(--border);border-left:4px solid var(--crimson);border-radius:4px;padding:20px 24px;margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+        <div>
+          <div style="font-weight:700;font-size:1rem;color:var(--ink);margin-bottom:4px;">Ești pregătit să trimiți un articol?</div>
+          <p style="font-size:0.97rem;color:var(--muted);line-height:1.5;margin:0;">Accesează formularul de trimitere și transmite materialul tău spre analiză editorială.</p>
+        </div>
+        <button onclick="showTab('formular')" style="background:var(--crimson);color:#fff;border:none;padding:11px 26px;border-radius:4px;font-size:1rem;font-family:'Source Serif 4',serif;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Trimite un articol →</button>
+      </div>
+
+    </div><!-- /panel-publicare -->
+
+    <!-- ══════════════════════════════════════
+         PANEL FORMULAR TRIMITERE (tab separat)
+    ══════════════════════════════════════ -->
+    <div class="info-panel" id="panel-formular">
+      <div class="panel-header">
+        <h2>Trimite un articol</h2>
+        <div class="panel-header-line"></div>
+      </div>
+
+      <p style="font-size:1.02rem;line-height:1.65;color:var(--ink);margin-bottom:24px;">
+        Revista Dokimasia primește contribuții din domeniul educației și din ariile conexe. Completează formularul de mai jos pentru a transmite materialul tău spre analiză editorială.
+      </p>
+
+      <!-- FORMULARUL DE TRIMITERE -->
       <div style="background:var(--paper-dark);border:1px solid var(--border);border-radius:6px;padding:24px 28px;margin-bottom:32px;" id="formular-trimitere">
 
       <!-- Introducere formular -->
@@ -801,15 +826,24 @@
         <div id="tr-drafts-loading" style="display:none;color:var(--muted);font-size:1rem;font-style:italic;margin-bottom:8px;">⏳ Se verifică articolele salvate...</div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <!-- Card 1: Editor online -->
-          <a href="editor-articol.html" style="text-decoration:none;">
-            <div style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='var(--crimson)';this.style.background='#fff3f3'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--paper-dark)'">
-              <div style="font-size:1.5rem;">✏️</div>
-              <div style="font-weight:700;font-size:1rem;color:var(--ink);">Redactează în editorul online</div>
-              <div style="font-size:1rem;color:var(--muted);line-height:1.5;flex:1;">Folosește editorul online pentru a redacta articolul într-un format ghidat. După finalizare, exportă/descarcă documentul și revino la formular pentru încărcare.</div>
-              <div style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 18px;border-radius:4px;font-size:1rem;font-weight:600;width:fit-content;">Deschide editorul online →</div>
+          <!-- Card 1: Editor online — cu drafturi integrate -->
+          <div style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box;">
+            <div style="font-size:1.5rem;">✏️</div>
+            <div style="font-weight:700;font-size:1rem;color:var(--ink);">Redactează în editorul online</div>
+            <div style="font-size:1rem;color:var(--muted);line-height:1.5;">Folosește editorul online pentru a redacta articolul într-un format ghidat. După finalizare, exportă/descarcă documentul și revino la formular pentru încărcare.</div>
+
+            <!-- Zona drafturi — vizibilă doar când e logat și are drafturi -->
+            <div id="card-editor-drafturi" style="display:none;margin-top:4px;background:#fff;border:1px solid var(--border);border-left:3px solid var(--crimson);border-radius:4px;padding:10px 14px;">
+              <div style="font-size:0.8rem;font-weight:700;color:var(--crimson);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Articole în curs de redactare</div>
+              <div id="card-editor-drafturi-list" style="display:flex;flex-direction:column;gap:5px;"></div>
             </div>
-          </a>
+            <!-- Mesaj fără drafturi (logat, dar fără articole salvate) -->
+            <div id="card-editor-fara-drafturi" style="display:none;margin-top:4px;font-size:0.9rem;color:var(--muted);font-style:italic;">Nu ai articole salvate în editor. Apasă mai jos pentru a începe unul nou.</div>
+            <!-- Mesaj nelogat -->
+            <div id="card-editor-nelogat" style="display:none;margin-top:4px;font-size:0.9rem;color:var(--muted);font-style:italic;">Loghează-te pentru a vedea articolele tale salvate.</div>
+
+            <a href="editor-articol.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--crimson);color:#fff;padding:10px 18px;border-radius:4px;font-size:1rem;font-weight:600;width:fit-content;text-decoration:none;margin-top:auto;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Deschide editorul online →</a>
+          </div>
           <!-- Card 2: Încarcă fișier -->
           <div onclick="trAlegereMod('fisier')" style="background:var(--paper-dark);border:2px solid var(--border);border-radius:8px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;height:100%;box-sizing:border-box;cursor:pointer;transition:border-color 0.2s,background 0.2s;" onmouseover="this.style.borderColor='var(--crimson)';this.style.background='#fff3f3'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--paper-dark)'">
             <div style="font-size:1.5rem;">📎</div>
@@ -1068,7 +1102,7 @@
         <p style="font-size:0.97rem;color:var(--ink);line-height:1.65;margin:0;">Contribuția editorială se achită la finalul procesului de transmitere a materialului, conform opțiunilor disponibile pe site. Aceasta acoperă costurile administrative și editoriale asociate procesării, pregătirii și publicării materialelor.</p>
       </div>
 
-    </div><!-- /panel-publicare -->
+    </div><!-- /panel-formular -->
 
     <div class="info-panel" id="panel-arhiva">
 
@@ -1129,8 +1163,9 @@
   var TAB_MAP = {
     despre:      'despre',
     publicare:   'publicare',
-    trimitere:   'publicare',   // compatibilitate cu referințe vechi
-    contributie: 'publicare',   // compatibilitate cu referințe vechi
+    trimitere:   'formular',    // compatibilitate cu referințe vechi → acum tab separat
+    contributie: 'formular',    // compatibilitate cu referințe vechi
+    formular:    'formular',
     ghid:        'ghid',
     arhiva:      'arhiva'
   };
@@ -1157,11 +1192,12 @@
     // Acțiuni secundare per panou
     if (panelId === 'arhiva') loadArhiva();
     if (panelId === 'publicare') incarcaDrafturi();
+    if (panelId === 'formular') incarcaDrafturi();
   }
 
   // Scroll direct la formular (butonul „Trimite un articol" din hero)
   function goToFormularTrimitere() {
-    showTab('publicare');
+    showTab('formular');
     setTimeout(function() {
       var el = document.getElementById('formular-trimitere');
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1480,6 +1516,16 @@
     try { session = await sb.auth.getSession(); } catch(e) {}
     var user = session && session.data && session.data.session && session.data.session.user;
 
+    // Actualizează starea cardului editor în funcție de logare
+    var cardNelogat = document.getElementById('card-editor-nelogat');
+    var cardFaraDrafturi = document.getElementById('card-editor-fara-drafturi');
+    var cardDrafturi = document.getElementById('card-editor-drafturi');
+    if (!user) {
+      if (cardNelogat) cardNelogat.style.display = 'block';
+      if (cardFaraDrafturi) cardFaraDrafturi.style.display = 'none';
+      if (cardDrafturi) cardDrafturi.style.display = 'none';
+    }
+
     if (!user) {
       if (btnDraft) btnDraft.style.display = 'none';
       // Ascunde selectorul de mod, afișează direct zona de fișiere
@@ -1501,6 +1547,38 @@
       if (loading) loading.style.display = 'none';
 
       var drafts = r.data || [];
+
+      // Populează cardul editor online cu drafturi
+      var cardNelogat2 = document.getElementById('card-editor-nelogat');
+      var cardFaraDrafturi2 = document.getElementById('card-editor-fara-drafturi');
+      var cardDrafturi2 = document.getElementById('card-editor-drafturi');
+      var cardDrafturiList = document.getElementById('card-editor-drafturi-list');
+      if (cardNelogat2) cardNelogat2.style.display = 'none';
+      if (drafts.length === 0) {
+        if (cardFaraDrafturi2) cardFaraDrafturi2.style.display = 'block';
+        if (cardDrafturi2) cardDrafturi2.style.display = 'none';
+      } else {
+        if (cardFaraDrafturi2) cardFaraDrafturi2.style.display = 'none';
+        if (cardDrafturi2) cardDrafturi2.style.display = 'block';
+        if (cardDrafturiList) {
+          var tipMapCard = { practic: 'Practici educaționale', cercetare: 'Cercetare și analiză', dezvoltare: 'Dezvoltare profesională' };
+          cardDrafturiList.innerHTML = drafts.slice(0,3).map(function(d) {
+            var titlu = (d.data && d.data.titlu && d.data.titlu.trim()) ? d.data.titlu : '<em style="color:var(--muted);">Fără titlu</em>';
+            var tip = tipMapCard[d.tip] || d.tip || '';
+            var dataStr = d.updated_at ? new Date(d.updated_at).toLocaleDateString('ro-RO', {day:'2-digit',month:'short',year:'numeric'}) : '';
+            return '<a href="editor-articol.html?id=' + d.id + '" style="display:flex;align-items:center;justify-content:space-between;gap:8px;text-decoration:none;padding:5px 0;border-bottom:1px dashed var(--border);">' +
+              '<div style="flex:1;min-width:0;">' +
+                '<div style="font-size:0.9rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + titlu + '</div>' +
+                (tip ? '<div style="font-size:0.78rem;color:var(--muted);">' + tip + ' · ' + dataStr + '</div>' : '<div style="font-size:0.78rem;color:var(--muted);">' + dataStr + '</div>') +
+              '</div>' +
+              '<span style="font-size:0.78rem;color:var(--crimson);font-weight:600;white-space:nowrap;">Continuă →</span>' +
+            '</a>';
+          }).join('');
+          if (drafts.length > 3) {
+            cardDrafturiList.innerHTML += '<div style="font-size:0.8rem;color:var(--muted);margin-top:5px;text-align:center;">+ ' + (drafts.length - 3) + ' alte articole în editor</div>';
+          }
+        }
+      }
 
       if (drafts.length === 0) {
         if (btnDraft) btnDraft.style.display = 'none';
