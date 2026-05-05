@@ -501,7 +501,7 @@
     <div class="revista-hero-buttons">
       <button class="hero-btn-primary" onclick="goToFormularTrimitere()">Trimite un articol</button>
       <button class="hero-btn-secondary" onclick="goToGhidAutori()">Consultă ghidul pentru autori</button>
-      <button class="hero-btn-secondary" onclick="goToPropuneImbunatatire()" style="border-color:var(--gold);color:var(--gold);" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';">Propune o îmbunătățire</button>
+      <button class="hero-btn-secondary" onclick="goToPropuneImbunatatire()" style="border-color:var(--gold);color:var(--gold);" onmouseover="this.style.background='var(--gold)';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='var(--gold)';">Propune / Întreabă</button>
     </div>
   </div>
 </div>
@@ -1344,6 +1344,16 @@
 </footer>
 
 <script>
+  // ── EmailJS ──────────────────────────────────────
+  var EJS_SVC = 'service_4a8gp1c';
+  var EJS_TPL = 'template_ole4m78';
+  var EJS_PUB = 'cPvtBWK6KReX_pqhM';
+  var ADMIN_EMAIL = 'm.ciprian1387@gmail.com';
+  emailjs.init(EJS_PUB);
+
+  // ── Persistență tab la refresh ───────────────────
+  var _savedTab = localStorage.getItem('revista_tab');
+
   // Set hero height CSS variable for info-section height calc
 
   // ─── NAVIGARE ───────────────────────────────────────────────────────────────
@@ -1361,6 +1371,9 @@
 
   function showTab(id) {
     var panelId = TAB_MAP[id] || id;
+
+    // Salvează tabul curent
+    localStorage.setItem('revista_tab', panelId);
 
     // Subnav — activează butonul corect
     document.querySelectorAll('.revista-subnav .subnav-btn').forEach(function(btn) {
@@ -1382,6 +1395,13 @@
     if (panelId === 'publicare') incarcaDrafturi();
     if (panelId === 'formular') incarcaDrafturi();
   }
+
+  // Restaurează tabul salvat la încărcare
+  document.addEventListener('DOMContentLoaded', function() {
+    if (_savedTab && _savedTab !== 'despre') {
+      showTab(_savedTab);
+    }
+  });
 
   // Scroll direct la formular (butonul „Trimite un articol" din hero)
   function goToFormularTrimitere() {
@@ -1423,30 +1443,52 @@
     var notif    = document.getElementById('propunere-notif');
 
     if (!email || !email.includes('@')) { notif.innerHTML = '<span style="color:#c0392b;">⚠ Introdu o adresă de e-mail validă.</span>'; return; }
-    if (!text) { notif.innerHTML = '<span style="color:#c0392b;">⚠ Descrie propunerea ta.</span>'; return; }
+    if (!text) { notif.innerHTML = '<span style="color:#c0392b;">⚠ Descrie propunerea sau întrebarea ta.</span>'; return; }
 
     var btn = document.getElementById('btnTrimitePropunere');
     btn.disabled = true;
     btn.textContent = 'Se trimite...';
     notif.innerHTML = '';
 
+    var subiect = 'Propune / Întreabă — ' + (sectiune || 'General');
+    var mesajComplet = (sectiune ? '[Secțiunea: ' + sectiune + ']\n\n' : '') + text;
+
+    var ok1 = false, ok2 = false;
+
+    // 1. Salvare în Supabase
     try {
       await sbAdmin.from('messages').insert([{
         name:      nume || 'Anonim',
         email:     email,
-        subject:   'Propunere îmbunătățire conținut — ' + (sectiune || 'General'),
-        message:   (sectiune ? '[Secțiunea: ' + sectiune + ']\n\n' : '') + text,
+        subject:   subiect,
+        message:   mesajComplet,
         citit:     false,
         direction: 'inbox',
         sters:     false
       }]);
-      notif.innerHTML = '<span style="color:#27ae60;">✅ Propunerea ta a fost trimisă. Mulțumim!</span>';
+      ok1 = true;
+    } catch(e) { console.error('Supabase insert error:', e); }
+
+    // 2. Email prin EmailJS
+    try {
+      await emailjs.send(EJS_SVC, EJS_TPL, {
+        to_email:  ADMIN_EMAIL,
+        to_name:   'Dokimasia Admin',
+        from_name: nume || 'Anonim',
+        subject:   subiect,
+        message:   mesajComplet + '\n\nRăspuns la: ' + email,
+        reply_to:  email
+      });
+      ok2 = true;
+    } catch(e) { console.error('EmailJS error:', e); }
+
+    if (ok1 || ok2) {
+      notif.innerHTML = '<span style="color:#27ae60;">✅ Mesajul tău a fost trimis. Mulțumim!</span>';
       setTimeout(inchideModalPropunere, 2000);
-    } catch(e) {
+    } else {
       notif.innerHTML = '<span style="color:#c0392b;">⚠ Eroare la trimitere. Încearcă din nou.</span>';
-    } finally {
       btn.disabled = false;
-      btn.textContent = 'Trimite propunerea';
+      btn.textContent = 'Trimite';
     }
   }
 
@@ -2366,12 +2408,12 @@
     <div style="background:#8B6914;border-radius:8px 8px 0 0;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;">
       <div>
         <div style="font-size:0.72rem;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.75);margin-bottom:2px;">Revista Dokimasia</div>
-        <div style="font-size:1rem;font-weight:700;color:#fff;">Propune o îmbunătățire a conținutului</div>
+        <div style="font-size:1rem;font-weight:700;color:#fff;">Propune / Întreabă</div>
       </div>
       <button onclick="inchideModalPropunere()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1.1rem;cursor:pointer;">✕</button>
     </div>
     <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;">
-      <p style="font-size:0.9rem;color:#666;line-height:1.6;margin:0;">Dacă ai observat o informație inexactă, o formulare care poate fi îmbunătățită sau vrei să sugerezi conținut nou, ne poți transmite propunerea prin acest formular.</p>
+      <p style="font-size:0.9rem;color:#666;line-height:1.6;margin:0;">Ai o întrebare despre revistă, despre procesul de publicare sau despre conținutul paginii? Sau vrei să propui o îmbunătățire? Trimite-ne mesajul și îți răspundem.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div>
           <label style="font-size:0.82rem;color:#555;display:block;margin-bottom:4px;">Nume (opțional)</label>
@@ -2385,25 +2427,25 @@
       <div>
         <label style="font-size:0.82rem;color:#555;display:block;margin-bottom:4px;">Secțiunea vizată</label>
         <select id="propunere-sectiune" style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-family:Georgia,serif;font-size:0.92rem;background:#fff;">
-          <option value="">— Selectează secțiunea —</option>
+          <option value="">— Selectează subiectul —</option>
+          <option>Întrebare despre publicare</option>
+          <option>Întrebare despre contribuția editorială</option>
+          <option>Întrebare despre documente / adeverințe</option>
+          <option>Propunere îmbunătățire conținut</option>
           <option>Despre revistă</option>
-          <option>Publică în revistă</option>
           <option>Ghid autori</option>
-          <option>Trimite articol</option>
-          <option>Ce poate primi autorul</option>
-          <option>Devino colaborator</option>
-          <option>Întrebări frecvente</option>
+          <option>Formularul de trimitere</option>
           <option>Alta / General</option>
         </select>
       </div>
       <div>
-        <label style="font-size:0.82rem;color:#555;display:block;margin-bottom:4px;">Propunerea ta <span style="color:#8B0000;">*</span></label>
-        <textarea id="propunere-text" rows="5" placeholder="Descrie ce ai dori să fie îmbunătățit sau corectat..." style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-family:Georgia,serif;font-size:0.92rem;resize:vertical;box-sizing:border-box;"></textarea>
+        <label style="font-size:0.82rem;color:#555;display:block;margin-bottom:4px;">Întrebarea sau propunerea ta <span style="color:#8B0000;">*</span></label>
+        <textarea id="propunere-text" rows="5" placeholder="Scrie întrebarea sau propunerea ta..." style="width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:6px;font-family:Georgia,serif;font-size:0.92rem;resize:vertical;box-sizing:border-box;"></textarea>
       </div>
       <div id="propunere-notif" style="font-size:0.88rem;min-height:18px;"></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button onclick="inchideModalPropunere()" style="padding:9px 20px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-family:Georgia,serif;font-size:0.9rem;">Anulează</button>
-        <button id="btnTrimitePropunere" onclick="trimitePropunere()" style="padding:9px 22px;background:#8B6914;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:Georgia,serif;font-size:0.9rem;font-weight:700;">Trimite propunerea</button>
+        <button id="btnTrimitePropunere" onclick="trimitePropunere()" style="padding:9px 22px;background:#8B6914;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:Georgia,serif;font-size:0.9rem;font-weight:700;">Trimite</button>
       </div>
     </div>
   </div>
