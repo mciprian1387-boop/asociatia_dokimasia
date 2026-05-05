@@ -395,7 +395,7 @@
           <div class="stat-card">
             <div class="stat-icon">✅</div>
             <div class="stat-number" id="countCitite">—</div>
-            <div class="stat-label">Mesaje citite</div>
+            <div class="stat-label">Conversații citite</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">🗑</div>
@@ -407,55 +407,77 @@
         <!-- Tab-uri -->
         <div style="display:flex;gap:8px;margin-bottom:16px;">
           <button class="btn btn-red btn-sm" id="tabNecitite" onclick="switchMsgTab('necitite')">🔴 Necitite</button>
-          <button class="btn btn-outline btn-sm" id="tabCitite" onclick="switchMsgTab('citite')">✅ Citite</button>
+          <button class="btn btn-outline btn-sm" id="tabCitite" onclick="switchMsgTab('citite')">✅ Toate conversațiile</button>
           <button class="btn btn-outline btn-sm" id="tabSterse" onclick="switchMsgTab('sterse')">🗑 Șterse</button>
         </div>
 
-        <!-- Necitite -->
-        <div id="msgNecitite">
-          <div class="table-wrap">
-            <div class="table-header">
-              <h3>Mesaje necitite</h3>
-              <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻ Actualizează</button>
-            </div>
-            <div id="mesajeListNecitite"><div class="loading">Se încarcă...</div></div>
-          </div>
-        </div>
+        <!-- Layout 2 coloane: lista + conversatie -->
+        <div style="display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start;">
 
-        <!-- Citite -->
-        <div id="msgCitite" style="display:none;">
-          <div class="table-wrap">
-            <div class="table-header">
-              <h3>Mesaje citite</h3>
-              <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻ Actualizează</button>
-            </div>
-            <div id="mesajeListCitite"><div class="loading">Se încarcă...</div></div>
-          </div>
-        </div>
-
-        <!-- Sterse -->
-        <div id="msgSterse" style="display:none;">
-          <div class="table-wrap">
-            <div class="table-header">
-              <h3>Mesaje șterse</h3>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻ Actualizează</button>
-                <button class="btn btn-danger btn-sm" onclick="golireSterse()">🗑 Golire coș</button>
+          <!-- Coloana stânga: lista conversații -->
+          <div>
+            <div id="msgNecitite">
+              <div class="table-wrap" style="padding:0;">
+                <div class="table-header" style="padding:12px 16px;">
+                  <h3 style="font-size:0.95rem;">Necitite</h3>
+                  <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻</button>
+                </div>
+                <div id="mesajeListNecitite"><div class="loading">Se încarcă...</div></div>
               </div>
             </div>
-            <div id="mesajeListSterse"><div class="loading">Se încarcă...</div></div>
-          </div>
-        </div>
-
-        <!-- Detaliu mesaj -->
-        <div id="msgDetail" style="display:none; margin-top:20px;">
-          <div class="card">
-            <h3 id="msgDetailTitle">Detaliu mesaj</h3>
-            <div id="msgDetailContent"></div>
-            <div style="margin-top:16px; display:flex; gap:10px;">
-              <button class="btn btn-outline btn-sm" onclick="document.getElementById('msgDetail').style.display='none'">← Înapoi</button>
-              <button class="btn btn-danger btn-sm" id="msgDeleteBtn" onclick="deleteMesaj()">🗑 Șterge</button>
+            <div id="msgCitite" style="display:none;">
+              <div class="table-wrap" style="padding:0;">
+                <div class="table-header" style="padding:12px 16px;">
+                  <h3 style="font-size:0.95rem;">Toate conversațiile</h3>
+                  <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻</button>
+                </div>
+                <div id="mesajeListCitite"><div class="loading">Se încarcă...</div></div>
+              </div>
             </div>
+            <div id="msgSterse" style="display:none;">
+              <div class="table-wrap" style="padding:0;">
+                <div class="table-header" style="padding:12px 16px;">
+                  <h3 style="font-size:0.95rem;">Șterse</h3>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-outline btn-sm" onclick="loadMesaje()">↻</button>
+                    <button class="btn btn-danger btn-sm" onclick="golireSterse()">🗑</button>
+                  </div>
+                </div>
+                <div id="mesajeListSterse"><div class="loading">Se încarcă...</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Coloana dreapta: conversatie -->
+          <div id="msgDetail" style="display:none;">
+            <div class="card" style="padding:0;overflow:hidden;">
+              <!-- Header conversatie -->
+              <div style="background:#f9f4f4;border-bottom:1px solid #f0e0e0;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div>
+                  <div style="font-weight:700;font-size:1rem;color:#1a1a1a;" id="msgDetailTitle">—</div>
+                  <div style="font-size:0.82rem;color:#888;margin-top:2px;" id="msgDetailEmail">—</div>
+                </div>
+                <div style="display:flex;gap:6px;flex-shrink:0;">
+                  <button class="btn btn-danger btn-sm" id="msgDeleteBtn" onclick="deleteMesaj()">🗑 Șterge</button>
+                </div>
+              </div>
+              <!-- Thread mesaje -->
+              <div id="msgThread" style="display:flex;flex-direction:column;gap:0;max-height:520px;overflow-y:auto;padding:16px;"></div>
+              <!-- Box răspuns -->
+              <div id="msgReplyBox" style="border-top:1px solid #f0e0e0;padding:14px 18px;">
+                <textarea id="replyText" rows="3" placeholder="Scrie un răspuns..."
+                  style="width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:Georgia,serif;font-size:0.93rem;resize:vertical;box-sizing:border-box;"></textarea>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+                  <span id="replyNotif" style="font-size:0.85rem;"></span>
+                  <button onclick="trimitReplyInline()" style="background:#8B0000;color:#fff;border:none;padding:8px 20px;border-radius:4px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:Georgia,serif;">Trimite →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Placeholder când nicio conversatie selectata -->
+          <div id="msgPlaceholder" style="display:flex;align-items:center;justify-content:center;min-height:300px;color:#bbb;font-size:0.95rem;font-style:italic;">
+            Selectează o conversație
           </div>
         </div>
       </div>
@@ -961,6 +983,7 @@
   let currentMsgEmail = ''
   let currentMsgName = ''
   let currentMsgSubject = ''
+  let currentThreadId = null
   let allMessagesCache = {}
   let currentMsgTab = 'necitite'
 
@@ -973,117 +996,239 @@
     document.getElementById('tabCitite').className = tab === 'citite' ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
     document.getElementById('tabSterse').className = tab === 'sterse' ? 'btn btn-red btn-sm' : 'btn btn-outline btn-sm'
     document.getElementById('msgDetail').style.display = 'none'
+    document.getElementById('msgPlaceholder').style.display = 'flex'
   }
 
-  function msgItemHTML(m, isDeleted) {
-    allMessagesCache[m.id] = m
-    const id = m.id
-    const name = (m.name||'—')
-    const subj = (m.subject||'')
-    const date = new Date(m.created_at).toLocaleDateString('ro-RO')
-    const preview = (m.message||'').substring(0,100)
-    const unread = m.citit ? '' : 'unread'
-    const badge = !m.citit && !isDeleted ? '<span class="badge badge-red">Nou</span>' : (isDeleted ? '<span class="badge badge-gray">Șters</span>' : '')
-    return `<div class="msg-item ${unread}" onclick="openMesajById('${id}',${isDeleted})">
-      <div class="msg-meta">
-        <span class="msg-name">${name}</span>
-        <span class="msg-subject">${subj}</span>
-        <span class="msg-date">${date}</span>
-        ${badge}
-      </div>
-      <div class="msg-preview">${preview}...</div>
-    </div>`
+  // Grupează mesajele după email — returnează conversații sortate după ultimul mesaj
+  function grupeazaDupaEmail(msgs) {
+    var map = {}
+    msgs.forEach(function(m) {
+      var key = (m.email || '').toLowerCase()
+      if (!map[key]) map[key] = { email: key, name: m.name||'—', msgs: [], hasUnread: false }
+      map[key].msgs.push(m)
+      if (!m.citit && m.direction !== 'sent') map[key].hasUnread = true
+    })
+    // sortăm după cel mai recent mesaj
+    return Object.values(map).sort(function(a, b) {
+      var aLast = Math.max.apply(null, a.msgs.map(function(m) { return new Date(m.created_at).getTime() }))
+      var bLast = Math.max.apply(null, b.msgs.map(function(m) { return new Date(m.created_at).getTime() }))
+      return bLast - aLast
+    })
   }
 
+  function convItemHTML(conv, isDeleted) {
+    var lastMsg = conv.msgs.slice().sort(function(a,b) { return new Date(b.created_at) - new Date(a.created_at) })[0]
+    var date = lastMsg ? new Date(lastMsg.created_at).toLocaleDateString('ro-RO') : '—'
+    var preview = (lastMsg && lastMsg.message || '').substring(0, 80)
+    var unread = conv.hasUnread && !isDeleted ? 'unread' : ''
+    var badge = conv.hasUnread && !isDeleted ? '<span class="badge badge-red">Nou</span>' : ''
+    var count = conv.msgs.length > 1 ? '<span style="font-size:0.75rem;background:#f0e0e0;color:#8B0000;padding:1px 6px;border-radius:10px;margin-left:4px;">' + conv.msgs.length + '</span>' : ''
+    return '<div class="msg-item ' + unread + '" onclick="deschideConversatie(\'' + conv.email.replace(/'/g,"&#39;") + '\',' + isDeleted + ')" style="cursor:pointer;">' +
+      '<div class="msg-meta">' +
+        '<span class="msg-name">' + conv.name + count + '</span>' +
+        '<span class="msg-date">' + date + '</span>' +
+        badge +
+      '</div>' +
+      '<div class="msg-preview" style="font-size:0.82rem;color:#999;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + preview + '</div>' +
+    '</div>'
+  }
 
   async function loadMesaje() {
     try {
-      const { data } = await sb.from('messages').select('*').order('created_at', { ascending: false })
+      const { data } = await sb.from('messages').select('*').order('created_at', { ascending: true })
       const allMsgs = data || []
       allMessagesCache = {}
       allMsgs.forEach(m => allMessagesCache[m.id] = m)
+
       const active = allMsgs.filter(m => m.sters !== true)
-      const necitite = active.filter(m => m.citit !== true)
-      const citite = active.filter(m => m.citit === true)
       const sterse = allMsgs.filter(m => m.sters === true)
+      const necitite = active.filter(m => !m.citit && m.direction !== 'sent')
+
+      const convActive = grupeazaDupaEmail(active)
+      const convNecitite = convActive.filter(c => c.hasUnread)
+      const convSterse = grupeazaDupaEmail(sterse)
 
       const cn = document.getElementById('countNecitite')
       const cc = document.getElementById('countCitite')
       const cs = document.getElementById('countSterse')
       const cb = document.getElementById('msgBadge')
+
+      if (cn) cn.textContent = necitite.length
+      if (cc) cc.textContent = convActive.length
+      if (cs) cs.textContent = sterse.length
+      if (cb) cb.textContent = necitite.length || ''
+
       const ln = document.getElementById('mesajeListNecitite')
       const lc = document.getElementById('mesajeListCitite')
       const ls = document.getElementById('mesajeListSterse')
 
-      if (cn) cn.textContent = necitite.length
-      if (cc) cc.textContent = citite.length
-      if (cs) cs.textContent = sterse.length
-      if (cb) cb.textContent = necitite.length
-      if (ln) ln.innerHTML = necitite.length ? necitite.map(m => msgItemHTML(m,false)).join('') : '<div class="loading">Nu există mesaje necitite.</div>'
-      if (lc) lc.innerHTML = citite.length ? citite.map(m => msgItemHTML(m,false)).join('') : '<div class="loading">Nu există mesaje citite.</div>'
-      if (ls) ls.innerHTML = sterse.length ? sterse.map(m => msgItemHTML(m,true)).join('') : '<div class="loading">Coșul de gunoi este gol.</div>'
+      if (ln) ln.innerHTML = convNecitite.length ? convNecitite.map(c => convItemHTML(c, false)).join('') : '<div class="loading">Nu există mesaje necitite.</div>'
+      if (lc) lc.innerHTML = convActive.length ? convActive.map(c => convItemHTML(c, false)).join('') : '<div class="loading">Nicio conversație.</div>'
+      if (ls) ls.innerHTML = convSterse.length ? convSterse.map(c => convItemHTML(c, true)).join('') : '<div class="loading">Coșul de gunoi este gol.</div>'
+
+      // Dacă o conversație e deschisă, o reîmprospătăm
+      if (currentMsgEmail) deschideConversatie(currentMsgEmail, false)
+
     } catch(e) {
       console.error('loadMesaje error:', e)
     }
   }
 
-  async function openMesajById(id, isDeleted) {
-    const m = allMessagesCache[id]
-    if (!m) return
-    await openMesaj(m.id, m.name||'', m.email||'', m.subject||'', m.message||'', m.created_at, isDeleted)
+  function deschideConversatie(email, isDeleted) {
+    currentMsgEmail = email
+
+    // Adunăm toate mesajele pentru acest email, sortate cronologic
+    var allMsgs = Object.values(allMessagesCache)
+    var thread = allMsgs
+      .filter(function(m) { return (m.email||'').toLowerCase() === email.toLowerCase() })
+      .sort(function(a, b) { return new Date(a.created_at) - new Date(b.created_at) })
+
+    if (!thread.length) return
+
+    var firstInbox = thread.find(function(m) { return m.direction !== 'sent' }) || thread[0]
+    currentMsgId = firstInbox.id
+    currentMsgName = firstInbox.name || '—'
+    currentMsgSubject = firstInbox.subject || 'Mesaj'
+    currentThreadId = firstInbox.thread_id || firstInbox.id
+
+    document.getElementById('msgDetailTitle').textContent = currentMsgSubject
+    document.getElementById('msgDetailEmail').textContent = currentMsgName + ' · ' + email
+
+    // Construim thread-ul vizual
+    var threadHTML = thread.map(function(m) {
+      var isSent = m.direction === 'sent'
+      var time = new Date(m.created_at).toLocaleString('ro-RO', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      return '<div style="display:flex;flex-direction:column;' + (isSent ? 'align-items:flex-end;' : 'align-items:flex-start;') + 'margin-bottom:14px;">' +
+        '<div style="max-width:85%;background:' + (isSent ? '#8B0000' : '#fff') + ';color:' + (isSent ? '#fff' : '#1a1a1a') + ';border:1px solid ' + (isSent ? '#8B0000' : '#f0e0e0') + ';border-radius:' + (isSent ? '12px 12px 2px 12px' : '12px 12px 12px 2px') + ';padding:10px 14px;font-size:0.93rem;line-height:1.65;">' +
+          m.message +
+        '</div>' +
+        '<div style="font-size:0.75rem;color:#aaa;margin-top:4px;">' + (isSent ? 'Tu · ' : currentMsgName + ' · ') + time + '</div>' +
+      '</div>'
+    }).join('')
+
+    document.getElementById('msgThread').innerHTML = threadHTML
+
+    // Scroll la ultimul mesaj
+    var threadEl = document.getElementById('msgThread')
+    setTimeout(function() { threadEl.scrollTop = threadEl.scrollHeight }, 50)
+
+    // Afișăm/ascundem box răspuns
+    document.getElementById('msgReplyBox').style.display = isDeleted ? 'none' : 'block'
+    document.getElementById('replyText').value = ''
+    document.getElementById('replyNotif').innerHTML = ''
+
+    // Buton ștergere
+    var deleteBtn = document.getElementById('msgDeleteBtn')
+    if (isDeleted) {
+      deleteBtn.textContent = '🗑 Șterge definitiv'
+      deleteBtn.onclick = deleteMesajDefinitiv
+    } else {
+      deleteBtn.textContent = '🗑 Șterge'
+      deleteBtn.onclick = deleteMesaj
+    }
+
+    document.getElementById('msgDetail').style.display = 'block'
+    document.getElementById('msgPlaceholder').style.display = 'none'
+
+    // Marcăm toate mesajele din thread ca citite
+    if (!isDeleted) {
+      thread.filter(function(m) { return !m.citit && m.direction !== 'sent' }).forEach(async function(m) {
+        await sbAdmin.from('messages').update({ citit: true }).eq('id', m.id)
+        if (allMessagesCache[m.id]) allMessagesCache[m.id].citit = true
+      })
+      // Reîmprospătăm contoarele fără a reîncărca tot
+      var necitite = Object.values(allMessagesCache).filter(function(m) { return !m.citit && m.direction !== 'sent' && m.sters !== true })
+      var cn = document.getElementById('countNecitite')
+      var cb = document.getElementById('msgBadge')
+      if (cn) cn.textContent = necitite.length
+      if (cb) cb.textContent = necitite.length || ''
+    }
   }
 
-  async function openMesaj(id, name, email, subject, message, date, isDeleted) {
-    currentMsgId = id
-    currentMsgEmail = email
-    currentMsgName = name
-    currentMsgSubject = subject
-    document.getElementById('msgDetailTitle').textContent = subject || 'Mesaj'
-    let html = '<p><strong>De la:</strong> ' + name + ' (' + email + ')</p>'
-    html += '<p style="margin-top:6px"><strong>Data:</strong> ' + new Date(date).toLocaleString('ro-RO') + '</p>'
-    html += '<hr style="margin:16px 0;border:none;border-top:1px solid #f0e0e0;">'
-    html += '<p style="line-height:1.8;">' + message + '</p>'
-    if (!isDeleted) html += '<div style="margin-top:16px;"><button class="btn btn-red btn-sm" onclick="deschideRaspuns()">↩ Răspunde pe email</button></div>'
-    document.getElementById('msgDetailContent').innerHTML = html
+  async function trimitReplyInline() {
+    var mesaj = document.getElementById('replyText').value.trim()
+    var notif = document.getElementById('replyNotif')
+    if (!mesaj) { notif.innerHTML = '<span style="color:#c0392b;">Scrie un mesaj.</span>'; return }
 
-    const deleteBtn = document.getElementById('msgDeleteBtn')
-    const revBtn = document.getElementById('revenireBtn')
-    if (revBtn) revBtn.remove()
-    if (isDeleted) {
-      if (deleteBtn) { deleteBtn.textContent = '🗑 Șterge definitiv'; deleteBtn.onclick = deleteMesajDefinitiv }
-      if (deleteBtn) deleteBtn.insertAdjacentHTML('beforebegin', '<button class="btn btn-outline btn-sm" id="revenireBtn" onclick="revenireMesaj()">↩ Revenire</button>')
-    } else {
-      if (deleteBtn) { deleteBtn.textContent = '🗑 Șterge'; deleteBtn.onclick = deleteMesaj }
-    }
-    document.getElementById('msgDetail').style.display = 'block'
-    if (!isDeleted) {
-      await sbAdmin.from('messages').update({ citit: true }).eq('id', id)
-      loadMesaje()
+    notif.innerHTML = '<span style="color:#888;">Se trimite...</span>'
+
+    try {
+      // Trimitem prin EmailJS
+      await emailjs.send(EJS_SVC, EJS_TPL, {
+        to_email:  currentMsgEmail,
+        to_name:   currentMsgName,
+        subject:   'Re: ' + currentMsgSubject,
+        message:   mesaj,
+        from_name: 'Asociația Dokimasia',
+        reply_to:  'contact@dokimasia.ro'
+      })
+
+      // Salvăm răspunsul în DB pentru istoric
+      await sbAdmin.from('messages').insert([{
+        name:      'Asociația Dokimasia',
+        email:     currentMsgEmail,
+        subject:   'Re: ' + currentMsgSubject,
+        message:   mesaj,
+        citit:     true,
+        direction: 'sent',
+        thread_id: currentThreadId,
+        sters:     false
+      }])
+
+      notif.innerHTML = '<span style="color:#27ae60;">✅ Trimis!</span>'
+      document.getElementById('replyText').value = ''
+
+      // Reîncărcăm mesajele pentru a vedea răspunsul în thread
+      await loadMesaje()
+
+    } catch(e) {
+      notif.innerHTML = '<span style="color:#c0392b;">Eroare: ' + (e.text || e.message || 'necunoscută') + '</span>'
     }
   }
 
   async function deleteMesaj() {
-    if (!currentMsgId) return
-    showConfirm('Mesajul va fi mutat în coșul de gunoi.', async () => {
-      await sbAdmin.from('messages').update({ sters: true }).eq('id', currentMsgId)
+    if (!currentMsgEmail) return
+    showConfirm('Toate mesajele din această conversație vor fi mutate în coș.', async () => {
+      var thread = Object.values(allMessagesCache).filter(function(m) {
+        return (m.email||'').toLowerCase() === currentMsgEmail.toLowerCase()
+      })
+      for (var m of thread) {
+        await sbAdmin.from('messages').update({ sters: true }).eq('id', m.id)
+      }
       document.getElementById('msgDetail').style.display = 'none'
+      document.getElementById('msgPlaceholder').style.display = 'flex'
+      currentMsgEmail = ''
       loadMesaje()
     })
   }
 
   async function deleteMesajDefinitiv() {
-    if (!currentMsgId) return
-    showConfirm('Mesajul va fi șters definitiv!', async () => {
-      await sbAdmin.from('messages').delete().eq('id', currentMsgId)
+    if (!currentMsgEmail) return
+    showConfirm('Conversația va fi ștearsă definitiv!', async () => {
+      var thread = Object.values(allMessagesCache).filter(function(m) {
+        return (m.email||'').toLowerCase() === currentMsgEmail.toLowerCase()
+      })
+      for (var m of thread) {
+        await sbAdmin.from('messages').delete().eq('id', m.id)
+      }
       document.getElementById('msgDetail').style.display = 'none'
+      document.getElementById('msgPlaceholder').style.display = 'flex'
+      currentMsgEmail = ''
       loadMesaje()
     })
   }
 
   async function revenireMesaj() {
-    if (!currentMsgId) return
-    await sbAdmin.from('messages').update({ sters: false }).eq('id', currentMsgId)
+    if (!currentMsgEmail) return
+    var thread = Object.values(allMessagesCache).filter(function(m) {
+      return (m.email||'').toLowerCase() === currentMsgEmail.toLowerCase()
+    })
+    for (var m of thread) {
+      await sbAdmin.from('messages').update({ sters: false }).eq('id', m.id)
+    }
     document.getElementById('msgDetail').style.display = 'none'
+    document.getElementById('msgPlaceholder').style.display = 'flex'
+    currentMsgEmail = ''
     switchMsgTab('citite')
     loadMesaje()
   }
@@ -1094,6 +1239,17 @@
       loadMesaje()
     })
   }
+
+  // Funcții vechi păstrate pentru compatibilitate
+  async function openMesajById(id, isDeleted) {
+    const m = allMessagesCache[id]
+    if (!m) return
+    deschideConversatie(m.email || '', isDeleted)
+  }
+
+  function deschideRaspuns() { document.getElementById('replyText').focus() }
+
+
 
     // ─── UTILIZATORI ───
   function switchUtilTab(tab) {
@@ -1245,49 +1401,6 @@
         alert('Eroare: ' + e.message)
       }
     })
-  }
-
-  // ── RĂSPUNS EMAIL ─────────────────────────────────────
-  function deschideRaspuns() {
-    document.getElementById('raspuns-catre').textContent = currentMsgName + ' <' + currentMsgEmail + '>'
-    document.getElementById('raspuns-subiect').textContent = 'Re: ' + currentMsgSubject
-    document.getElementById('raspuns-mesaj').value = ''
-    document.getElementById('raspuns-notif').innerHTML = ''
-    document.getElementById('modalRaspuns').style.display = 'flex'
-  }
-
-  function inchideRaspuns() {
-    document.getElementById('modalRaspuns').style.display = 'none'
-  }
-
-  async function trimitRaspuns() {
-    const mesaj = document.getElementById('raspuns-mesaj').value.trim()
-    const notif = document.getElementById('raspuns-notif')
-    if (!mesaj) {
-      notif.innerHTML = '<span style="color:#c0392b;">⚠ Scrie un mesaj înainte de a trimite.</span>'
-      return
-    }
-    const btn = document.getElementById('btnTrimitRaspuns')
-    btn.disabled = true
-    btn.textContent = 'Se trimite...'
-    notif.innerHTML = ''
-    try {
-      await emailjs.send(EJS_SVC, EJS_TPL, {
-        to_email:  currentMsgEmail,
-        to_name:   currentMsgName,
-        subject:   'Re: ' + currentMsgSubject,
-        message:   mesaj,
-        from_name: 'Asociația Dokimasia',
-        reply_to:  'contact@dokimasia.ro'
-      })
-      notif.innerHTML = '<span style="color:#27ae60;">✅ Mesajul a fost trimis cu succes!</span>'
-      setTimeout(inchideRaspuns, 1500)
-    } catch(e) {
-      notif.innerHTML = '<span style="color:#c0392b;">⚠ Eroare: ' + (e.text || e.message || JSON.stringify(e)) + '</span>'
-    } finally {
-      btn.disabled = false
-      btn.textContent = 'Trimite răspunsul'
-    }
   }
 
   function stergeUtilizator(id, email, name, created_at) {
