@@ -6,6 +6,7 @@
   <title>Admin — Asociația Dokimasia</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Georgia', serif; background: #f5f5f5; color: #222; }
@@ -853,6 +854,10 @@
 <script>
   const ADMIN_EMAIL = 'm.ciprian1387@gmail.com'
 
+  const EJS_SVC     = 'service_4a8gp1c'
+  const EJS_TPL     = 'template_ole4m78'
+  const EJS_PUB     = 'cPvtBWK6KReX_pqhM'
+
   const { createClient } = supabase
   const sb = createClient(
     'https://jaoxhsyplnkanhqevnnr.supabase.co',
@@ -874,6 +879,7 @@
   )
 
   document.getElementById('year').textContent = new Date().getFullYear()
+  emailjs.init(EJS_PUB)
   document.getElementById('statDate').textContent = new Date().toLocaleDateString('ro-RO')
 
   // Check admin access
@@ -952,6 +958,9 @@
 
   // ─── MESAJE ───
   let currentMsgId = null
+  let currentMsgEmail = ''
+  let currentMsgName = ''
+  let currentMsgSubject = ''
   let allMessagesCache = {}
   let currentMsgTab = 'necitite'
 
@@ -1026,12 +1035,15 @@
 
   async function openMesaj(id, name, email, subject, message, date, isDeleted) {
     currentMsgId = id
+    currentMsgEmail = email
+    currentMsgName = name
+    currentMsgSubject = subject
     document.getElementById('msgDetailTitle').textContent = subject || 'Mesaj'
     let html = '<p><strong>De la:</strong> ' + name + ' (' + email + ')</p>'
     html += '<p style="margin-top:6px"><strong>Data:</strong> ' + new Date(date).toLocaleString('ro-RO') + '</p>'
     html += '<hr style="margin:16px 0;border:none;border-top:1px solid #f0e0e0;">'
     html += '<p style="line-height:1.8;">' + message + '</p>'
-    if (!isDeleted) html += '<div style="margin-top:16px;"><a href="mailto:' + email + '?subject=Re: ' + subject + '" class="btn btn-red btn-sm">↩ Răspunde pe email</a></div>'
+    if (!isDeleted) html += '<div style="margin-top:16px;"><button class="btn btn-red btn-sm" onclick="deschideRaspuns()">↩ Răspunde pe email</button></div>'
     document.getElementById('msgDetailContent').innerHTML = html
 
     const deleteBtn = document.getElementById('msgDeleteBtn')
@@ -1233,6 +1245,49 @@
         alert('Eroare: ' + e.message)
       }
     })
+  }
+
+  // ── RĂSPUNS EMAIL ─────────────────────────────────────
+  function deschideRaspuns() {
+    document.getElementById('raspuns-catre').textContent = currentMsgName + ' <' + currentMsgEmail + '>'
+    document.getElementById('raspuns-subiect').textContent = 'Re: ' + currentMsgSubject
+    document.getElementById('raspuns-mesaj').value = ''
+    document.getElementById('raspuns-notif').innerHTML = ''
+    document.getElementById('modalRaspuns').style.display = 'flex'
+  }
+
+  function inchideRaspuns() {
+    document.getElementById('modalRaspuns').style.display = 'none'
+  }
+
+  async function trimitRaspuns() {
+    const mesaj = document.getElementById('raspuns-mesaj').value.trim()
+    const notif = document.getElementById('raspuns-notif')
+    if (!mesaj) {
+      notif.innerHTML = '<span style="color:#c0392b;">⚠ Scrie un mesaj înainte de a trimite.</span>'
+      return
+    }
+    const btn = document.getElementById('btnTrimitRaspuns')
+    btn.disabled = true
+    btn.textContent = 'Se trimite...'
+    notif.innerHTML = ''
+    try {
+      await emailjs.send(EJS_SVC, EJS_TPL, {
+        to_email:  currentMsgEmail,
+        to_name:   currentMsgName,
+        subject:   'Re: ' + currentMsgSubject,
+        message:   mesaj,
+        from_name: 'Asociația Dokimasia',
+        reply_to:  'contact@dokimasia.ro'
+      })
+      notif.innerHTML = '<span style="color:#27ae60;">✅ Mesajul a fost trimis cu succes!</span>'
+      setTimeout(inchideRaspuns, 1500)
+    } catch(e) {
+      notif.innerHTML = '<span style="color:#c0392b;">⚠ Eroare: ' + (e.text || e.message || JSON.stringify(e)) + '</span>'
+    } finally {
+      btn.disabled = false
+      btn.textContent = 'Trimite răspunsul'
+    }
   }
 
   function stergeUtilizator(id, email, name, created_at) {
@@ -2398,6 +2453,29 @@
     <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button onclick="inchideModalArticolNouRed()" style="padding:8px 16px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;">Anulează</button>
       <button onclick="creeazaArticolRedactie()" style="padding:8px 18px;background:#8B0000;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:600;">Creează și deschide în editor →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RĂSPUNS EMAIL -->
+<div id="modalRaspuns" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:3000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fdf8f4;border-radius:8px;width:100%;max-width:560px;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+    <div style="background:#8B0000;border-radius:8px 8px 0 0;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:1rem;font-weight:700;color:#fff;">↩ Răspunde pe email</div>
+      <button onclick="inchideRaspuns()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;font-size:1.1rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:22px 24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-size:0.88rem;color:#666;">
+        <div><strong>Către:</strong> <span id="raspuns-catre" style="color:#333;"></span></div>
+        <div style="margin-top:4px;"><strong>Subiect:</strong> <span id="raspuns-subiect" style="color:#333;"></span></div>
+      </div>
+      <textarea id="raspuns-mesaj" rows="7" placeholder="Scrie răspunsul tău aici..."
+        style="width:100%;padding:12px;border:1px solid #ddd;border-radius:6px;font-family:Georgia,serif;font-size:0.95rem;line-height:1.6;resize:vertical;box-sizing:border-box;"></textarea>
+      <div id="raspuns-notif" style="font-size:0.9rem;min-height:20px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button onclick="inchideRaspuns()" style="padding:9px 20px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-family:Georgia,serif;font-size:0.9rem;">Anulează</button>
+        <button id="btnTrimitRaspuns" onclick="trimitRaspuns()" style="padding:9px 22px;background:#8B0000;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:Georgia,serif;font-size:0.9rem;font-weight:700;">Trimite răspunsul</button>
+      </div>
     </div>
   </div>
 </div>

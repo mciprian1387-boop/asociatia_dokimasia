@@ -1034,8 +1034,8 @@ async function stergeArticol(id, autor) {
   const articol = allArticole.find(a => a.id === id);
   if (!articol) return;
   // Salvează în istoric înainte de ștergere
-  await sb.from('articole_sterse').insert([{ articol_id: id, date: articol }]);
-  const { error } = await sb.from('articole_revista').delete().eq('id', id);
+  await sbAdmin.from('articole_sterse').insert([{ articol_id: id, date: articol }]);
+  const { error } = await sbAdmin.from('articole_revista').delete().eq('id', id);
   if (error) { toast('Eroare la ștergere: ' + error.message, 'error'); return; }
   allArticole = allArticole.filter(a => a.id !== id);
   toast(`Articolul lui "${autor_display}" a fost șters și salvat în istoric.`, 'info');
@@ -1070,7 +1070,7 @@ async function loadIstoric() {
 
 async function golesteIstoric() {
   if (!confirm('⚠️ Ștergi definitiv tot istoricul? Articolele nu vor mai putea fi restaurate.')) return;
-  const { error } = await sb.from('articole_sterse').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const { error } = await sbAdmin.from('articole_sterse').delete().neq('id', '00000000-0000-0000-0000-000000000000');
   if (error) { toast('Eroare: ' + error.message, 'error'); return; }
   toast('Istoricul a fost golit.', 'info');
   loadIstoric();
@@ -1082,9 +1082,9 @@ async function restaureazaArticol(istoricId) {
   if (error || !data) { toast('Eroare la restaurare', 'error'); return; }
   const articol = data.date;
   delete articol.id; // lasă Supabase să genereze un ID nou
-  const { error: insErr } = await sb.from('articole_revista').insert([articol]);
+  const { error: insErr } = await sbAdmin.from('articole_revista').insert([articol]);
   if (insErr) { toast('Eroare la restaurare: ' + insErr.message, 'error'); return; }
-  await sb.from('articole_sterse').delete().eq('id', istoricId);
+  await sbAdmin.from('articole_sterse').delete().eq('id', istoricId);
   toast('Articolul a fost restaurat cu succes!', 'success');
   await loadArticole();
   loadIstoric();
