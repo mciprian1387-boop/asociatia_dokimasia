@@ -331,6 +331,8 @@
       .despre-cols-grid { grid-template-columns:1fr !important; }
       .pub-tipuri-grid { grid-template-columns:1fr 1fr !important; }
       .pub-beneficii-grid { grid-template-columns:1fr !important; }
+      .pub-tipuri-grid { grid-template-columns:repeat(2,1fr) !important; }
+      .pub-colaboratori-grid { grid-template-columns:1fr !important; }
     }
 
     /* GHID AUTORI — acordeon */
@@ -920,6 +922,52 @@
 
       <!-- Notă discretă -->
       <p style="font-size:0.82rem;color:var(--muted);line-height:1.65;font-style:italic;margin-bottom:32px;padding:0 4px;"><strong style="font-style:normal;">Notă:</strong> Revista Dokimasia eliberează documente care confirmă publicarea articolului sau, după caz, activitatea editorială auxiliară desfășurată. Utilizarea acestor documente în dosare profesionale se face de către beneficiar, în conformitate cu metodologiile, criteriile și grilele de evaluare în vigoare. Publicarea unui articol, plata unei contribuții editoriale sau implicarea într-un rol auxiliar nu garantează automat obținerea unui punctaj, a gradației de merit, a transferului, pretransferului sau a altor beneficii profesionale.</p>
+
+      <!-- ══════════════════════════════════
+           DEVINO COLABORATOR
+      ══════════════════════════════════ -->
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:1.15rem;font-weight:700;color:var(--crimson);margin-bottom:10px;">Devino colaborator al Revistei Dokimasia</h3>
+      <p style="font-size:0.95rem;color:var(--ink);line-height:1.7;margin-bottom:18px;">Autorii și cadrele didactice interesate se pot implica, la cerere, în activități editoriale auxiliare ale Revistei Dokimasia. Pentru aceste roluri se achită o contribuție editorială suplimentară, iar adeverința se eliberează numai după îndeplinirea sarcinilor stabilite de redacție.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;" class="pub-colaboratori-grid">
+
+        <div style="background:#fff;border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:5px;">Contribuție: 100 lei</div>
+            <div style="font-weight:700;font-size:0.97rem;color:var(--ink);margin-bottom:6px;">Devino coordonator de secțiune / număr tematic</div>
+            <div style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Coordonatorul sprijină organizarea unei secțiuni sau a unui număr tematic al revistei, în funcție de nevoile redacției. Activitatea poate include centralizarea materialelor, comunicarea cu autorii, urmărirea termenelor, verificarea respectării structurii solicitate și transmiterea observațiilor către redacție. <strong style="color:var(--ink);">Adeverința de coordonator se eliberează după realizarea sarcinilor stabilite.</strong></div>
+          </div>
+          <a href="mailto:contact@dokimasia.ro?subject=Solicitare rol coordonator - Revista Dokimasia" style="display:inline-flex;align-items:center;justify-content:center;background:var(--crimson);color:#fff;padding:9px 14px;border-radius:4px;font-size:0.88rem;font-family:'Source Serif 4',serif;font-weight:700;text-decoration:none;margin-top:auto;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Solicită rolul de coordonator</a>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:5px;">Contribuție: 75 lei</div>
+            <div style="font-weight:700;font-size:0.97rem;color:var(--ink);margin-bottom:6px;">Devino evaluator / recenzent editorial</div>
+            <div style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Evaluatorul analizează materiale transmise spre publicare, pe baza unei fișe de evaluare puse la dispoziție de redacție. Activitatea poate include verificarea relevanței tematice, clarității, coerenței, originalității declarate, respectării cerințelor de redactare și formularea unor recomandări de revizuire. <strong style="color:var(--ink);">Adeverința de evaluator se eliberează după predarea fișei de evaluare și validarea activității.</strong></div>
+          </div>
+          <a href="mailto:contact@dokimasia.ro?subject=Solicitare rol evaluator - Revista Dokimasia" style="display:inline-flex;align-items:center;justify-content:center;background:var(--crimson);color:#fff;padding:9px 14px;border-radius:4px;font-size:0.88rem;font-family:'Source Serif 4',serif;font-weight:700;text-decoration:none;margin-top:auto;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Solicită rolul de evaluator</a>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--border);border-top:3px solid var(--crimson);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--crimson);font-weight:700;margin-bottom:5px;">Contribuție: 50 lei</div>
+            <div style="font-weight:700;font-size:0.97rem;color:var(--ink);margin-bottom:6px;">Devino membru colaborator al revistei</div>
+            <div style="font-size:0.86rem;color:var(--muted);line-height:1.6;">Membrul colaborator sprijină activități editoriale și administrative ale revistei, în funcție de nevoile redacției. Activitatea poate include promovarea apelului de articole, verificarea datelor autorilor, organizarea conținutului, semnalarea erorilor materiale, actualizarea unor informații editoriale sau alte sarcini punctuale stabilite de redacție. <strong style="color:var(--ink);">Adeverința de membru colaborator se eliberează după îndeplinirea sarcinilor alocate.</strong></div>
+          </div>
+          <a href="mailto:contact@dokimasia.ro?subject=Solicitare rol membru colaborator - Revista Dokimasia" style="display:inline-flex;align-items:center;justify-content:center;background:var(--crimson);color:#fff;padding:9px 14px;border-radius:4px;font-size:0.88rem;font-family:'Source Serif 4',serif;font-weight:700;text-decoration:none;margin-top:auto;transition:background 0.2s;" onmouseover="this.style.background='var(--crimson-dark)'" onmouseout="this.style.background='var(--crimson)'">Solicită rolul de membru</a>
+        </div>
+
+      </div>
+
+      <!-- Casetă Cum funcționează -->
+      <div style="background:var(--paper-dark);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 4px 4px 0;padding:14px 18px;margin-bottom:10px;">
+        <div style="font-weight:700;font-size:0.93rem;color:var(--ink);margin-bottom:6px;">Cum funcționează?</div>
+        <p style="font-size:0.9rem;color:var(--muted);line-height:1.7;margin:0;">Pentru rolurile editoriale auxiliare, persoana interesată transmite cererea, achită contribuția editorială suplimentară și primește sarcinile stabilite de redacție. Adeverința se eliberează numai după realizarea sarcinilor și verificarea activității. Plata contribuției nu înlocuiește activitatea și nu garantează eliberarea adeverinței în lipsa îndeplinirii sarcinilor.</p>
+      </div>
+
+      <!-- Notă discretă colaboratori -->
+      <p style="font-size:0.82rem;color:var(--muted);line-height:1.65;font-style:italic;margin-bottom:32px;padding:0 4px;">Rolurile de coordonator, evaluator sau membru colaborator sunt acordate la cerere, în funcție de nevoile editoriale ale revistei. Aceste roluri nu reprezintă funcții permanente în redacție și nu garantează punctaj în dosare profesionale. Recunoașterea documentelor depinde de metodologia și grila aplicabile la momentul depunerii dosarului.</p>
 
       <!-- ══════════════════════════════════
            7. FAQ
