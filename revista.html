@@ -1344,12 +1344,11 @@
 </footer>
 
 <script>
-  // ── EmailJS ──────────────────────────────────────
-  var EJS_SVC = 'service_4a8gp1c';
-  var EJS_TPL = 'template_ole4m78';
-  var EJS_PUB = 'cPvtBWK6KReX_pqhM';
-  var ADMIN_EMAIL = 'm.ciprian1387@gmail.com';
-  emailjs.init(EJS_PUB);
+  // ── EmailJS pentru revista.html ───────────────────
+  if (typeof window.EJS_SVC === 'undefined') window.EJS_SVC = 'service_4a8gp1c';
+  if (typeof window.EJS_TPL === 'undefined') window.EJS_TPL = 'template_ole4m78';
+  if (typeof window.EJS_PUB === 'undefined') window.EJS_PUB = 'cPvtBWK6KReX_pqhM';
+  if (typeof window.ADMIN_EMAIL === 'undefined') window.ADMIN_EMAIL = 'm.ciprian1387@gmail.com';
 
   // ── Persistență tab la refresh ───────────────────
   var _savedTab = localStorage.getItem('revista_tab');
@@ -1398,6 +1397,7 @@
 
   // Restaurează tabul salvat la încărcare
   document.addEventListener('DOMContentLoaded', function() {
+    if (typeof emailjs !== 'undefined') emailjs.init(EJS_PUB);
     if (_savedTab && _savedTab !== 'despre') {
       showTab(_savedTab);
     }
